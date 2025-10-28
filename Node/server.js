@@ -1,9 +1,9 @@
 import express from "express";
-import cors from "cors"; // Pour les requêtes cross-origin
-import db from "./db/db.js"; // Configuration de la base de données
-import path from "node:path"; // Gestion des chemins de fichiers
-import { fileURLToPath } from "node:url"; // Conversion URL vers chemin fichier
-import { webhookHandler } from "./controllers/payment.controller.js"; // Gestionnaire webhooks Stripe
+import cors from "cors";
+import db from "./db/db.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { webhookHandler } from "./controllers/payment.controller.js";
 import paymentRoutes from "./routes/payment.route.js";
 import ligneCommandeRoutes from "./routes/ligneCommande.route.js";
 import commandeRoutes from "./routes/Commande.route.js";
@@ -21,31 +21,23 @@ import couleur_interieurRoutes from "./routes/couleur_interieur.route.js";
 import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
 import taille_janteRoutes from "./routes/taille_jante.route.js";
 
-// Configuration des chemins pour les fichiers statiques
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Création de l'application Express
 const app = express();
-const port = process.env.PORT || 3000; // Port du serveur (3000 par défaut)
+const port = process.env.PORT || 3000;
 
 // Configuration des middlewares globaux
-app.use(cors()); // Active CORS pour toutes les routes
-app.use(express.json()); // Parse automatiquement le JSON des requêtes
-
-// Route spéciale webhook pour les paiements Stripe (doit être avant express.json())
+app.use(cors());
+app.use(express.json());
+// Route spéciale webhook pour les paiements Stripe
 app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
-
-// Démarrage du serveur sur le port spécifié
 app.listen(port, () => {
   console.log(`le serveur est démarré sur le port ${port}`);
 });
-
-// Route racine de l'API
 app.get("/", (req, res) => {
-  res.send("This is Porsche API"); // Message de bienvenue de l'API
+  res.send("This is Porsche API");
 });
-
 db();
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

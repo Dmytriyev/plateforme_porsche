@@ -9,13 +9,13 @@ export default function userValidation(body) {
     nom: joi.string().required(),
     prenom: joi.string().required(),
     telephone: joi
-      .number()
-      .regex(/^[0-9]{13}$/)
+      .string()
+      .pattern(/^[0-9]{13}$/)
       .required(),
     adresse: joi.string().required(),
     code_postal: joi
-      .number()
-      .regex(/^[0-9]{5}$/)
+      .string()
+      .pattern(/^[0-9]{5}$/)
       .required(),
     panier: joi.string().hex().length(24),
   });
@@ -25,9 +25,9 @@ export default function userValidation(body) {
     password: joi.string().min(5),
     nom: joi.string(),
     prenom: joi.string(),
-    telephone: joi.number().regex(/^[0-9]{13}$/),
+    telephone: joi.string().pattern(/^[0-9]{13}$/),
     adresse: joi.string(),
-    code_postal: joi.number().regex(/^[0-9]{5}$/),
+    code_postal: joi.string().pattern(/^[0-9]{5}$/),
     panier: joi.string().hex().length(24),
   });
 
@@ -49,6 +49,8 @@ export default function userValidation(body) {
     info_moteur: joi.string(),
     info_transmission: joi.string(),
     numero_win: joi.string(),
+    couleur_exterieur: joi.string().hex().length(24),
+    couleur_interieur: joi.string().hex().length(24),
   });
 
   return {

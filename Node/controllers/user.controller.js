@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import userValidation from "../validations/user.validation.js";
+import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Commande from "../models/Commande.model.js";
@@ -30,7 +31,8 @@ const register = async (req, res) => {
     const commande = new Commande({
       user: null, // Sera mis à jour après création de l'utilisateur
       date_commande: new Date(),
-      prix: 0,
+      prix: commande.prix,
+      acompte: commande.acompte,
       status: true, // true = panier actif, false = commande validée
     });
 
@@ -41,7 +43,6 @@ const register = async (req, res) => {
     await commande.save();
     const newUser = await user.save();
 
-    // Retourner l'utilisateur sans le mot de passe
     const userResponse = newUser.toObject();
     delete userResponse.password;
 
@@ -70,7 +71,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Identifiants invalides" });
     }
 
-    // Retourner l'utilisateur sans le mot de passe dans le token
+    // Retour l'utilisateur sans le mot de passe dans le token
     const userForToken = {
       id: user._id,
       email: user.email,
@@ -97,7 +98,6 @@ const login = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    // Exclure le mot de passe de la réponse
     const users = await User.find().select("-password");
     return res.status(200).json(users);
   } catch (error) {
@@ -108,7 +108,6 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    // Exclure le mot de passe de la réponse
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -155,7 +154,7 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Supprimer aussi toutes les réservations et Porsches de l'utilisateur
+    // Supprimer toutes les réservations et Porsches de l'utilisateur
     await Reservation.deleteMany({ user: req.params.id });
     await Model_porsche_actuel.deleteMany({ user: req.params.id });
     await Commande.deleteMany({ user: req.params.id });
@@ -169,7 +168,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Créer une réservation pour l'utilisateur
+// Créer une réservation pour l'utilisateur
 const createUserReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -181,19 +180,16 @@ const createUserReservation = async (req, res) => {
       });
     }
 
-    // Validation avec Joi
     const { error } = userValidation(body).userReservation;
     if (error) {
       return res.status(401).json(error.details[0].message);
     }
 
-    // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Vérifier que la date n'est pas dans le passé
     const dateReservation = new Date(body.date_reservation);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -204,9 +200,8 @@ const createUserReservation = async (req, res) => {
       });
     }
 
-    // Vérifier qu'il n'y a pas déjà une réservation pour cette voiture à cette date
     const existingReservation = await Reservation.findOne({
-      voiture: body.voiture,
+      voiture: body.voiture.nom_model,
       date_reservation: dateReservation,
       status: true,
     });
@@ -216,7 +211,6 @@ const createUserReservation = async (req, res) => {
         message: "Cette voiture est déjà réservée pour cette date",
       });
     }
-
     const reservation = new Reservation({
       ...body,
       user: userId,
@@ -226,7 +220,7 @@ const createUserReservation = async (req, res) => {
     const newReservation = await reservation.save();
     const populatedReservation = await Reservation.findById(newReservation._id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "type_model concessionnaire prix");
+      .populate("voiture", "nom_model concessionnaire prix");
 
     return res.status(201).json(populatedReservation);
   } catch (error) {
@@ -235,7 +229,7 @@ const createUserReservation = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Obtenir les réservations de l'utilisateur
+// Obtenir les réservations de l'utilisateur
 const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -246,7 +240,7 @@ const getUserReservations = async (req, res) => {
     }
 
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "type_model concessionnaire prix")
+      .populate("voiture", "nom_model concessionnaire prix")
       .sort({ date_reservation: -1 });
 
     return res.status(200).json(reservations);
@@ -256,7 +250,7 @@ const getUserReservations = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Ajouter une Porsche personnelle à l'utilisateur
+// Ajouter une Porsche personnelle à l'utilisateur
 const addUserPorsche = async (req, res) => {
   try {
     const { body } = req;
@@ -268,8 +262,8 @@ const addUserPorsche = async (req, res) => {
       });
     }
 
-    // Validation avec Joi
-    const { error } = userValidation(body).userPorsche;
+    const { error } =
+      model_porsche_actuelValidation(body).model_porsche_actuelCreate;
     if (error) {
       return res.status(401).json(error.details[0].message);
     }
@@ -292,7 +286,7 @@ const addUserPorsche = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Obtenir les Porsches de l'utilisateur
+// Obtenir les Porsches de l'utilisateur
 const getUserPorsches = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -302,9 +296,13 @@ const getUserPorsches = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    const porsches = await Model_porsche_actuel.find({ user: userId }).sort({
-      createdAt: -1,
-    });
+    const porsches = await Model_porsche_actuel.find({ user: userId })
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("photo_voiture_actuel", "name alt")
+      .sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json(porsches);
   } catch (error) {
@@ -313,7 +311,7 @@ const getUserPorsches = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Obtenir le profil complet de l'utilisateur
+// Obtenir le profil complet de l'utilisateur
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -325,14 +323,18 @@ const getUserProfile = async (req, res) => {
 
     // Obtenir les réservations
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "type_model concessionnaire prix")
+      .populate("voiture", "nom_model concessionnaire prix")
       .sort({ date_reservation: -1 })
-      .limit(5); // Limiter aux 5 dernières
+      .limit(5); // 5 dernières
 
     // Obtenir les Porsches personnelles
-    const porsches = await Model_porsche_actuel.find({ user: userId }).sort({
-      createdAt: -1,
-    });
+    const porsches = await Model_porsche_actuel.find({ user: userId })
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("photo_voiture_actuel", "name alt")
+      .sort({
+        createdAt: -1,
+      });
 
     // Obtenir le panier actuel
     const panier = await Commande.findOne({ user: userId, status: true });
@@ -340,13 +342,11 @@ const getUserProfile = async (req, res) => {
 
     if (panier) {
       const ligneCommandes = await LigneCommande.find({ commande: panier._id })
-        .populate("type_produit_a", "nom prix")
-        .populate("type_produit_v", "type_model prix");
+        .populate("accesoire", "nom_accesoire prix")
+        .populate("voiture", "nom_model prix acompte");
 
       const total = ligneCommandes.reduce((sum, line) => {
-        const prix = line.type_produit_v
-          ? line.type_produit_v.prix
-          : line.type_produit_a.prix;
+        const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
         return sum + prix * line.quantite;
       }, 0);
 
@@ -368,16 +368,6 @@ const getUserProfile = async (req, res) => {
       porsches,
       panier: panierDetails,
       historique,
-      stats: {
-        totalReservations: await Reservation.countDocuments({ user: userId }),
-        totalPorsches: await Model_porsche_actuel.countDocuments({
-          user: userId,
-        }),
-        totalCommandes: await Commande.countDocuments({
-          user: userId,
-          status: false,
-        }),
-      },
     };
 
     return res.status(200).json(profile);
@@ -387,19 +377,17 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Supprimer une réservation de l'utilisateur
+// Supprimer une réservation de l'utilisateur
 const deleteUserReservation = async (req, res) => {
   try {
     const userId = req.params.id;
     const reservationId = req.params.reservationId;
 
-    // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Vérifier que la réservation appartient à cet utilisateur
     const reservation = await Reservation.findOne({
       _id: reservationId,
       user: userId,
@@ -422,24 +410,21 @@ const deleteUserReservation = async (req, res) => {
   }
 };
 
-// Nouvelle fonction : Supprimer une Porsche de l'utilisateur
+// Supprimer une Porsche de l'utilisateur
 const deleteUserPorsche = async (req, res) => {
   try {
     const userId = req.params.id;
     const porscheId = req.params.porscheId;
 
-    // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Vérifier que la Porsche appartient à cet utilisateur
     const porsche = await Model_porsche_actuel.findOne({
       _id: porscheId,
       user: userId,
     });
-
     if (!porsche) {
       return res.status(404).json({
         message: "Porsche introuvable ou n'appartient pas à cet utilisateur",

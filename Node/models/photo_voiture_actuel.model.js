@@ -10,10 +10,6 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    model_porsche_actuel: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Model_porsche_actuel",
-    },
   },
   { timestamps: true }
 );

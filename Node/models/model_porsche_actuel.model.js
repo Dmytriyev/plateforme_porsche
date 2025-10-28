@@ -41,6 +41,12 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_interieur",
     },
+    photo_voiture_actuel: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Photo_voiture_actuel",
+      },
+    ],
   },
   { timestamps: true }
 );

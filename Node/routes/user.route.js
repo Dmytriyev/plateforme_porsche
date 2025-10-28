@@ -17,30 +17,23 @@ import {
 import auth from "../middlewares/auth.js";
 
 const router = Router();
-
-// Routes d'authentification (publiques)
+// d'authentification
 router.post("/register", register);
 router.post("/login", login);
-
-// Routes administratives (protégées)
-router.get("/all", auth, getAllUsers);
-
-// Routes utilisateur (publiques pour certaines, protégées pour d'autres)
+// administratives
+router.get("/all", getAllUsers);
+// utilisateur
 router.get("/:id", getUserById);
-router.put("/:id", auth, updateUser);
-router.delete("/:id", auth, deleteUser);
-
-// Nouvelles routes pour les fonctionnalités utilisateur
-router.get("/:id/profile", getUserProfile); // Profil complet
-
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
+router.get("/:id/profile", getUserProfile);
 // Gestion des réservations
-router.post("/:id/reservations", auth, createUserReservation); // Créer une réservation
-router.get("/:id/reservations", getUserReservations); // Voir les réservations
-router.delete("/:id/reservations/:reservationId", auth, deleteUserReservation); // Supprimer une réservation
-
+router.post("/:id/reservations", createUserReservation);
+router.get("/:id/reservations", getUserReservations);
+router.delete("/:id/reservations/:reservationId", deleteUserReservation);
 // Gestion des Porsches personnelles
-router.post("/:id/porsches", auth, addUserPorsche); // Ajouter une Porsche personnelle
-router.get("/:id/porsches", getUserPorsches); // Voir les Porsches
-router.delete("/:id/porsches/:porscheId", auth, deleteUserPorsche); // Supprimer une Porsche
+router.post("/:id/porsches", addUserPorsche);
+router.get("/:id/porsches", getUserPorsches);
+router.delete("/:id/porsches/:porscheId", deleteUserPorsche);
 
 export default router;

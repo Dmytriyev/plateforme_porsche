@@ -8,11 +8,9 @@ const CommandeSchema = new mongoose.Schema(
     },
     prix: {
       type: Number,
-      default: 0,
     },
     acompte: {
       type: Number,
-      default: 0,
     },
     status: {
       type: Boolean,

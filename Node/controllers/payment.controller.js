@@ -18,8 +18,8 @@ export const createCheckoutSession = async (req, res) => {
       return res.status(404).json({ message: "la commande n'existe pas" });
     }
     const ligneCommande = await LigneCommande.find({ commande: id })
-      .populate("type_produit_a", "prix nom_produit")
-      .populate("type_produit_v", "prix nom_produit");
+      .populate("accesoire", "nom_accesoire prix")
+      .populate("voiture", "nom_model prix acompte");
     let items = [];
     if (ligneCommande.length == 0) {
       return res.status(400).json({ message: "le panier est vide" });
@@ -29,13 +29,13 @@ export const createCheckoutSession = async (req, res) => {
         price_data: {
           currency: "eur",
           product_data: {
-            name: line.type_produit_v
-              ? line.type_produit_v.nom_produit
-              : line.type_produit_a.nom_produit,
+            name: line.voiture
+              ? line.voiture.nom_model
+              : line.accesoire.nom_accesoire,
           },
-          unit_amount: line_type_produit_v
-            ? line.type_produit_v.prix
-            : line.type_produit_a.prix,
+          unit_amount: line_voiture
+            ? line.voiture.acompte
+            : line.accesoire.prix,
         },
         quantite: line.quantite,
       };
@@ -45,11 +45,8 @@ export const createCheckoutSession = async (req, res) => {
       name: `${commande.user.nom} ${commande.user.prenom}`,
       email: commande.user.email,
       telephone: commande.user.telephone,
-      adresse: {
-        adresse: commande.user.adresse,
-        code_postale: commande.user.code_postale,
-        country: "FR",
-      },
+      adresse: commande.user.adresse,
+      code_postale: commande.user.code_postale,
     });
 
     const session = await stripe.checkout.sessions.create({
@@ -58,7 +55,6 @@ export const createCheckoutSession = async (req, res) => {
       line_items: items,
       // les produits envoyés depuis le frontend
       mode: "payment",
-      // les url à adaptable en cas de succè ou échec de la transaction
       success_url: "http://localhost:3000/success",
       cancel_url: "http://localhost:3000/cancel",
       metadata: {

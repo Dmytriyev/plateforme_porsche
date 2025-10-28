@@ -43,12 +43,11 @@ const getCommandeById = async (req, res) => {
       commande: req.params.id,
     })
       .populate("accesoire", "prix nom_accesoire")
-      .populate("voiture", "prix nom_model");
+      .populate("voiture", "prix nom_model acompte");
+
     const total = ligneCommandes.reduce((sum, line) => {
-      return (
-        sum + line.voiture.prix * line.quantite ||
-        line.accesoire.prix * line.quantite
-      );
+      const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
+      return sum + prix * line.quantite;
     }, 0);
     return res
       .status(200)
@@ -113,13 +112,12 @@ const getPanier = async (req, res) => {
       commande: panier._id,
     })
       .populate("accesoire", "nom_accesoire prix")
-      .populate("voiture", "nom_model prix");
+      .populate("voiture", "nom_model prix acompte");
     const total = ligneCommandes.reduce((sum, line) => {
-      return (
-        sum + line.accesoire.prix * line.quantite ||
-        line.voiture.prix * line.quantite
-      );
+      const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
+      return sum + prix * line.quantite;
     }, 0);
+
     return res
       .status(200)
       .json({ ...panier.toObject(), ligneCommandes, total });

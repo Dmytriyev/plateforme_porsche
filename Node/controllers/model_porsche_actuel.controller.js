@@ -27,8 +27,10 @@ const createModel_porsche_actuel = async (req, res) => {
 const getAllModel_porsche_actuels = async (req, res) => {
   try {
     const model_porsche_actuels = await Model_porsche_actuel.find()
-      .populate("photo_voiture_actuel", "name")
-      .populate("type_model annee_production");
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("user", "nom email");
     return res.status(200).json(model_porsche_actuels);
   } catch (error) {
     console.log(error);
@@ -41,8 +43,10 @@ const getModel_porsche_actuelById = async (req, res) => {
     const model_porsche_actuel = await Model_porsche_actuel.findById(
       req.params.id
     )
-      .populate("photo_voiture_actuel", "name")
-      .populate("type_model numero_win");
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("user", "nom email");
     if (!model_porsche_actuel) {
       return res
         .status(404)
@@ -72,7 +76,10 @@ const updateModel_porsche_actuel = async (req, res) => {
     const updatedModel_porsche_actuel =
       await Model_porsche_actuel.findByIdAndUpdate(req.params.id, body, {
         new: true,
-      });
+      })
+        .populate("photo_voiture_actuel", "name alt")
+        .populate("couleur_exterieur", "nom_couleur")
+        .populate("couleur_interieur", "nom_couleur");
     if (!updatedModel_porsche_actuel) {
       return res
         .status(404)
@@ -97,7 +104,7 @@ const deleteModel_porsche_actuel = async (req, res) => {
     }
     return res
       .status(200)
-      .json({ message: "model_porsche_actuel has been deleted" });
+      .json({ message: "model_porsche_actuel à bien été supprimé" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -106,22 +113,18 @@ const deleteModel_porsche_actuel = async (req, res) => {
 const addImages = async (req, res) => {
   try {
     const { body } = req;
-    if (!body || !body.photo_voiture_actuels) {
+    if (!body) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
 
-    // Validation simple pour les photos
-    if (!Array.isArray(body.photo_voiture_actuels)) {
-      return res
-        .status(400)
-        .json({
-          message: "Le champ photo_voiture_actuels doit être un tableau",
-        });
+    const { error } =
+      model_porsche_actuelValidation(body).model_porsche_actuelAddOrRemoveImage;
+    if (error) {
+      return res.status(401).json(error.details[0].message);
     }
 
-    // Vérifier que toutes les photos existent
     for (let photo_voiture_actuelId of body.photo_voiture_actuels) {
       const photo_voiture_actuel = await Photo.findById(photo_voiture_actuelId);
       if (!photo_voiture_actuel) {
@@ -131,7 +134,6 @@ const addImages = async (req, res) => {
       }
     }
 
-    // Vérifier que le modèle existe
     const model_porsche_actuel = await Model_porsche_actuel.findById(
       req.params.id
     );
@@ -141,7 +143,7 @@ const addImages = async (req, res) => {
         .json({ message: `le modèle ${req.params.id} n'existe pas` });
     }
 
-    // Utiliser $addToSet pour ajouter les photos sans doublons
+    // ajouter les photos sans doublons
     const updatedModel_porsche_actuel =
       await Model_porsche_actuel.findByIdAndUpdate(
         req.params.id,
@@ -151,7 +153,7 @@ const addImages = async (req, res) => {
           },
         },
         { new: true }
-      );
+      ).populate("photo_voiture_actuel", "name alt");
 
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
@@ -163,22 +165,17 @@ const addImages = async (req, res) => {
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
-    if (!body || !body.photo_voiture_actuels) {
+    if (!body) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
-    // Validation simple pour les photos
-    if (!Array.isArray(body.photo_voiture_actuels)) {
-      return res
-        .status(400)
-        .json({
-          message: "Le champ photo_voiture_actuels doit être un tableau",
-        });
+    const { error } =
+      model_porsche_actuelValidation(body).model_porsche_actuelAddOrRemoveImage;
+    if (error) {
+      return res.status(401).json(error.details[0].message);
     }
 
-    // Vérifier que toutes les photos existent
     for (let photo_voiture_actuelId of body.photo_voiture_actuels) {
       const photo_voiture_actuel = await Photo.findById(photo_voiture_actuelId);
       if (!photo_voiture_actuel) {
@@ -188,7 +185,6 @@ const removeImages = async (req, res) => {
       }
     }
 
-    // Vérifier que le modèle existe
     const model_porsche_actuel = await Model_porsche_actuel.findById(
       req.params.id
     );
@@ -205,7 +201,8 @@ const removeImages = async (req, res) => {
           $pull: { photo_voiture_actuel: { $in: body.photo_voiture_actuels } },
         },
         { new: true }
-      );
+      ).populate("photo_voiture_actuel", "name alt");
+
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
     console.log(error);
