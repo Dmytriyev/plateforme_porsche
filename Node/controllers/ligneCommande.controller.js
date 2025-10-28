@@ -7,7 +7,9 @@ const createLigneCommande = async (req, res) => {
     const { body, user } = req;
 
     const commande = await Commande.findOne({ user: user.id, status: true });
-    console.log(body);
+    console.log("Debug - Body reçu:", body);
+    console.log("Debug - User.id du token:", user.id);
+    console.log("Debug - Commande trouvée:", commande ? commande._id : "null");
 
     if (!body) {
       return res
@@ -15,8 +17,16 @@ const createLigneCommande = async (req, res) => {
         .json({ message: "Pas de données dans la requête" });
     }
 
+    if (!commande) {
+      return res
+        .status(404)
+        .json({
+          message: "Aucune commande active trouvée pour cet utilisateur",
+        });
+    }
+
     const line = { ...body, commande: commande._id.toString() };
-    console.log(line);
+    console.log("Debug - Ligne à créer:", line);
 
     const { error } = ligneCommandeValidation(line).ligneCommandeCreate;
     if (error) {

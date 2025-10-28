@@ -10,16 +10,24 @@ import LigneCommande from "../models/ligneCommande.model.js";
 
 const register = async (req, res) => {
   try {
+    console.log("=== DÉBUT REGISTER ===");
     const { body } = req;
+    console.log("Body reçu:", body);
+
     if (!body) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
+    console.log("Validation en cours...");
     const { error } = userValidation(body).userCreate;
     if (error) {
+      console.log("Erreur validation:", error.details[0].message);
       return res.status(401).json(error.details[0].message);
     }
+
+    console.log("Recherche utilisateur existant...");
     const searchUser = await User.findOne({ email: body.email });
     if (searchUser) {
       return res
@@ -27,28 +35,39 @@ const register = async (req, res) => {
         .json({ message: "Utilisateur existe déjà avec cet email" });
     }
 
+    console.log("Création utilisateur...");
+    const user = new User(body);
+
+    console.log("Sauvegarde utilisateur...");
+    const newUser = await user.save();
+
+    console.log("Création commande panier...");
     // Créer une commande panier pour l'utilisateur
     const commande = new Commande({
-      user: null, // Sera mis à jour après création de l'utilisateur
+      user: newUser._id,
       date_commande: new Date(),
-      prix: commande.prix,
-      acompte: commande.acompte,
+      prix: 0,
+      acompte: 0,
       status: true, // true = panier actif, false = commande validée
     });
 
-    const user = new User(body);
-    user.panier = commande._id;
-    commande.user = user._id;
-
+    console.log("Sauvegarde commande...");
     await commande.save();
-    const newUser = await user.save();
+
+    // Mettre à jour l'utilisateur avec l'ID du panier
+    newUser.panier = commande._id;
+    await newUser.save();
+
+    console.log("Utilisateur créé avec succès");
 
     const userResponse = newUser.toObject();
     delete userResponse.password;
 
+    console.log("=== FIN REGISTER SUCCÈS ===");
     return res.status(201).json(userResponse);
   } catch (error) {
-    console.log(error);
+    console.log("=== ERREUR REGISTER ===");
+    console.log("Erreur complète:", error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };

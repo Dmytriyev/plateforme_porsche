@@ -17,7 +17,6 @@ const accesoireSchema = new mongoose.Schema(
     prix: {
       type: Number,
       required: true,
-      default: 0,
     },
     couleur_accesoire: {
       type: mongoose.Schema.Types.ObjectId,

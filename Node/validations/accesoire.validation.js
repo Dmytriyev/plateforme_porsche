@@ -5,7 +5,7 @@ export default function accesoireValidation(body) {
     type_accesoire: joi.string().required(),
     nom_accesoire: joi.string().required(),
     description: joi.string().required(),
-    prix: joi.number().min(0).required(),
+    prix: joi.number().required(),
     couleur_accesoire: joi.string().hex().length(24),
   });
 
@@ -13,7 +13,7 @@ export default function accesoireValidation(body) {
     type_accesoire: joi.string(),
     nom_accesoire: joi.string(),
     description: joi.string(),
-    prix: joi.number().min(0),
+    prix: joi.number(),
     couleur_accesoire: joi.string().hex().length(24),
   });
 

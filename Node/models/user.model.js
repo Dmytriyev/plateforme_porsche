@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     telephone: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     code_postal: {
-      type: Number,
+      type: String,
       required: true,
     },
     panier: {

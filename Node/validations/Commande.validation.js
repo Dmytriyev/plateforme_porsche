@@ -3,8 +3,8 @@ import joi from "joi";
 export default function CommandeValidation(body) {
   const CommandeCreate = joi.object({
     date_commande: joi.date().required(),
-    prix: joi.number().min(0),
-    acompte: joi.number().min(0),
+    prix: joi.number(),
+    acompte: joi.number(),
     status: joi.boolean().required(),
     factureUrl: joi.string(),
     user: joi.string().hex().length(24),

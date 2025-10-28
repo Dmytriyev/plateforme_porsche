@@ -10,7 +10,7 @@ import auth from "../middlewares/auth.js";
 
 const router = Router();
 
-router.post("/new", createLigneCommande);
+router.post("/new", auth, createLigneCommande);
 router.get("/all", getAllLigneCommandes);
 router.get("/:id", getLigneCommandeById);
 router.put("/:id", updateLigneCommande);
