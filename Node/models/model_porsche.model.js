@@ -52,6 +52,20 @@ const model_porscheSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
     },
+    couleur_exterieur: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Couleur_exterieur",
+    },
+    couleur_interieur: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Couleur_interieur",
+      },
+    ],
+    taille_jante: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Taille_jante",
+    },
   },
   { timestamps: true }
 );

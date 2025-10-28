@@ -1,17 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const taille_janteSchema = new mongoose.Schema({
+const taille_janteSchema = new mongoose.Schema(
+  {
     taille_jante: {
       type: String,
-      required: true
+      required: true,
     },
-    photo_jante: {
+    couleur_jante: {
       type: String,
-      required: true
+      required: true,
+    },
+    photo_couleur: {
+      type: String,
+      required: true,
     },
     description: {
-      type: String
-    }
-}, { timestamps: true });
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model('Taille_jante', taille_janteSchema);
+export default mongoose.model("Taille_jante", taille_janteSchema);

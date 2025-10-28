@@ -23,8 +23,6 @@ export default function userValidation(body) {
   const userUpdate = joi.object({
     email: joi.string().email(),
     password: joi.string().min(5),
-    isAdmin: joi.boolean(),
-    role: joi.string(),
     nom: joi.string(),
     prenom: joi.string(),
     telephone: joi.number().regex(/^[0-9]{13}$/),

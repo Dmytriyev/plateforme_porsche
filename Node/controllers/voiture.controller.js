@@ -27,7 +27,7 @@ const getAllVoitures = async (req, res) => {
   try {
     const voitures = await Voiture.find()
       .populate("photo_voiture", "name")
-      .populate("type_model prix")
+      .populate("nom_model prix")
       .populate("model_porsche", "numero_win");
     return res.status(200).json(voitures);
   } catch (error) {
@@ -40,7 +40,7 @@ const getVoitureById = async (req, res) => {
   try {
     const voiture = await Voiture.findById(req.params.id)
       .populate("photo_voiture", "name")
-      .populate("model_porsche", "nom_model type_carrosserie");
+      .populate("model_porsche", "type_model type_carrosserie");
     if (!voiture) {
       return res.status(404).json({ message: "voiture n'existe pas" });
     }

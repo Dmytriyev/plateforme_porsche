@@ -6,7 +6,7 @@ const accesoireSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    nom: {
+    nom_accesoire: {
       type: String,
       required: true,
     },
@@ -18,6 +18,10 @@ const accesoireSchema = new mongoose.Schema(
       type: Number,
       required: true,
       default: 0,
+    },
+    couleur_accesoire: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Couleur_accesoire",
     },
   },
   { timestamps: true }

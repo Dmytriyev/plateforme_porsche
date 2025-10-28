@@ -42,12 +42,12 @@ const getCommandeById = async (req, res) => {
     const ligneCommandes = await LigneCommande.find({
       commande: req.params.id,
     })
-      .populate("type_produit_a", "prix nom_produit")
-      .populate("type_produit_v", "prix nom_produit");
+      .populate("accesoire", "prix nom_accesoire")
+      .populate("voiture", "prix nom_model");
     const total = ligneCommandes.reduce((sum, line) => {
       return (
-        sum + line.type_produit_v.prix * line.quantite ||
-        line.type_produit_a.prix * line.quantite
+        sum + line.voiture.prix * line.quantite ||
+        line.accesoire.prix * line.quantite
       );
     }, 0);
     return res
@@ -112,12 +112,12 @@ const getPanier = async (req, res) => {
     const ligneCommandes = await LigneCommande.find({
       commande: panier._id,
     })
-      .populate("type_produit_a", "nom_produit prix")
-      .populate("type_produit_v", "nom_produit prix");
+      .populate("accesoire", "nom_accesoire prix")
+      .populate("voiture", "nom_model prix");
     const total = ligneCommandes.reduce((sum, line) => {
       return (
-        sum + line.type_produit_a.prix * line.quantite ||
-        line.type_produit_v.prix * line.quantite
+        sum + line.accesoire.prix * line.quantite ||
+        line.voiture.prix * line.quantite
       );
     }, 0);
     return res

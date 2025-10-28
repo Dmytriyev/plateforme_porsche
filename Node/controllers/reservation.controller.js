@@ -66,7 +66,7 @@ const createReservation = async (req, res) => {
     // Populate pour retourner les détails complets
     const infoReservation = await Reservation.findById(newReservation._id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "type_model concessionnaire prix");
+      .populate("voiture", "nom_model concessionnaire prix");
 
     return res.status(201).json(infoReservation);
   } catch (error) {
@@ -79,7 +79,7 @@ const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find()
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "type_model concessionnaire prix ")
+      .populate("voiture", "nom_model concessionnaire prix ")
       .sort({ date_reservation: -1 }); // Trier par date décroissante
     return res.status(200).json(reservations);
   } catch (error) {
@@ -92,7 +92,7 @@ const getReservationById = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "type_model concessionnaire prix");
+      .populate("voiture", "nom_model concessionnaire prix");
     if (!reservation) {
       return res.status(404).json({ message: "réservation n'existe pas" });
     }
@@ -153,7 +153,7 @@ const updateReservation = async (req, res) => {
       { new: true }
     )
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "type_model concessionnaire prix");
+      .populate("voiture", "nom_model concessionnaire prix");
 
     if (!updatedReservation) {
       return res.status(404).json({ message: "réservation n'existe pas" });
@@ -190,7 +190,7 @@ const getReservationsByUser = async (req, res) => {
     }
 
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "type_model concessionnaire prix")
+      .populate("voiture", "nom_model concessionnaire prix")
       .sort({ date_reservation: -1 });
 
     return res.status(200).json(reservations);

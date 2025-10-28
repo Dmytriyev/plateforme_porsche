@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const ligneCommandeSchema = new mongoose.Schema(
   {
-    type_produit_v: {
+    voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
     },
-    type_produit_a: {
+    accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",
     },
@@ -15,16 +15,17 @@ const ligneCommandeSchema = new mongoose.Schema(
       ref: "Commande",
       required: true,
     },
-    nom_produit: {
-      type: String,
-      required: true,
-    },
     quantite: {
       type: Number,
       required: true,
       default: 1,
     },
     prix: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    acompte: {
       type: Number,
       required: true,
       default: 0,

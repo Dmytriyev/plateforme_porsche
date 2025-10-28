@@ -8,7 +8,6 @@ export default function photo_voiture_actuelValidation(body) {
   const photo_voiture_actuelUpdate = joi.object({
     name: joi.string(),
     alt: joi.string(),
-    model_porsche_actuel: joi.string().hex().length(24),
   });
   return {
     photo_voiture_actuelCreate: photo_voiture_actuelCreate.validate(body),

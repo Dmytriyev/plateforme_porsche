@@ -2,19 +2,18 @@ import joi from "joi";
 
 export default function CommandeValidation(body) {
   const CommandeCreate = joi.object({
-    user: joi
-      .string()
-      .regex(/^[0-9a-fA-F]{24}$/)
-      .required(),
     date_commande: joi.date().required(),
-    prix: joi.number().min(0).required(),
+    prix: joi.number().min(0),
+    acompte: joi.number().min(0),
     status: joi.boolean().required(),
+    factureUrl: joi.string(),
+    user: joi.string().hex().length(24),
   });
 
   const CommandeUpdate = joi.object({
-    user: joi.string().regex(/^[0-9a-fA-F]{24}$/),
     status: joi.boolean(),
-    url: joi.string(),
+    factureUrl: joi.string(),
+    user: joi.string().hex().length(24),
   });
 
   return {

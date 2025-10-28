@@ -1,17 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const couleur_interieurSchema = new mongoose.Schema({
+const couleur_interieurSchema = new mongoose.Schema(
+  {
     nom_couleur: {
       type: String,
-      required: true
+      required: true,
     },
     photo_couleur: {
       type: String,
-      required: true
+      required: true,
     },
     description: {
-      type: String
-    }
-}, { timestamps: true });
+      type: String,
+    },
+    photo_voiture: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Photo_voiture",
+    },
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model('Couleur_interieur', couleur_interieurSchema);
+export default mongoose.model("Couleur_interieur", couleur_interieurSchema);

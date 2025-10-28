@@ -3,6 +3,7 @@ export default function photo_accesoireValidation(body) {
   const photo_accesoireCreate = joi.object({
     name: joi.string().required(),
     alt: joi.string().required(),
+    acccsesoire: joi.string().hex().length(24).required(),
   });
   const photo_accesoireUpdate = joi.object({
     name: joi.string(),

@@ -1,15 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const photo_accesoireSchema = new mongoose.Schema({
+const photo_accesoireSchema = new mongoose.Schema(
+  {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     alt: {
       type: String,
-      required: true
+      required: true,
     },
+    accesoire: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Accesoire",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true });
-
-export default mongoose.model('Photo_accesoire', photo_accesoireSchema);
+export default mongoose.model("Photo_accesoire", photo_accesoireSchema);

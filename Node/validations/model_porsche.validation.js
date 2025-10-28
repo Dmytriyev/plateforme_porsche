@@ -14,6 +14,9 @@ export default function model_porscheValidation(body) {
     numero_win: joi.string(),
     prix: joi.number().min(0).required(),
     voiture: joi.string().hex().length(24),
+    couleur_exterieur: joi.string().hex().length(24),
+    couleur_interieur: joi.array().items(joi.string().hex().length(24)),
+    taille_jante: joi.string().hex().length(24),
   });
 
   const model_porscheUpdate = joi.object({
@@ -29,6 +32,9 @@ export default function model_porscheValidation(body) {
     numero_win: joi.string(),
     prix: joi.number().min(0),
     voiture: joi.string().hex().length(24),
+    couleur_exterieur: joi.string().hex().length(24),
+    couleur_interieur: joi.array().items(joi.string().hex().length(24)),
+    taille_jante: joi.string().hex().length(24),
   });
 
   return {
