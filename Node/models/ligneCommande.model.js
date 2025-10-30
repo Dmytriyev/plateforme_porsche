@@ -20,14 +20,14 @@ const ligneCommandeSchema = new mongoose.Schema(
       required: true,
       default: 1,
     },
+    // Prix unitaire l'accesoire
     prix: {
       type: Number,
-      required: true,
       default: 0,
     },
+    // Acompte versé pour voiture neuf
     acompte: {
       type: Number,
-      required: true,
       default: 0,
     },
   },

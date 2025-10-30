@@ -20,7 +20,7 @@ const router = Router();
 // d'authentification
 router.post("/register", register);
 router.post("/login", login);
-// administratives
+// administrateur
 router.get("/all", getAllUsers);
 // utilisateur
 router.get("/:id", getUserById);

@@ -14,6 +14,7 @@ const taille_janteSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // info sur la jante
     description: {
       type: String,
     },

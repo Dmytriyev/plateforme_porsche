@@ -6,9 +6,9 @@ const reservationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    // true = confirmée, false = en attente
     status: {
       type: Boolean,
-      required: true,
       default: false,
     },
     user: {

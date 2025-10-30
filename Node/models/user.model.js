@@ -13,10 +13,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       bcrypt: true,
     },
+    // admin ou user
     isAdmin: {
       type: Boolean,
       default: false,
     },
+    // responsable, client, conseillere
     role: {
       type: String,
       default: "user",

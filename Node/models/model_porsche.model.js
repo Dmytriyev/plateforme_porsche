@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 
 const model_porscheSchema = new mongoose.Schema(
   {
-    type_model: {
+    // 911(Carrera, S, GTS, GT3, GT3RS), Cayman(S, GTS, GT4RS), Cayenne(Hybrid, Turbo)
+    nom_model: {
       type: String,
       required: true,
     },
+    // Coupe, Cabriolet, Targa, SUV
     type_carrosserie: {
       type: String,
       required: true,
@@ -14,14 +16,17 @@ const model_porscheSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    // Flat-6, V8,
     info_moteur: {
       type: String,
       required: true,
     },
+    // ex: 300 ch, 450 ch, 580 ch
     info_puissance: {
       type: Number,
       required: true,
     },
+    // PDK
     info_transmission: {
       type: String,
       required: true,
@@ -38,14 +43,28 @@ const model_porscheSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    // numero de serie unique
     numero_win: {
       type: String,
       unique: true,
       uppercase: true,
     },
+    // ou situé la voiture
+    concessionnaire: {
+      type: String,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    // accompte pour reserver la voiture neuf
+    acompte: {
+      type: Number,
+      default: 0,
+    },
+    // prix total de la voiture oocation ou neuf
     prix: {
       type: Number,
-      required: true,
       default: 0,
     },
     voiture: {

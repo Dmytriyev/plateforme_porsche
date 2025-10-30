@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const accesoireSchema = new mongoose.Schema(
   {
+    // Type d'accessoire (porte-clés, casquettes, decoration, )
     type_accesoire: {
       type: String,
       required: true,
@@ -10,6 +11,7 @@ const accesoireSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Information de l'accessoire
     description: {
       type: String,
       required: true,

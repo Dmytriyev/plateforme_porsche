@@ -6,16 +6,22 @@ const CommandeSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    // Prix total de la commande
     prix: {
       type: Number,
     },
+    // Acompte versé pour voiture neuf
     acompte: {
       type: Number,
     },
+    // status de la commande payée ou non payée
     status: {
       type: Boolean,
       required: true,
+      default: false,
+      // false = non payée , true = payée
     },
+    // URL de la facture générée
     factureUrl: {
       type: String,
     },

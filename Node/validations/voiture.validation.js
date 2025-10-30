@@ -4,16 +4,14 @@ export default function voitureValidation(body) {
   const voitureCreate = joi.object({
     type_voiture: joi.boolean().required(),
     nom_model: joi.string().required(),
-    concessionnaire: joi.string(),
-    acompte: joi.number().min(0),
+    description: joi.string().required(),
     prix: joi.number().min(0),
   });
 
   const voitureUpdate = joi.object({
     type_voiture: joi.boolean(),
     nom_model: joi.string(),
-    concessionnaire: joi.string(),
-    acompte: joi.number().min(0),
+    description: joi.string(),
     prix: joi.number().min(0),
   });
   const voitureAddOrRemoveImage = joi.object({
