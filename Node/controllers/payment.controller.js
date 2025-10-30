@@ -2,7 +2,6 @@ import Stripe from "stripe";
 import dotenv from "dotenv";
 import LigneCommande from "../models/ligneCommande.model.js";
 import Commande from "../models/Commande.model.js";
-import { createFactureFromStripe } from "./facture.controller.js";
 
 dotenv.config();
 
@@ -99,10 +98,7 @@ export const webhookHandler = async (req, res) => {
       }
 
       const invoice = await stripe.invoices.retrieve(session.invoice);
-      console.log("Facture Stripe récupérée:", invoice.id);
-
-      const facture = await createFactureFromStripe(session, invoice);
-      console.log(`Facture persistée: ${facture.numeroFacture}`);
+      console.log("Invoice Stripe récupérée:", invoice.id);
 
       commande.status = false;
       commande.factureUrl = invoice.hosted_invoice_url;

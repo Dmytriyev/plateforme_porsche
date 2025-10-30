@@ -20,7 +20,6 @@ import couleur_exterieurRoutes from "./routes/couleur_exterieur.route.js";
 import couleur_interieurRoutes from "./routes/couleur_interieur.route.js";
 import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
 import taille_janteRoutes from "./routes/taille_jante.route.js";
-import factureRoutes from "./routes/facture.route.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,4 +57,3 @@ app.use("/taille_jante", taille_janteRoutes);
 app.use("/couleur_accesoire", couleur_accesoireRoutes);
 app.use("/couleur_interieur", couleur_interieurRoutes);
 app.use("/couleur_exterieur", couleur_exterieurRoutes);
-app.use("/facture", factureRoutes);
