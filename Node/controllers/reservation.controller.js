@@ -50,7 +50,7 @@ const createReservation = async (req, res) => {
       const existingReservation = await Reservation.findOne({
         voiture: body.voiture,
         date_reservation: body.date_reservation,
-        status: true, // Réservation active
+        status: true, // true = active
       });
 
       if (existingReservation) {

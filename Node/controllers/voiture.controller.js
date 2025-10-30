@@ -40,7 +40,7 @@ const getVoitureById = async (req, res) => {
   try {
     const voiture = await Voiture.findById(req.params.id)
       .populate("photo_voiture", "name")
-      .populate("model_porsche", "type_model type_carrosserie");
+      .populate("model_porsche", "nom_model type_carrosserie");
     if (!voiture) {
       return res.status(404).json({ message: "voiture n'existe pas" });
     }
@@ -65,9 +65,7 @@ const updateVoiture = async (req, res) => {
       return res.status(401).json(error.details[0].message);
     }
 
-    // Séparer les photos des autres données
     const { photo_voiture, ...otherData } = body;
-
     let updateQuery = otherData;
 
     // Si des photos sont fournies, utiliser $addToSet pour éviter les doublons
@@ -120,14 +118,12 @@ const addImages = async (req, res) => {
         .json({ message: "Pas de données dans la requête" });
     }
 
-    // Validation simple pour les photos
     if (!Array.isArray(body.photo_voitures)) {
       return res
         .status(400)
         .json({ message: "Le champ photo_voitures doit être un tableau" });
     }
 
-    // Vérifier que toutes les photos existent
     for (let photo_voitureId of body.photo_voitures) {
       const photo_voiture = await Photo.findById(photo_voitureId);
       if (!photo_voiture) {
@@ -137,7 +133,6 @@ const addImages = async (req, res) => {
       }
     }
 
-    // Vérifier que la voiture existe
     const voiture = await Voiture.findById(req.params.id);
     if (!voiture) {
       return res

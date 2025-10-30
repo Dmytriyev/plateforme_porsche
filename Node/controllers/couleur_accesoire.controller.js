@@ -5,7 +5,9 @@ const createCouleur_accesoire = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "no data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
     const { error } = couleur_accesoireValidation(body).couleur_accesoireCreate;
     if (error) {
@@ -49,7 +51,9 @@ const updateCouleur_accesoire = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "No data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
 
     const { error } = couleur_accesoireValidation(body).couleur_accesoireUpdate;
@@ -85,7 +89,7 @@ const deleteCouleur_accesoire = async (req, res) => {
     }
     return res
       .status(200)
-      .json({ message: "couleur_accesoire has been deleted" });
+      .json({ message: "couleur_accesoire a été supprimé" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

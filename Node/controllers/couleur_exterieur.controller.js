@@ -5,7 +5,9 @@ const createCouleur_exterieur = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "no data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
     const { error } = couleur_exterieurValidation(body).couleur_exterieurCreate;
     if (error) {
@@ -34,9 +36,7 @@ const getCouleur_exterieurById = async (req, res) => {
   try {
     const couleur_exterieur = await Couleur_exterieur.findById(req.params.id);
     if (!couleur_exterieur) {
-      return res
-        .status(404)
-        .json({ message: "couleur n'existe pas" });
+      return res.status(404).json({ message: "couleur n'existe pas" });
     }
     return res.status(200).json(couleur_exterieur);
   } catch (error) {
@@ -49,7 +49,9 @@ const updateCouleur_exterieur = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "No data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
 
     const { error } = couleur_exterieurValidation(body).couleur_exterieurUpdate;
@@ -62,9 +64,7 @@ const updateCouleur_exterieur = async (req, res) => {
       { new: true }
     );
     if (!updatedCouleur_exterieur) {
-      return res
-        .status(404)
-        .json({ message: "couleur n'existe pas" });
+      return res.status(404).json({ message: "couleur n'existe pas" });
     }
     return res.status(200).json(updatedCouleur_exterieur);
   } catch (error) {
@@ -79,13 +79,11 @@ const deleteCouleur_exterieur = async (req, res) => {
       req.params.id
     );
     if (!couleur_exterieur) {
-      return res
-        .status(404)
-        .json({ message: "couleur n'existe pas" });
+      return res.status(404).json({ message: "couleur n'existe pas" });
     }
     return res
       .status(200)
-      .json({ message: "couleur_exterieur has been deleted" });
+      .json({ message: "couleur_exterieur a été supprimé" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

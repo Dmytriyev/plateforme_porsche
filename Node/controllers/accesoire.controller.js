@@ -5,7 +5,9 @@ const createAccesoire = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "no data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
     const { error } = accesoireValidation(body).accesoireCreate;
     if (error) {
@@ -47,7 +49,9 @@ const updateAccesoire = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "No data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
 
     const { error } = accesoireValidation(body).accesoireUpdate;
@@ -75,7 +79,7 @@ const deleteAccesoire = async (req, res) => {
     if (!accesoire) {
       return res.status(404).json({ message: "accessoire n'existe pas" });
     }
-    return res.status(200).json({ message: "accesoire has been deleted" });
+    return res.status(200).json({ message: "accesoire a été supprimé" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
