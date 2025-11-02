@@ -10,6 +10,7 @@ const photo_accesoireSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // relation many to one {}
     accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",

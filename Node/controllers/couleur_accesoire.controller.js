@@ -4,14 +4,14 @@ import couleur_accesoireValidation from "../validations/couleur_accesoire.valida
 const createCouleur_accesoire = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
     const { error } = couleur_accesoireValidation(body).couleur_accesoireCreate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
     const couleur_accesoire = new Couleur_accesoire(body);
     const newCouleur_accesoire = await couleur_accesoire.save();
@@ -24,7 +24,9 @@ const createCouleur_accesoire = async (req, res) => {
 
 const getAllCouleur_accesoires = async (req, res) => {
   try {
-    const couleur_accesoires = await Couleur_accesoire.find();
+    const couleur_accesoires = await Couleur_accesoire.find().sort({
+      nom_couleur: 1,
+    });
     return res.status(200).json(couleur_accesoires);
   } catch (error) {
     console.log(error);
@@ -38,7 +40,7 @@ const getCouleur_accesoireById = async (req, res) => {
     if (!couleur_accesoire) {
       return res
         .status(404)
-        .json({ message: "couleur_accessoire n'existe pas" });
+        .json({ message: "couleur d'accessoire n'existe pas" });
     }
     return res.status(200).json(couleur_accesoire);
   } catch (error) {
@@ -50,7 +52,7 @@ const getCouleur_accesoireById = async (req, res) => {
 const updateCouleur_accesoire = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
@@ -58,7 +60,7 @@ const updateCouleur_accesoire = async (req, res) => {
 
     const { error } = couleur_accesoireValidation(body).couleur_accesoireUpdate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
     const updatedCouleur_accesoire = await Couleur_accesoire.findByIdAndUpdate(
       req.params.id,
@@ -68,7 +70,7 @@ const updateCouleur_accesoire = async (req, res) => {
     if (!updatedCouleur_accesoire) {
       return res
         .status(404)
-        .json({ message: "couleur_accessoire n'existe pas" });
+        .json({ message: "couleur d'accessoire n'existe pas" });
     }
     return res.status(200).json(updatedCouleur_accesoire);
   } catch (error) {
@@ -85,11 +87,11 @@ const deleteCouleur_accesoire = async (req, res) => {
     if (!couleur_accesoire) {
       return res
         .status(404)
-        .json({ message: "couleur_accessoire n'existe pas" });
+        .json({ message: "couleur d'accessoire n'existe pas" });
     }
     return res
       .status(200)
-      .json({ message: "couleur_accesoire a été supprimé" });
+      .json({ message: "couleur d'accessoire a été supprimée" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

@@ -11,6 +11,7 @@ const reservationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // relation many to one {}
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

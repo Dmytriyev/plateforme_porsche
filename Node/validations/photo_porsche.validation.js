@@ -1,0 +1,18 @@
+import joi from "joi";
+export default function photo_porscheValidation(body) {
+  const photo_porscheCreate = joi.object({
+    name: joi.string().required(),
+    alt: joi.string().required(),
+    model_porsche: joi.string().hex().length(24), // Many-to-One: un seul model_porsche
+  });
+  const photo_porscheUpdate = joi.object({
+    name: joi.string(),
+    alt: joi.string(),
+    model_porsche: joi.string().hex().length(24), // Many-to-One: un seul model_porsche
+  });
+
+  return {
+    photo_porscheCreate: photo_porscheCreate.validate(body),
+    photo_porscheUpdate: photo_porscheUpdate.validate(body),
+  };
+}

@@ -8,15 +8,18 @@ const couleur_interieurSchema = new mongoose.Schema(
     },
     photo_couleur: {
       type: String,
-      required: true,
+      default: null,
     },
     description: {
       type: String,
     },
-    photo_voiture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Photo_voiture",
-    },
+    // relation one to many [ {} ]
+    model_porsche: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Model_porsche",
+      },
+    ],
   },
   { timestamps: true }
 );

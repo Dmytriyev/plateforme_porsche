@@ -3,14 +3,25 @@ import joi from "joi";
 export default function userValidation(body) {
   const userCreate = joi.object({
     email: joi.string().email().required(),
-    password: joi.string().required().min(5),
+    password: joi
+      .string()
+      .required()
+      .min(8)
+      .pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+      )
+      .messages({
+        "string.pattern.base":
+          "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)",
+        "string.min": "Le mot de passe doit contenir au moins 8 caractères",
+      }),
     isAdmin: joi.boolean(),
     role: joi.string(),
     nom: joi.string().required(),
     prenom: joi.string().required(),
     telephone: joi
       .string()
-      .pattern(/^[0-9]{13}$/)
+      .pattern(/^[0-9]{10,13}$/)
       .required(),
     adresse: joi.string().required(),
     code_postal: joi
@@ -22,18 +33,28 @@ export default function userValidation(body) {
 
   const userUpdate = joi.object({
     email: joi.string().email(),
-    password: joi.string().min(5),
+    password: joi
+      .string()
+      .min(8)
+      .pattern(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+      )
+      .messages({
+        "string.pattern.base":
+          "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&)",
+        "string.min": "Le mot de passe doit contenir au moins 8 caractères",
+      }),
     nom: joi.string(),
     prenom: joi.string(),
-    telephone: joi.string().pattern(/^[0-9]{13}$/),
+    telephone: joi.string().pattern(/^[0-9]{10,13}$/),
     adresse: joi.string(),
     code_postal: joi.string().pattern(/^[0-9]{5}$/),
     panier: joi.string().hex().length(24),
   });
 
   const userLogin = joi.object({
-    email: joi.string().email(),
-    password: joi.string(),
+    email: joi.string().email().required(),
+    password: joi.string().required(),
   });
 
   const userReservation = joi.object({

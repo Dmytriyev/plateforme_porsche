@@ -20,10 +20,18 @@ const accesoireSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    // relation many to one {}
     couleur_accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_accesoire",
     },
+    // relation one to many [{}]
+    photo_accesoire: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Photo_accesoire",
+      },
+    ],
   },
   { timestamps: true }
 );

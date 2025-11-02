@@ -8,7 +8,7 @@ const couleur_accesoireSchema = new mongoose.Schema(
     },
     photo_couleur: {
       type: String,
-      required: true,
+      default: null,
     },
   },
   { timestamps: true }

@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import db from "./db/db.js";
 import path from "node:path";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
 import userRoutes from "./routes/user.route.js";
@@ -27,7 +29,27 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuration des middlewares globaux
+// Configuration CORS sécurisée
+
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     const allowedOrigins = [
+//       process.env.FRONTEND_URL,
+//       "http://localhost:3001",
+//     ];
+
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Non autorisé par CORS"));
+//     }
+//   },
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// };
+// app.use(cors(corsOptions));
+
 app.use(cors());
 app.use(express.json());
 // Route spéciale webhook pour les paiements Stripe
@@ -40,15 +62,66 @@ app.get("/", (req, res) => {
 });
 db();
 
+// Middlewares de sécurité
+app.use(helmet());
+
+// Rate limiting global - Protection contre les attaques DDoS
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requêtes par IP
+  message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Limiter les tentatives de connexion
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 tentatives max
+  message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Limiter les inscriptions
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 3, // 3 inscriptions max
+  message: "Trop d'inscriptions, réessayez dans 1 heure",
+});
+
+// Limiter les paiements
+const paymentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 10, // 10 tentatives de paiement max
+  message: "Trop de tentatives de paiement, réessayez plus tard",
+});
+
+// Limiter les uploads d'images
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 20, // 20 uploads max
+  message: "Trop d'uploads d'images, réessayez plus tard",
+});
+
+// Appliquer rate limiting global sur toutes les routes
+app.use(globalLimiter);
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/photo_voiture", photo_voitureRoutes);
-app.use("/photo_voiture_actuel", photo_voiture_actuelRoutes);
-app.use("/photo_accesoire", photo_accesoireRoutes);
+
+app.use("/photo_voiture", uploadLimiter, photo_voitureRoutes);
+app.use("/photo_voiture_actuel", uploadLimiter, photo_voiture_actuelRoutes);
+app.use("/photo_accesoire", uploadLimiter, photo_accesoireRoutes);
+
+app.use("/user/login", loginLimiter);
+app.use("/user/register", registerLimiter);
 app.use("/user", userRoutes);
+
+app.use("/api/payment", paymentLimiter, paymentRoutes);
+
 app.use("/reservation", reservationRoutes);
 app.use("/commande", commandeRoutes);
 app.use("/ligneCommande", ligneCommandeRoutes);
-app.use("/api/payment", paymentRoutes);
 app.use("/model_porsche_actuel", model_porsche_actuelRoutes);
 app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);

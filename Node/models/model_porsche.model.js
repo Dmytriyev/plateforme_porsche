@@ -53,6 +53,7 @@ const model_porscheSchema = new mongoose.Schema(
     concessionnaire: {
       type: String,
     },
+    // info general sur la model
     description: {
       type: String,
       required: true,
@@ -67,24 +68,36 @@ const model_porscheSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // relation many to one {}
     voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
+      required: true,
     },
+    // relation many to one {}
     couleur_exterieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
+    // relation many to many [{}]
     couleur_interieur: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Couleur_interieur",
       },
     ],
+    // relation many to one {}
     taille_jante: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Taille_jante",
     },
+    // relation one to many [{}]
+    photo_porsche: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Photo_porsche",
+      },
+    ],
   },
   { timestamps: true }
 );

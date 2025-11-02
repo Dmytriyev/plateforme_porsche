@@ -44,6 +44,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // relation many to one {}
     panier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Commande",

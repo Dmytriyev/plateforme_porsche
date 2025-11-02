@@ -25,7 +25,9 @@ const createCommande = async (req, res) => {
 
 const getAllCommandes = async (req, res) => {
   try {
-    const commandes = await Commande.find();
+    const commandes = await Commande.find()
+      .populate("user", "name email")
+      .sort({ date_commande: -1 });
     return res.status(200).json(commandes);
   } catch (error) {
     console.log(error);
@@ -35,7 +37,10 @@ const getAllCommandes = async (req, res) => {
 
 const getCommandeById = async (req, res) => {
   try {
-    const commande = await Commande.findById(req.params.id);
+    const commande = await Commande.findById(req.params.id).populate(
+      "user",
+      "name email"
+    );
     if (!commande) {
       return res.status(404).json({ message: "commande n'existe pas" });
     }
@@ -43,10 +48,19 @@ const getCommandeById = async (req, res) => {
       commande: req.params.id,
     })
       .populate("accesoire", "prix nom_accesoire")
-      .populate("voiture", "prix nom_model acompte");
+      .populate("voiture", "prix nom_model type_voiture");
 
     const total = ligneCommandes.reduce((sum, line) => {
-      const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
+      // Vérifier le type de produit et utiliser le bon prix
+      let prix = 0;
+      if (line.voiture && line.acompte > 0) {
+        prix = line.acompte;
+      } else if (line.accesoire && line.accesoire.prix) {
+        prix = line.accesoire.prix;
+      } else if (line.prix) {
+        // Utiliser le prix sauvegardé dans la ligne si disponible
+        prix = line.prix;
+      }
       return sum + prix * line.quantite;
     }, 0);
     return res
@@ -88,11 +102,20 @@ const updateCommande = async (req, res) => {
 
 const deleteCommande = async (req, res) => {
   try {
-    const commande = await Commande.findByIdAndDelete(req.params.id);
+    const commande = await Commande.findById(req.params.id);
     if (!commande) {
       return res.status(404).json({ message: "commande n'existe pas" });
     }
-    return res.status(200).json({ message: "commande a été supprimé" });
+
+    // Supprimer toutes les lignes de commande associées
+    await LigneCommande.deleteMany({ commande: req.params.id });
+
+    // Supprimer la commande
+    await Commande.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      message: "commande et ses lignes ont été supprimées",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -101,10 +124,13 @@ const deleteCommande = async (req, res) => {
 
 const getPanier = async (req, res) => {
   if (!req.user) {
-    return res.status(404).json({ message: "erreur 404" });
+    return res.status(401).json({ message: "Non autorisé" });
   }
   try {
-    const panier = await Commande.findOne({ user: req.user.id, status: true });
+    const panier = await Commande.findOne({
+      user: req.user.id,
+      status: true,
+    }).populate("user", "name email");
     if (!panier) {
       return res.status(404).json({ message: "panier n'existe pas" });
     }
@@ -112,9 +138,19 @@ const getPanier = async (req, res) => {
       commande: panier._id,
     })
       .populate("accesoire", "nom_accesoire prix")
-      .populate("voiture", "nom_model prix acompte");
+      .populate("voiture", "nom_model prix type_voiture");
+
     const total = ligneCommandes.reduce((sum, line) => {
-      const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
+      // Vérifier le type de produit et utiliser le bon prix
+      let prix = 0;
+      if (line.voiture && line.acompte > 0) {
+        prix = line.acompte;
+      } else if (line.accesoire && line.accesoire.prix) {
+        prix = line.accesoire.prix;
+      } else if (line.prix) {
+        // Utiliser le prix sauvegardé dans la ligne si disponible
+        prix = line.prix;
+      }
       return sum + prix * line.quantite;
     }, 0);
 
@@ -129,13 +165,13 @@ const getPanier = async (req, res) => {
 
 const getMyCommandes = async (req, res) => {
   if (!req.user) {
-    return res.status(403).json({ message: "Vous n'êtes pas autorisé" });
+    return res.status(401).json({ message: "Non autorisé" });
   }
   try {
     const historique = await Commande.find({
       user: req.user.id,
       status: false,
-    });
+    }).sort({ date_commande: -1 });
     return res.status(200).json(historique);
   } catch (error) {
     console.log(error);

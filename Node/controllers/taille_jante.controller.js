@@ -5,7 +5,9 @@ const createTaille_jante = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "no data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
     const { error } = taille_janteValidation(body).taille_janteCreate;
     if (error) {
@@ -47,7 +49,9 @@ const updateTaille_jante = async (req, res) => {
   try {
     const { body } = req;
     if (!body) {
-      return res.status(400).json({ message: "No data in the request" });
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
     }
 
     const { error } = taille_janteValidation(body).taille_janteUpdate;
@@ -75,7 +79,7 @@ const deleteTaille_jante = async (req, res) => {
     if (!taille_jante) {
       return res.status(404).json({ message: "taille de jante n'existe pas" });
     }
-    return res.status(200).json({ message: "taille_jante has been deleted" });
+    return res.status(200).json({ message: "taille_jante a été supprimé" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

@@ -23,7 +23,6 @@ const voitureSchema = new mongoose.Schema(
       default: 0,
     },
     // relation many to many [ {} ]
-    // relation many to one {}
     photo_voiture: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -9,6 +9,7 @@ import {
   getPanier,
 } from "../controllers/Commande.controller.js";
 import auth from "../middlewares/auth.js";
+import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
@@ -16,8 +17,8 @@ router.post("/new", createCommande);
 router.get("/panier", getPanier);
 router.get("/all", getAllCommandes);
 router.get("/historique", getMyCommandes);
-router.get("/:id", getCommandeById);
-router.put("/:id", updateCommande);
-router.delete("/:id", deleteCommande);
+router.get("/:id", validateObjectId("id"), getCommandeById);
+router.put("/:id", validateObjectId("id"), updateCommande);
+router.delete("/:id", validateObjectId("id"), deleteCommande);
 
 export default router;

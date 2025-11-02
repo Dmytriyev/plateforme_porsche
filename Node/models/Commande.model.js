@@ -14,17 +14,17 @@ const CommandeSchema = new mongoose.Schema(
     acompte: {
       type: Number,
     },
-    // status de la commande payée ou non payée
+    // Status de la commande : true = panier actif (non validée), false = commande validée
     status: {
       type: Boolean,
       required: true,
       default: false,
-      // false = non payée , true = payée
     },
     // URL de la facture générée
     factureUrl: {
       type: String,
     },
+    // relation many to one {}
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

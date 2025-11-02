@@ -15,7 +15,10 @@ export default function voitureValidation(body) {
     prix: joi.number().min(0),
   });
   const voitureAddOrRemoveImage = joi.object({
-    photo_voiture: joi.array().items(joi.string().hex().length(24).required()),
+    photo_voiture: joi
+      .array()
+      .items(joi.string().hex().length(24).required())
+      .required(),
   });
 
   return {

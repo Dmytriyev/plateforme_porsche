@@ -16,10 +16,10 @@ export default function model_porscheValidation(body) {
     description: joi.string().required(),
     acompte: joi.number().min(0),
     prix: joi.number().min(0),
-    voiture: joi.string().hex().length(24),
-    couleur_exterieur: joi.string().hex().length(24),
-    couleur_interieur: joi.array().items(joi.string().hex().length(24)),
-    taille_jante: joi.string().hex().length(24),
+    voiture: joi.string().hex().length(24).required(), // Many-to-One: une seule voiture
+    couleur_exterieur: joi.string().hex().length(24), // Many-to-One: une seule couleur
+    couleur_interieur: joi.array().items(joi.string().hex().length(24)), // Many-to-Many: plusieurs couleurs
+    taille_jante: joi.string().hex().length(24), // Many-to-One: une seule taille
   });
 
   const model_porscheUpdate = joi.object({
@@ -37,14 +37,22 @@ export default function model_porscheValidation(body) {
     description: joi.string(),
     acompte: joi.number().min(0),
     prix: joi.number().min(0),
-    voiture: joi.string().hex().length(24),
-    couleur_exterieur: joi.string().hex().length(24),
-    couleur_interieur: joi.array().items(joi.string().hex().length(24)),
-    taille_jante: joi.string().hex().length(24),
+    voiture: joi.string().hex().length(24), // Many-to-One: une seule voiture
+    couleur_exterieur: joi.string().hex().length(24), // Many-to-One: une seule couleur
+    couleur_interieur: joi.array().items(joi.string().hex().length(24)), // Many-to-Many: plusieurs couleurs
+    taille_jante: joi.string().hex().length(24), // Many-to-One: une seule taille
+  });
+
+  const model_porscheAddOrRemoveImage = joi.object({
+    photo_porsche: joi
+      .array()
+      .items(joi.string().hex().length(24).required())
+      .required(),
   });
 
   return {
     model_porscheCreate: model_porscheCreate.validate(body),
     model_porscheUpdate: model_porscheUpdate.validate(body),
+    model_porscheAddOrRemoveImage: model_porscheAddOrRemoveImage.validate(body),
   };
 }

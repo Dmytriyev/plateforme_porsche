@@ -125,7 +125,7 @@ const addImages = async (req, res) => {
       return res.status(401).json(error.details[0].message);
     }
 
-    for (let photo_voiture_actuelId of body.photo_voiture_actuels) {
+    for (let photo_voiture_actuelId of body.photo_voiture_actuel) {
       const photo_voiture_actuel = await Photo.findById(photo_voiture_actuelId);
       if (!photo_voiture_actuel) {
         return res
@@ -149,7 +149,7 @@ const addImages = async (req, res) => {
         req.params.id,
         {
           $addToSet: {
-            photo_voiture_actuel: { $each: body.photo_voiture_actuels },
+            photo_voiture_actuel: { $each: body.photo_voiture_actuel },
           },
         },
         { new: true }
@@ -176,7 +176,7 @@ const removeImages = async (req, res) => {
       return res.status(401).json(error.details[0].message);
     }
 
-    for (let photo_voiture_actuelId of body.photo_voiture_actuels) {
+    for (let photo_voiture_actuelId of body.photo_voiture_actuel) {
       const photo_voiture_actuel = await Photo.findById(photo_voiture_actuelId);
       if (!photo_voiture_actuel) {
         return res
@@ -198,7 +198,7 @@ const removeImages = async (req, res) => {
       await Model_porsche_actuel.findByIdAndUpdate(
         req.params.id,
         {
-          $pull: { photo_voiture_actuel: { $in: body.photo_voiture_actuels } },
+          $pull: { photo_voiture_actuel: { $in: body.photo_voiture_actuel } },
         },
         { new: true }
       ).populate("photo_voiture_actuel", "name alt");

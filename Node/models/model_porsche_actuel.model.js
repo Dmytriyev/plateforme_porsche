@@ -32,20 +32,23 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       unique: true,
       uppercase: true,
     },
-    // relation many to many [ {} ]
     // relation many to one {}
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    // relation many to one {}
     couleur_exterieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
+    // relation many to one {}
     couleur_interieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_interieur",
     },
+    // relation one to many [{}]
+    // One-to-Many (un modèle → plusieurs photos)
     photo_voiture_actuel: [
       {
         type: mongoose.Schema.Types.ObjectId,

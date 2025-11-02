@@ -11,7 +11,6 @@ import LigneCommande from "../models/ligneCommande.model.js";
 const register = async (req, res) => {
   try {
     const { body } = req;
-    console.log("reçu:", body);
     if (!body) {
       return res
         .status(400)
@@ -20,7 +19,6 @@ const register = async (req, res) => {
 
     const { error } = userValidation(body).userCreate;
     if (error) {
-      console.log("Erreur validation:", error.details[0].message);
       return res.status(401).json(error.details[0].message);
     }
 
@@ -47,13 +45,12 @@ const register = async (req, res) => {
     newUser.panier = commande._id;
     await newUser.save();
 
-    console.log("Utilisateur créé avec succès");
     const userResponse = newUser.toObject();
     delete userResponse.password;
 
     return res.status(201).json(userResponse);
   } catch (error) {
-    console.log("Erreur", error);
+    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -112,6 +109,11 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
+    // Vérifier que l'utilisateur accède à ses propres données ou est admin
+    if (req.user.id !== req.params.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -119,17 +121,29 @@ const getUserById = async (req, res) => {
     return res.status(200).json(user);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
 const updateUser = async (req, res) => {
   try {
+    // Vérifier que l'utilisateur modifie ses propres données ou est admin
+    if (req.user.id !== req.params.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const { body } = req;
     if (!body) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Empêcher la modification des champs sensibles par un utilisateur non-admin
+    if (!req.user.isAdmin) {
+      delete body.isAdmin;
+      delete body.role;
+      delete body.panier;
     }
 
     const { error } = userValidation(body).userUpdate;
@@ -147,12 +161,17 @@ const updateUser = async (req, res) => {
     return res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
+    // Vérifier que l'utilisateur supprime son propre compte ou est admin
+    if (req.user.id !== req.params.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -168,7 +187,7 @@ const deleteUser = async (req, res) => {
       .json({ message: "Utilisateur et toutes ses données ont été supprimés" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -177,6 +196,11 @@ const createUserReservation = async (req, res) => {
   try {
     const { body } = req;
     const userId = req.params.id;
+
+    // Vérifier que l'utilisateur crée une réservation pour lui-même ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
 
     if (!body) {
       return res.status(400).json({
@@ -205,7 +229,7 @@ const createUserReservation = async (req, res) => {
     }
 
     const existingReservation = await Reservation.findOne({
-      voiture: body.voiture.nom_model,
+      voiture: body.voiture,
       date_reservation: dateReservation,
       status: true,
     });
@@ -224,7 +248,7 @@ const createUserReservation = async (req, res) => {
     const newReservation = await reservation.save();
     const populatedReservation = await Reservation.findById(newReservation._id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "nom_model concessionnaire prix");
+      .populate("voiture", "nom_model type_voiture description prix");
 
     return res.status(201).json(populatedReservation);
   } catch (error) {
@@ -238,13 +262,18 @@ const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;
 
+    // Vérifier que l'utilisateur accède à ses propres réservations ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "nom_model concessionnaire prix")
+      .populate("voiture", "nom_model type_voiture description prix")
       .sort({ date_reservation: -1 });
 
     return res.status(200).json(reservations);
@@ -259,6 +288,11 @@ const addUserPorsche = async (req, res) => {
   try {
     const { body } = req;
     const userId = req.params.id;
+
+    // Vérifier que l'utilisateur ajoute une Porsche pour lui-même ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
 
     if (!body) {
       return res.status(400).json({
@@ -295,6 +329,11 @@ const getUserPorsches = async (req, res) => {
   try {
     const userId = req.params.id;
 
+    // Vérifier que l'utilisateur accède à ses propres Porsches ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -320,6 +359,11 @@ const getUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
 
+    // Vérifier que l'utilisateur accède à son propre profil ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -327,7 +371,7 @@ const getUserProfile = async (req, res) => {
 
     // Obtenir les réservations
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "nom_model concessionnaire prix")
+      .populate("voiture", "nom_model type_voiture description prix")
       .sort({ date_reservation: -1 })
       .limit(5); // 5 dernières
 
@@ -347,10 +391,15 @@ const getUserProfile = async (req, res) => {
     if (panier) {
       const ligneCommandes = await LigneCommande.find({ commande: panier._id })
         .populate("accesoire", "nom_accesoire prix")
-        .populate("voiture", "nom_model prix acompte");
+        .populate("voiture", "nom_model type_voiture prix");
 
       const total = ligneCommandes.reduce((sum, line) => {
-        const prix = line.voiture ? line.voiture.acompte : line.accesoire.prix;
+        // Si c'est une voiture, utiliser l'acompte de la ligne de commande, sinon le prix de l'accessoire
+        const prix = line.type_produit
+          ? line.acompte
+          : line.accesoire
+          ? line.accesoire.prix
+          : 0;
         return sum + prix * line.quantite;
       }, 0);
 
@@ -387,6 +436,11 @@ const deleteUserReservation = async (req, res) => {
     const userId = req.params.id;
     const reservationId = req.params.reservationId;
 
+    // Vérifier que l'utilisateur supprime sa propre réservation ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -419,6 +473,11 @@ const deleteUserPorsche = async (req, res) => {
   try {
     const userId = req.params.id;
     const porscheId = req.params.porscheId;
+
+    // Vérifier que l'utilisateur supprime sa propre Porsche ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
 
     const user = await User.findById(userId);
     if (!user) {

@@ -16,25 +16,58 @@ export const createCheckoutSession = async (req, res) => {
     if (!commande) {
       return res.status(404).json({ message: "la commande n'existe pas" });
     }
+
+    // Vérifier que c'est un panier actif
+    if (commande.status === false) {
+      return res
+        .status(400)
+        .json({ message: "Cette commande a déjà été validée" });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire (si req.user existe)
+    if (req.user && commande.user._id.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ message: "Vous n'êtes pas autorisé à payer cette commande" });
+    }
+
     const ligneCommande = await LigneCommande.find({ commande: id })
       .populate("accesoire", "nom_accesoire prix")
-      .populate("voiture", "nom_model prix acompte");
-    let items = [];
-    if (ligneCommande.length == 0) {
+      .populate("voiture", "nom_model prix type_voiture");
+
+    if (ligneCommande.length === 0) {
       return res.status(400).json({ message: "le panier est vide" });
     }
-    ligneCommande.map((line) => {
+
+    let items = [];
+    ligneCommande.forEach((line) => {
+      // Déterminer le prix correct depuis LigneCommande
+      let unitPrice = 0;
+      let productName = "";
+
+      if (line.voiture && line.acompte > 0) {
+        unitPrice = line.acompte;
+        productName = `${line.voiture.nom_model} (Acompte)`;
+      } else if (line.accesoire && line.accesoire.prix) {
+        unitPrice = line.accesoire.prix;
+        productName = line.accesoire.nom_accesoire;
+      } else if (line.prix) {
+        unitPrice = line.prix;
+        productName = line.voiture
+          ? line.voiture.nom_model
+          : "Produit personnalisé";
+      }
+
+      // Stripe requiert les prix en centimes
+      const unitAmountInCents = Math.round(unitPrice * 100);
+
       let item = {
         price_data: {
           currency: "eur",
           product_data: {
-            name: line.voiture
-              ? line.voiture.nom_model
-              : line.accesoire.nom_accesoire,
+            name: productName,
           },
-          unit_amount: line.voiture
-            ? line.voiture.acompte
-            : line.accesoire.prix,
+          unit_amount: unitAmountInCents,
         },
         quantity: line.quantite,
       };
@@ -55,8 +88,11 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ["card", "paypal"],
       line_items: items,
       mode: "payment",
-      success_url: "http://localhost:3000/success",
-      cancel_url: "http://localhost:3000/cancel",
+      success_url:
+        process.env.FRONTEND_URL + "/success" ||
+        "http://localhost:3000/success",
+      cancel_url:
+        process.env.FRONTEND_URL + "/cancel" || "http://localhost:3000/cancel",
       metadata: {
         commandeId: id,
       },
@@ -69,6 +105,7 @@ export const createCheckoutSession = async (req, res) => {
       customer: session.customer,
     });
   } catch (error) {
+    console.error("Erreur création session Stripe:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -86,10 +123,14 @@ export const webhookHandler = async (req, res) => {
   }
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    console.log("Paiement réussi :", session);
 
     try {
       const commandeId = session.metadata.commandeId;
+
+      if (!commandeId) {
+        console.error("Metadata commandeId manquant dans le webhook");
+        return res.status(400).json({ error: "commandeId manquant" });
+      }
 
       const commande = await Commande.findById(commandeId);
       if (!commande) {
@@ -97,14 +138,35 @@ export const webhookHandler = async (req, res) => {
         return res.status(404).json({ error: "Commande introuvable" });
       }
 
-      const invoice = await stripe.invoices.retrieve(session.invoice);
-      console.log("Invoice Stripe récupérée:", invoice.id);
+      // Vérifier que la commande n'a pas déjà été traitée
+      if (commande.status === false && commande.factureUrl) {
+        console.warn(`Commande ${commandeId} déjà traitée`);
+        return res.json({ received: true, message: "Déjà traité" });
+      }
 
+      // Récupérer la facture Stripe
+      const invoice = await stripe.invoices.retrieve(session.invoice);
+
+      // Calculer le total depuis les lignes de commande
+      const lignesCommande = await LigneCommande.find({ commande: commandeId });
+      const total = lignesCommande.reduce((sum, line) => {
+        let prix = 0;
+        if (line.acompte > 0) {
+          prix = line.acompte;
+        } else if (line.prix) {
+          prix = line.prix;
+        }
+        return sum + prix * line.quantite;
+      }, 0);
+
+      // Mettre à jour la commande
       commande.status = false;
       commande.factureUrl = invoice.hosted_invoice_url;
+      commande.prix = total;
+      commande.date_commande = new Date();
       await commande.save();
-      console.log(`Commande ${commandeId} mise à jour`);
 
+      // Créer un nouveau panier pour l'utilisateur
       const nouveauPanier = new Commande({
         user: commande.user,
         date_commande: new Date(),
@@ -113,11 +175,15 @@ export const webhookHandler = async (req, res) => {
         status: true,
       });
       await nouveauPanier.save();
-      console.log(`Nouveau panier créé: ${nouveauPanier._id}`);
+
+      console.log(
+        `Commande ${commandeId} validée | Nouveau panier: ${nouveauPanier._id}`
+      );
     } catch (error) {
       console.error(" Erreur traitement webhook:", error);
       return res.status(500).json({ error: "Erreur traitement paiement" });
     }
   }
+
   res.json({ received: true });
 };

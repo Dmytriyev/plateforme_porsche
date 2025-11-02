@@ -20,13 +20,18 @@ export default function model_porsche_actuelValidation(body) {
     info_moteur: joi.string(),
     info_transmission: joi.string(),
     numero_win: joi.string(),
+    user: joi.string().hex().length(24),
     couleur_interieur: joi.string().hex().length(24),
     couleur_exterieur: joi.string().hex().length(24),
   });
 
   const model_porsche_actuelAddOrRemoveImage = joi.object({
-    photo_voiture_actuels: joi.array().items(joi.string().hex().length(24)),
+    photo_voiture_actuel: joi
+      .array()
+      .items(joi.string().hex().length(24).required())
+      .required(),
   });
+
   return {
     model_porsche_actuelCreate: model_porsche_actuelCreate.validate(body),
     model_porsche_actuelUpdate: model_porsche_actuelUpdate.validate(body),
