@@ -39,7 +39,7 @@ const model_porscheSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    info_consomation: {
+    info_consommation: {
       type: Number,
       required: true,
     },
@@ -58,12 +58,12 @@ const model_porscheSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // accompte pour reserver la voiture neuf
+    // acompte pour réserver la voiture neuf
     acompte: {
       type: Number,
       default: 0,
     },
-    // prix total de la voiture oocation ou neuf
+    // prix total de la voiture occasion ou neuf
     prix: {
       type: Number,
       default: 0,
@@ -79,7 +79,7 @@ const model_porscheSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
-    // relation many to many [{}]
+    // relation one to many [{}]
     couleur_interieur: [
       {
         type: mongoose.Schema.Types.ObjectId,

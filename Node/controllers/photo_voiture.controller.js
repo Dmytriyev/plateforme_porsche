@@ -4,12 +4,33 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Voiture from "../models/voiture.model.js";
+import Couleur_exterieur from "../models/couleur_exterieur.model.js";
+import Couleur_interieur from "../models/couleur_interieur.model.js";
+import Taille_jante from "../models/taille_jante.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const createPhoto_voiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+      }
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+      }
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
@@ -34,6 +55,72 @@ const createPhoto_voiture = async (req, res) => {
       }
       return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Vérifier que la voiture existe et est de type neuf (type_voiture = true)
+    if (body.voiture && Array.isArray(body.voiture)) {
+      for (let voitureId of body.voiture) {
+        const voiture = await Voiture.findById(voitureId);
+        if (!voiture) {
+          if (req.file) {
+            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          }
+          return res
+            .status(404)
+            .json({ message: `Voiture ${voitureId} introuvable` });
+        }
+        // Vérifier que c'est une voiture neuve
+        if (voiture.type_voiture !== true) {
+          if (req.file) {
+            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          }
+          return res.status(400).json({
+            message: `Les photos de voiture ne peuvent être ajoutées qu'aux voitures neuves (type_voiture = true)`,
+          });
+        }
+      }
+    }
+
+    // Vérifier que la couleur extérieure existe si fournie
+    if (body.couleur_exterieur) {
+      const couleurExt = await Couleur_exterieur.findById(
+        body.couleur_exterieur
+      );
+      if (!couleurExt) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res
+          .status(404)
+          .json({ message: "Couleur extérieure introuvable" });
+      }
+    }
+
+    // Vérifier que la couleur intérieure existe si fournie
+    if (body.couleur_interieur) {
+      const couleurInt = await Couleur_interieur.findById(
+        body.couleur_interieur
+      );
+      if (!couleurInt) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res
+          .status(404)
+          .json({ message: "Couleur intérieure introuvable" });
+      }
+    }
+
+    // Vérifier que la taille de jante existe si fournie
+    if (body.taille_jante) {
+      const tailleJante = await Taille_jante.findById(body.taille_jante);
+      if (!tailleJante) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res.status(404).json({ message: "Taille de jante introuvable" });
+      }
+    }
+
     const photo_voiture = new Photo_voiture(body);
     const newPhoto_voiture = await photo_voiture.save();
 
@@ -44,7 +131,10 @@ const createPhoto_voiture = async (req, res) => {
       .populate("couleur_interieur", "nom_couleur photo_couleur")
       .populate("taille_jante", "taille_jante");
 
-    return res.status(201).json(populatedPhoto);
+    return res.status(201).json({
+      message: "Photo de voiture créée avec succès",
+      photo: populatedPhoto,
+    });
   } catch (error) {
     console.log(error);
     if (req.file) {
@@ -88,6 +178,24 @@ const getPhoto_voitureById = async (req, res) => {
 
 const updatePhoto_voiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+      }
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+      }
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
 
     // Vérifier qu'il y a des données (body ou file)
@@ -116,6 +224,70 @@ const updatePhoto_voiture = async (req, res) => {
           fs.unlinkSync("./uploads/voiture/" + req.file.filename);
         }
         return res.status(400).json({ message: error.details[0].message });
+      }
+    }
+
+    // Vérifier que les voitures existent et sont neuves si fournies
+    if (body.voiture && Array.isArray(body.voiture)) {
+      for (let voitureId of body.voiture) {
+        const voiture = await Voiture.findById(voitureId);
+        if (!voiture) {
+          if (req.file) {
+            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          }
+          return res
+            .status(404)
+            .json({ message: `Voiture ${voitureId} introuvable` });
+        }
+        if (voiture.type_voiture !== true) {
+          if (req.file) {
+            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          }
+          return res.status(400).json({
+            message: `Les photos de voiture ne peuvent être ajoutées qu'aux voitures neuves`,
+          });
+        }
+      }
+    }
+
+    // Vérifier couleur extérieure si fournie
+    if (body.couleur_exterieur) {
+      const couleurExt = await Couleur_exterieur.findById(
+        body.couleur_exterieur
+      );
+      if (!couleurExt) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res
+          .status(404)
+          .json({ message: "Couleur extérieure introuvable" });
+      }
+    }
+
+    // Vérifier couleur intérieure si fournie
+    if (body.couleur_interieur) {
+      const couleurInt = await Couleur_interieur.findById(
+        body.couleur_interieur
+      );
+      if (!couleurInt) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res
+          .status(404)
+          .json({ message: "Couleur intérieure introuvable" });
+      }
+    }
+
+    // Vérifier taille de jante si fournie
+    if (body.taille_jante) {
+      const tailleJante = await Taille_jante.findById(body.taille_jante);
+      if (!tailleJante) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        }
+        return res.status(404).json({ message: "Taille de jante introuvable" });
       }
     }
 
@@ -159,7 +331,10 @@ const updatePhoto_voiture = async (req, res) => {
       .populate("couleur_interieur", "nom_couleur photo_couleur")
       .populate("taille_jante", "taille_jante");
 
-    return res.status(200).json(updatedPhoto_voiture);
+    return res.status(200).json({
+      message: "Photo de voiture mise à jour avec succès",
+      photo: updatedPhoto_voiture,
+    });
   } catch (error) {
     console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
@@ -176,6 +351,18 @@ const updatePhoto_voiture = async (req, res) => {
 
 const deletePhoto_voiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const voitures = await Voiture.find({ photo_voiture: req.params.id });
     if (voitures.length > 0) {
       return res.status(400).json({
@@ -186,7 +373,7 @@ const deletePhoto_voiture = async (req, res) => {
     }
     const photo_voiture = await Photo_voiture.findById(req.params.id);
     if (!photo_voiture) {
-      return res.status(404).json({ message: "photo de voiture n'existe pas" });
+      return res.status(404).json({ message: "Photo de voiture n'existe pas" });
     }
 
     if (photo_voiture.name) {
@@ -202,7 +389,7 @@ const deletePhoto_voiture = async (req, res) => {
     await photo_voiture.deleteOne();
     return res
       .status(200)
-      .json({ message: "photo de voiture a été supprimée avec succès" });
+      .json({ message: "Photo de voiture supprimée avec succès" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

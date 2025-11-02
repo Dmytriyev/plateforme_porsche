@@ -8,13 +8,36 @@ import {
 } from "../controllers/couleur_exterieur.controller.js";
 import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
+import auth from "../middlewares/auth.js";
+import isAdmin from "../middlewares/isAdmin.js";
 
 const router = Router();
 
-router.post("/new", upload.single("name"), createCouleur_exterieur);
+// Routes publiques (consultation)
 router.get("/all", getAllCouleur_exterieurs);
 router.get("/:id", validateObjectId("id"), getCouleur_exterieurById);
-router.put("/:id", validateObjectId("id"), updateCouleur_exterieur);
-router.delete("/:id", validateObjectId("id"), deleteCouleur_exterieur);
+
+// Routes protégées (admin uniquement - CRUD)
+router.post(
+  "/new",
+  auth,
+  isAdmin,
+  upload.single("name"),
+  createCouleur_exterieur
+);
+router.put(
+  "/:id",
+  auth,
+  isAdmin,
+  validateObjectId("id"),
+  updateCouleur_exterieur
+);
+router.delete(
+  "/:id",
+  auth,
+  isAdmin,
+  validateObjectId("id"),
+  deleteCouleur_exterieur
+);
 
 export default router;

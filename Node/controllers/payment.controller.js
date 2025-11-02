@@ -14,7 +14,7 @@ export const createCheckoutSession = async (req, res) => {
       "email nom prenom adresse code_postal telephone"
     );
     if (!commande) {
-      return res.status(404).json({ message: "la commande n'existe pas" });
+      return res.status(404).json({ message: "Commande n'existe pas" });
     }
 
     // Vérifier que c'est un panier actif
@@ -36,22 +36,29 @@ export const createCheckoutSession = async (req, res) => {
       .populate("voiture", "nom_model prix type_voiture");
 
     if (ligneCommande.length === 0) {
-      return res.status(400).json({ message: "le panier est vide" });
+      return res.status(400).json({ message: "Le panier est vide" });
     }
 
     let items = [];
     ligneCommande.forEach((line) => {
-      // Déterminer le prix correct depuis LigneCommande
       let unitPrice = 0;
-      let productName = "";
+      let productName = "Produit";
 
-      if (line.voiture && line.acompte > 0) {
+      // Déterminer le prix unitaire à utiliser
+      if (line.voiture && line.acompte && line.acompte > 0) {
+        // Pour les voitures avec acompte, utiliser l'acompte
         unitPrice = line.acompte;
         productName = `${line.voiture.nom_model} (Acompte)`;
+      } else if (line.voiture && line.voiture.prix) {
+        // Pour les voitures sans acompte, utiliser le prix de la voiture
+        unitPrice = line.voiture.prix;
+        productName = line.voiture.nom_model;
       } else if (line.accesoire && line.accesoire.prix) {
+        // Pour les accessoires, utiliser le prix de l'accessoire
         unitPrice = line.accesoire.prix;
         productName = line.accesoire.nom_accesoire;
       } else if (line.prix) {
+        // Fallback sur le prix de la ligne
         unitPrice = line.prix;
         productName = line.voiture
           ? line.voiture.nom_model
@@ -60,7 +67,6 @@ export const createCheckoutSession = async (req, res) => {
 
       // Stripe requiert les prix en centimes
       const unitAmountInCents = Math.round(unitPrice * 100);
-
       let item = {
         price_data: {
           currency: "eur",
@@ -88,11 +94,12 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ["card", "paypal"],
       line_items: items,
       mode: "payment",
-      success_url:
-        process.env.FRONTEND_URL + "/success" ||
-        "http://localhost:3000/success",
-      cancel_url:
-        process.env.FRONTEND_URL + "/cancel" || "http://localhost:3000/cancel",
+      success_url: process.env.FRONTEND_URL
+        ? `${process.env.FRONTEND_URL}/success`
+        : "http://localhost:3001/success",
+      cancel_url: process.env.FRONTEND_URL
+        ? `${process.env.FRONTEND_URL}/cancel`
+        : "http://localhost:3001/cancel",
       metadata: {
         commandeId: id,
       },

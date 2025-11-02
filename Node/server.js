@@ -22,6 +22,7 @@ import taille_janteRoutes from "./routes/taille_jante.route.js";
 import accesoireRoutes from "./routes/accesoire.route.js";
 import photo_accesoireRoutes from "./routes/photo_accesoire.route.js";
 import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
+import photo_porscheRoutes from "./routes/photo_porsche.route.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,8 +30,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuration CORS sécurisée
+// Connexion à la base de données
+db();
 
+// Configuration CORS sécurisée
 // const corsOptions = {
 //   origin: function (origin, callback) {
 //     const allowedOrigins = [
@@ -51,82 +54,90 @@ const port = process.env.PORT || 3000;
 // app.use(cors(corsOptions));
 
 app.use(cors());
-app.use(express.json());
-// Route spéciale webhook pour les paiements Stripe
-app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
-app.listen(port, () => {
-  console.log(`le serveur est démarré sur le port ${port}`);
-});
-app.get("/", (req, res) => {
-  res.send("This is Porsche API");
-});
-db();
 
 // Middlewares de sécurité
 app.use(helmet());
 
-// Rate limiting global - Protection contre les attaques DDoS
+// Rate limiting - Protection contre les attaques DDoS
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requêtes par IP
+  max: 500, // 500 requêtes par IP (augmenté pour les tests)
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Limiter les tentatives de connexion
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 tentatives max
+  max: 20, // 20 tentatives max (augmenté pour les tests)
   message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Limiter les inscriptions
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 3, // 3 inscriptions max
+  max: 10, // 10 inscriptions max (augmenté pour les tests)
   message: "Trop d'inscriptions, réessayez dans 1 heure",
 });
 
-// Limiter les paiements
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 10, // 10 tentatives de paiement max
+  max: 50, // 50 tentatives de paiement max (augmenté pour les tests)
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
-// Limiter les uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 20, // 20 uploads max
+  max: 100, // 100 uploads max (augmenté pour les tests)
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
-// Appliquer rate limiting global sur toutes les routes
+// Route webhook Stripe (AVANT express.json() car utilise express.raw)
+app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
+
+// Parser JSON pour toutes les autres routes
+app.use(express.json());
+
+// Appliquer rate limiting global
 app.use(globalLimiter);
 
+// Fichiers statiques
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Route racine
+app.get("/", (req, res) => {
+  res.send("This is Porsche API");
+});
+
+// Routes photos avec limitation uploads
 app.use("/photo_voiture", uploadLimiter, photo_voitureRoutes);
 app.use("/photo_voiture_actuel", uploadLimiter, photo_voiture_actuelRoutes);
 app.use("/photo_accesoire", uploadLimiter, photo_accesoireRoutes);
+app.use("/photo_porsche", uploadLimiter, photo_porscheRoutes);
+app.use("/couleur_exterieur", uploadLimiter, couleur_exterieurRoutes);
+app.use("/couleur_interieur", uploadLimiter, couleur_interieurRoutes);
+app.use("/couleur_accesoire", uploadLimiter, couleur_accesoireRoutes);
+app.use("/taille_jante", uploadLimiter, taille_janteRoutes);
 
-app.use("/user/login", loginLimiter);
-app.use("/user/register", registerLimiter);
+// Routes utilisateur avec limiters spécifiques
+app.use("/user/login", loginLimiter, userRoutes);
+app.use("/user/register", registerLimiter, userRoutes);
 app.use("/user", userRoutes);
 
+// Route paiement avec limiter
 app.use("/api/payment", paymentLimiter, paymentRoutes);
 
+// Routes métier
 app.use("/reservation", reservationRoutes);
 app.use("/commande", commandeRoutes);
 app.use("/ligneCommande", ligneCommandeRoutes);
 app.use("/model_porsche_actuel", model_porsche_actuelRoutes);
 app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);
-app.use("/couleur_exterieur", couleur_exterieurRoutes);
-app.use("/couleur_interieur", couleur_interieurRoutes);
-app.use("/taille_jante", taille_janteRoutes);
 app.use("/accesoire", accesoireRoutes);
-app.use("/couleur_accesoire", couleur_accesoireRoutes);
+
+// Démarrage du serveur
+app.listen(port, () => {
+  console.log(`Le serveur est démarré sur le port ${port}`);
+});

@@ -1,23 +1,78 @@
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
 import Photo from "../models/photo_voiture_actuel.model.js";
+import Couleur_exterieur from "../models/couleur_exterieur.model.js";
+import Couleur_interieur from "../models/couleur_interieur.model.js";
+import Taille_jante from "../models/taille_jante.model.js";
 
 const createModel_porsche_actuel = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
+    // Auto-assigner l'utilisateur connecté
+    body.user = req.user.id;
+
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelCreate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Vérifier que les couleurs existent si fournies
+    if (body.couleur_exterieur) {
+      const couleurExt = await Couleur_exterieur.findById(
+        body.couleur_exterieur
+      );
+      if (!couleurExt) {
+        return res
+          .status(404)
+          .json({ message: "Couleur extérieure introuvable" });
+      }
+    }
+
+    if (body.couleur_interieur) {
+      const couleurInt = await Couleur_interieur.findById(
+        body.couleur_interieur
+      );
+      if (!couleurInt) {
+        return res
+          .status(404)
+          .json({ message: "Couleur intérieure introuvable" });
+      }
+    }
+
+    if (body.taille_jante) {
+      const jante = await Taille_jante.findById(body.taille_jante);
+      if (!jante) {
+        return res.status(404).json({ message: "Taille de jante introuvable" });
+      }
+    }
+
     const model_porsche_actuel = new Model_porsche_actuel(body);
     const newModel_porsche_actuel = await model_porsche_actuel.save();
-    return res.status(201).json(newModel_porsche_actuel);
+
+    // Retourner avec populate
+    const populated = await Model_porsche_actuel.findById(
+      newModel_porsche_actuel._id
+    )
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante")
+      .populate("user", "nom prenom email");
+
+    return res.status(201).json(populated);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -30,7 +85,9 @@ const getAllModel_porsche_actuels = async (req, res) => {
       .populate("photo_voiture_actuel", "name alt")
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
-      .populate("user", "nom email");
+      .populate("taille_jante", "taille_jante couleur_jante")
+      .populate("user", "nom prenom email")
+      .sort({ createdAt: -1 });
     return res.status(200).json(model_porsche_actuels);
   } catch (error) {
     console.log(error);
@@ -46,11 +103,12 @@ const getModel_porsche_actuelById = async (req, res) => {
       .populate("photo_voiture_actuel", "name alt")
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
-      .populate("user", "nom email");
+      .populate("taille_jante", "taille_jante couleur_jante photo_couleur")
+      .populate("user", "nom prenom email");
     if (!model_porsche_actuel) {
       return res
         .status(404)
-        .json({ message: "model_porsche_actuel n'existe pas" });
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
     }
     return res.status(200).json(model_porsche_actuel);
   } catch (error) {
@@ -62,29 +120,79 @@ const getModel_porsche_actuelById = async (req, res) => {
 const updateModel_porsche_actuel = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
 
+    // Vérifier que le modèle existe
+    const existingModel = await Model_porsche_actuel.findById(req.params.id);
+    if (!existingModel) {
+      return res
+        .status(404)
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (existingModel.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    // Empêcher la modification du champ user
+    delete body.user;
+
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelUpdate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Vérifier que les nouvelles couleurs/jantes existent si fournies
+    if (body.couleur_exterieur) {
+      const couleurExt = await Couleur_exterieur.findById(
+        body.couleur_exterieur
+      );
+      if (!couleurExt) {
+        return res
+          .status(404)
+          .json({ message: "Couleur extérieure introuvable" });
+      }
+    }
+
+    if (body.couleur_interieur) {
+      const couleurInt = await Couleur_interieur.findById(
+        body.couleur_interieur
+      );
+      if (!couleurInt) {
+        return res
+          .status(404)
+          .json({ message: "Couleur intérieure introuvable" });
+      }
+    }
+
+    if (body.taille_jante) {
+      const jante = await Taille_jante.findById(body.taille_jante);
+      if (!jante) {
+        return res.status(404).json({ message: "Taille de jante introuvable" });
+      }
+    }
+
     const updatedModel_porsche_actuel =
       await Model_porsche_actuel.findByIdAndUpdate(req.params.id, body, {
         new: true,
       })
         .populate("photo_voiture_actuel", "name alt")
         .populate("couleur_exterieur", "nom_couleur")
-        .populate("couleur_interieur", "nom_couleur");
-    if (!updatedModel_porsche_actuel) {
-      return res
-        .status(404)
-        .json({ message: "model_porsche_actuel n'existe pas" });
-    }
+        .populate("couleur_interieur", "nom_couleur")
+        .populate("taille_jante", "taille_jante couleur_jante");
+
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
     console.log(error);
@@ -94,14 +202,30 @@ const updateModel_porsche_actuel = async (req, res) => {
 
 const deleteModel_porsche_actuel = async (req, res) => {
   try {
-    const model_porsche_actuel = await Model_porsche_actuel.findByIdAndDelete(
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const model_porsche_actuel = await Model_porsche_actuel.findById(
       req.params.id
     );
     if (!model_porsche_actuel) {
       return res
         .status(404)
-        .json({ message: "model_porsche_actuel n'existe pas" });
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
     }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (
+      model_porsche_actuel.user.toString() !== req.user.id &&
+      !req.user.isAdmin
+    ) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    await Model_porsche_actuel.findByIdAndDelete(req.params.id);
+
     return res
       .status(200)
       .json({ message: "model_porsche_actuel à bien été supprimé" });
@@ -113,7 +237,13 @@ const deleteModel_porsche_actuel = async (req, res) => {
 const addImages = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
@@ -122,7 +252,7 @@ const addImages = async (req, res) => {
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelAddOrRemoveImage;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     for (let photo_voiture_actuelId of body.photo_voiture_actuel) {
@@ -130,7 +260,7 @@ const addImages = async (req, res) => {
       if (!photo_voiture_actuel) {
         return res
           .status(404)
-          .json({ message: `la photo ${photo_voiture_actuelId} n'existe pas` });
+          .json({ message: `Photo ${photo_voiture_actuelId} n'existe pas` });
       }
     }
 
@@ -140,7 +270,15 @@ const addImages = async (req, res) => {
     if (!model_porsche_actuel) {
       return res
         .status(404)
-        .json({ message: `le modèle ${req.params.id} n'existe pas` });
+        .json({ message: `Modèle ${req.params.id} n'existe pas` });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (
+      model_porsche_actuel.user.toString() !== req.user.id &&
+      !req.user.isAdmin
+    ) {
+      return res.status(403).json({ message: "Accès non autorisé" });
     }
 
     // ajouter les photos sans doublons
@@ -153,7 +291,11 @@ const addImages = async (req, res) => {
           },
         },
         { new: true }
-      ).populate("photo_voiture_actuel", "name alt");
+      )
+        .populate("photo_voiture_actuel", "name alt")
+        .populate("couleur_exterieur", "nom_couleur")
+        .populate("couleur_interieur", "nom_couleur")
+        .populate("taille_jante", "taille_jante couleur_jante");
 
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
@@ -165,15 +307,22 @@ const addImages = async (req, res) => {
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelAddOrRemoveImage;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     for (let photo_voiture_actuelId of body.photo_voiture_actuel) {
@@ -181,7 +330,7 @@ const removeImages = async (req, res) => {
       if (!photo_voiture_actuel) {
         return res
           .status(404)
-          .json({ message: `la photo ${photo_voiture_actuelId} n'existe pas` });
+          .json({ message: `Photo ${photo_voiture_actuelId} n'existe pas` });
       }
     }
 
@@ -191,7 +340,15 @@ const removeImages = async (req, res) => {
     if (!model_porsche_actuel) {
       return res
         .status(404)
-        .json({ message: `le modèle ${req.params.id} n'existe pas` });
+        .json({ message: `Modèle ${req.params.id} n'existe pas` });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (
+      model_porsche_actuel.user.toString() !== req.user.id &&
+      !req.user.isAdmin
+    ) {
+      return res.status(403).json({ message: "Accès non autorisé" });
     }
 
     const updatedModel_porsche_actuel =
@@ -201,9 +358,341 @@ const removeImages = async (req, res) => {
           $pull: { photo_voiture_actuel: { $in: body.photo_voiture_actuel } },
         },
         { new: true }
-      ).populate("photo_voiture_actuel", "name alt");
+      )
+        .populate("photo_voiture_actuel", "name alt")
+        .populate("couleur_exterieur", "nom_couleur")
+        .populate("couleur_interieur", "nom_couleur")
+        .populate("taille_jante", "taille_jante couleur_jante");
 
     return res.status(200).json(updatedModel_porsche_actuel);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Récupérer les Porsches de l'utilisateur connecté
+const getMesPorsches = async (req, res) => {
+  try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const mesPorsches = await Model_porsche_actuel.find({ user: req.user.id })
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante photo_couleur")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      total: mesPorsches.length,
+      porsches: mesPorsches,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Changer la couleur extérieure
+const setCouleurExterieur = async (req, res) => {
+  try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const { couleur_exterieur } = req.body;
+
+    if (!couleur_exterieur) {
+      return res.status(400).json({ message: "couleur_exterieur est requis" });
+    }
+
+    // Vérifier que la couleur existe
+    const couleur = await Couleur_exterieur.findById(couleur_exterieur);
+    if (!couleur) {
+      return res
+        .status(404)
+        .json({ message: "Couleur extérieure introuvable" });
+    }
+
+    // Vérifier que le modèle existe
+    const model = await Model_porsche_actuel.findById(req.params.id);
+    if (!model) {
+      return res
+        .status(404)
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (model.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    model.couleur_exterieur = couleur_exterieur;
+    await model.save();
+
+    const updated = await Model_porsche_actuel.findById(model._id)
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante");
+
+    return res.status(200).json({
+      message: "Couleur extérieure mise à jour avec succès",
+      porsche: updated,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Changer la couleur intérieure
+const setCouleurInterieur = async (req, res) => {
+  try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const { couleur_interieur } = req.body;
+
+    if (!couleur_interieur) {
+      return res.status(400).json({ message: "couleur_interieur est requis" });
+    }
+
+    // Vérifier que la couleur existe
+    const couleur = await Couleur_interieur.findById(couleur_interieur);
+    if (!couleur) {
+      return res
+        .status(404)
+        .json({ message: "Couleur intérieure introuvable" });
+    }
+
+    // Vérifier que le modèle existe
+    const model = await Model_porsche_actuel.findById(req.params.id);
+    if (!model) {
+      return res
+        .status(404)
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (model.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    model.couleur_interieur = couleur_interieur;
+    await model.save();
+
+    const updated = await Model_porsche_actuel.findById(model._id)
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante");
+
+    return res.status(200).json({
+      message: "Couleur intérieure mise à jour avec succès",
+      porsche: updated,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Changer la taille des jantes
+const setTailleJante = async (req, res) => {
+  try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const { taille_jante } = req.body;
+
+    if (!taille_jante) {
+      return res.status(400).json({ message: "taille_jante est requis" });
+    }
+
+    // Vérifier que la jante existe
+    const jante = await Taille_jante.findById(taille_jante);
+    if (!jante) {
+      return res.status(404).json({ message: "Taille de jante introuvable" });
+    }
+
+    // Vérifier que le modèle existe
+    const model = await Model_porsche_actuel.findById(req.params.id);
+    if (!model) {
+      return res
+        .status(404)
+        .json({ message: "Modèle Porsche actuel n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est propriétaire ou admin
+    if (model.user.toString() !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    model.taille_jante = taille_jante;
+    await model.save();
+
+    const updated = await Model_porsche_actuel.findById(model._id)
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante photo_couleur");
+
+    return res.status(200).json({
+      message: "Taille de jante mise à jour avec succès",
+      porsche: updated,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Rechercher par critères
+const searchPorschesByCriteria = async (req, res) => {
+  try {
+    const {
+      type_model,
+      type_carrosserie,
+      annee_min,
+      annee_max,
+      couleur_exterieur,
+      couleur_interieur,
+      taille_jante,
+    } = req.query;
+
+    const filter = {};
+
+    if (type_model) {
+      filter.type_model = { $regex: type_model, $options: "i" };
+    }
+
+    if (type_carrosserie) {
+      filter.type_carrosserie = { $regex: type_carrosserie, $options: "i" };
+    }
+
+    if (annee_min || annee_max) {
+      filter.annee_production = {};
+      if (annee_min) {
+        filter.annee_production.$gte = new Date(annee_min);
+      }
+      if (annee_max) {
+        filter.annee_production.$lte = new Date(annee_max);
+      }
+    }
+
+    if (couleur_exterieur) {
+      filter.couleur_exterieur = couleur_exterieur;
+    }
+
+    if (couleur_interieur) {
+      filter.couleur_interieur = couleur_interieur;
+    }
+
+    if (taille_jante) {
+      filter.taille_jante = taille_jante;
+    }
+
+    const porsches = await Model_porsche_actuel.find(filter)
+      .populate("photo_voiture_actuel", "name alt")
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("taille_jante", "taille_jante couleur_jante")
+      .populate("user", "nom prenom email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      total: porsches.length,
+      criteres: req.query,
+      porsches,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Statistiques des Porsches (Admin)
+const getStatistiquesPorsches = async (req, res) => {
+  try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier les droits admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
+    const totalPorsches = await Model_porsche_actuel.countDocuments();
+
+    // Par type de modèle
+    const parTypeModel = await Model_porsche_actuel.aggregate([
+      { $group: { _id: "$type_model", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Par type de carrosserie
+    const parTypeCarrosserie = await Model_porsche_actuel.aggregate([
+      { $group: { _id: "$type_carrosserie", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+
+    // Par année
+    const parAnnee = await Model_porsche_actuel.aggregate([
+      { $group: { _id: { $year: "$annee_production" }, count: { $sum: 1 } } },
+      { $sort: { _id: -1 } },
+    ]);
+
+    // Couleurs les plus populaires
+    const couleursExtPopulaires = await Model_porsche_actuel.aggregate([
+      { $match: { couleur_exterieur: { $exists: true } } },
+      { $group: { _id: "$couleur_exterieur", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "couleur_exterieurs",
+          localField: "_id",
+          foreignField: "_id",
+          as: "couleur",
+        },
+      },
+      { $unwind: "$couleur" },
+    ]);
+
+    const statistiques = {
+      total: totalPorsches,
+      parTypeModel: parTypeModel.map((item) => ({
+        type: item._id,
+        nombre: item.count,
+      })),
+      parTypeCarrosserie: parTypeCarrosserie.map((item) => ({
+        type: item._id,
+        nombre: item.count,
+      })),
+      parAnnee: parAnnee.map((item) => ({
+        annee: item._id,
+        nombre: item.count,
+      })),
+      topCouleursExterieur: couleursExtPopulaires.map((item) => ({
+        couleur: item.couleur.nom_couleur,
+        nombre: item.count,
+      })),
+    };
+
+    return res.status(200).json(statistiques);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -218,4 +707,10 @@ export {
   deleteModel_porsche_actuel,
   addImages,
   removeImages,
+  getMesPorsches,
+  setCouleurExterieur,
+  setCouleurInterieur,
+  setTailleJante,
+  searchPorschesByCriteria,
+  getStatistiquesPorsches,
 };

@@ -13,6 +13,10 @@ import {
   getUserPorsches,
   deleteUserPorsche,
   getUserProfile,
+  getUserStatistiques,
+  cancelUserReservation,
+  updateUserPorsche,
+  getUserDashboard,
 } from "../controllers/user.controller.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
@@ -25,29 +29,62 @@ router.post("/register", register);
 router.post("/login", login);
 
 // Routes administrateur - Nécessite authentification + droits admin
-router.get("/all", getAllUsers);
+router.get("/all", auth, isAdmin, getAllUsers);
 
 // Routes utilisateur - Nécessite authentification
-router.get("/:id", validateObjectId("id"), getUserById);
-router.put("/:id", validateObjectId("id"), updateUser);
-router.delete("/:id", validateObjectId("id"), deleteUser);
-router.get("/:id/profile", validateObjectId("id"), getUserProfile);
+router.get("/:id", auth, validateObjectId("id"), getUserById);
+router.put("/:id", auth, validateObjectId("id"), updateUser);
+router.delete("/:id", auth, validateObjectId("id"), deleteUser);
+router.get("/:id/profile", auth, validateObjectId("id"), getUserProfile);
+router.get(
+  "/:id/statistiques",
+  auth,
+  validateObjectId("id"),
+  getUserStatistiques
+);
+router.get("/:id/dashboard", auth, validateObjectId("id"), getUserDashboard);
 
 // Gestion des réservations - Nécessite authentification
-router.post("/:id/reservations", validateObjectId("id"), createUserReservation);
-router.get("/:id/reservations", validateObjectId("id"), getUserReservations);
+router.post(
+  "/:id/reservations",
+  auth,
+  validateObjectId("id"),
+  createUserReservation
+);
+router.get(
+  "/:id/reservations",
+  auth,
+  validateObjectId("id"),
+  getUserReservations
+);
+router.put(
+  "/:id/reservations/:reservationId/cancel",
+  auth,
+  validateObjectId("id"),
+  validateObjectId("reservationId"),
+  cancelUserReservation
+);
 router.delete(
   "/:id/reservations/:reservationId",
+  auth,
   validateObjectId("id"),
   validateObjectId("reservationId"),
   deleteUserReservation
 );
 
 // Gestion des Porsches personnelles - Nécessite authentification
-router.post("/:id/porsches", validateObjectId("id"), addUserPorsche);
-router.get("/:id/porsches", validateObjectId("id"), getUserPorsches);
+router.post("/:id/porsches", auth, validateObjectId("id"), addUserPorsche);
+router.get("/:id/porsches", auth, validateObjectId("id"), getUserPorsches);
+router.put(
+  "/:id/porsches/:porscheId",
+  auth,
+  validateObjectId("id"),
+  validateObjectId("porscheId"),
+  updateUserPorsche
+);
 router.delete(
   "/:id/porsches/:porscheId",
+  auth,
   validateObjectId("id"),
   validateObjectId("porscheId"),
   deleteUserPorsche

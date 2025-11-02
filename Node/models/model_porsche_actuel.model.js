@@ -47,6 +47,11 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_interieur",
     },
+    // relation many to one {}
+    taille_jante: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Taille_jante",
+    },
     // relation one to many [{}]
     // One-to-Many (un modèle → plusieurs photos)
     photo_voiture_actuel: [

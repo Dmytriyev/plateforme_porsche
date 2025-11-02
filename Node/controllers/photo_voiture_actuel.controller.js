@@ -10,6 +10,14 @@ const __dirname = path.dirname(__filename);
 
 const createPhoto_voiture_actuel = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+      }
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
@@ -19,6 +27,32 @@ const createPhoto_voiture_actuel = async (req, res) => {
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
+    // Vérifier que le model_porsche_actuel existe et appartient à l'utilisateur
+    if (body.model_porsche_actuel) {
+      const model_porsche_actuel = await Model_porsche_actuel.findById(
+        body.model_porsche_actuel
+      );
+      if (!model_porsche_actuel) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+        }
+        return res
+          .status(404)
+          .json({ message: "Model Porsche actuel n'existe pas" });
+      }
+      // Vérifier que l'utilisateur est le propriétaire
+      if (model_porsche_actuel.user.toString() !== req.user._id.toString()) {
+        if (req.file) {
+          fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+        }
+        return res.status(403).json({
+          message:
+            "Vous n'avez pas la permission d'ajouter des photos à ce véhicule",
+        });
+      }
+    }
+
     if (req.file) {
       body.name =
         req.protocol +
@@ -37,7 +71,10 @@ const createPhoto_voiture_actuel = async (req, res) => {
     }
     const photo_voiture_actuel = new Photo_voiture_actuel(body);
     const newPhoto_voiture_actuel = await photo_voiture_actuel.save();
-    return res.status(201).json(newPhoto_voiture_actuel);
+    return res.status(201).json({
+      message: "Photo de voiture ajoutée avec succès",
+      photo: newPhoto_voiture_actuel,
+    });
   } catch (error) {
     console.log(error);
     if (req.file) {
@@ -63,9 +100,7 @@ const getPhoto_voiture_actuelById = async (req, res) => {
       req.params.id
     );
     if (!photo_voiture_actuel) {
-      return res
-        .status(404)
-        .json({ message: "photo_voiture_actuel n'existe pas" });
+      return res.status(404).json({ message: "Photo de voiture n'existe pas" });
     }
     return res.status(200).json(photo_voiture_actuel);
   } catch (error) {
@@ -76,6 +111,14 @@ const getPhoto_voiture_actuelById = async (req, res) => {
 
 const updatePhoto_voiture_actuel = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+      }
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     const { body } = req;
 
     // Vérifier qu'il y a des données (body ou file)
@@ -83,6 +126,30 @@ const updatePhoto_voiture_actuel = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Récupérer l'ancienne photo pour vérifier la propriété
+    const oldPhoto = await Photo_voiture_actuel.findById(
+      req.params.id
+    ).populate("model_porsche_actuel");
+    if (!oldPhoto) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+      }
+      return res.status(404).json({ message: "Photo de voiture n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est le propriétaire
+    if (
+      oldPhoto.model_porsche_actuel?.user?.toString() !==
+      req.user._id.toString()
+    ) {
+      if (req.file) {
+        fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
+      }
+      return res.status(403).json({
+        message: "Vous n'avez pas la permission de modifier cette photo",
+      });
     }
 
     // Si un fichier est uploadé, mettre à jour le champ name
@@ -106,18 +173,6 @@ const updatePhoto_voiture_actuel = async (req, res) => {
         }
         return res.status(400).json({ message: error.details[0].message });
       }
-    }
-
-    // Récupérer l'ancienne photo pour supprimer l'ancien fichier si nécessaire
-    const oldPhoto = await Photo_voiture_actuel.findById(req.params.id);
-    if (!oldPhoto) {
-      // Nettoyer le nouveau fichier si la photo n'existe pas
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
-      }
-      return res
-        .status(404)
-        .json({ message: "photo_voiture_actuel n'existe pas" });
     }
 
     // Si on remplace l'image, supprimer l'ancienne
@@ -145,7 +200,10 @@ const updatePhoto_voiture_actuel = async (req, res) => {
         new: true,
       });
 
-    return res.status(200).json(updatedPhoto_voiture_actuel);
+    return res.status(200).json({
+      message: "Photo de voiture mise à jour avec succès",
+      photo: updatedPhoto_voiture_actuel,
+    });
   } catch (error) {
     console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
@@ -162,6 +220,28 @@ const updatePhoto_voiture_actuel = async (req, res) => {
 
 const deletePhoto_voiture_actuel = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const photo_voiture_actuel = await Photo_voiture_actuel.findById(
+      req.params.id
+    ).populate("model_porsche_actuel");
+    if (!photo_voiture_actuel) {
+      return res.status(404).json({ message: "Photo de voiture n'existe pas" });
+    }
+
+    // Vérifier que l'utilisateur est le propriétaire
+    if (
+      photo_voiture_actuel.model_porsche_actuel?.user?.toString() !==
+      req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "Vous n'avez pas la permission de supprimer cette photo",
+      });
+    }
+
     const model_porsche_actuels = await Model_porsche_actuel.find({
       photo_voiture_actuel: req.params.id,
     });
@@ -173,14 +253,6 @@ const deletePhoto_voiture_actuel = async (req, res) => {
       });
     }
 
-    const photo_voiture_actuel = await Photo_voiture_actuel.findById(
-      req.params.id
-    );
-    if (!photo_voiture_actuel) {
-      return res
-        .status(404)
-        .json({ message: "photo_voiture_actuel n'existe pas" });
-    }
     if (photo_voiture_actuel.name) {
       const oldPath = path.join(
         __dirname,
@@ -194,7 +266,7 @@ const deletePhoto_voiture_actuel = async (req, res) => {
     await photo_voiture_actuel.deleteOne();
     return res
       .status(200)
-      .json({ message: "photo_voiture_actuel a été supprimé" });
+      .json({ message: "Photo de voiture supprimée avec succès" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

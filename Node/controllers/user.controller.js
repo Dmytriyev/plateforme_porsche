@@ -5,13 +5,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Commande from "../models/Commande.model.js";
 import Reservation from "../models/reservation.model.js";
+import Voiture from "../models/voiture.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
 
 const register = async (req, res) => {
   try {
     const { body } = req;
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
@@ -19,7 +20,7 @@ const register = async (req, res) => {
 
     const { error } = userValidation(body).userCreate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const searchUser = await User.findOne({ email: body.email });
@@ -58,10 +59,16 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { error } = userValidation(req.body).userLogin;
 
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Pas de données dans la requête" });
+    }
+
+    const { error } = userValidation(req.body).userLogin;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const user = await User.findOne({ email: email });
@@ -86,7 +93,12 @@ const login = async (req, res) => {
       message: user.email + " est connecté",
       user: userForToken,
       token: jwt.sign(
-        { id: user._id, email: user.email },
+        {
+          id: user._id,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          role: user.role,
+        },
         process.env.SECRET_KEY,
         { expiresIn: "24h" }
       ),
@@ -109,6 +121,11 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur accède à ses propres données ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
@@ -127,13 +144,18 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur modifie ses propres données ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
 
     const { body } = req;
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
@@ -148,7 +170,7 @@ const updateUser = async (req, res) => {
 
     const { error } = userValidation(body).userUpdate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.params.id, body, {
@@ -167,6 +189,11 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur supprime son propre compte ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
@@ -197,12 +224,17 @@ const createUserReservation = async (req, res) => {
     const { body } = req;
     const userId = req.params.id;
 
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur crée une réservation pour lui-même ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
 
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res.status(400).json({
         message: "Données de réservation requises",
       });
@@ -210,7 +242,7 @@ const createUserReservation = async (req, res) => {
 
     const { error } = userValidation(body).userReservation;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const user = await User.findById(userId);
@@ -225,6 +257,20 @@ const createUserReservation = async (req, res) => {
     if (dateReservation < today) {
       return res.status(400).json({
         message: "La date de réservation ne peut pas être dans le passé",
+      });
+    }
+
+    // Vérifier que la voiture existe et qu'elle est bien d'occasion
+    const voiture = await Voiture.findById(body.voiture);
+    if (!voiture) {
+      return res.status(404).json({ message: "Voiture introuvable" });
+    }
+
+    // LOGIQUE MÉTIER: Seules les voitures d'occasion peuvent être réservées
+    if (voiture.type_voiture !== false) {
+      return res.status(400).json({
+        message:
+          "Seules les voitures d'occasion peuvent être réservées. Les voitures neuves doivent être achetées via une commande.",
       });
     }
 
@@ -262,6 +308,11 @@ const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;
 
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur accède à ses propres réservations ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
@@ -289,12 +340,17 @@ const addUserPorsche = async (req, res) => {
     const { body } = req;
     const userId = req.params.id;
 
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur ajoute une Porsche pour lui-même ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
 
-    if (!body) {
+    if (!body || Object.keys(body).length === 0) {
       return res.status(400).json({
         message: "Données de la Porsche requises",
       });
@@ -303,7 +359,7 @@ const addUserPorsche = async (req, res) => {
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelCreate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const user = await User.findById(userId);
@@ -328,6 +384,11 @@ const addUserPorsche = async (req, res) => {
 const getUserPorsches = async (req, res) => {
   try {
     const userId = req.params.id;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
 
     // Vérifier que l'utilisateur accède à ses propres Porsches ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
@@ -358,6 +419,11 @@ const getUserPorsches = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
 
     // Vérifier que l'utilisateur accède à son propre profil ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
@@ -436,6 +502,11 @@ const deleteUserReservation = async (req, res) => {
     const userId = req.params.id;
     const reservationId = req.params.reservationId;
 
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur supprime sa propre réservation ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
@@ -474,6 +545,11 @@ const deleteUserPorsche = async (req, res) => {
     const userId = req.params.id;
     const porscheId = req.params.porscheId;
 
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
     // Vérifier que l'utilisateur supprime sa propre Porsche ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
@@ -502,6 +578,318 @@ const deleteUserPorsche = async (req, res) => {
   }
 };
 
+// Obtenir les statistiques de l'utilisateur
+const getUserStatistiques = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur accède à ses propres stats ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur n'existe pas" });
+    }
+
+    // Statistiques des commandes
+    const commandes = await Commande.find({ user: userId, status: false });
+    const totalCommandes = commandes.length;
+    const montantTotalCommandes = commandes.reduce(
+      (sum, cmd) => sum + (cmd.prix || 0),
+      0
+    );
+    const acompteTotalCommandes = commandes.reduce(
+      (sum, cmd) => sum + (cmd.acompte || 0),
+      0
+    );
+
+    // Statistiques des réservations
+    const reservations = await Reservation.find({ user: userId });
+    const reservationsActives = reservations.filter(
+      (r) => r.status === true
+    ).length;
+    const reservationsPassees = reservations.filter(
+      (r) => r.status === false
+    ).length;
+
+    // Statistiques des Porsches personnelles
+    const porsches = await Model_porsche_actuel.find({ user: userId });
+    const nombrePorsches = porsches.length;
+
+    // Panier actuel
+    const panier = await Commande.findOne({ user: userId, status: true });
+    let panierInfo = null;
+    if (panier) {
+      const lignesCommande = await LigneCommande.find({ commande: panier._id });
+      const totalPanier = lignesCommande.reduce((sum, ligne) => {
+        return sum + (ligne.prix_unitaire * ligne.quantite || 0);
+      }, 0);
+      panierInfo = {
+        nombreArticles: lignesCommande.length,
+        montantTotal: totalPanier,
+      };
+    }
+
+    const statistiques = {
+      utilisateur: {
+        nom: user.nom,
+        prenom: user.prenom,
+        email: user.email,
+        telephone: user.telephone,
+        inscrit: user.createdAt,
+      },
+      commandes: {
+        total: totalCommandes,
+        montantTotal: montantTotalCommandes,
+        acompteTotal: acompteTotalCommandes,
+        montantMoyen:
+          totalCommandes > 0 ? montantTotalCommandes / totalCommandes : 0,
+        derniereCommande:
+          totalCommandes > 0
+            ? commandes[commandes.length - 1].date_commande
+            : null,
+      },
+      reservations: {
+        total: reservations.length,
+        actives: reservationsActives,
+        passees: reservationsPassees,
+      },
+      porsches: {
+        total: nombrePorsches,
+      },
+      panier: panierInfo,
+    };
+
+    return res.status(200).json(statistiques);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Annuler une réservation (change le status au lieu de supprimer)
+const cancelUserReservation = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const reservationId = req.params.reservationId;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur annule sa propre réservation ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur n'existe pas" });
+    }
+
+    const reservation = await Reservation.findOne({
+      _id: reservationId,
+      user: userId,
+    });
+
+    if (!reservation) {
+      return res.status(404).json({
+        message:
+          "Réservation introuvable ou n'appartient pas à cet utilisateur",
+      });
+    }
+
+    if (reservation.status === false) {
+      return res.status(400).json({
+        message: "Cette réservation est déjà annulée",
+      });
+    }
+
+    // Mettre à jour le status au lieu de supprimer
+    reservation.status = false;
+    await reservation.save();
+
+    return res.status(200).json({
+      message: "Réservation annulée avec succès",
+      reservation,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Mettre à jour une Porsche personnelle
+const updateUserPorsche = async (req, res) => {
+  try {
+    const { body } = req;
+    const userId = req.params.id;
+    const porscheId = req.params.porscheId;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur modifie sa propre Porsche ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    if (!body || Object.keys(body).length === 0) {
+      return res.status(400).json({
+        message: "Données de mise à jour requises",
+      });
+    }
+
+    const { error } =
+      model_porsche_actuelValidation(body).model_porsche_actuelUpdate;
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur n'existe pas" });
+    }
+
+    const porsche = await Model_porsche_actuel.findOne({
+      _id: porscheId,
+      user: userId,
+    });
+
+    if (!porsche) {
+      return res.status(404).json({
+        message: "Porsche introuvable ou n'appartient pas à cet utilisateur",
+      });
+    }
+
+    const updatedPorsche = await Model_porsche_actuel.findByIdAndUpdate(
+      porscheId,
+      body,
+      { new: true }
+    )
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("photo_voiture_actuel", "name alt");
+
+    return res.status(200).json({
+      message: "Porsche mise à jour avec succès",
+      porsche: updatedPorsche,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Obtenir le tableau de bord complet de l'utilisateur
+const getUserDashboard = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur accède à son propre dashboard ou est admin
+    if (req.user.id !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur n'existe pas" });
+    }
+
+    // Réservations à venir
+    const today = new Date();
+    const reservationsAvenir = await Reservation.find({
+      user: userId,
+      status: true,
+      date_reservation: { $gte: today },
+    })
+      .populate("voiture", "nom_model type_voiture description prix")
+      .sort({ date_reservation: 1 })
+      .limit(5);
+
+    // Dernières commandes
+    const dernieresCommandes = await Commande.find({
+      user: userId,
+      status: false,
+    })
+      .sort({ date_commande: -1 })
+      .limit(5);
+
+    // Panier actuel
+    const panier = await Commande.findOne({ user: userId, status: true });
+    let panierDetails = null;
+    if (panier) {
+      const lignesCommande = await LigneCommande.find({ commande: panier._id })
+        .populate("accesoire", "nom_accesoire prix")
+        .populate("voiture", "nom_model type_voiture prix");
+
+      const total = lignesCommande.reduce((sum, ligne) => {
+        return sum + (ligne.prix_unitaire * ligne.quantite || 0);
+      }, 0);
+
+      panierDetails = {
+        _id: panier._id,
+        nombreArticles: lignesCommande.length,
+        total,
+        lignesCommande,
+      };
+    }
+
+    // Porsches personnelles récentes
+    const porschesRecentes = await Model_porsche_actuel.find({ user: userId })
+      .populate("couleur_exterieur", "nom_couleur")
+      .populate("couleur_interieur", "nom_couleur")
+      .populate("photo_voiture_actuel", "name alt")
+      .sort({ createdAt: -1 })
+      .limit(3);
+
+    // Statistiques rapides
+    const totalCommandes = await Commande.countDocuments({
+      user: userId,
+      status: false,
+    });
+    const totalReservations = await Reservation.countDocuments({
+      user: userId,
+    });
+    const totalPorsches = await Model_porsche_actuel.countDocuments({
+      user: userId,
+    });
+
+    const dashboard = {
+      utilisateur: user,
+      stats: {
+        totalCommandes,
+        totalReservations,
+        totalPorsches,
+      },
+      reservationsAvenir,
+      dernieresCommandes,
+      panier: panierDetails,
+      porschesRecentes,
+    };
+
+    return res.status(200).json(dashboard);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
 export {
   register,
   login,
@@ -516,4 +904,8 @@ export {
   getUserPorsches,
   deleteUserPorsche,
   getUserProfile,
+  getUserStatistiques,
+  cancelUserReservation,
+  updateUserPorsche,
+  getUserDashboard,
 };

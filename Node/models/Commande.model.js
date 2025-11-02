@@ -32,7 +32,16 @@ const CommandeSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Virtual pour les lignes de commande
+CommandeSchema.virtual("lignesCommande", {
+  ref: "LigneCommande",
+  localField: "_id",
+  foreignField: "commande",
+});
 
 export default mongoose.model("Commande", CommandeSchema);

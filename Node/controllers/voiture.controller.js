@@ -4,16 +4,42 @@ import Photo from "../models/photo_voiture.model.js";
 
 const createVoiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
     const { error } = voitureValidation(body).voitureCreate;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Vérifier que les photos existent si fournies
+    if (body.photo_voiture && Array.isArray(body.photo_voiture)) {
+      for (let photoId of body.photo_voiture) {
+        const photo = await Photo.findById(photoId);
+        if (!photo) {
+          return res
+            .status(404)
+            .json({ message: `La photo ${photoId} n'existe pas` });
+        }
+      }
+    }
+
     const voiture = new Voiture(body);
     const newVoiture = await voiture.save();
 
@@ -21,7 +47,10 @@ const createVoiture = async (req, res) => {
       "photo_voiture",
       "name alt"
     );
-    return res.status(201).json(populatedVoiture);
+    return res.status(201).json({
+      message: "Voiture créée avec succès",
+      voiture: populatedVoiture,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -58,6 +87,18 @@ const getVoitureById = async (req, res) => {
 
 const updateVoiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -70,15 +111,29 @@ const updateVoiture = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
+    // Vérifier que la voiture existe
+    const voitureExist = await Voiture.findById(req.params.id);
+    if (!voitureExist) {
+      return res.status(404).json({ message: "Voiture n'existe pas" });
+    }
+
     const { photo_voiture, ...otherData } = body;
     let updateQuery = otherData;
 
-    // Si des photos sont fournies, utiliser $addToSet pour éviter les doublons
+    // Si des photos sont fournies, vérifier qu'elles existent et utiliser $addToSet
     if (
       photo_voiture &&
       Array.isArray(photo_voiture) &&
       photo_voiture.length > 0
     ) {
+      for (let photoId of photo_voiture) {
+        const photo = await Photo.findById(photoId);
+        if (!photo) {
+          return res
+            .status(404)
+            .json({ message: `La photo ${photoId} n'existe pas` });
+        }
+      }
       updateQuery = {
         ...otherData,
         $addToSet: { photo_voiture: { $each: photo_voiture } },
@@ -92,9 +147,12 @@ const updateVoiture = async (req, res) => {
     ).populate("photo_voiture", "name alt");
 
     if (!updatedVoiture) {
-      return res.status(404).json({ message: "voiture n'existe pas" });
+      return res.status(404).json({ message: "Voiture n'existe pas" });
     }
-    return res.status(200).json(updatedVoiture);
+    return res.status(200).json({
+      message: "Voiture mise à jour avec succès",
+      voiture: updatedVoiture,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -103,13 +161,23 @@ const updateVoiture = async (req, res) => {
 
 const deleteVoiture = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const voiture = await Voiture.findByIdAndDelete(req.params.id);
     if (!voiture) {
-      return res.status(404).json({ message: "voiture n'existe pas" });
+      return res.status(404).json({ message: "Voiture n'existe pas" });
     }
-    return res
-      .status(200)
-      .json({ message: "voiture a été supprimée avec succès" });
+    return res.status(200).json({ message: "Voiture supprimée avec succès" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -118,6 +186,18 @@ const deleteVoiture = async (req, res) => {
 
 const addImages = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -130,21 +210,21 @@ const addImages = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
+    const voiture = await Voiture.findById(req.params.id);
+    if (!voiture) {
+      return res
+        .status(404)
+        .json({ message: `La voiture ${req.params.id} n'existe pas` });
+    }
+
     // Vérifier que les photos existent
     for (let photo_voitureId of body.photo_voiture) {
       const photo_voiture = await Photo.findById(photo_voitureId);
       if (!photo_voiture) {
         return res
           .status(404)
-          .json({ message: `la photo ${photo_voitureId} n'existe pas` });
+          .json({ message: `La photo ${photo_voitureId} n'existe pas` });
       }
-    }
-
-    const voiture = await Voiture.findById(req.params.id);
-    if (!voiture) {
-      return res
-        .status(404)
-        .json({ message: `la voiture ${req.params.id} n'existe pas` });
     }
 
     // Utiliser $addToSet pour ajouter les photos sans doublons
@@ -154,7 +234,10 @@ const addImages = async (req, res) => {
       { new: true }
     ).populate("photo_voiture", "name alt");
 
-    return res.status(200).json(updatedVoiture);
+    return res.status(200).json({
+      message: "Photos ajoutées avec succès",
+      voiture: updatedVoiture,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -163,6 +246,18 @@ const addImages = async (req, res) => {
 
 const removeImages = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -175,21 +270,21 @@ const removeImages = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
+    const voiture = await Voiture.findById(req.params.id);
+    if (!voiture) {
+      return res
+        .status(404)
+        .json({ message: `La voiture ${req.params.id} n'existe pas` });
+    }
+
     // Vérifier que les photos existent
     for (let photo_voitureId of body.photo_voiture) {
       const photo_voiture = await Photo.findById(photo_voitureId);
       if (!photo_voiture) {
         return res
           .status(404)
-          .json({ message: `la photo ${photo_voitureId} n'existe pas` });
+          .json({ message: `La photo ${photo_voitureId} n'existe pas` });
       }
-    }
-
-    const voiture = await Voiture.findById(req.params.id);
-    if (!voiture) {
-      return res
-        .status(404)
-        .json({ message: `la voiture ${req.params.id} n'existe pas` });
     }
 
     const updatedVoiture = await Voiture.findByIdAndUpdate(
@@ -198,7 +293,10 @@ const removeImages = async (req, res) => {
       { new: true }
     ).populate("photo_voiture", "name alt");
 
-    return res.status(200).json(updatedVoiture);
+    return res.status(200).json({
+      message: "Photos supprimées avec succès",
+      voiture: updatedVoiture,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

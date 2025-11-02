@@ -3,6 +3,18 @@ import couleur_interieurValidation from "../validations/couleur_interieur.valida
 
 const createCouleur_interieur = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -15,7 +27,16 @@ const createCouleur_interieur = async (req, res) => {
     }
     const couleur_interieur = new Couleur_interieur(body);
     const newCouleur_interieur = await couleur_interieur.save();
-    return res.status(201).json(newCouleur_interieur);
+
+    // Retourner avec populate
+    const populatedCouleur = await Couleur_interieur.findById(
+      newCouleur_interieur._id
+    ).populate("model_porsche", "nom_model prix");
+
+    return res.status(201).json({
+      message: "Couleur intérieure créée avec succès",
+      couleur: populatedCouleur,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -42,7 +63,7 @@ const getCouleur_interieurById = async (req, res) => {
     if (!couleur_interieur) {
       return res
         .status(404)
-        .json({ message: "couleur intérieure n'existe pas" });
+        .json({ message: "Couleur intérieure n'existe pas" });
     }
     return res.status(200).json(couleur_interieur);
   } catch (error) {
@@ -53,6 +74,18 @@ const getCouleur_interieurById = async (req, res) => {
 
 const updateCouleur_interieur = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -72,9 +105,12 @@ const updateCouleur_interieur = async (req, res) => {
     if (!updatedCouleur_interieur) {
       return res
         .status(404)
-        .json({ message: "couleur intérieure n'existe pas" });
+        .json({ message: "Couleur intérieure n'existe pas" });
     }
-    return res.status(200).json(updatedCouleur_interieur);
+    return res.status(200).json({
+      message: "Couleur intérieure mise à jour avec succès",
+      couleur: updatedCouleur_interieur,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -83,17 +119,29 @@ const updateCouleur_interieur = async (req, res) => {
 
 const deleteCouleur_interieur = async (req, res) => {
   try {
+    // Vérifier l'authentification
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    // Vérifier que l'utilisateur est admin
+    if (!req.user.isAdmin) {
+      return res
+        .status(403)
+        .json({ message: "Accès réservé aux administrateurs" });
+    }
+
     const couleur_interieur = await Couleur_interieur.findByIdAndDelete(
       req.params.id
     );
     if (!couleur_interieur) {
       return res
         .status(404)
-        .json({ message: "couleur intérieure n'existe pas" });
+        .json({ message: "Couleur intérieure n'existe pas" });
     }
     return res
       .status(200)
-      .json({ message: "couleur intérieure a été supprimée" });
+      .json({ message: "Couleur intérieure supprimée avec succès" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });

@@ -15,7 +15,7 @@ const createReservation = async (req, res) => {
     // Validation des données
     const { error } = reservationValidation(body).reservationCreate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     // Vérifier que la date de réservation n'est pas dans le passé
@@ -42,6 +42,14 @@ const createReservation = async (req, res) => {
       const voitureExists = await Voiture.findById(body.voiture);
       if (!voitureExists) {
         return res.status(404).json({ message: "Voiture introuvable" });
+      }
+
+      // LOGIQUE MÉTIER: Seules les voitures d'occasion peuvent être réservées
+      if (voitureExists.type_voiture !== false) {
+        return res.status(400).json({
+          message:
+            "Seules les voitures d'occasion peuvent être réservées. Les voitures neuves doivent être achetées via une commande.",
+        });
       }
     }
 
@@ -115,7 +123,7 @@ const updateReservation = async (req, res) => {
     // Validation des données
     const { error } = reservationValidation(body).reservationUpdate;
     if (error) {
-      return res.status(401).json(error.details[0].message);
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     // Si on modifie la date, vérifier qu'elle n'est pas dans le passé

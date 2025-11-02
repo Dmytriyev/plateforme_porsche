@@ -8,18 +8,23 @@ import {
 } from "../controllers/photo_voiture_actuel.controller.js";
 import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
+import auth from "../middlewares/auth.js";
 
 const router = Router();
 
-router.post("/new", upload.single("name"), createPhoto_voiture_actuel);
+// Routes publiques
 router.get("/all", getAllPhoto_voiture_actuels);
 router.get("/:id", validateObjectId("id"), getPhoto_voiture_actuelById);
+
+// Routes utilisateur authentifié (gère ses propres photos)
+router.post("/new", auth, upload.single("name"), createPhoto_voiture_actuel);
 router.put(
   "/:id",
+  auth,
   validateObjectId("id"),
   upload.single("name"),
   updatePhoto_voiture_actuel
 );
-router.delete("/:id", validateObjectId("id"), deletePhoto_voiture_actuel);
+router.delete("/:id", auth, validateObjectId("id"), deletePhoto_voiture_actuel);
 
 export default router;

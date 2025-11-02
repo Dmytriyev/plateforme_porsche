@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const voitureSchema = new mongoose.Schema(
   {
-    // neuf ou occasion
+    // true = neuf, false = occasion
     type_voiture: {
       type: Boolean,
       required: true,
@@ -27,7 +27,6 @@ const voitureSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Photo_voiture",
-        required: true,
       },
     ],
   },
