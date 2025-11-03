@@ -6,19 +6,22 @@ const reservationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    // true = confirmée, false = en attente
+    // Status: true = confirmée, false = en attente
     status: {
       type: Boolean,
       default: false,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Utilisateur
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
+    // Relation Many-to-One: Voiture (occasion uniquement)
     voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
+      required: true,
     },
   },
   { timestamps: true }

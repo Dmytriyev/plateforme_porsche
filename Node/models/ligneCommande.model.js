@@ -2,43 +2,43 @@ import mongoose from "mongoose";
 
 const ligneCommandeSchema = new mongoose.Schema(
   {
-    // relation many to one {}
-    // nom de la voiture
+    // Relation Many-to-One: Voiture commandée (si type_produit = true)
     voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
     },
-    // relation many to one {}
-    // nom de l'accesoire
+    // Relation Many-to-One: Accessoire commandé (si type_produit = false)
     accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",
     },
-    // relation many to one {}
+    // Relation Many-to-One: Commande parent
     commande: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Commande",
       required: true,
     },
-    // true = voiture, false = accesoire
+    // Type de produit: true = voiture, false = accessoire
     type_produit: {
       type: Boolean,
       required: true,
-      default: false,
     },
     quantite: {
       type: Number,
       required: true,
+      min: 1,
       default: 1,
     },
-    // Prix unitaire l'accesoire
+    // Prix total de la ligne
     prix: {
       type: Number,
+      min: 0,
       default: 0,
     },
-    // Acompte versé pour voiture neuf
+    // Acompte versé (voiture neuve uniquement: 20%)
     acompte: {
       type: Number,
+      min: 0,
       default: 0,
     },
   },

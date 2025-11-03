@@ -17,17 +17,18 @@ import isAdmin from "../middlewares/isAdmin.js";
 
 const router = Router();
 
-// Routes publiques (consultation)
-router.get("/all", getAllAccesoires);
-router.get("/search", getAccessoiresByCriteria);
+// ===== Routes publiques =====
+router.get("/all", getAllAccesoires); // Liste tous les accessoires
+router.get("/search", getAccessoiresByCriteria); // Recherche par critères
 router.get("/:id", validateObjectId("id"), getAccesoireById);
 
-// Routes protégées (admin uniquement - CRUD)
+// ===== Routes admin =====
+// CRUD accessoire
 router.post("/new", auth, isAdmin, createAccesoire);
 router.put("/:id", auth, isAdmin, validateObjectId("id"), updateAccesoire);
 router.delete("/:id", auth, isAdmin, validateObjectId("id"), deleteAccesoire);
 
-// Gestion des images (admin uniquement)
+// Gestion des photos
 router.put("/:id/images/add", auth, isAdmin, validateObjectId("id"), addImages);
 router.put(
   "/:id/images/remove",
@@ -37,7 +38,7 @@ router.put(
   removeImages
 );
 
-// Gestion de la couleur (admin uniquement - Many-to-One)
+// Gestion de la couleur (Many-to-One)
 router.put(
   "/:id/couleur/set",
   auth,

@@ -5,12 +5,14 @@ export default function couleur_exterieurValidation(body) {
     nom_couleur: joi.string().required(),
     photo_couleur: joi.string(),
     description: joi.string(),
+    prix: joi.number().min(0),
   });
 
   const couleur_exterieurUpdate = joi.object({
     nom_couleur: joi.string(),
     photo_couleur: joi.string(),
     description: joi.string(),
+    prix: joi.number().min(0),
   });
 
   return {

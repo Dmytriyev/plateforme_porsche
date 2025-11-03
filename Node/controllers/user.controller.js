@@ -9,6 +9,7 @@ import Voiture from "../models/voiture.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
 
+// Inscription nouvel utilisateur + création panier automatique
 const register = async (req, res) => {
   try {
     const { body } = req;
@@ -32,17 +33,16 @@ const register = async (req, res) => {
 
     const user = new User(body);
     const newUser = await user.save();
-    // Créer une commande panier pour l'utilisateur
+
     const commande = new Commande({
       user: newUser._id,
       date_commande: new Date(),
       prix: 0,
       acompte: 0,
-      status: true, // true = panier actif, false = commande validée
+      status: true,
     });
 
     await commande.save();
-    // Mettre à jour l'utilisateur avec l'ID du panier
     newUser.panier = commande._id;
     await newUser.save();
 
@@ -51,11 +51,12 @@ const register = async (req, res) => {
 
     return res.status(201).json(userResponse);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    console.error("Erreur register:", error);
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
+// Connexion utilisateur + génération token JWT
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -71,7 +72,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).select("+password");
     if (!user) {
       return res.status(400).json({ message: "Identifiants invalides" });
     }
@@ -104,29 +105,24 @@ const login = async (req, res) => {
       ),
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    console.error("Erreur login:", error);
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
+// Récupérer tous les utilisateurs (admin uniquement)
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
     return res.status(200).json(users);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
 
+// Récupérer utilisateur par ID (propriétaire ou admin)
 const getUserById = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à ses propres données ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -137,19 +133,13 @@ const getUserById = async (req, res) => {
     }
     return res.status(200).json(user);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
+// Mettre à jour utilisateur (propriétaire ou admin)
 const updateUser = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur modifie ses propres données ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -182,19 +172,12 @@ const updateUser = async (req, res) => {
     }
     return res.status(200).json(updatedUser);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur supprime son propre compte ou est admin
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -213,7 +196,6 @@ const deleteUser = async (req, res) => {
       .status(200)
       .json({ message: "Utilisateur et toutes ses données ont été supprimés" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
@@ -224,12 +206,6 @@ const createUserReservation = async (req, res) => {
     const { body } = req;
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur crée une réservation pour lui-même ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -298,7 +274,6 @@ const createUserReservation = async (req, res) => {
 
     return res.status(201).json(populatedReservation);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -308,12 +283,6 @@ const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à ses propres réservations ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -329,7 +298,6 @@ const getUserReservations = async (req, res) => {
 
     return res.status(200).json(reservations);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -340,12 +308,6 @@ const addUserPorsche = async (req, res) => {
     const { body } = req;
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur ajoute une Porsche pour lui-même ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -375,7 +337,6 @@ const addUserPorsche = async (req, res) => {
     const newPorsche = await porsche.save();
     return res.status(201).json(newPorsche);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -385,12 +346,6 @@ const getUserPorsches = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à ses propres Porsches ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -410,7 +365,6 @@ const getUserPorsches = async (req, res) => {
 
     return res.status(200).json(porsches);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -420,12 +374,6 @@ const getUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à son propre profil ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -491,7 +439,6 @@ const getUserProfile = async (req, res) => {
 
     return res.status(200).json(profile);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -502,12 +449,6 @@ const deleteUserReservation = async (req, res) => {
     const userId = req.params.id;
     const reservationId = req.params.reservationId;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur supprime sa propre réservation ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -534,7 +475,6 @@ const deleteUserReservation = async (req, res) => {
       .status(200)
       .json({ message: "Réservation supprimée avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -545,12 +485,6 @@ const deleteUserPorsche = async (req, res) => {
     const userId = req.params.id;
     const porscheId = req.params.porscheId;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur supprime sa propre Porsche ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -573,103 +507,6 @@ const deleteUserPorsche = async (req, res) => {
     await Model_porsche_actuel.findByIdAndDelete(porscheId);
     return res.status(200).json({ message: "Porsche supprimée avec succès" });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
-  }
-};
-
-// Obtenir les statistiques de l'utilisateur
-const getUserStatistiques = async (req, res) => {
-  try {
-    const userId = req.params.id;
-
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à ses propres stats ou est admin
-    if (req.user.id !== userId && !req.user.isAdmin) {
-      return res.status(403).json({ message: "Accès non autorisé" });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur n'existe pas" });
-    }
-
-    // Statistiques des commandes
-    const commandes = await Commande.find({ user: userId, status: false });
-    const totalCommandes = commandes.length;
-    const montantTotalCommandes = commandes.reduce(
-      (sum, cmd) => sum + (cmd.prix || 0),
-      0
-    );
-    const acompteTotalCommandes = commandes.reduce(
-      (sum, cmd) => sum + (cmd.acompte || 0),
-      0
-    );
-
-    // Statistiques des réservations
-    const reservations = await Reservation.find({ user: userId });
-    const reservationsActives = reservations.filter(
-      (r) => r.status === true
-    ).length;
-    const reservationsPassees = reservations.filter(
-      (r) => r.status === false
-    ).length;
-
-    // Statistiques des Porsches personnelles
-    const porsches = await Model_porsche_actuel.find({ user: userId });
-    const nombrePorsches = porsches.length;
-
-    // Panier actuel
-    const panier = await Commande.findOne({ user: userId, status: true });
-    let panierInfo = null;
-    if (panier) {
-      const lignesCommande = await LigneCommande.find({ commande: panier._id });
-      const totalPanier = lignesCommande.reduce((sum, ligne) => {
-        return sum + (ligne.prix_unitaire * ligne.quantite || 0);
-      }, 0);
-      panierInfo = {
-        nombreArticles: lignesCommande.length,
-        montantTotal: totalPanier,
-      };
-    }
-
-    const statistiques = {
-      utilisateur: {
-        nom: user.nom,
-        prenom: user.prenom,
-        email: user.email,
-        telephone: user.telephone,
-        inscrit: user.createdAt,
-      },
-      commandes: {
-        total: totalCommandes,
-        montantTotal: montantTotalCommandes,
-        acompteTotal: acompteTotalCommandes,
-        montantMoyen:
-          totalCommandes > 0 ? montantTotalCommandes / totalCommandes : 0,
-        derniereCommande:
-          totalCommandes > 0
-            ? commandes[commandes.length - 1].date_commande
-            : null,
-      },
-      reservations: {
-        total: reservations.length,
-        actives: reservationsActives,
-        passees: reservationsPassees,
-      },
-      porsches: {
-        total: nombrePorsches,
-      },
-      panier: panierInfo,
-    };
-
-    return res.status(200).json(statistiques);
-  } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -680,12 +517,6 @@ const cancelUserReservation = async (req, res) => {
     const userId = req.params.id;
     const reservationId = req.params.reservationId;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur annule sa propre réservation ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -722,7 +553,6 @@ const cancelUserReservation = async (req, res) => {
       reservation,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -734,12 +564,6 @@ const updateUserPorsche = async (req, res) => {
     const userId = req.params.id;
     const porscheId = req.params.porscheId;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur modifie sa propre Porsche ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -786,7 +610,6 @@ const updateUserPorsche = async (req, res) => {
       porsche: updatedPorsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -796,12 +619,6 @@ const getUserDashboard = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur accède à son propre dashboard ou est admin
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -885,7 +702,6 @@ const getUserDashboard = async (req, res) => {
 
     return res.status(200).json(dashboard);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -904,7 +720,6 @@ export {
   getUserPorsches,
   deleteUserPorsche,
   getUserProfile,
-  getUserStatistiques,
   cancelUserReservation,
   updateUserPorsche,
   getUserDashboard,

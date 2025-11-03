@@ -5,13 +5,14 @@ const photo_porscheSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     alt: {
       type: String,
       required: true,
+      trim: true,
     },
-    // relation many to one {}
-    // Many-to-One (plusieurs photos → un modèle)
+    // Relation Many-to-One: Modèle Porsche associé
     model_porsche: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Model_porsche",

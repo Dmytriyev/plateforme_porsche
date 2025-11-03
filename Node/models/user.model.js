@@ -7,44 +7,52 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
       required: true,
-      bcrypt: true,
+      select: false, // Ne pas retourner le password par défaut
     },
-    // admin ou user
+    // Droits administrateur
     isAdmin: {
       type: Boolean,
       default: false,
     },
-    // responsable, client, conseillere
+    // Rôle utilisateur: "user", "responsable", "conseillere"
     role: {
       type: String,
+      enum: ["user", "responsable", "conseillere", "admin"],
       default: "user",
     },
     nom: {
       type: String,
       required: true,
+      trim: true,
     },
     prenom: {
       type: String,
       required: true,
+      trim: true,
     },
     telephone: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     adresse: {
       type: String,
       required: true,
+      trim: true,
     },
     code_postal: {
       type: String,
       required: true,
+      trim: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Panier actif de l'utilisateur
     panier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Commande",
@@ -53,8 +61,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Middleware exécuté avant de sauvegarder un utilisateur dans la base de données
-// Si le mot de passe a été modifié, il est haché avant d'être sauvegardé
+// Hash du mot de passe avant sauvegarde
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
@@ -62,17 +69,13 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Middleware exécuté avant de mettre à jour un utilisateur avec findOneAndUpdate
-// Si le mot de passe est présent dans les mises à jour, il est haché avant d'être sauvegardé
+// Hash du mot de passe avant mise à jour
 userSchema.pre("findOneAndUpdate", async function (next) {
-  let update = this.getUpdate();
+  const update = this.getUpdate();
 
   if (update.password) {
     const hashed = await bcrypt.hash(update.password, 10);
-    this.setUpdate({
-      ...update,
-      password: hashed,
-    });
+    this.setUpdate({ ...update, password: hashed });
   }
   next();
 });

@@ -5,18 +5,25 @@ const taille_janteSchema = new mongoose.Schema(
     taille_jante: {
       type: String,
       required: true,
+      trim: true,
     },
     couleur_jante: {
       type: String,
-      required: true,
+      trim: true,
     },
-    photo_couleur: {
+    photo_jante: {
       type: String,
-      required: true,
+      trim: true,
     },
-    // info sur la jante
     description: {
       type: String,
+      trim: true,
+    },
+    // Prix supplémentaire pour ces jantes
+    prix: {
+      type: Number,
+      min: 0,
+      default: 0,
     },
   },
   { timestamps: true }

@@ -13,7 +13,6 @@ import {
   getUserPorsches,
   deleteUserPorsche,
   getUserProfile,
-  getUserStatistiques,
   cancelUserReservation,
   updateUserPorsche,
   getUserDashboard,
@@ -24,27 +23,24 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Routes publiques - Authentification
-router.post("/register", register);
-router.post("/login", login);
+// ===== Routes publiques =====
+router.post("/register", register); // Inscription
+router.post("/login", login); // Connexion
 
-// Routes administrateur - Nécessite authentification + droits admin
-router.get("/all", auth, isAdmin, getAllUsers);
+// ===== Routes admin =====
+router.get("/all", auth, isAdmin, getAllUsers); // Liste tous les utilisateurs
 
-// Routes utilisateur - Nécessite authentification
+// ===== Routes utilisateur (auth requise) =====
+// CRUD utilisateur
 router.get("/:id", auth, validateObjectId("id"), getUserById);
 router.put("/:id", auth, validateObjectId("id"), updateUser);
 router.delete("/:id", auth, validateObjectId("id"), deleteUser);
+
+// Profil & dashboard
 router.get("/:id/profile", auth, validateObjectId("id"), getUserProfile);
-router.get(
-  "/:id/statistiques",
-  auth,
-  validateObjectId("id"),
-  getUserStatistiques
-);
 router.get("/:id/dashboard", auth, validateObjectId("id"), getUserDashboard);
 
-// Gestion des réservations - Nécessite authentification
+// ===== Gestion des réservations =====
 router.post(
   "/:id/reservations",
   auth,
@@ -72,7 +68,7 @@ router.delete(
   deleteUserReservation
 );
 
-// Gestion des Porsches personnelles - Nécessite authentification
+// ===== Gestion des Porsches personnelles =====
 router.post("/:id/porsches", auth, validateObjectId("id"), addUserPorsche);
 router.get("/:id/porsches", auth, validateObjectId("id"), getUserPorsches);
 router.put(

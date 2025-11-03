@@ -5,15 +5,23 @@ const couleur_interieurSchema = new mongoose.Schema(
     nom_couleur: {
       type: String,
       required: true,
+      trim: true,
     },
     photo_couleur: {
       type: String,
-      default: null,
+      trim: true,
     },
     description: {
       type: String,
+      trim: true,
     },
-    // relation one to many [ {} ]
+    // Prix supplémentaire pour cette couleur
+    prix: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    // Relation One-to-Many: Modèles utilisant cette couleur
     model_porsche: [
       {
         type: mongoose.Schema.Types.ObjectId,

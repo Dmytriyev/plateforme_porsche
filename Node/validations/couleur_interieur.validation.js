@@ -5,6 +5,7 @@ export default function couleur_interieurValidation(body) {
     nom_couleur: joi.string().required(),
     photo_couleur: joi.string(),
     description: joi.string(),
+    prix: joi.number().min(0),
     model_porsche: joi.array().items(joi.string().hex().length(24)),
   });
 
@@ -12,6 +13,7 @@ export default function couleur_interieurValidation(body) {
     nom_couleur: joi.string(),
     photo_couleur: joi.string(),
     description: joi.string(),
+    prix: joi.number().min(0),
     model_porsche: joi.array().items(joi.string().hex().length(24)),
   });
 

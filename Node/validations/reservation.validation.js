@@ -4,15 +4,15 @@ export default function reservationValidation(body) {
   const reservationCreate = joi.object({
     date_reservation: joi.date().required(),
     status: joi.boolean(),
-    user: joi.string().hex().length(24), // Many-to-One: un seul user
-    voiture: joi.string().hex().length(24), // Many-to-One: une seule voiture
+    user: joi.string().hex().length(24),
+    voiture: joi.string().hex().length(24),
   });
 
   const reservationUpdate = joi.object({
     date_reservation: joi.date(),
     status: joi.boolean(),
-    user: joi.string().hex().length(24), // Many-to-One: un seul user
-    voiture: joi.string().hex().length(24), // Many-to-One: une seule voiture
+    user: joi.string().hex().length(24),
+    voiture: joi.string().hex().length(24),
   });
 
   return {

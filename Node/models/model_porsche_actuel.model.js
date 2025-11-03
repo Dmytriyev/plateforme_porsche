@@ -2,58 +2,64 @@ import mongoose from "mongoose";
 
 const model_porsche_actuelSchema = new mongoose.Schema(
   {
-    // 911(Carrera, S, GTS, GT3, GT3RS), Cayman(S, GTS, GT4RS), Cayenne(Hybrid, Turbo)
+    // Modèle: 911 Carrera, Cayman GTS, Cayenne Hybrid, etc.
     type_model: {
       type: String,
       required: true,
+      trim: true,
     },
-    // Coupe, Cabriolet, Targa, SUV
+    // Carrosserie: Coupe, Cabriolet, Targa, SUV
     type_carrosserie: {
       type: String,
       required: true,
       default: "Coupe",
+      trim: true,
     },
     annee_production: {
       type: Date,
       required: true,
     },
-    // ex: Flat-6 3.4L, 4.0L, V6, V8, Hybrid
+    // Moteur: Flat-6 3.4L, V6, V8, Hybrid
     info_moteur: {
       type: String,
       default: "N/A",
+      trim: true,
     },
-    // manuelle, PDK, Tiptronic
+    // Transmission: Manuelle, PDK, Tiptronic
     info_transmission: {
       type: String,
+      trim: true,
     },
-    // numero de serie
+    // Numéro de série unique (VIN)
     numero_win: {
       type: String,
       unique: true,
+      sparse: true,
       uppercase: true,
+      trim: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Propriétaire
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Couleur extérieure
     couleur_exterieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
-    // relation many to one {}
+    // Relation Many-to-One: Couleur intérieure
     couleur_interieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_interieur",
     },
-    // relation many to one {}
+    // Relation Many-to-One: Taille de jantes
     taille_jante: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Taille_jante",
     },
-    // relation one to many [{}]
-    // One-to-Many (un modèle → plusieurs photos)
+    // Relation One-to-Many: Photos de la voiture
     photo_voiture_actuel: [
       {
         type: mongoose.Schema.Types.ObjectId,

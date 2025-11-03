@@ -2,30 +2,34 @@ import mongoose from "mongoose";
 
 const accesoireSchema = new mongoose.Schema(
   {
-    // Type d'accessoire (porte-clés, casquettes, decoration, )
+    // Type: porte-clés, casquettes, decoration, etc.
     type_accesoire: {
       type: String,
       required: true,
+      trim: true,
     },
     nom_accesoire: {
       type: String,
       required: true,
+      trim: true,
     },
-    // Information de l'accessoire
+    // Description détaillée de l'accessoire
     description: {
       type: String,
       required: true,
+      trim: true,
     },
     prix: {
       type: Number,
       required: true,
+      min: 0,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Couleur de l'accessoire
     couleur_accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_accesoire",
     },
-    // relation one to many [{}]
+    // Relation One-to-Many: Photos associées
     photo_accesoire: [
       {
         type: mongoose.Schema.Types.ObjectId,

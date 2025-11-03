@@ -76,7 +76,6 @@ const createPhoto_voiture_actuel = async (req, res) => {
       photo: newPhoto_voiture_actuel,
     });
   } catch (error) {
-    console.log(error);
     if (req.file) {
       fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
     }
@@ -89,7 +88,6 @@ const getAllPhoto_voiture_actuels = async (req, res) => {
     const photo_voiture_actuels = await Photo_voiture_actuel.find();
     return res.status(200).json(photo_voiture_actuels);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -104,7 +102,6 @@ const getPhoto_voiture_actuelById = async (req, res) => {
     }
     return res.status(200).json(photo_voiture_actuel);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -205,14 +202,11 @@ const updatePhoto_voiture_actuel = async (req, res) => {
       photo: updatedPhoto_voiture_actuel,
     });
   } catch (error) {
-    console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
       try {
         fs.unlinkSync("./uploads/voiture_actuel/" + req.file.filename);
-      } catch (err) {
-        console.log("Erreur lors du nettoyage du fichier:", err);
-      }
+      } catch (err) {}
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -268,7 +262,6 @@ const deletePhoto_voiture_actuel = async (req, res) => {
       .status(200)
       .json({ message: "Photo de voiture supprimée avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };

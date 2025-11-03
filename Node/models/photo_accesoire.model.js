@@ -5,12 +5,14 @@ const photo_accesoireSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     alt: {
       type: String,
       required: true,
+      trim: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Accessoire associé
     accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",

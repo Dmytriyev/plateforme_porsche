@@ -12,7 +12,6 @@ import {
   setCouleurInterieur,
   setTailleJante,
   searchPorschesByCriteria,
-  getStatistiquesPorsches,
 } from "../controllers/model_porsche_actuel.controller.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
@@ -45,8 +44,5 @@ router.put(
   setCouleurInterieur
 );
 router.put("/:id/taille-jante", auth, validateObjectId("id"), setTailleJante);
-
-// Routes admin
-router.get("/statistiques/all", auth, isAdmin, getStatistiquesPorsches);
 
 export default router;

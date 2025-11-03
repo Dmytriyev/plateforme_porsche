@@ -13,6 +13,8 @@ import {
   removeCouleursInterieur,
   addTailleJante,
   removeTailleJante,
+  calculatePrixTotal,
+  getModel_porscheWithPrixTotal,
 } from "../controllers/model_porsche.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -23,6 +25,13 @@ const router = Router();
 // Routes publiques (consultation)
 router.get("/all", getAllModel_porsches);
 router.get("/:id", validateObjectId("id"), getModel_porscheById);
+// Nouvelles routes pour le calcul de prix
+router.get("/:id/prix-total", validateObjectId("id"), calculatePrixTotal);
+router.get(
+  "/:id/details-complet",
+  validateObjectId("id"),
+  getModel_porscheWithPrixTotal
+);
 
 // Routes protégées (admin uniquement - CRUD)
 router.post("/new", auth, isAdmin, createModel_porsche);

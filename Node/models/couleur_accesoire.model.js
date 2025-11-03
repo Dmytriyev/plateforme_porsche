@@ -5,10 +5,11 @@ const couleur_accesoireSchema = new mongoose.Schema(
     nom_couleur: {
       type: String,
       required: true,
+      trim: true,
     },
     photo_couleur: {
       type: String,
-      default: null,
+      trim: true,
     },
   },
   { timestamps: true }

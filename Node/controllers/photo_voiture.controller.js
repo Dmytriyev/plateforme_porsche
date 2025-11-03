@@ -136,7 +136,6 @@ const createPhoto_voiture = async (req, res) => {
       photo: populatedPhoto,
     });
   } catch (error) {
-    console.log(error);
     if (req.file) {
       fs.unlinkSync("./uploads/voiture/" + req.file.filename);
     }
@@ -154,7 +153,6 @@ const getAllPhoto_voitures = async (req, res) => {
       .sort({ createdAt: -1 });
     return res.status(200).json(photo_voitures);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -171,7 +169,6 @@ const getPhoto_voitureById = async (req, res) => {
     }
     return res.status(200).json(photo_voiture);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -336,14 +333,11 @@ const updatePhoto_voiture = async (req, res) => {
       photo: updatedPhoto_voiture,
     });
   } catch (error) {
-    console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
       try {
         fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      } catch (err) {
-        console.log("Erreur lors du nettoyage du fichier:", err);
-      }
+      } catch (err) {}
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -391,7 +385,6 @@ const deletePhoto_voiture = async (req, res) => {
       .status(200)
       .json({ message: "Photo de voiture supprimée avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -422,7 +415,6 @@ const getPhotosByCriteria = async (req, res) => {
       photos,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };

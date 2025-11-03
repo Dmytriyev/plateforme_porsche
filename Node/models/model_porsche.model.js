@@ -2,96 +2,112 @@ import mongoose from "mongoose";
 
 const model_porscheSchema = new mongoose.Schema(
   {
-    // 911(Carrera, S, GTS, GT3, GT3RS), Cayman(S, GTS, GT4RS), Cayenne(Hybrid, Turbo)
+    // Modèle: 911 Carrera S, Cayman GTS, etc.
     nom_model: {
       type: String,
       required: true,
+      trim: true,
     },
-    // Coupe, Cabriolet, Targa, SUV
+    // Carrosserie: Coupe, Cabriolet, Targa, SUV
     type_carrosserie: {
       type: String,
       required: true,
+      trim: true,
     },
     annee_production: {
       type: Date,
-      required: true,
     },
-    // Flat-6, V8,
+    // Moteur: Flat-6, V8, etc.
     info_moteur: {
       type: String,
       required: true,
+      trim: true,
     },
-    // ex: 300 ch, 450 ch, 580 ch
+    // Puissance en chevaux (ex: 450)
     info_puissance: {
       type: Number,
       required: true,
+      min: 0,
     },
-    // PDK
+    // Transmission: PDK, Manuelle
     info_transmission: {
       type: String,
       required: true,
+      trim: true,
     },
+    // Accélération 0-100 km/h en secondes
     info_acceleration: {
       type: Number,
       required: true,
+      min: 0,
     },
+    // Vitesse maximale en km/h
     info_vitesse_max: {
       type: Number,
       required: true,
+      min: 0,
     },
+    // Consommation en L/100km
     info_consommation: {
       type: Number,
       required: true,
+      min: 0,
     },
-    // numero de serie unique
+    // Numéro de série unique (VIN)
     numero_win: {
       type: String,
       unique: true,
+      sparse: true,
       uppercase: true,
+      trim: true,
     },
-    // ou situé la voiture
+    // Localisation de la voiture
     concessionnaire: {
       type: String,
+      trim: true,
     },
-    // info general sur la model
+    // Description générale
     description: {
       type: String,
       required: true,
+      trim: true,
     },
-    // acompte pour réserver la voiture neuf
+    // Acompte (voiture neuve: 20% du prix)
     acompte: {
       type: Number,
+      min: 0,
       default: 0,
     },
-    // prix total de la voiture occasion ou neuf
+    // Prix total de la configuration
     prix: {
       type: Number,
+      min: 0,
       default: 0,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Modèle de base
     voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
       required: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Couleur extérieure
     couleur_exterieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
-    // relation one to many [{}]
+    // Relation One-to-Many: Couleurs intérieures
     couleur_interieur: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Couleur_interieur",
       },
     ],
-    // relation many to one {}
+    // Relation Many-to-One: Taille de jantes
     taille_jante: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Taille_jante",
     },
-    // relation one to many [{}]
+    // Relation One-to-Many: Photos
     photo_porsche: [
       {
         type: mongoose.Schema.Types.ObjectId,

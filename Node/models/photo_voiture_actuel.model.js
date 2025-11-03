@@ -5,12 +5,14 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     alt: {
       type: String,
       required: true,
+      trim: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Voiture personnelle associée
     model_porsche_actuel: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Model_porsche_actuel",

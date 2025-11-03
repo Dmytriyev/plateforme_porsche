@@ -1,107 +1,118 @@
 import Commande from "../models/Commande.model.js";
 import commandeValidation from "../validations/Commande.validation.js";
 import LigneCommande from "../models/ligneCommande.model.js";
+import {
+  calculerPrixTotalModelPorsche,
+  enrichirLigneAvecModelPorsche,
+  calculerMontantLigne,
+} from "../utils/prixCalculator.js";
+import {
+  sendSuccess,
+  sendError,
+  sendNotFound,
+  sendUnauthorized,
+  sendValidationError,
+} from "../utils/responses.js";
 
+/**
+ * Créer une nouvelle commande
+ */
 const createCommande = async (req, res) => {
-  // Vérifier authentification
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
+  if (!req.user) return sendUnauthorized(res);
 
   try {
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return sendError(res, "Pas de données dans la requête", 400);
     }
 
-    // Ajouter l'utilisateur connecté
     body.user = req.user.id;
 
     const { error } = commandeValidation(body).CommandeCreate;
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    if (error) return sendValidationError(res, error);
 
-    const commande = new Commande(body);
-    const newCommande = await commande.save();
-
-    // Retourner avec populate
-    const populatedCommande = await Commande.findById(newCommande._id).populate(
+    const commande = await new Commande(body).save();
+    const populatedCommande = await Commande.findById(commande._id).populate(
       "user",
       "name email"
     );
 
-    return res.status(201).json(populatedCommande);
+    return sendSuccess(
+      res,
+      populatedCommande,
+      "Commande créée avec succès",
+      201
+    );
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Récupérer toutes les commandes
+ */
 const getAllCommandes = async (req, res) => {
   try {
     const commandes = await Commande.find()
       .populate("user", "name email")
       .sort({ date_commande: -1 });
-    return res.status(200).json(commandes);
+    return sendSuccess(res, commandes);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Récupérer une commande par ID avec ses lignes enrichies
+ */
 const getCommandeById = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id).populate(
       "user",
       "name email"
     );
-    if (!commande) {
-      return res.status(404).json({ message: "Commande n'existe pas" });
-    }
+    if (!commande) return sendNotFound(res, "Commande");
+
     const ligneCommandes = await LigneCommande.find({
       commande: req.params.id,
     })
       .populate("accesoire", "prix nom_accesoire")
       .populate("voiture", "prix nom_model type_voiture");
 
-    const total = ligneCommandes.reduce((sum, line) => {
-      // Vérifier le type de produit et utiliser le bon prix
-      let prix = 0;
-      if (line.voiture && line.acompte > 0) {
-        prix = line.acompte;
-      } else if (line.accesoire && line.accesoire.prix) {
-        prix = line.accesoire.prix;
-      } else if (line.prix) {
-        // Utiliser le prix sauvegardé dans la ligne si disponible
-        prix = line.prix;
-      }
-      return sum + prix * line.quantite;
-    }, 0);
-    return res
-      .status(200)
-      .json({ ...commande.toObject(), ligneCommandes, total });
+    // Enrichir lignes avec détails model_porsche
+    const lignesEnrichies = await Promise.all(
+      ligneCommandes.map((line) => enrichirLigneAvecModelPorsche(line))
+    );
+
+    // Calculer total à payer
+    const total = ligneCommandes.reduce(
+      (sum, line) => sum + calculerMontantLigne(line),
+      0
+    );
+
+    return sendSuccess(res, {
+      ...commande.toObject(),
+      ligneCommandes: lignesEnrichies,
+      total,
+      note: "Le total inclut les acomptes pour les voitures neuves.",
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Mettre à jour une commande
+ */
 const updateCommande = async (req, res) => {
   try {
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return sendError(res, "Pas de données dans la requête", 400);
     }
 
     const { error } = commandeValidation(body).CommandeUpdate;
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    if (error) return sendValidationError(res, error);
 
     const updatedCommande = await Commande.findByIdAndUpdate(
       req.params.id,
@@ -109,103 +120,103 @@ const updateCommande = async (req, res) => {
       { new: true }
     ).populate("user", "name email");
 
-    if (!updatedCommande) {
-      return res.status(404).json({ message: "Commande n'existe pas" });
-    }
-    return res.status(200).json(updatedCommande);
+    if (!updatedCommande) return sendNotFound(res, "Commande");
+
+    return sendSuccess(res, updatedCommande, "Commande mise à jour");
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Supprimer une commande et ses lignes
+ */
 const deleteCommande = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id);
-    if (!commande) {
-      return res.status(404).json({ message: "Commande n'existe pas" });
-    }
+    if (!commande) return sendNotFound(res, "Commande");
 
-    // Supprimer toutes les lignes de commande associées
+    // Supprimer lignes et commande
     await LigneCommande.deleteMany({ commande: req.params.id });
-
-    // Supprimer la commande
     await Commande.findByIdAndDelete(req.params.id);
 
-    return res.status(200).json({
-      message: "Commande et ses lignes ont été supprimées avec succès",
-    });
+    return sendSuccess(
+      res,
+      null,
+      "Commande et ses lignes supprimées avec succès"
+    );
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Récupérer le panier actif de l'utilisateur
+ */
 const getPanier = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
+  if (!req.user) return sendUnauthorized(res);
+
   try {
     const panier = await Commande.findOne({
       user: req.user.id,
       status: true,
     }).populate("user", "name email");
-    if (!panier) {
-      return res.status(404).json({ message: "Panier n'existe pas" });
-    }
+
+    if (!panier) return sendNotFound(res, "Panier");
+
     const ligneCommandes = await LigneCommande.find({
       commande: panier._id,
     })
       .populate("accesoire", "nom_accesoire prix")
       .populate("voiture", "nom_model prix type_voiture");
 
-    const total = ligneCommandes.reduce((sum, line) => {
-      // Vérifier le type de produit et utiliser le bon prix
-      let prix = 0;
-      if (line.voiture && line.acompte > 0) {
-        prix = line.acompte;
-      } else if (line.accesoire && line.accesoire.prix) {
-        prix = line.accesoire.prix;
-      } else if (line.prix) {
-        // Utiliser le prix sauvegardé dans la ligne si disponible
-        prix = line.prix;
-      }
-      return sum + prix * line.quantite;
-    }, 0);
+    // Enrichir lignes avec détails model_porsche
+    const lignesEnrichies = await Promise.all(
+      ligneCommandes.map((line) => enrichirLigneAvecModelPorsche(line))
+    );
 
-    return res
-      .status(200)
-      .json({ ...panier.toObject(), ligneCommandes, total });
+    // Calculer total
+    const total = ligneCommandes.reduce(
+      (sum, line) => sum + calculerMontantLigne(line),
+      0
+    );
+
+    return sendSuccess(res, {
+      ...panier.toObject(),
+      ligneCommandes: lignesEnrichies,
+      total,
+      note: "Le total à payer inclut les acomptes pour les voitures neuves.",
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+/**
+ * Récupérer l'historique des commandes de l'utilisateur
+ */
 const getMyCommandes = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
+  if (!req.user) return sendUnauthorized(res);
+
   try {
     const historique = await Commande.find({
       user: req.user.id,
       status: false,
     }).sort({ date_commande: -1 });
-    return res.status(200).json(historique);
+
+    return sendSuccess(res, historique);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
-// Créer ou récupérer le panier actif
+/**
+ * Créer ou récupérer le panier actif de l'utilisateur
+ */
 const getOrCreatePanier = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
+  if (!req.user) return sendUnauthorized(res);
 
   try {
-    // Chercher un panier existant (status = true)
     let panier = await Commande.findOne({
       user: req.user.id,
       status: true,
@@ -213,149 +224,87 @@ const getOrCreatePanier = async (req, res) => {
       .populate("user", "name email")
       .populate({
         path: "lignesCommande",
-        populate: [
-          { path: "voiture", populate: "model_porsche_actuel" },
-          { path: "accessoire" },
-        ],
+        populate: [{ path: "voiture" }, { path: "accesoire" }],
       });
 
-    // Si pas de panier, en créer un
+    // Créer panier si inexistant
     if (!panier) {
-      const nouveauPanier = new Commande({
+      const nouveauPanier = await new Commande({
         user: req.user.id,
         date_commande: new Date(),
         status: true,
         prix: 0,
         acompte: 0,
-      });
-      await nouveauPanier.save();
+      }).save();
 
       panier = await Commande.findById(nouveauPanier._id)
         .populate("user", "name email")
         .populate({
           path: "lignesCommande",
-          populate: [
-            { path: "voiture", populate: "model_porsche_actuel" },
-            { path: "accessoire" },
-          ],
+          populate: [{ path: "voiture" }, { path: "accesoire" }],
         });
     }
 
-    // Calculer le total
+    // Calculer total
     const lignesCommande = panier.lignesCommande || [];
-    const prixTotal = lignesCommande.reduce((total, ligne) => {
-      return total + (ligne.prix_unitaire * ligne.quantite || 0);
-    }, 0);
+    const prixTotal = lignesCommande.reduce(
+      (total, ligne) => total + calculerMontantLigne(ligne),
+      0
+    );
 
-    return res.status(200).json({
+    return sendSuccess(res, {
       ...panier.toObject(),
       prixTotal,
       nombreArticles: lignesCommande.length,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
-// Valider le panier (transformer en commande)
+/**
+ * Valider le panier (transformer en commande)
+ */
 const validerPanier = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
+  if (!req.user) return sendUnauthorized(res);
 
   try {
-    // Chercher le panier actif
     const panier = await Commande.findOne({
       user: req.user.id,
       status: true,
     }).populate({
       path: "lignesCommande",
-      populate: [
-        { path: "voiture", populate: "model_porsche_actuel" },
-        { path: "accessoire" },
-      ],
+      populate: [{ path: "voiture" }, { path: "accesoire" }],
     });
 
-    if (!panier) {
-      return res.status(404).json({ message: "Aucun panier trouvé" });
-    }
+    if (!panier) return sendNotFound(res, "Panier");
 
-    // Vérifier qu'il y a des articles
     if (!panier.lignesCommande || panier.lignesCommande.length === 0) {
-      return res.status(400).json({ message: "Le panier est vide" });
+      return sendError(res, "Le panier est vide", 400);
     }
 
-    // Calculer le prix total
-    const prixTotal = panier.lignesCommande.reduce((total, ligne) => {
-      return total + (ligne.prix_unitaire * ligne.quantite || 0);
-    }, 0);
+    // Calculer prix total
+    const prixTotal = panier.lignesCommande.reduce(
+      (total, ligne) => total + calculerMontantLigne(ligne),
+      0
+    );
 
-    // Mettre à jour le panier
-    panier.status = false; // Passer en commande validée
+    // Transformer en commande validée
+    panier.status = false;
     panier.prix = prixTotal;
     panier.date_commande = new Date();
-
     await panier.save();
 
-    // Retourner la commande validée
     const commandeValidee = await Commande.findById(panier._id)
       .populate("user", "name email")
       .populate({
         path: "lignesCommande",
-        populate: [
-          { path: "voiture", populate: "model_porsche_actuel" },
-          { path: "accessoire" },
-        ],
+        populate: [{ path: "voiture" }, { path: "accesoire" }],
       });
 
-    return res.status(200).json({
-      message: "Commande validée avec succès",
-      commande: commandeValidee,
-    });
+    return sendSuccess(res, commandeValidee, "Commande validée avec succès");
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
-  }
-};
-
-// Statistiques de commandes pour l'utilisateur
-const getMesStatistiques = async (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
-
-  try {
-    const commandes = await Commande.find({
-      user: req.user.id,
-      status: false, // Commandes validées uniquement
-    }).populate({
-      path: "lignesCommande",
-    });
-
-    const stats = {
-      nombreCommandes: commandes.length,
-      montantTotal: commandes.reduce(
-        (total, cmd) => total + (cmd.prix || 0),
-        0
-      ),
-      acompteTotal: commandes.reduce(
-        (total, cmd) => total + (cmd.acompte || 0),
-        0
-      ),
-      derniereCommande:
-        commandes.length > 0 ? commandes[0].date_commande : null,
-      commandesMoyenne:
-        commandes.length > 0
-          ? commandes.reduce((total, cmd) => total + (cmd.prix || 0), 0) /
-            commandes.length
-          : 0,
-    };
-
-    return res.status(200).json(stats);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -369,5 +318,4 @@ export {
   getMyCommandes,
   getOrCreatePanier,
   validerPanier,
-  getMesStatistiques,
 };

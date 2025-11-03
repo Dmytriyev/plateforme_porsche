@@ -5,29 +5,36 @@ const CommandeSchema = new mongoose.Schema(
     date_commande: {
       type: Date,
       required: true,
+      default: Date.now,
     },
     // Prix total de la commande
     prix: {
       type: Number,
+      min: 0,
+      default: 0,
     },
-    // Acompte versé pour voiture neuf
+    // Acompte versé (voiture neuve uniquement)
     acompte: {
       type: Number,
+      min: 0,
+      default: 0,
     },
-    // Status de la commande : true = panier actif (non validée), false = commande validée
+    // Status : false = panier actif, true = commande validée
     status: {
       type: Boolean,
       required: true,
       default: false,
     },
-    // URL de la facture générée
+    // URL de la facture PDF générée
     factureUrl: {
       type: String,
+      trim: true,
     },
-    // relation many to one {}
+    // Relation Many-to-One: Utilisateur propriétaire
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   {
@@ -37,7 +44,7 @@ const CommandeSchema = new mongoose.Schema(
   }
 );
 
-// Virtual pour les lignes de commande
+// Propriété virtuelle: récupère toutes les lignes de cette commande
 CommandeSchema.virtual("lignesCommande", {
   ref: "LigneCommande",
   localField: "_id",

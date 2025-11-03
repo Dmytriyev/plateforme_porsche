@@ -75,7 +75,6 @@ const createPhoto_porsche = async (req, res) => {
       photo: populatedPhoto,
     });
   } catch (error) {
-    console.log(error);
     if (req.file) {
       fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
     }
@@ -90,7 +89,6 @@ const getAllPhoto_porsches = async (req, res) => {
       .sort({ createdAt: -1 });
     return res.status(200).json(photo_porsches);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -106,7 +104,6 @@ const getPhoto_porscheById = async (req, res) => {
     }
     return res.status(200).json(photo_porsche);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -214,14 +211,11 @@ const updatePhoto_porsche = async (req, res) => {
       photo: updatedPhoto_porsche,
     });
   } catch (error) {
-    console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
       try {
         fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
-      } catch (err) {
-        console.log("Erreur lors du nettoyage du fichier:", err);
-      }
+      } catch (err) {}
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -260,7 +254,6 @@ const deletePhoto_porsche = async (req, res) => {
       .status(200)
       .json({ message: "Photo Porsche supprimée avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };

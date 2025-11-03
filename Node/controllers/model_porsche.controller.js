@@ -97,7 +97,6 @@ const createModel_porsche = async (req, res) => {
       model_porsche: populatedModel,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -107,14 +106,39 @@ const getAllModel_porsches = async (req, res) => {
     const model_porsches = await Model_porsche.find()
       .populate("photo_porsche", "name alt")
       .populate("voiture", "nom_model type_voiture description prix")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante")
+      .populate("couleur_exterieur", "nom_couleur photo_couleur prix")
+      .populate("couleur_interieur", "nom_couleur photo_couleur prix")
+      .populate("taille_jante", "taille_jante couleur_jante prix")
       .sort({ annee_production: -1 });
-    return res.status(200).json(model_porsches);
+
+    // Ajouter le calcul de prix pour chaque modèle
+    const model_porschesWithPrix = model_porsches.map((model) => {
+      const prixBase = model.voiture?.prix || 0;
+      const prixCouleurExt = model.couleur_exterieur?.prix || 0;
+
+      let prixCouleursInt = 0;
+      if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
+        prixCouleursInt = model.couleur_interieur.reduce((total, couleur) => {
+          return total + (couleur?.prix || 0);
+        }, 0);
+      }
+
+      const prixJante = model.taille_jante?.prix || 0;
+      const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
+
+      return {
+        ...model.toObject(),
+        prix_calcule: {
+          prix_base: prixBase,
+          total_options: prixCouleurExt + prixCouleursInt + prixJante,
+          prix_total: prixTotal,
+        },
+      };
+    });
+
+    return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
@@ -123,16 +147,57 @@ const getModel_porscheById = async (req, res) => {
     const model_porsche = await Model_porsche.findById(req.params.id)
       .populate("photo_porsche", "name alt")
       .populate("voiture", "nom_model type_voiture description prix")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur description")
-      .populate("couleur_interieur", "nom_couleur photo_couleur description")
-      .populate("taille_jante", "taille_jante");
+      .populate(
+        "couleur_exterieur",
+        "nom_couleur photo_couleur description prix"
+      )
+      .populate(
+        "couleur_interieur",
+        "nom_couleur photo_couleur description prix"
+      )
+      .populate("taille_jante", "taille_jante couleur_jante description prix");
     if (!model_porsche) {
       return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
     }
-    return res.status(200).json(model_porsche);
+
+    // Calculer le prix total automatiquement
+    const prixBase = model_porsche.voiture?.prix || 0;
+    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
+
+    let prixCouleursInt = 0;
+    if (
+      model_porsche.couleur_interieur &&
+      Array.isArray(model_porsche.couleur_interieur)
+    ) {
+      prixCouleursInt = model_porsche.couleur_interieur.reduce(
+        (total, couleur) => {
+          return total + (couleur?.prix || 0);
+        },
+        0
+      );
+    }
+
+    const prixJante = model_porsche.taille_jante?.prix || 0;
+    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
+
+    // Ajouter le prix calculé à la réponse
+    const response = {
+      ...model_porsche.toObject(),
+      prix_calcule: {
+        prix_base: prixBase,
+        options: {
+          couleur_exterieur: prixCouleurExt,
+          couleurs_interieur: prixCouleursInt,
+          taille_jante: prixJante,
+        },
+        total_options: prixCouleurExt + prixCouleursInt + prixJante,
+        prix_total: prixTotal,
+      },
+    };
+
+    return res.status(200).json(response);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
@@ -228,7 +293,6 @@ const updateModel_porsche = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -255,7 +319,6 @@ const deleteModel_porsche = async (req, res) => {
       .status(200)
       .json({ message: "Modèle Porsche supprimé avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -319,7 +382,6 @@ const addImages = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -383,7 +445,6 @@ const removeImages = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -436,7 +497,6 @@ const addCouleurExterieur = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -474,7 +534,6 @@ const removeCouleurExterieur = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -531,7 +590,6 @@ const addCouleursInterieur = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -587,7 +645,6 @@ const removeCouleursInterieur = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -638,7 +695,6 @@ const addTailleJante = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -676,8 +732,130 @@ const removeTailleJante = async (req, res) => {
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Calculer le prix total du modèle avec toutes les options
+const calculatePrixTotal = async (req, res) => {
+  try {
+    const model_porsche = await Model_porsche.findById(req.params.id)
+      .populate("voiture", "prix")
+      .populate("couleur_exterieur", "prix")
+      .populate("couleur_interieur", "prix")
+      .populate("taille_jante", "prix");
+
+    if (!model_porsche) {
+      return res.status(404).json({ message: "Modèle Porsche introuvable" });
+    }
+
+    // Prix de base de la voiture
+    const prixBase = model_porsche.voiture?.prix || 0;
+
+    // Prix de la couleur extérieure
+    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
+
+    // Prix des couleurs intérieures (somme de toutes les couleurs)
+    let prixCouleursInt = 0;
+    if (
+      model_porsche.couleur_interieur &&
+      Array.isArray(model_porsche.couleur_interieur)
+    ) {
+      prixCouleursInt = model_porsche.couleur_interieur.reduce(
+        (total, couleur) => {
+          return total + (couleur?.prix || 0);
+        },
+        0
+      );
+    }
+
+    // Prix de la taille de jante
+    const prixJante = model_porsche.taille_jante?.prix || 0;
+
+    // Prix total
+    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
+
+    // Détails du calcul
+    const detailsPrix = {
+      prix_base: prixBase,
+      options: {
+        couleur_exterieur: prixCouleurExt,
+        couleurs_interieur: prixCouleursInt,
+        taille_jante: prixJante,
+      },
+      total_options: prixCouleurExt + prixCouleursInt + prixJante,
+      prix_total: prixTotal,
+    };
+
+    return res.status(200).json({
+      message: "Prix total calculé avec succès",
+      model_id: model_porsche._id,
+      nom_model: model_porsche.nom_model,
+      details_prix: detailsPrix,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
+// Obtenir le modèle complet avec le prix total calculé
+const getModel_porscheWithPrixTotal = async (req, res) => {
+  try {
+    const model_porsche = await Model_porsche.findById(req.params.id)
+      .populate("photo_porsche", "name alt")
+      .populate("voiture", "nom_model type_voiture description prix")
+      .populate(
+        "couleur_exterieur",
+        "nom_couleur photo_couleur description prix"
+      )
+      .populate(
+        "couleur_interieur",
+        "nom_couleur photo_couleur description prix"
+      )
+      .populate("taille_jante", "taille_jante couleur_jante description prix");
+
+    if (!model_porsche) {
+      return res.status(404).json({ message: "Modèle Porsche introuvable" });
+    }
+
+    // Calculer le prix total
+    const prixBase = model_porsche.voiture?.prix || 0;
+    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
+
+    let prixCouleursInt = 0;
+    if (
+      model_porsche.couleur_interieur &&
+      Array.isArray(model_porsche.couleur_interieur)
+    ) {
+      prixCouleursInt = model_porsche.couleur_interieur.reduce(
+        (total, couleur) => {
+          return total + (couleur?.prix || 0);
+        },
+        0
+      );
+    }
+
+    const prixJante = model_porsche.taille_jante?.prix || 0;
+    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
+
+    // Créer l'objet de réponse avec le prix total
+    const response = {
+      ...model_porsche.toObject(),
+      prix_calcule: {
+        prix_base: prixBase,
+        options: {
+          couleur_exterieur: prixCouleurExt,
+          couleurs_interieur: prixCouleursInt,
+          taille_jante: prixJante,
+        },
+        total_options: prixCouleurExt + prixCouleursInt + prixJante,
+        prix_total: prixTotal,
+      },
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
@@ -695,4 +873,6 @@ export {
   removeCouleursInterieur,
   addTailleJante,
   removeTailleJante,
+  calculatePrixTotal,
+  getModel_porscheWithPrixTotal,
 };

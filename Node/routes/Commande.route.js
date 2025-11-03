@@ -9,7 +9,6 @@ import {
   getPanier,
   getOrCreatePanier,
   validerPanier,
-  getMesStatistiques,
 } from "../controllers/Commande.controller.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
@@ -17,16 +16,20 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Routes admin - AVANT les routes avec paramètres dynamiques
-router.get("/all", auth, isAdmin, getAllCommandes);
+// ===== Routes admin =====
+router.get("/all", auth, isAdmin, getAllCommandes); // Liste toutes les commandes
 
-// Routes protégées - nécessitent authentification
+// ===== Routes utilisateur (auth requise) =====
+// Gestion du panier
+router.get("/panier", auth, getPanier); // Récupère le panier actif
+router.get("/panier/get-or-create", auth, getOrCreatePanier); // Crée ou récupère le panier
+router.post("/panier/valider", auth, validerPanier); // Valide le panier en commande
+
+// Historique
+router.get("/historique", auth, getMyCommandes); // Historique des commandes
+
+// CRUD commande
 router.post("/new", auth, createCommande);
-router.get("/panier", auth, getPanier);
-router.get("/panier/get-or-create", auth, getOrCreatePanier);
-router.post("/panier/valider", auth, validerPanier);
-router.get("/historique", auth, getMyCommandes);
-router.get("/statistiques", auth, getMesStatistiques);
 router.get("/:id", auth, validateObjectId("id"), getCommandeById);
 router.put("/:id", auth, validateObjectId("id"), updateCommande);
 router.delete("/:id", auth, validateObjectId("id"), deleteCommande);

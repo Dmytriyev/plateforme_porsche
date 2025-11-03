@@ -58,7 +58,6 @@ const createPhoto_accesoire = async (req, res) => {
       photo: newPhoto_accesoire,
     });
   } catch (error) {
-    console.log(error);
     if (req.file) {
       fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
     }
@@ -71,7 +70,6 @@ const getAllPhoto_accesoires = async (req, res) => {
     const photo_accesoires = await Photo_accesoire.find();
     return res.status(200).json(photo_accesoires);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -86,7 +84,6 @@ const getPhoto_accesoireById = async (req, res) => {
     }
     return res.status(200).json(photo_accesoire);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -185,14 +182,11 @@ const updatePhoto_accesoire = async (req, res) => {
       photo: updatedPhoto_accesoire,
     });
   } catch (error) {
-    console.log(error);
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
       try {
         fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
-      } catch (err) {
-        console.log("Erreur lors du nettoyage du fichier:", err);
-      }
+      } catch (err) {}
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -233,7 +227,6 @@ const deletePhoto_accesoire = async (req, res) => {
       .status(200)
       .json({ message: "Photo d'accessoire supprimée avec succès" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };

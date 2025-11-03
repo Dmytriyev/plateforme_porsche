@@ -74,7 +74,6 @@ const createModel_porsche_actuel = async (req, res) => {
 
     return res.status(201).json(populated);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -90,7 +89,6 @@ const getAllModel_porsche_actuels = async (req, res) => {
       .sort({ createdAt: -1 });
     return res.status(200).json(model_porsche_actuels);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -112,7 +110,6 @@ const getModel_porsche_actuelById = async (req, res) => {
     }
     return res.status(200).json(model_porsche_actuel);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -195,7 +192,6 @@ const updateModel_porsche_actuel = async (req, res) => {
 
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -230,7 +226,6 @@ const deleteModel_porsche_actuel = async (req, res) => {
       .status(200)
       .json({ message: "model_porsche_actuel à bien été supprimé" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -299,7 +294,6 @@ const addImages = async (req, res) => {
 
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -366,7 +360,6 @@ const removeImages = async (req, res) => {
 
     return res.status(200).json(updatedModel_porsche_actuel);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -391,7 +384,6 @@ const getMesPorsches = async (req, res) => {
       porsches: mesPorsches,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -445,7 +437,6 @@ const setCouleurExterieur = async (req, res) => {
       porsche: updated,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -499,7 +490,6 @@ const setCouleurInterieur = async (req, res) => {
       porsche: updated,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -551,7 +541,6 @@ const setTailleJante = async (req, res) => {
       porsche: updated,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -615,86 +604,6 @@ const searchPorschesByCriteria = async (req, res) => {
       porsches,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Erreur serveur", error: error });
-  }
-};
-
-// Statistiques des Porsches (Admin)
-const getStatistiquesPorsches = async (req, res) => {
-  try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier les droits admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
-    const totalPorsches = await Model_porsche_actuel.countDocuments();
-
-    // Par type de modèle
-    const parTypeModel = await Model_porsche_actuel.aggregate([
-      { $group: { _id: "$type_model", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-    ]);
-
-    // Par type de carrosserie
-    const parTypeCarrosserie = await Model_porsche_actuel.aggregate([
-      { $group: { _id: "$type_carrosserie", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-    ]);
-
-    // Par année
-    const parAnnee = await Model_porsche_actuel.aggregate([
-      { $group: { _id: { $year: "$annee_production" }, count: { $sum: 1 } } },
-      { $sort: { _id: -1 } },
-    ]);
-
-    // Couleurs les plus populaires
-    const couleursExtPopulaires = await Model_porsche_actuel.aggregate([
-      { $match: { couleur_exterieur: { $exists: true } } },
-      { $group: { _id: "$couleur_exterieur", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 5 },
-      {
-        $lookup: {
-          from: "couleur_exterieurs",
-          localField: "_id",
-          foreignField: "_id",
-          as: "couleur",
-        },
-      },
-      { $unwind: "$couleur" },
-    ]);
-
-    const statistiques = {
-      total: totalPorsches,
-      parTypeModel: parTypeModel.map((item) => ({
-        type: item._id,
-        nombre: item.count,
-      })),
-      parTypeCarrosserie: parTypeCarrosserie.map((item) => ({
-        type: item._id,
-        nombre: item.count,
-      })),
-      parAnnee: parAnnee.map((item) => ({
-        annee: item._id,
-        nombre: item.count,
-      })),
-      topCouleursExterieur: couleursExtPopulaires.map((item) => ({
-        couleur: item.couleur.nom_couleur,
-        nombre: item.count,
-      })),
-    };
-
-    return res.status(200).json(statistiques);
-  } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
@@ -712,5 +621,4 @@ export {
   setCouleurInterieur,
   setTailleJante,
   searchPorschesByCriteria,
-  getStatistiquesPorsches,
 };

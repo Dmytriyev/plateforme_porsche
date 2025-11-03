@@ -2,27 +2,30 @@ import mongoose from "mongoose";
 
 const voitureSchema = new mongoose.Schema(
   {
-    // true = neuf, false = occasion
+    // Type: true = neuve, false = occasion
     type_voiture: {
       type: Boolean,
       required: true,
       default: false,
     },
-    // 911 Cayman Cayenne
+    // Nom du modèle: 911, Cayman, Cayenne, etc.
     nom_model: {
       type: String,
       required: true,
+      trim: true,
     },
-    // info general sur la model
+    // Description générale du modèle
     description: {
       type: String,
+      trim: true,
     },
-    // prix de base
+    // Prix de base du modèle
     prix: {
       type: Number,
+      min: 0,
       default: 0,
     },
-    // relation many to many [ {} ]
+    // Relation Many-to-Many: Photos associées
     photo_voiture: [
       {
         type: mongoose.Schema.Types.ObjectId,

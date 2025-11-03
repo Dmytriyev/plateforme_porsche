@@ -3,20 +3,19 @@ import joi from "joi";
 export default function CommandeValidation(body) {
   const CommandeCreate = joi.object({
     date_commande: joi.date(),
-    prix: joi.number(),
-    acompte: joi.number(),
+    prix: joi.number().min(0),
+    acompte: joi.number().min(0),
     status: joi.boolean(),
     factureUrl: joi.string(),
-    user: joi.string().hex().length(24), // Accepter le champ user (sera auto-assigné dans le contrôleur)
+    user: joi.string().hex().length(24),
   });
 
   const CommandeUpdate = joi.object({
     date_commande: joi.date(),
-    prix: joi.number(),
-    acompte: joi.number(),
+    prix: joi.number().min(0),
+    acompte: joi.number().min(0),
     status: joi.boolean(),
     factureUrl: joi.string(),
-    // user ne peut pas être modifié
   });
 
   return {

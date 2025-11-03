@@ -112,7 +112,6 @@ export const createCheckoutSession = async (req, res) => {
       customer: session.customer,
     });
   } catch (error) {
-    console.error("Erreur création session Stripe:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -187,7 +186,6 @@ export const webhookHandler = async (req, res) => {
         `Commande ${commandeId} validée | Nouveau panier: ${nouveauPanier._id}`
       );
     } catch (error) {
-      console.error(" Erreur traitement webhook:", error);
       return res.status(500).json({ error: "Erreur traitement paiement" });
     }
   }
