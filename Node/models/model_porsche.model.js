@@ -119,8 +119,8 @@ const model_porscheSchema = new mongoose.Schema(
 );
 
 // Index pour accélérer les recherches
+// Note: numero_win a déjà un index via unique: true
 model_porscheSchema.index({ voiture: 1 });
-model_porscheSchema.index({ numero_win: 1 });
 model_porscheSchema.index({ nom_model: 1 });
 model_porscheSchema.index({ prix: 1 });
 model_porscheSchema.index({ concessionnaire: 1 });

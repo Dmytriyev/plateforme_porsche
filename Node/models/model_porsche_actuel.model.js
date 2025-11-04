@@ -71,8 +71,8 @@ const model_porsche_actuelSchema = new mongoose.Schema(
 );
 
 // Index pour accélérer les recherches
+// Note: numero_win a déjà un index via unique: true
 model_porsche_actuelSchema.index({ user: 1 });
-model_porsche_actuelSchema.index({ numero_win: 1 });
 model_porsche_actuelSchema.index({ type_model: 1 });
 model_porsche_actuelSchema.index({ annee_production: -1 });
 model_porsche_actuelSchema.index({ createdAt: -1 });

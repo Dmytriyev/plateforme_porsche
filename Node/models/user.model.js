@@ -62,8 +62,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Index pour accélérer les recherches
-userSchema.index({ email: 1 });
-userSchema.index({ telephone: 1 });
+// Note: email et telephone ont déjà des index via unique: true
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ role: 1 });
 
