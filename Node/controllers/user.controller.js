@@ -39,7 +39,7 @@ const register = async (req, res) => {
       date_commande: new Date(),
       prix: 0,
       acompte: 0,
-      status: true,
+      status: false, // false = panier actif/non validé
     });
 
     await commande.save();
@@ -398,8 +398,8 @@ const getUserProfile = async (req, res) => {
         createdAt: -1,
       });
 
-    // Obtenir le panier actuel
-    const panier = await Commande.findOne({ user: userId, status: true });
+    // Obtenir le panier actuel (status: false = panier actif)
+    const panier = await Commande.findOne({ user: userId, status: false });
     let panierDetails = null;
 
     if (panier) {
@@ -639,16 +639,16 @@ const getUserDashboard = async (req, res) => {
       .sort({ date_reservation: 1 })
       .limit(5);
 
-    // Dernières commandes
+    // Dernières commandes (status: true = commandes validées)
     const dernieresCommandes = await Commande.find({
       user: userId,
-      status: false,
+      status: true,
     })
       .sort({ date_commande: -1 })
       .limit(5);
 
-    // Panier actuel
-    const panier = await Commande.findOne({ user: userId, status: true });
+    // Panier actuel (status: false = panier actif)
+    const panier = await Commande.findOne({ user: userId, status: false });
     let panierDetails = null;
     if (panier) {
       const lignesCommande = await LigneCommande.find({ commande: panier._id })

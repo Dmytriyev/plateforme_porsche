@@ -38,9 +38,9 @@ const createCouleur_exterieur = async (req, res) => {
 // Récupérer toutes les couleurs extérieures (public)
 const getAllCouleur_exterieurs = async (req, res) => {
   try {
-    const couleur_exterieurs = await Couleur_exterieur.find().sort({
-      nom_couleur: 1,
-    });
+    const couleur_exterieurs = await Couleur_exterieur.find()
+      .sort({ nom_couleur: 1 })
+      .lean(); // Retourne des objets JS purs (30-50% plus rapide)
     return res.status(200).json(couleur_exterieurs);
   } catch (error) {
     return handleError(res, error, "getAllCouleur_exterieurs");
@@ -50,7 +50,9 @@ const getAllCouleur_exterieurs = async (req, res) => {
 // Récupérer une couleur extérieure par ID (public)
 const getCouleur_exterieurById = async (req, res) => {
   try {
-    const couleur_exterieur = await Couleur_exterieur.findById(req.params.id);
+    const couleur_exterieur = await Couleur_exterieur.findById(
+      req.params.id
+    ).lean();
     if (!couleur_exterieur) {
       return res
         .status(404)

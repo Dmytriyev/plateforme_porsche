@@ -86,7 +86,8 @@ const getAllModel_porsche_actuels = async (req, res) => {
       .populate("couleur_interieur", "nom_couleur")
       .populate("taille_jante", "taille_jante couleur_jante")
       .populate("user", "nom prenom email")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean(); // Retourne des objets JS purs (30-50% plus rapide)
     return res.status(200).json(model_porsche_actuels);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error });
@@ -102,7 +103,8 @@ const getModel_porsche_actuelById = async (req, res) => {
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
       .populate("taille_jante", "taille_jante couleur_jante photo_couleur")
-      .populate("user", "nom prenom email");
+      .populate("user", "nom prenom email")
+      .lean(); // Retourne un objet JS pur
     if (!model_porsche_actuel) {
       return res
         .status(404)

@@ -47,4 +47,10 @@ const ligneCommandeSchema = new mongoose.Schema(
   }
 );
 
+// Index pour accélérer les recherches
+ligneCommandeSchema.index({ commande: 1 });
+ligneCommandeSchema.index({ voiture: 1 });
+ligneCommandeSchema.index({ accesoire: 1 });
+ligneCommandeSchema.index({ type_produit: 1 });
+
 export default mongoose.model("LigneCommande", ligneCommandeSchema);

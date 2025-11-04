@@ -210,9 +210,10 @@ const testCouleursExterieur = async () => {
     },
   ];
 
-  for (const couleur of couleurs) {
+  // Création en parallèle pour gagner du temps
+  log.info(`Création de ${couleurs.length} couleurs en parallèle...`);
+  const promises = couleurs.map(async (couleur) => {
     try {
-      log.info(`Création couleur: ${couleur.nom_couleur}...`);
       const result = await request(
         "/couleur_exterieur/new",
         {
@@ -231,10 +232,14 @@ const testCouleursExterieur = async () => {
       log.success(
         `Couleur extérieure créée: ${couleurCreee.nom_couleur} (ID: ${couleurCreee._id})`
       );
+      return couleurCreee;
     } catch (error) {
       log.error(`Erreur création couleur extérieure: ${error.message}`);
+      return null;
     }
-  }
+  });
+
+  await Promise.all(promises);
 
   // Test READ
   try {
@@ -289,9 +294,10 @@ const testCouleursInterieur = async () => {
     },
   ];
 
-  for (const couleur of couleurs) {
+  // Création en parallèle pour gagner du temps
+  log.info(`Création de ${couleurs.length} couleurs en parallèle...`);
+  const promises = couleurs.map(async (couleur) => {
     try {
-      log.info(`Création couleur: ${couleur.nom_couleur}...`);
       const result = await request(
         "/couleur_interieur/new",
         {
@@ -310,10 +316,14 @@ const testCouleursInterieur = async () => {
       log.success(
         `Couleur intérieure créée: ${couleurCreee.nom_couleur} (ID: ${couleurCreee._id})`
       );
+      return couleurCreee;
     } catch (error) {
       log.error(`Erreur création couleur intérieure: ${error.message}`);
+      return null;
     }
-  }
+  });
+
+  await Promise.all(promises);
 
   // Test READ all
   try {
@@ -337,9 +347,12 @@ const testCouleursAccessoire = async () => {
     { nom_couleur: "Carbone", photo_couleur: "carbone.jpg" },
   ];
 
-  for (const couleur of couleurs) {
+  // Création en parallèle pour gagner du temps
+  log.info(
+    `Création de ${couleurs.length} couleurs accessoires en parallèle...`
+  );
+  const promises = couleurs.map(async (couleur) => {
     try {
-      log.info(`Création couleur accessoire: ${couleur.nom_couleur}...`);
       const result = await request(
         "/couleur_accesoire/new",
         {
@@ -358,10 +371,14 @@ const testCouleursAccessoire = async () => {
       log.success(
         `Couleur accessoire créée: ${couleurCreee.nom_couleur} (ID: ${couleurCreee._id})`
       );
+      return couleurCreee;
     } catch (error) {
       log.error(`Erreur création couleur accessoire: ${error.message}`);
+      return null;
     }
-  }
+  });
+
+  await Promise.all(promises);
 };
 
 /**
@@ -391,9 +408,10 @@ const testTaillesJantes = async () => {
     },
   ];
 
-  for (const taille of tailles) {
+  // Création en parallèle pour gagner du temps
+  log.info(`Création de ${tailles.length} tailles de jantes en parallèle...`);
+  const promises = tailles.map(async (taille) => {
     try {
-      log.info(`Création taille jante: ${taille.taille_jante}...`);
       const result = await request(
         "/taille_jante/new",
         {
@@ -409,10 +427,14 @@ const testTaillesJantes = async () => {
       log.success(
         `Taille jante créée: ${janteCreee.taille_jante} (ID: ${janteCreee._id})`
       );
+      return janteCreee;
     } catch (error) {
       log.error(`Erreur création taille jante: ${error.message}`);
+      return null;
     }
-  }
+  });
+
+  await Promise.all(promises);
 
   // Test UPDATE
   if (testData.tailles_jantes.length > 0) {
@@ -660,9 +682,10 @@ const testAccessoires = async () => {
     },
   ];
 
-  for (const accessoire of accessoires) {
+  // Création en parallèle pour gagner du temps
+  log.info(`Création de ${accessoires.length} accessoires en parallèle...`);
+  const promises = accessoires.map(async (accessoire) => {
     try {
-      log.info(`Création accessoire: ${accessoire.nom_accesoire}...`);
       const result = await request(
         "/accesoire/new",
         {
@@ -678,10 +701,14 @@ const testAccessoires = async () => {
       log.success(
         `Accessoire créé: ${accessoireCreee.nom_accesoire} (ID: ${accessoireCreee._id})`
       );
+      return accessoireCreee;
     } catch (error) {
       log.error(`Erreur création accessoire: ${error.message}`);
+      return null;
     }
-  }
+  });
+
+  await Promise.all(promises);
 
   // Test UPDATE
   if (testData.accessoires.length > 0) {
@@ -1454,61 +1481,29 @@ const runAllTests = async () => {
 
   try {
     // Attendre que le serveur soit prêt
-    log.info("Attente démarrage serveur (2s)...");
-    await sleep(2000);
+    log.info("Attente démarrage serveur (500ms)...");
+    await sleep(500);
 
     // ===== PARTIE ADMIN =====
     await testAdminAuth();
-    await sleep(500);
-
     await testCouleursExterieur();
-    await sleep(500);
-
     await testCouleursInterieur();
-    await sleep(500);
-
     await testCouleursAccessoire();
-    await sleep(500);
-
     await testTaillesJantes();
-    await sleep(500);
-
     await testVoituresOccasion();
-    await sleep(500);
-
     await testVoituresNeuf();
-    await sleep(500);
-
     await testAccessoires();
-    await sleep(500);
 
     // ===== PARTIE USER =====
     await testUserAuth();
-    await sleep(500);
-
     await testUserProfile();
-    await sleep(500);
-
     await testModelPorscheActuel();
-    await sleep(500);
-
     await testReservations();
-    await sleep(500);
-
     await testCommandeVoitureNeuf();
-    await sleep(500);
-
     await testCommandeAccessoires();
-    await sleep(500);
-
     await testValidationCommande();
-    await sleep(500);
-
     await testAnnulationReservation();
-    await sleep(500);
-
     await testAnnulationCommande();
-    await sleep(500);
 
     // ===== NETTOYAGE =====
     await testCleanup();

@@ -118,4 +118,12 @@ const model_porscheSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+model_porscheSchema.index({ voiture: 1 });
+model_porscheSchema.index({ numero_win: 1 });
+model_porscheSchema.index({ nom_model: 1 });
+model_porscheSchema.index({ prix: 1 });
+model_porscheSchema.index({ concessionnaire: 1 });
+model_porscheSchema.index({ createdAt: -1 });
+
 export default mongoose.model("Model_porsche", model_porscheSchema);

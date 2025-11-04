@@ -29,4 +29,8 @@ const taille_janteSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+taille_janteSchema.index({ taille_jante: 1 });
+taille_janteSchema.index({ prix: 1 });
+
 export default mongoose.model("Taille_jante", taille_janteSchema);

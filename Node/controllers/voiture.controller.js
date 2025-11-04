@@ -59,7 +59,8 @@ const getAllVoitures = async (req, res) => {
   try {
     const voitures = await Voiture.find()
       .populate("photo_voiture", "name alt")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean(); // Retourne des objets JS purs (30-50% plus rapide)
 
     return sendSuccess(res, voitures);
   } catch (error) {
@@ -72,10 +73,9 @@ const getAllVoitures = async (req, res) => {
  */
 const getVoitureById = async (req, res) => {
   try {
-    const voiture = await Voiture.findById(req.params.id).populate(
-      "photo_voiture",
-      "name alt"
-    );
+    const voiture = await Voiture.findById(req.params.id)
+      .populate("photo_voiture", "name alt")
+      .lean(); // Retourne un objet JS pur
 
     if (!voiture) {
       return sendNotFound(res, "Voiture introuvable");

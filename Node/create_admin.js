@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import mongoose from "mongoose";
-import User from "../models/user.model.js";
-import Commande from "../models/Commande.model.js";
+import User from "./models/user.model.js";
+import Commande from "./models/Commande.model.js";
 import dotenv from "dotenv";
 
 dotenv.config();

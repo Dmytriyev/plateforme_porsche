@@ -36,4 +36,10 @@ const voitureSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+voitureSchema.index({ type_voiture: 1 });
+voitureSchema.index({ nom_model: 1 });
+voitureSchema.index({ prix: 1 });
+voitureSchema.index({ createdAt: -1 });
+
 export default mongoose.model("Voiture", voitureSchema);

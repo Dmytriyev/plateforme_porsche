@@ -19,11 +19,11 @@ const CommandeSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
-    // Status : false = panier actif, true = commande validée
+    // Status : false = panier actif (non validé), true = commande validée/payée
     status: {
       type: Boolean,
       required: true,
-      default: false,
+      default: false, // false = panier en cours
     },
     // URL de la facture PDF générée
     factureUrl: {
@@ -50,5 +50,11 @@ CommandeSchema.virtual("lignesCommande", {
   localField: "_id",
   foreignField: "commande",
 });
+
+// Index pour accélérer les recherches
+CommandeSchema.index({ user: 1 });
+CommandeSchema.index({ status: 1 });
+CommandeSchema.index({ date_commande: -1 });
+CommandeSchema.index({ user: 1, status: 1 }); // Index composé pour panier actif
 
 export default mongoose.model("Commande", CommandeSchema);

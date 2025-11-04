@@ -15,4 +15,7 @@ const couleur_accesoireSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+couleur_accesoireSchema.index({ nom_couleur: 1 });
+
 export default mongoose.model("Couleur_accesoire", couleur_accesoireSchema);

@@ -32,4 +32,8 @@ const couleur_interieurSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+couleur_interieurSchema.index({ nom_couleur: 1 });
+couleur_interieurSchema.index({ prix: 1 });
+
 export default mongoose.model("Couleur_interieur", couleur_interieurSchema);

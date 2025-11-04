@@ -40,4 +40,9 @@ const accesoireSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+accesoireSchema.index({ type_accesoire: 1 });
+accesoireSchema.index({ nom_accesoire: 1 });
+accesoireSchema.index({ prix: 1 });
+
 export default mongoose.model("Accesoire", accesoireSchema);

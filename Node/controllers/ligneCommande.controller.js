@@ -35,10 +35,10 @@ const createLigneCommande = async (req, res) => {
       return sendError(res, "Un accessoire est requis pour ce type", 400);
     }
 
-    // Chercher panier actif
+    // Chercher panier actif (status: false = panier non validé)
     const commande = await Commande.findOne({
       user: req.user.id,
-      status: true,
+      status: false, // false = panier actif/non validé
     });
     if (!commande) {
       return sendNotFound(res, "Panier actif");
@@ -151,8 +151,8 @@ const updateLigneCommande = async (req, res) => {
       return sendForbidden(res);
     }
 
-    // Vérifier que c'est encore un panier
-    if (commande.status === false) {
+    // Vérifier que c'est encore un panier (status: false = panier actif)
+    if (commande.status === true) {
       return sendError(res, "Impossible de modifier une commande validée", 403);
     }
 
@@ -192,8 +192,8 @@ const deleteLigneCommande = async (req, res) => {
       return sendForbidden(res);
     }
 
-    // Vérifier que c'est encore un panier
-    if (commande.status === false) {
+    // Vérifier que c'est encore un panier (status: false = panier actif)
+    if (commande.status === true) {
       return sendError(
         res,
         "Impossible de supprimer une ligne d'une commande validée",
@@ -263,7 +263,7 @@ const getMesLignesPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
   try {
-    const panier = await Commande.findOne({ user: req.user.id, status: true });
+    const panier = await Commande.findOne({ user: req.user.id, status: false }); // false = panier actif
 
     if (!panier) {
       return sendSuccess(res, {
@@ -312,7 +312,7 @@ const viderPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
   try {
-    const panier = await Commande.findOne({ user: req.user.id, status: true });
+    const panier = await Commande.findOne({ user: req.user.id, status: false }); // false = panier actif
     if (!panier) return sendNotFound(res, "Panier actif");
 
     const result = await LigneCommande.deleteMany({ commande: panier._id });
@@ -351,8 +351,8 @@ const updateQuantite = async (req, res) => {
       return sendForbidden(res);
     }
 
-    // Vérifier que c'est un panier
-    if (commande.status === false) {
+    // Vérifier que c'est un panier (status: false = panier actif)
+    if (commande.status === true) {
       return sendError(res, "Impossible de modifier une commande validée", 403);
     }
 

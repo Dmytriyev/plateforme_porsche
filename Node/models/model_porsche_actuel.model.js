@@ -70,6 +70,13 @@ const model_porsche_actuelSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+model_porsche_actuelSchema.index({ user: 1 });
+model_porsche_actuelSchema.index({ numero_win: 1 });
+model_porsche_actuelSchema.index({ type_model: 1 });
+model_porsche_actuelSchema.index({ annee_production: -1 });
+model_porsche_actuelSchema.index({ createdAt: -1 });
+
 export default mongoose.model(
   "Model_porsche_actuel",
   model_porsche_actuelSchema

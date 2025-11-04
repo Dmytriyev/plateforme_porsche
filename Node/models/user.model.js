@@ -61,6 +61,12 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+userSchema.index({ email: 1 });
+userSchema.index({ telephone: 1 });
+userSchema.index({ isAdmin: 1 });
+userSchema.index({ role: 1 });
+
 // Hash du mot de passe avant sauvegarde
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {

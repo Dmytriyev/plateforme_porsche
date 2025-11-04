@@ -68,7 +68,8 @@ const getAllAccesoires = async (req, res) => {
     const accesoires = await Accesoire.find()
       .populate("photo_accesoire", "name alt")
       .populate("couleur_accesoire", "nom_couleur photo_couleur")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean(); // Retourne des objets JS purs (30-50% plus rapide)
 
     return sendSuccess(res, accesoires);
   } catch (error) {
@@ -83,7 +84,8 @@ const getAccesoireById = async (req, res) => {
   try {
     const accesoire = await Accesoire.findById(req.params.id)
       .populate("photo_accesoire", "name alt")
-      .populate("couleur_accesoire", "nom_couleur photo_couleur description");
+      .populate("couleur_accesoire", "nom_couleur photo_couleur description")
+      .lean(); // Retourne un objet JS pur
 
     if (!accesoire) {
       return sendNotFound(res, "Accessoire introuvable");

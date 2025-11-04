@@ -34,7 +34,7 @@ const createCommande = async (req, res) => {
     const commande = await new Commande(body).save();
     const populatedCommande = await Commande.findById(commande._id).populate(
       "user",
-      "name email"
+      "nom prenom email"
     );
 
     return sendSuccess(
@@ -54,7 +54,7 @@ const createCommande = async (req, res) => {
 const getAllCommandes = async (req, res) => {
   try {
     const commandes = await Commande.find()
-      .populate("user", "name email")
+      .populate("user", "nom prenom email")
       .sort({ date_commande: -1 });
     return sendSuccess(res, commandes);
   } catch (error) {
@@ -69,7 +69,7 @@ const getCommandeById = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id).populate(
       "user",
-      "name email"
+      "nom prenom email"
     );
     if (!commande) return sendNotFound(res, "Commande");
 
@@ -118,7 +118,7 @@ const updateCommande = async (req, res) => {
       req.params.id,
       body,
       { new: true }
-    ).populate("user", "name email");
+    ).populate("user", "nom prenom email");
 
     if (!updatedCommande) return sendNotFound(res, "Commande");
 
@@ -159,8 +159,8 @@ const getPanier = async (req, res) => {
   try {
     const panier = await Commande.findOne({
       user: req.user.id,
-      status: true,
-    }).populate("user", "name email");
+      status: false, // false = panier actif/non validé
+    }).populate("user", "nom prenom email");
 
     if (!panier) return sendNotFound(res, "Panier");
 
@@ -201,7 +201,7 @@ const getMyCommandes = async (req, res) => {
   try {
     const historique = await Commande.find({
       user: req.user.id,
-      status: false,
+      status: true, // true = commandes validées/payées
     }).sort({ date_commande: -1 });
 
     return sendSuccess(res, historique);
@@ -219,9 +219,9 @@ const getOrCreatePanier = async (req, res) => {
   try {
     let panier = await Commande.findOne({
       user: req.user.id,
-      status: true,
+      status: false, // false = panier actif/non validé
     })
-      .populate("user", "name email")
+      .populate("user", "nom prenom email")
       .populate({
         path: "lignesCommande",
         populate: [{ path: "voiture" }, { path: "accesoire" }],
@@ -232,13 +232,13 @@ const getOrCreatePanier = async (req, res) => {
       const nouveauPanier = await new Commande({
         user: req.user.id,
         date_commande: new Date(),
-        status: true,
+        status: false, // false = panier actif
         prix: 0,
         acompte: 0,
       }).save();
 
       panier = await Commande.findById(nouveauPanier._id)
-        .populate("user", "name email")
+        .populate("user", "nom prenom email")
         .populate({
           path: "lignesCommande",
           populate: [{ path: "voiture" }, { path: "accesoire" }],
@@ -271,7 +271,7 @@ const validerPanier = async (req, res) => {
   try {
     const panier = await Commande.findOne({
       user: req.user.id,
-      status: true,
+      status: false, // false = panier actif
     }).populate({
       path: "lignesCommande",
       populate: [{ path: "voiture" }, { path: "accesoire" }],
@@ -290,13 +290,13 @@ const validerPanier = async (req, res) => {
     );
 
     // Transformer en commande validée
-    panier.status = false;
+    panier.status = true; // true = commande validée
     panier.prix = prixTotal;
     panier.date_commande = new Date();
     await panier.save();
 
     const commandeValidee = await Commande.findById(panier._id)
-      .populate("user", "name email")
+      .populate("user", "nom prenom email")
       .populate({
         path: "lignesCommande",
         populate: [{ path: "voiture" }, { path: "accesoire" }],

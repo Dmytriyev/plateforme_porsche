@@ -25,4 +25,8 @@ const couleur_exterieurSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Index pour accélérer les recherches
+couleur_exterieurSchema.index({ nom_couleur: 1 });
+couleur_exterieurSchema.index({ prix: 1 });
+
 export default mongoose.model("Couleur_exterieur", couleur_exterieurSchema);
