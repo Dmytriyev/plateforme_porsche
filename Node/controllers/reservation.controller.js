@@ -9,10 +9,6 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-/**
- * Créer une réservation
- * Règle : Seules les voitures d'occasion peuvent être réservées
- */
 const createReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -20,10 +16,19 @@ const createReservation = async (req, res) => {
       return sendValidationError(res, "Pas de données dans la requête");
     }
 
+    // SÉCURITÉ: L'utilisateur ne peut créer que SES propres réservations
+    if (!req.user) {
+      return sendError(res, "Authentification requise", 401);
+    }
+
+    // Valider AVANT d'ajouter le user
     const { error } = reservationValidation(body).reservationCreate;
     if (error) {
       return sendValidationError(res, error.details[0].message);
     }
+
+    // SÉCURITÉ: Forcer l'ID utilisateur depuis le token APRÈS validation (empêcher usurpation)
+    body.user = req.user.id;
 
     // Vérifier que la date n'est pas dans le passé
     const dateReservation = new Date(body.date_reservation);
@@ -90,13 +95,10 @@ const createReservation = async (req, res) => {
       201
     );
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
-/**
- * Récupérer toutes les réservations
- */
 const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find()
@@ -110,9 +112,6 @@ const getAllReservations = async (req, res) => {
   }
 };
 
-/**
- * Récupérer une réservation par ID
- */
 const getReservationById = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
@@ -129,9 +128,6 @@ const getReservationById = async (req, res) => {
   }
 };
 
-/**
- * Mettre à jour une réservation (utilisateur propriétaire ou admin)
- */
 const updateReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -200,9 +196,6 @@ const updateReservation = async (req, res) => {
   }
 };
 
-/**
- * Supprimer une réservation
- */
 const deleteReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findByIdAndDelete(req.params.id);
@@ -216,9 +209,6 @@ const deleteReservation = async (req, res) => {
   }
 };
 
-/**
- * Récupérer les réservations d'un utilisateur
- */
 const getReservationsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -238,9 +228,6 @@ const getReservationsByUser = async (req, res) => {
   }
 };
 
-/**
- * Récupérer les réservations pour une voiture
- */
 const getReservationsByVoiture = async (req, res) => {
   try {
     const { voitureId } = req.params;
@@ -260,9 +247,6 @@ const getReservationsByVoiture = async (req, res) => {
   }
 };
 
-/**
- * Vérifier la disponibilité d'une voiture pour une date donnée
- */
 const checkReservations = async (req, res) => {
   try {
     const { voitureId } = req.params;

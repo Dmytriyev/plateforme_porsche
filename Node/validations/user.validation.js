@@ -2,21 +2,24 @@ import joi from "joi";
 
 export default function userValidation(body) {
   const userCreate = joi.object({
-    email: joi.string().email().required(),
+    email: joi.string().email().required().max(150).min(5),
     password: joi
       .string()
       .min(8)
+      .max(100)
+      // une majuscule, une minuscule, un chiffre et un caractère spécial
       .pattern(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
       )
       .required(),
-    nom: joi.string().required(),
-    prenom: joi.string().required(),
+    nom: joi.string().required().max(50).min(2),
+    prenom: joi.string().required().max(100).min(2),
     telephone: joi
       .string()
+      // numéro de téléphone entre 10 et 13 chiffres
       .pattern(/^[0-9]{10,13}$/)
       .required(),
-    adresse: joi.string().required(),
+    adresse: joi.string().required().max(250),
     code_postal: joi
       .string()
       .pattern(/^[0-9]{5}$/)
@@ -31,10 +34,10 @@ export default function userValidation(body) {
       .pattern(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
       ),
-    nom: joi.string(),
-    prenom: joi.string(),
+    nom: joi.string().max(50).min(2),
+    prenom: joi.string().max(100).min(2),
     telephone: joi.string().pattern(/^[0-9]{10,13}$/),
-    adresse: joi.string(),
+    adresse: joi.string().max(250),
     code_postal: joi.string().pattern(/^[0-9]{5}$/),
   });
 
@@ -45,17 +48,17 @@ export default function userValidation(body) {
 
   const userReservation = joi.object({
     voiture: joi.string().hex().length(24).required(),
-    date_reservation: joi.date().required(),
+    date_reservation: joi.date().required().greater("now"),
     status: joi.boolean().default(true),
   });
 
   const userPorsche = joi.object({
-    type_model: joi.string().required(),
-    type_carrosserie: joi.string().required(),
+    type_model: joi.string().required().max(200),
+    type_carrosserie: joi.string().required().max(50),
     annee_production: joi.date().required(),
-    info_moteur: joi.string(),
-    info_transmission: joi.string(),
-    numero_win: joi.string(),
+    info_moteur: joi.string().max(250),
+    info_transmission: joi.string().max(100),
+    numero_win: joi.string().max(100),
     couleur_exterieur: joi.string().hex().length(24),
     couleur_interieur: joi.string().hex().length(24),
   });

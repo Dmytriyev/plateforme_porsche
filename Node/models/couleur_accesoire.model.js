@@ -6,6 +6,7 @@ const couleur_accesoireSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     photo_couleur: {
       type: String,

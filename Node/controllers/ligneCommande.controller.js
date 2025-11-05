@@ -15,9 +15,6 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-/**
- * Créer une ligne de commande (ajouter un article au panier)
- */
 const createLigneCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -28,11 +25,51 @@ const createLigneCommande = async (req, res) => {
     }
 
     // Validation type produit
-    if (body.type_produit === true && !body.voiture) {
-      return sendError(res, "Une voiture est requise pour ce type", 400);
+    if (body.type_produit === true && !body.model_porsche_id) {
+      return sendError(
+        res,
+        "Une configuration Porsche (model_porsche_id) est requise pour commander une voiture neuve",
+        400
+      );
     }
     if (body.type_produit === false && !body.accesoire) {
       return sendError(res, "Un accessoire est requis pour ce type", 400);
+    }
+
+    // SÉCURITÉ: Empêcher la création directe de voitures par l'utilisateur
+    if (body.voiture) {
+      return sendError(
+        res,
+        "Impossible de créer directement une voiture. Utilisez model_porsche_id pour commander une voiture neuve configurée.",
+        403
+      );
+    }
+
+    // Validation supplémentaire: vérifier que la configuration existe
+    if (body.type_produit === true && body.model_porsche_id) {
+      const Model_porsche = (await import("../models/model_porsche.model.js"))
+        .default;
+      const config = await Model_porsche.findById(
+        body.model_porsche_id
+      ).populate("voiture", "type_voiture nom_model");
+
+      if (!config) {
+        return sendNotFound(res, "Configuration Porsche introuvable");
+      }
+
+      // Vérifier que c'est bien une voiture neuve
+      if (config.voiture?.type_voiture !== true) {
+        return sendError(
+          res,
+          `La configuration "${
+            config.voiture?.nom_model || "sélectionnée"
+          }" n'est pas disponible pour une voiture neuve. Les voitures d'occasion utilisent le système de réservation.`,
+          400
+        );
+      }
+
+      // Remplir automatiquement le champ voiture à partir du model_porsche
+      body.voiture = config.voiture._id;
     }
 
     // Chercher panier actif (status: false = panier non validé)
@@ -42,6 +79,15 @@ const createLigneCommande = async (req, res) => {
     });
     if (!commande) {
       return sendNotFound(res, "Panier actif");
+    }
+
+    // RÈGLE MÉTIER: Les voitures neuves ne peuvent avoir qu'une quantité de 1
+    if (body.type_produit === true && body.quantite && body.quantite > 1) {
+      return sendError(
+        res,
+        "Une voiture neuve ne peut être commandée qu'en quantité 1. Ajustez la quantité à 1.",
+        400
+      );
     }
 
     // Calculer prix et acompte
@@ -65,28 +111,49 @@ const createLigneCommande = async (req, res) => {
     const ligneCommande = await new LigneCommande(line).save();
     const populatedLigne = await LigneCommande.findById(ligneCommande._id)
       .populate("voiture", "nom_model prix type_voiture")
+      .populate({
+        path: "model_porsche_id",
+        populate: [
+          { path: "voiture", select: "nom_model prix" },
+          { path: "couleur_exterieur", select: "nom_couleur prix" },
+          { path: "couleur_interieur", select: "nom_couleur prix" },
+          { path: "taille_jante", select: "taille_jante prix" },
+        ],
+      })
       .populate("accesoire", "nom_accesoire prix")
       .populate("commande");
 
     // Enrichir avec détails model_porsche
     const response = await enrichirLigneAvecModelPorsche(populatedLigne);
     if (response.model_porsche_details) {
-      response.note = "Le montant à payer est l'acompte.";
+      response.note =
+        "Voiture neuve configurée - Le montant à payer est l'acompte (20% du prix total).";
     }
 
-    return sendSuccess(res, response, "Article ajouté au panier", 201);
+    return sendSuccess(
+      res,
+      response,
+      "Configuration Porsche ajoutée au panier",
+      201
+    );
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
-/**
- * Récupérer toutes les lignes de commande
- */
 const getAllLigneCommandes = async (req, res) => {
   try {
     const ligneCommandes = await LigneCommande.find()
       .populate("voiture", "nom_model prix type_voiture")
+      .populate({
+        path: "model_porsche_id",
+        populate: [
+          { path: "voiture", select: "nom_model prix" },
+          { path: "couleur_exterieur", select: "nom_couleur prix" },
+          { path: "couleur_interieur", select: "nom_couleur prix" },
+          { path: "taille_jante", select: "taille_jante prix" },
+        ],
+      })
       .populate("accesoire", "nom_accesoire prix")
       .populate("commande", "date_commande status")
       .sort({ createdAt: -1 });
@@ -96,15 +163,21 @@ const getAllLigneCommandes = async (req, res) => {
   }
 };
 
-/**
- * Récupérer une ligne de commande par ID
- */
 const getLigneCommandeById = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
   try {
     const ligneCommande = await LigneCommande.findById(req.params.id)
       .populate("voiture", "nom_model prix type_voiture description")
+      .populate({
+        path: "model_porsche_id",
+        populate: [
+          { path: "voiture", select: "nom_model prix" },
+          { path: "couleur_exterieur", select: "nom_couleur prix" },
+          { path: "couleur_interieur", select: "nom_couleur prix" },
+          { path: "taille_jante", select: "taille_jante prix" },
+        ],
+      })
       .populate("accesoire", "nom_accesoire prix description")
       .populate("commande", "date_commande status user");
 
@@ -119,7 +192,8 @@ const getLigneCommandeById = async (req, res) => {
     // Enrichir avec détails model_porsche
     const response = await enrichirLigneAvecModelPorsche(ligneCommande);
     if (response.model_porsche_details) {
-      response.note = "Le montant à payer est l'acompte.";
+      response.note =
+        "Voiture neuve configurée - Le montant à payer est l'acompte.";
     }
 
     return sendSuccess(res, response);
@@ -128,9 +202,6 @@ const getLigneCommandeById = async (req, res) => {
   }
 };
 
-/**
- * Mettre à jour une ligne de commande
- */
 const updateLigneCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -138,6 +209,20 @@ const updateLigneCommande = async (req, res) => {
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return sendError(res, "Pas de données dans la requête", 400);
+    }
+
+    // SÉCURITÉ: Empêcher la modification de champs critiques
+    if (
+      body.type_produit ||
+      body.voiture ||
+      body.model_porsche_id ||
+      body.accesoire
+    ) {
+      return sendError(
+        res,
+        "Impossible de modifier le type de produit, la voiture, la configuration ou l'accessoire. Supprimez et recréez la ligne.",
+        403
+      );
     }
 
     const existingLigne = await LigneCommande.findById(req.params.id).populate(
@@ -209,9 +294,6 @@ const deleteLigneCommande = async (req, res) => {
   }
 };
 
-/**
- * Récupérer toutes les lignes d'une commande spécifique
- */
 const getLignesByCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -226,6 +308,15 @@ const getLignesByCommande = async (req, res) => {
 
     const lignes = await LigneCommande.find({ commande: req.params.commandeId })
       .populate("voiture", "nom_model prix type_voiture description")
+      .populate({
+        path: "model_porsche_id",
+        populate: [
+          { path: "voiture", select: "nom_model prix" },
+          { path: "couleur_exterieur", select: "nom_couleur prix" },
+          { path: "couleur_interieur", select: "nom_couleur prix" },
+          { path: "taille_jante", select: "taille_jante prix" },
+        ],
+      })
       .populate("accesoire", "nom_accesoire prix description")
       .sort({ createdAt: -1 });
 
@@ -256,9 +347,6 @@ const getLignesByCommande = async (req, res) => {
   }
 };
 
-/**
- * Récupérer les lignes du panier actif de l'utilisateur
- */
 const getMesLignesPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -276,6 +364,15 @@ const getMesLignesPanier = async (req, res) => {
 
     const lignes = await LigneCommande.find({ commande: panier._id })
       .populate("voiture", "nom_model prix type_voiture description")
+      .populate({
+        path: "model_porsche_id",
+        populate: [
+          { path: "voiture", select: "nom_model prix" },
+          { path: "couleur_exterieur", select: "nom_couleur prix" },
+          { path: "couleur_interieur", select: "nom_couleur prix" },
+          { path: "taille_jante", select: "taille_jante prix" },
+        ],
+      })
       .populate("accesoire", "nom_accesoire prix description")
       .sort({ createdAt: -1 });
 
@@ -305,9 +402,6 @@ const getMesLignesPanier = async (req, res) => {
   }
 };
 
-/**
- * Vider le panier (supprimer toutes les lignes)
- */
 const viderPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -327,9 +421,6 @@ const viderPanier = async (req, res) => {
   }
 };
 
-/**
- * Mettre à jour la quantité d'une ligne de commande
- */
 const updateQuantite = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -354,6 +445,15 @@ const updateQuantite = async (req, res) => {
     // Vérifier que c'est un panier (status: false = panier actif)
     if (commande.status === true) {
       return sendError(res, "Impossible de modifier une commande validée", 403);
+    }
+
+    // RÈGLE MÉTIER: Les voitures neuves ne peuvent avoir qu'une quantité de 1
+    if (ligneCommande.type_produit === true && quantite > 1) {
+      return sendError(
+        res,
+        "Une voiture neuve ne peut être commandée qu'en quantité 1. Pour commander plusieurs voitures, créez des lignes séparées.",
+        400
+      );
     }
 
     // Mettre à jour

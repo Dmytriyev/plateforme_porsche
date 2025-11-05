@@ -366,7 +366,6 @@ const removeImages = async (req, res) => {
   }
 };
 
-// Récupérer les Porsches de l'utilisateur connecté
 const getMesPorsches = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -390,7 +389,6 @@ const getMesPorsches = async (req, res) => {
   }
 };
 
-// Changer la couleur extérieure
 const setCouleurExterieur = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -443,7 +441,6 @@ const setCouleurExterieur = async (req, res) => {
   }
 };
 
-// Changer la couleur intérieure
 const setCouleurInterieur = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -496,7 +493,6 @@ const setCouleurInterieur = async (req, res) => {
   }
 };
 
-// Changer la taille des jantes
 const setTailleJante = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -547,7 +543,6 @@ const setTailleJante = async (req, res) => {
   }
 };
 
-// Rechercher par critères
 const searchPorschesByCriteria = async (req, res) => {
   try {
     const {

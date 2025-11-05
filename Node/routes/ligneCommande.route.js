@@ -16,27 +16,24 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// ===== Routes admin =====
-router.get("/all", auth, isAdmin, getAllLigneCommandes); // Liste toutes les lignes
-
-// ===== Routes utilisateur (auth requise) =====
-// Gestion du panier
-router.get("/panier", auth, getMesLignesPanier); // Lignes du panier actif
-router.delete("/panier/vider", auth, viderPanier); // Vider le panier
-
-// Consultation par commande
+// Routes admin
+router.get("/all", auth, isAdmin, getAllLigneCommandes);
+// Routes utilisateur
+// panier
+router.get("/panier", auth, getMesLignesPanier);
+router.delete("/panier/vider", auth, viderPanier);
+// commande
 router.get(
   "/commande/:commandeId",
   auth,
   validateObjectId("commandeId"),
   getLignesByCommande
 );
-
-// CRUD ligne de commande
+// ligne de commande
 router.post("/new", auth, createLigneCommande);
 router.get("/:id", auth, validateObjectId("id"), getLigneCommandeById);
 router.put("/:id", auth, validateObjectId("id"), updateLigneCommande);
-router.put("/:id/quantite", auth, validateObjectId("id"), updateQuantite); // Modifier quantité
+router.put("/:id/quantite", auth, validateObjectId("id"), updateQuantite);
 router.delete("/:id", auth, validateObjectId("id"), deleteLigneCommande);
 
 export default router;

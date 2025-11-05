@@ -134,19 +134,15 @@ export const webhookHandler = async (req, res) => {
       const commandeId = session.metadata.commandeId;
 
       if (!commandeId) {
-        console.error("Metadata commandeId manquant dans le webhook");
         return res.status(400).json({ error: "commandeId manquant" });
       }
 
       const commande = await Commande.findById(commandeId);
       if (!commande) {
-        console.error(`Commande ${commandeId} introuvable`);
         return res.status(404).json({ error: "Commande introuvable" });
       }
 
-      // Vérifier que la commande n'a pas déjà été traitée
       if (commande.status === false && commande.factureUrl) {
-        console.warn(`Commande ${commandeId} déjà traitée`);
         return res.json({ received: true, message: "Déjà traité" });
       }
 
@@ -181,10 +177,6 @@ export const webhookHandler = async (req, res) => {
         status: true,
       });
       await nouveauPanier.save();
-
-      console.log(
-        `Commande ${commandeId} validée | Nouveau panier: ${nouveauPanier._id}`
-      );
     } catch (error) {
       return res.status(500).json({ error: "Erreur traitement paiement" });
     }

@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  createPhoto_accesoire,
-  getAllPhoto_accesoires,
-  getPhoto_accesoireById,
-  updatePhoto_accesoire,
-  deletePhoto_accesoire,
-} from "../controllers/photo_accesoire.controller.js";
+  createPackage,
+  getAllPackages,
+  getPackageById,
+  updatePackage,
+  deletePackage,
+} from "../controllers/package.controller.js";
 import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -15,31 +15,27 @@ import isStaff from "../middlewares/isStaff.js";
 const router = Router();
 
 // Routes publiques
-router.get("/all", getAllPhoto_accesoires);
-router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
+router.get("/all", getAllPackages);
+router.get("/:id", validateObjectId("id"), getPackageById);
+
 // Routes staff (admin, responsable, conseillère)
 router.post(
   "/new",
   auth,
   isStaff,
-  upload.single("name"),
-  createPhoto_accesoire
+  upload.single("photo_package"),
+  createPackage
 );
 router.put(
   "/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  upload.single("name"),
-  updatePhoto_accesoire
+  upload.single("photo_package"),
+  updatePackage
 );
-// Routes admin uniquement
-router.delete(
-  "/:id",
-  auth,
-  isAdmin,
-  validateObjectId("id"),
-  deletePhoto_accesoire
-);
+
+// Seul admin peut supprimer
+router.delete("/:id", auth, isAdmin, validateObjectId("id"), deletePackage);
 
 export default router;

@@ -6,10 +6,12 @@ const taille_janteSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 50,
     },
     couleur_jante: {
       type: String,
       trim: true,
+      maxlength: 100,
     },
     photo_jante: {
       type: String,
@@ -18,12 +20,13 @@ const taille_janteSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      maxlength: 500,
     },
-    // Prix supplémentaire pour ces jantes
     prix: {
       type: Number,
       min: 0,
       default: 0,
+      max: 100000,
     },
   },
   { timestamps: true }

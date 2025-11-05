@@ -10,28 +10,29 @@ import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
+import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
 // Routes publiques
 router.get("/all", getAllCouleur_accesoires);
 router.get("/:id", validateObjectId("id"), getCouleur_accesoireById);
-
-// Routes admin
+// Routes staff (admin, responsable, conseillère)
 router.post(
   "/new",
   auth,
-  isAdmin,
+  isStaff,
   upload.single("name"),
   createCouleur_accesoire
 );
 router.put(
   "/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"),
   updateCouleur_accesoire
 );
+// Routes admin uniquement
 router.delete(
   "/:id",
   auth,

@@ -12,8 +12,9 @@ const CommandeSchema = new mongoose.Schema(
       type: Number,
       min: 0,
       default: 0,
+      max: 1000000,
     },
-    // Acompte versé (voiture neuve uniquement)
+    // Acompte versé (voiture neuve uniquement 20%)
     acompte: {
       type: Number,
       min: 0,
@@ -56,5 +57,14 @@ CommandeSchema.index({ user: 1 });
 CommandeSchema.index({ status: 1 });
 CommandeSchema.index({ date_commande: -1 });
 CommandeSchema.index({ user: 1, status: 1 }); // Index composé pour panier actif
+
+// Validation: l'acompte ne peut pas dépasser le prix
+CommandeSchema.pre("save", function (next) {
+  if (this.acompte > this.prix) {
+    next(new Error("L'acompte ne peut pas dépasser le prix total"));
+  } else {
+    next();
+  }
+});
 
 export default mongoose.model("Commande", CommandeSchema);

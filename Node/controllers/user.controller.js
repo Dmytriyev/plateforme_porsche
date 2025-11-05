@@ -9,7 +9,6 @@ import Voiture from "../models/voiture.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
 
-// Inscription nouvel utilisateur + création panier automatique
 const register = async (req, res) => {
   try {
     const { body } = req;
@@ -51,12 +50,10 @@ const register = async (req, res) => {
 
     return res.status(201).json(userResponse);
   } catch (error) {
-    console.error("Erreur register:", error);
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
-// Connexion utilisateur + génération token JWT
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -105,12 +102,10 @@ const login = async (req, res) => {
       ),
     });
   } catch (error) {
-    console.error("Erreur login:", error);
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
 
-// Récupérer tous les utilisateurs (admin uniquement)
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
@@ -120,7 +115,6 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Récupérer utilisateur par ID (propriétaire ou admin)
 const getUserById = async (req, res) => {
   try {
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
@@ -137,7 +131,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Mettre à jour utilisateur (propriétaire ou admin)
 const updateUser = async (req, res) => {
   try {
     if (req.user.id !== req.params.id && !req.user.isAdmin) {

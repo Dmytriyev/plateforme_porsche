@@ -1,43 +1,43 @@
 import { Router } from "express";
 import {
-  createCouleur_exterieur,
-  getAllCouleur_exterieurs,
-  getCouleur_exterieurById,
-  updateCouleur_exterieur,
-  deleteCouleur_exterieur,
+  createCouleurExterieur,
+  getAllCouleurExterieur,
+  getCouleurExterieurById,
+  updateCouleurExterieur,
+  deleteCouleurExterieur,
 } from "../controllers/couleur_exterieur.controller.js";
 import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
+import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
-// Routes publiques (consultation)
-router.get("/all", getAllCouleur_exterieurs);
-router.get("/:id", validateObjectId("id"), getCouleur_exterieurById);
+router.get("/all", getAllCouleurExterieur);
+router.get("/:id", validateObjectId("id"), getCouleurExterieurById);
 
-// Routes protégées (admin uniquement - CRUD)
 router.post(
   "/new",
   auth,
-  isAdmin,
+  isStaff,
   upload.single("name"),
-  createCouleur_exterieur
+  createCouleurExterieur
 );
 router.put(
   "/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"),
-  updateCouleur_exterieur
+  updateCouleurExterieur
 );
+
 router.delete(
   "/:id",
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteCouleur_exterieur
+  deleteCouleurExterieur
 );
 
 export default router;

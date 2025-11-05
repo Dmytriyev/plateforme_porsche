@@ -14,23 +14,24 @@ import {
   searchPorschesByCriteria,
 } from "../controllers/model_porsche_actuel.controller.js";
 import auth from "../middlewares/auth.js";
-import isAdmin from "../middlewares/isAdmin.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Routes publiques
-router.get("/all", getAllModel_porsche_actuels);
-router.get("/search", searchPorschesByCriteria);
-router.get("/:id", validateObjectId("id"), getModel_porsche_actuelById);
-
-// Routes protégées - nécessitent authentification
+router.get("/all", auth, getAllModel_porsche_actuels);
+router.get("/search", auth, searchPorschesByCriteria);
+router.get("/:id", auth, validateObjectId("id"), getModel_porsche_actuelById);
 router.post("/new", auth, createModel_porsche_actuel);
 router.get("/user/mes-porsches", auth, getMesPorsches);
 router.put("/:id", auth, validateObjectId("id"), updateModel_porsche_actuel);
-router.delete("/:id", auth, validateObjectId("id"), deleteModel_porsche_actuel);
+router.delete(
+  "/:id/delete",
+  auth,
+  validateObjectId("id"),
+  deleteModel_porsche_actuel
+);
 router.put("/:id/addImages", auth, validateObjectId("id"), addImages);
-router.put("/:id/deleteImages", auth, validateObjectId("id"), removeImages);
+router.delete("/:id/deleteImages", auth, validateObjectId("id"), removeImages);
 router.put(
   "/:id/couleur-exterieur",
   auth,

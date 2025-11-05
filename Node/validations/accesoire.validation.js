@@ -2,10 +2,10 @@ import joi from "joi";
 
 export default function accesoireValidation(body) {
   const accesoireCreate = joi.object({
-    type_accesoire: joi.string().required(),
-    nom_accesoire: joi.string().required(),
-    description: joi.string().required(),
-    prix: joi.number().min(0).required(),
+    type_accesoire: joi.string().required().max(150),
+    nom_accesoire: joi.string().required().max(250),
+    description: joi.string().required().max(1000),
+    prix: joi.number().min(0).required().max(1000000),
     couleur_accesoire: joi.string().hex().length(24),
     photo_accesoire: joi.array().items(joi.string().hex().length(24)),
   });

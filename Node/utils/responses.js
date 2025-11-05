@@ -1,6 +1,4 @@
-/**
- * Réponses HTTP standardisées pour l'API
- */
+// Réponses HTTP pour l'API
 
 export const sendSuccess = (res, data, message, statusCode = 200) => {
   const response = { success: true };

@@ -5,7 +5,6 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = express.Router();
 
-// Route protégée - paiement nécessite authentification
 router.post(
   "/checkout/:id",
   auth,

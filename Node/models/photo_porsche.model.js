@@ -6,11 +6,13 @@ const photo_porscheSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     alt: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     // Relation Many-to-One: Modèle Porsche associé
     model_porsche: {
@@ -21,5 +23,8 @@ const photo_porscheSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Index pour accélérer les recherches
+photo_porscheSchema.index({ model_porsche: 1 });
 
 export default mongoose.model("Photo_porsche", photo_porscheSchema);

@@ -6,11 +6,13 @@ const photo_voitureSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     alt: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     // Relation Many-to-Many: Voitures associées
     voiture: [
@@ -38,5 +40,9 @@ const photo_voitureSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Index pour accélérer les recherches
+photo_voitureSchema.index({ voiture: 1 });
+photo_voitureSchema.index({ couleur_exterieur: 1 });
 
 export default mongoose.model("Photo_voiture", photo_voitureSchema);

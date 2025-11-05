@@ -9,9 +9,6 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-/**
- * Créer un accessoire (admin uniquement)
- */
 const createAccesoire = async (req, res) => {
   try {
     const { body } = req;
@@ -60,9 +57,6 @@ const createAccesoire = async (req, res) => {
   }
 };
 
-/**
- * Récupérer tous les accessoires (public)
- */
 const getAllAccesoires = async (req, res) => {
   try {
     const accesoires = await Accesoire.find()
@@ -77,9 +71,6 @@ const getAllAccesoires = async (req, res) => {
   }
 };
 
-/**
- * Récupérer un accessoire par ID (public)
- */
 const getAccesoireById = async (req, res) => {
   try {
     const accesoire = await Accesoire.findById(req.params.id)
@@ -97,9 +88,6 @@ const getAccesoireById = async (req, res) => {
   }
 };
 
-/**
- * Mettre à jour un accessoire (admin uniquement)
- */
 const updateAccesoire = async (req, res) => {
   try {
     const { body } = req;
@@ -143,9 +131,6 @@ const updateAccesoire = async (req, res) => {
   }
 };
 
-/**
- * Supprimer un accessoire (admin uniquement)
- */
 const deleteAccesoire = async (req, res) => {
   try {
     const accesoire = await Accesoire.findByIdAndDelete(req.params.id);
@@ -159,9 +144,6 @@ const deleteAccesoire = async (req, res) => {
   }
 };
 
-/**
- * Ajouter des photos à un accessoire (admin uniquement)
- */
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -206,9 +188,6 @@ const addImages = async (req, res) => {
   }
 };
 
-/**
- * Supprimer des photos d'un accessoire (admin uniquement)
- */
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -252,7 +231,6 @@ const removeImages = async (req, res) => {
   }
 };
 
-// Gestion de la couleur d'accessoire
 const setCouleur = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -347,7 +325,6 @@ const removeCouleur = async (req, res) => {
   }
 };
 
-// Recherche d'accessoires par critères
 const getAccessoiresByCriteria = async (req, res) => {
   try {
     const { type_accesoire, couleur_accesoire, prix_min, prix_max } = req.query;

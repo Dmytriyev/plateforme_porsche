@@ -11,12 +11,8 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 
 const router = Router();
-
-// Routes publiques
-router.get("/all", getAllPhoto_voiture_actuels);
-router.get("/:id", validateObjectId("id"), getPhoto_voiture_actuelById);
-
-// Routes utilisateur authentifié (gère ses propres photos)
+router.get("/all", auth, getAllPhoto_voiture_actuels);
+router.get("/:id", auth, validateObjectId("id"), getPhoto_voiture_actuelById);
 router.post("/new", auth, upload.single("name"), createPhoto_voiture_actuel);
 router.put(
   "/:id",

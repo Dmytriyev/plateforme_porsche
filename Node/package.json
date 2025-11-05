@@ -25,11 +25,9 @@
   "dependencies": {
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
-    "concurrently": "^9.2.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.2.1",
     "express-validator": "^7.3.0",
     "helmet": "^8.1.0",
@@ -37,8 +35,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
-    "node-fetch": "^3.3.2",
-    "strike": "^0.1.73",
     "stripe": "^18.5.0"
   },
   "devDependencies": {

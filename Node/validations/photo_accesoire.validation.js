@@ -1,8 +1,8 @@
 import joi from "joi";
 export default function photo_accesoireValidation(body) {
   const photo_accesoireCreate = joi.object({
-    name: joi.string().required(),
-    alt: joi.string().required(),
+    name: joi.string().required().max(250),
+    alt: joi.string().required().max(250),
     accesoire: joi.string().hex().length(24).required(), // Many-to-One: un seul accesoire
   });
   const photo_accesoireUpdate = joi.object({

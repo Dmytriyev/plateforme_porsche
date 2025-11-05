@@ -23,24 +23,19 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// ===== Routes publiques =====
-router.post("/register", register); // Inscription
-router.post("/login", login); // Connexion
-
-// ===== Routes admin =====
-router.get("/all", auth, isAdmin, getAllUsers); // Liste tous les utilisateurs
-
-// ===== Routes utilisateur (auth requise) =====
-// CRUD utilisateur
+// Routes publiques
+router.post("/register", register);
+router.post("/login", login);
+// Routes admin
+router.get("/all", auth, isAdmin, getAllUsers);
+// Routes utilisateur
 router.get("/:id", auth, validateObjectId("id"), getUserById);
 router.put("/:id", auth, validateObjectId("id"), updateUser);
 router.delete("/:id", auth, validateObjectId("id"), deleteUser);
-
-// Profil & dashboard
+// Profil
 router.get("/:id/profile", auth, validateObjectId("id"), getUserProfile);
 router.get("/:id/dashboard", auth, validateObjectId("id"), getUserDashboard);
-
-// ===== Gestion des réservations =====
+// Gestion des réservations
 router.post(
   "/:id/reservations",
   auth,
@@ -67,8 +62,7 @@ router.delete(
   validateObjectId("reservationId"),
   deleteUserReservation
 );
-
-// ===== Gestion des Porsches personnelles =====
+// Gestion des voitures personnelles
 router.post("/:id/porsches", auth, validateObjectId("id"), addUserPorsche);
 router.get("/:id/porsches", auth, validateObjectId("id"), getUserPorsches);
 router.put(

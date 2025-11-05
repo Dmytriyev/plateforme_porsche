@@ -13,23 +13,8 @@ const __dirname = path.dirname(__filename);
 
 const createPhoto_voiture = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      }
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      }
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
+    // Vérification auth/staff gérée par les middlewares (auth + isStaff)
+    // Pas besoin de vérifier isAdmin ici
 
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
@@ -175,23 +160,8 @@ const getPhoto_voitureById = async (req, res) => {
 
 const updatePhoto_voiture = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      }
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      }
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
+    // Vérification auth/staff gérée par les middlewares (auth + isStaff)
+    // Pas besoin de vérifier isAdmin ici
 
     const { body } = req;
 
@@ -308,12 +278,7 @@ const updatePhoto_voiture = async (req, res) => {
       if (fs.existsSync(oldPath)) {
         try {
           fs.unlinkSync(oldPath);
-        } catch (err) {
-          console.log(
-            "Erreur lors de la suppression de l'ancien fichier:",
-            err
-          );
-        }
+        } catch (err) {}
       }
     }
 

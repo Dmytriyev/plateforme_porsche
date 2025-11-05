@@ -2,22 +2,6 @@ import mongoose from "mongoose";
 
 const ligneCommandeSchema = new mongoose.Schema(
   {
-    // Relation Many-to-One: Voiture commandée (si type_produit = true)
-    voiture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Voiture",
-    },
-    // Relation Many-to-One: Accessoire commandé (si type_produit = false)
-    accesoire: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Accesoire",
-    },
-    // Relation Many-to-One: Commande parent
-    commande: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Commande",
-      required: true,
-    },
     // Type de produit: true = voiture, false = accessoire
     type_produit: {
       type: Boolean,
@@ -28,18 +12,61 @@ const ligneCommandeSchema = new mongoose.Schema(
       required: true,
       min: 1,
       default: 1,
+      max: 1000,
+      validate: {
+        validator: function (value) {
+          // RÈGLE MÉTIER: Les voitures neuves ne peuvent avoir qu'une quantité de 1
+          if (this.type_produit === true && value > 1) {
+            return false;
+          }
+          return true;
+        },
+        message: "Une voiture neuve ne peut être commandée qu'en quantité 1",
+      },
     },
     // Prix total de la ligne
     prix: {
       type: Number,
       min: 0,
       default: 0,
+      max: 1000000,
     },
     // Acompte versé (voiture neuve uniquement: 20%)
     acompte: {
       type: Number,
       min: 0,
       default: 0,
+    },
+    // Relation Many-to-One: Voiture commandée (si type_produit = true)
+    // Ce champ est rempli automatiquement depuis model_porsche_id
+    voiture: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Voiture",
+      required: function () {
+        return this.type_produit === true;
+      },
+    },
+    // Relation Many-to-One: Configuration Porsche (pour voitures neuves personnalisées)
+    model_porsche_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Model_porsche",
+      required: function () {
+        return this.type_produit === true;
+      },
+    },
+    // Relation Many-to-One: Accessoire commandé (si type_produit = false)
+    accesoire: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Accesoire",
+      required: function () {
+        return this.type_produit === false;
+      },
+    },
+    // Relation Many-to-One: Commande parent
+    commande: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Commande",
+      required: true,
     },
   },
   {
@@ -50,7 +77,17 @@ const ligneCommandeSchema = new mongoose.Schema(
 // Index pour accélérer les recherches
 ligneCommandeSchema.index({ commande: 1 });
 ligneCommandeSchema.index({ voiture: 1 });
+ligneCommandeSchema.index({ model_porsche_id: 1 });
 ligneCommandeSchema.index({ accesoire: 1 });
 ligneCommandeSchema.index({ type_produit: 1 });
+
+// Validation: l'acompte ne peut pas dépasser le prix
+ligneCommandeSchema.pre("save", function (next) {
+  if (this.acompte > this.prix) {
+    next(new Error("L'acompte ne peut pas dépasser le prix total"));
+  } else {
+    next();
+  }
+});
 
 export default mongoose.model("LigneCommande", ligneCommandeSchema);

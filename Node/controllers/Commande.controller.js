@@ -14,9 +14,6 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-/**
- * Créer une nouvelle commande
- */
 const createCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -48,9 +45,6 @@ const createCommande = async (req, res) => {
   }
 };
 
-/**
- * Récupérer toutes les commandes
- */
 const getAllCommandes = async (req, res) => {
   try {
     const commandes = await Commande.find()
@@ -62,9 +56,6 @@ const getAllCommandes = async (req, res) => {
   }
 };
 
-/**
- * Récupérer une commande par ID avec ses lignes enrichies
- */
 const getCommandeById = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id).populate(
@@ -101,9 +92,6 @@ const getCommandeById = async (req, res) => {
   }
 };
 
-/**
- * Mettre à jour une commande
- */
 const updateCommande = async (req, res) => {
   try {
     const { body } = req;
@@ -128,9 +116,6 @@ const updateCommande = async (req, res) => {
   }
 };
 
-/**
- * Supprimer une commande et ses lignes
- */
 const deleteCommande = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id);
@@ -150,9 +135,6 @@ const deleteCommande = async (req, res) => {
   }
 };
 
-/**
- * Récupérer le panier actif de l'utilisateur
- */
 const getPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -192,9 +174,6 @@ const getPanier = async (req, res) => {
   }
 };
 
-/**
- * Récupérer l'historique des commandes de l'utilisateur
- */
 const getMyCommandes = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -210,9 +189,6 @@ const getMyCommandes = async (req, res) => {
   }
 };
 
-/**
- * Créer ou récupérer le panier actif de l'utilisateur
- */
 const getOrCreatePanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -262,9 +238,6 @@ const getOrCreatePanier = async (req, res) => {
   }
 };
 
-/**
- * Valider le panier (transformer en commande)
- */
 const validerPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -308,6 +281,195 @@ const validerPanier = async (req, res) => {
   }
 };
 
+const ajouterConfigurationAuPanier = async (req, res) => {
+  if (!req.user) return sendUnauthorized(res);
+
+  try {
+    const { model_porsche_id, quantite = 1 } = req.body;
+
+    if (!model_porsche_id) {
+      return sendValidationError(res, {
+        details: [{ message: "model_porsche_id requis" }],
+      });
+    }
+
+    // Import dynamique pour éviter dépendance circulaire
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+    const Voiture = (await import("../models/voiture.model.js")).default;
+
+    // 1. Vérifier que le model_porsche existe
+    const modelPorsche = await Model_porsche.findById(model_porsche_id)
+      .populate("voiture", "prix nom_model type_voiture")
+      .populate("couleur_exterieur", "prix nom_couleur")
+      .populate("couleur_interieur", "prix nom_couleur")
+      .populate("taille_jante", "prix taille_jante");
+
+    if (!modelPorsche) {
+      return sendNotFound(res, "Configuration Porsche");
+    }
+
+    // 2. Vérifier que c'est bien une voiture neuve
+    if (modelPorsche.voiture.type_voiture !== true) {
+      return sendError(
+        res,
+        "Seules les voitures neuves peuvent être ajoutées au panier. Les occasions utilisent le système de réservation.",
+        400
+      );
+    }
+
+    // 3. Calculer le prix total de la configuration
+    const prixDetails = await calculerPrixTotalModelPorsche(modelPorsche);
+
+    if (!prixDetails) {
+      return sendError(
+        res,
+        "Impossible de calculer le prix de la configuration",
+        500
+      );
+    }
+
+    const prixTotal = prixDetails.prix_total_avec_options;
+
+    // 4. Calculer l'acompte (20%)
+    const acompte = Math.round(prixTotal * 0.2);
+
+    // 5. Récupérer ou créer le panier
+    let panier = await Commande.findOne({
+      user: req.user.id,
+      status: false,
+    });
+
+    if (!panier) {
+      panier = await new Commande({
+        user: req.user.id,
+        date_commande: new Date(),
+        status: false,
+        prix: 0,
+        acompte: 0,
+      }).save();
+    }
+
+    // 6. Vérifier si cette configuration existe déjà dans le panier
+    const ligneExistante = await LigneCommande.findOne({
+      commande: panier._id,
+      model_porsche_id: model_porsche_id,
+    });
+
+    if (ligneExistante) {
+      // Incrémenter la quantité
+      ligneExistante.quantite += quantite;
+      await ligneExistante.save();
+    } else {
+      // Créer nouvelle ligne de commande
+      const nouvelleLigne = await new LigneCommande({
+        commande: panier._id,
+        voiture: modelPorsche.voiture._id,
+        model_porsche_id: model_porsche_id,
+        quantite: quantite,
+        prix: prixTotal,
+        acompte: acompte,
+        type_produit: true, // true = voiture neuve
+      }).save();
+    }
+
+    // 7. Récupérer le panier mis à jour
+    const panierMisAJour = await Commande.findById(panier._id).populate(
+      "user",
+      "nom prenom email"
+    );
+
+    const lignesCommande = await LigneCommande.find({
+      commande: panier._id,
+    })
+      .populate("voiture", "nom_model prix type_voiture")
+      .populate("accesoire", "nom_accesoire prix");
+
+    // Enrichir avec détails model_porsche
+    const lignesEnrichies = await Promise.all(
+      lignesCommande.map((line) => enrichirLigneAvecModelPorsche(line))
+    );
+
+    // Calculer total à payer (somme des acomptes pour voitures, prix pour accessoires)
+    const totalAPayer = lignesCommande.reduce((sum, line) => {
+      return sum + (line.type_produit ? line.acompte : line.prix);
+    }, 0);
+
+    return sendSuccess(
+      res,
+      {
+        ...panierMisAJour.toObject(),
+        ligneCommandes: lignesEnrichies,
+        total_a_payer: totalAPayer,
+        message:
+          "Configuration ajoutée au panier. Vous payerez un acompte de 20% maintenant.",
+      },
+      "Configuration ajoutée au panier avec succès",
+      201
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+const supprimerLignePanier = async (req, res) => {
+  if (!req.user) return sendUnauthorized(res);
+
+  try {
+    const { ligne_id } = req.params;
+
+    // Vérifier que la ligne existe et appartient au panier de l'utilisateur
+    const ligne = await LigneCommande.findById(ligne_id).populate({
+      path: "commande",
+      match: { user: req.user.id, status: false },
+    });
+
+    if (!ligne || !ligne.commande) {
+      return sendNotFound(res, "Ligne de commande dans votre panier");
+    }
+
+    await LigneCommande.findByIdAndDelete(ligne_id);
+
+    return sendSuccess(res, null, "Article supprimé du panier");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+const modifierQuantitePanier = async (req, res) => {
+  if (!req.user) return sendUnauthorized(res);
+
+  try {
+    const { ligne_id } = req.params;
+    const { quantite } = req.body;
+
+    if (!quantite || quantite < 1) {
+      return sendValidationError(res, {
+        details: [{ message: "Quantité doit être >= 1" }],
+      });
+    }
+
+    // Vérifier que la ligne existe et appartient au panier de l'utilisateur
+    const ligne = await LigneCommande.findById(ligne_id).populate({
+      path: "commande",
+      match: { user: req.user.id, status: false },
+    });
+
+    if (!ligne || !ligne.commande) {
+      return sendNotFound(res, "Ligne de commande dans votre panier");
+    }
+
+    ligne.quantite = quantite;
+    await ligne.save();
+
+    const ligneEnrichie = await enrichirLigneAvecModelPorsche(ligne);
+
+    return sendSuccess(res, ligneEnrichie, "Quantité mise à jour");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
 export {
   createCommande,
   getAllCommandes,
@@ -318,4 +480,7 @@ export {
   getMyCommandes,
   getOrCreatePanier,
   validerPanier,
+  ajouterConfigurationAuPanier,
+  supprimerLignePanier,
+  modifierQuantitePanier,
 };

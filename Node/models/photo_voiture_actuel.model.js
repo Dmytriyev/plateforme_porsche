@@ -6,11 +6,13 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     alt: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     // Relation Many-to-One: Voiture personnelle associée
     model_porsche_actuel: {
@@ -21,6 +23,9 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Index pour accélérer les recherches
+photo_voiture_actuelSchema.index({ model_porsche_actuel: 1 });
 
 export default mongoose.model(
   "Photo_voiture_actuel",

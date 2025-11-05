@@ -32,6 +32,6 @@ reservationSchema.index({ user: 1 });
 reservationSchema.index({ voiture: 1 });
 reservationSchema.index({ date_reservation: 1 });
 reservationSchema.index({ status: 1 });
-reservationSchema.index({ voiture: 1, date_reservation: 1, status: 1 }); // Index composé pour vérifications
+reservationSchema.index({ voiture: 1, date_reservation: 1, status: 1 });
 
 export default mongoose.model("Reservation", reservationSchema);

@@ -161,12 +161,7 @@ const updatePhoto_accesoire = async (req, res) => {
       if (fs.existsSync(oldPath)) {
         try {
           fs.unlinkSync(oldPath);
-        } catch (err) {
-          console.log(
-            "Erreur lors de la suppression de l'ancien fichier:",
-            err
-          );
-        }
+        } catch (err) {}
       }
     }
 

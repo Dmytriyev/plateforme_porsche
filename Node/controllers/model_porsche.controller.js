@@ -6,20 +6,85 @@ import Couleur_interieur from "../models/couleur_interieur.model.js";
 import Taille_jante from "../models/taille_jante.model.js";
 import Photo_porsche from "../models/photo_porsche.model.js";
 
+const POPULATE_FIELDS = {
+  photo_porsche: "name alt",
+  voiture: "nom_model type_voiture description",
+  couleur_exterieur: "nom_couleur photo_couleur prix",
+  couleur_interieur: "nom_couleur photo_couleur prix",
+  taille_jante: "taille_jante couleur_jante prix",
+  package: "nom_package prix",
+  siege: "nom_siege prix",
+};
+
+const validateEntity = async (Model, id, entityName) => {
+  const entity = await Model.findById(id);
+  if (!entity) {
+    throw new Error(`${entityName} introuvable`);
+  }
+  return entity;
+};
+
+const validateEntities = async (Model, ids, entityName) => {
+  const validationPromises = ids.map((id) =>
+    validateEntity(Model, id, entityName)
+  );
+  await Promise.all(validationPromises);
+};
+
+const populateModel = (query) => {
+  return query
+    .populate("photo_porsche", POPULATE_FIELDS.photo_porsche)
+    .populate("voiture", POPULATE_FIELDS.voiture)
+    .populate("couleur_exterieur", POPULATE_FIELDS.couleur_exterieur)
+    .populate("couleur_interieur", POPULATE_FIELDS.couleur_interieur)
+    .populate("taille_jante", POPULATE_FIELDS.taille_jante)
+    .populate("package", POPULATE_FIELDS.package)
+    .populate("siege", POPULATE_FIELDS.siege);
+};
+
+const calculatePrix = (model) => {
+  const prixBase = model.prix_base || 0;
+  const prixCouleurExt = model.couleur_exterieur?.prix || 0;
+
+  let prixCouleursInt = 0;
+  if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
+    prixCouleursInt = model.couleur_interieur.reduce(
+      (total, couleur) => total + (couleur?.prix || 0),
+      0
+    );
+  }
+
+  const prixJante = model.taille_jante?.prix || 0;
+  const prixPackage = model.package?.prix || 0;
+  const prixSiege = model.siege?.prix || 0;
+  const prixTotal =
+    prixBase +
+    prixCouleurExt +
+    prixCouleursInt +
+    prixJante +
+    prixPackage +
+    prixSiege;
+  const acompte = prixTotal * 0.2;
+
+  return {
+    prix_base_variante: prixBase,
+    options: {
+      couleur_exterieur: prixCouleurExt,
+      couleurs_interieur: prixCouleursInt,
+      jante: prixJante,
+      package: prixPackage,
+      siege: prixSiege,
+    },
+    total_options:
+      prixCouleurExt + prixCouleursInt + prixJante + prixPackage + prixSiege,
+    prix_total: prixTotal,
+    acompte_requis: acompte,
+    pourcentage_acompte: "20%",
+  };
+};
+
 const createModel_porsche = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -32,189 +97,137 @@ const createModel_porsche = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Vérifier que la voiture existe
-    const voiture = await Voiture.findById(body.voiture);
-    if (!voiture) {
-      return res.status(404).json({ message: "Voiture introuvable" });
+    await validateEntity(Voiture, body.voiture, "Voiture");
+
+    if (!body.prix_base || body.prix_base <= 0) {
+      return res.status(400).json({
+        message:
+          "Le prix_base de la variante est requis et doit être supérieur à 0",
+      });
     }
 
-    // Vérifier que la couleur extérieure existe si fournie
     if (body.couleur_exterieur) {
-      const couleurExt = await Couleur_exterieur.findById(
-        body.couleur_exterieur
+      await validateEntity(
+        Couleur_exterieur,
+        body.couleur_exterieur,
+        "Couleur extérieure"
       );
-      if (!couleurExt) {
-        return res
-          .status(404)
-          .json({ message: "Couleur extérieure introuvable" });
-      }
     }
 
-    // Vérifier que les couleurs intérieures existent si fournies
     if (body.couleur_interieur && Array.isArray(body.couleur_interieur)) {
-      for (let couleurId of body.couleur_interieur) {
-        const couleurInt = await Couleur_interieur.findById(couleurId);
-        if (!couleurInt) {
-          return res
-            .status(404)
-            .json({ message: `Couleur intérieure ${couleurId} introuvable` });
-        }
-      }
+      await validateEntities(
+        Couleur_interieur,
+        body.couleur_interieur,
+        "Couleur intérieure"
+      );
     }
 
-    // Vérifier que la taille de jante existe si fournie
     if (body.taille_jante) {
-      const jante = await Taille_jante.findById(body.taille_jante);
-      if (!jante) {
-        return res.status(404).json({ message: "Taille de jante introuvable" });
-      }
+      await validateEntity(Taille_jante, body.taille_jante, "Taille de jante");
     }
 
-    // Vérifier que les photos existent si fournies
     if (body.photo_porsche && Array.isArray(body.photo_porsche)) {
-      for (let photoId of body.photo_porsche) {
-        const photo = await Photo_porsche.findById(photoId);
-        if (!photo) {
-          return res
-            .status(404)
-            .json({ message: `Photo ${photoId} introuvable` });
-        }
-      }
+      await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
     }
 
     const model_porsche = new Model_porsche(body);
     const newModel_porsche = await model_porsche.save();
 
-    const populatedModel = await Model_porsche.findById(newModel_porsche._id)
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture description prix")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante");
+    const populatedModel = await populateModel(
+      Model_porsche.findById(newModel_porsche._id)
+    );
 
     return res.status(201).json({
-      message: "Modèle Porsche créé avec succès",
+      message: "Variante Porsche créée avec succès",
       model_porsche: populatedModel,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const getAllModel_porsches = async (req, res) => {
   try {
-    const model_porsches = await Model_porsche.find()
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture description prix")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur prix")
-      .populate("couleur_interieur", "nom_couleur photo_couleur prix")
-      .populate("taille_jante", "taille_jante couleur_jante prix")
-      .sort({ annee_production: -1 });
-
-    // Ajouter le calcul de prix pour chaque modèle
-    const model_porschesWithPrix = model_porsches.map((model) => {
-      const prixBase = model.voiture?.prix || 0;
-      const prixCouleurExt = model.couleur_exterieur?.prix || 0;
-
-      let prixCouleursInt = 0;
-      if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
-        prixCouleursInt = model.couleur_interieur.reduce((total, couleur) => {
-          return total + (couleur?.prix || 0);
-        }, 0);
-      }
-
-      const prixJante = model.taille_jante?.prix || 0;
-      const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
-
-      return {
-        ...model.toObject(),
-        prix_calcule: {
-          prix_base: prixBase,
-          total_options: prixCouleurExt + prixCouleursInt + prixJante,
-          prix_total: prixTotal,
-        },
-      };
+    const model_porsches = await populateModel(Model_porsche.find()).sort({
+      annee_production: -1,
     });
+
+    const model_porschesWithPrix = model_porsches.map((model) => ({
+      ...model.toObject(),
+      prix_calcule: calculatePrix(model),
+    }));
 
     return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
+const getConfigurationsByVoiture = async (req, res) => {
+  try {
+    const voitureId = req.params.voiture_id;
+
+    const voiture = await validateEntity(
+      Voiture,
+      voitureId,
+      "Gamme de voiture"
+    );
+
+    const configurations = await populateModel(
+      Model_porsche.find({ voiture: voitureId })
+    ).sort({ prix_base: 1 });
+
+    const configurationsAvecPrix = configurations.map((config) => ({
+      ...config.toObject(),
+      prix_calcule: calculatePrix(config),
+    }));
+
+    return res.status(200).json({
+      voiture: {
+        _id: voiture._id,
+        nom_model: voiture.nom_model,
+        type_voiture: voiture.type_voiture,
+        description: voiture.description,
+      },
+      nombre_configurations: configurationsAvecPrix.length,
+      configurations: configurationsAvecPrix,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const getModel_porscheById = async (req, res) => {
   try {
-    const model_porsche = await Model_porsche.findById(req.params.id)
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture description prix")
-      .populate(
-        "couleur_exterieur",
-        "nom_couleur photo_couleur description prix"
-      )
-      .populate(
-        "couleur_interieur",
-        "nom_couleur photo_couleur description prix"
-      )
-      .populate("taille_jante", "taille_jante couleur_jante description prix");
+    const model_porsche = await populateModel(
+      Model_porsche.findById(req.params.id)
+    );
+
     if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
+      return res.status(404).json({ message: "Variante Porsche n'existe pas" });
     }
 
-    // Calculer le prix total automatiquement
-    const prixBase = model_porsche.voiture?.prix || 0;
-    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
-
-    let prixCouleursInt = 0;
-    if (
-      model_porsche.couleur_interieur &&
-      Array.isArray(model_porsche.couleur_interieur)
-    ) {
-      prixCouleursInt = model_porsche.couleur_interieur.reduce(
-        (total, couleur) => {
-          return total + (couleur?.prix || 0);
-        },
-        0
-      );
-    }
-
-    const prixJante = model_porsche.taille_jante?.prix || 0;
-    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
-
-    // Ajouter le prix calculé à la réponse
     const response = {
       ...model_porsche.toObject(),
-      prix_calcule: {
-        prix_base: prixBase,
-        options: {
-          couleur_exterieur: prixCouleurExt,
-          couleurs_interieur: prixCouleursInt,
-          taille_jante: prixJante,
-        },
-        total_options: prixCouleurExt + prixCouleursInt + prixJante,
-        prix_total: prixTotal,
-      },
+      prix_calcule: calculatePrix(model_porsche),
     };
 
     return res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const updateModel_porsche = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -227,116 +240,69 @@ const updateModel_porsche = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Vérifier que le modèle existe
-    const modelExist = await Model_porsche.findById(req.params.id);
-    if (!modelExist) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
-    // Vérifier que la voiture existe si fournie
     if (body.voiture) {
-      const voiture = await Voiture.findById(body.voiture);
-      if (!voiture) {
-        return res.status(404).json({ message: "Voiture introuvable" });
-      }
+      await validateEntity(Voiture, body.voiture, "Voiture");
     }
 
-    // Vérifier que la couleur extérieure existe si fournie
     if (body.couleur_exterieur) {
-      const couleurExt = await Couleur_exterieur.findById(
-        body.couleur_exterieur
+      await validateEntity(
+        Couleur_exterieur,
+        body.couleur_exterieur,
+        "Couleur extérieure"
       );
-      if (!couleurExt) {
-        return res
-          .status(404)
-          .json({ message: "Couleur extérieure introuvable" });
-      }
     }
 
-    // Vérifier que les couleurs intérieures existent si fournies
     if (body.couleur_interieur && Array.isArray(body.couleur_interieur)) {
-      for (let couleurId of body.couleur_interieur) {
-        const couleurInt = await Couleur_interieur.findById(couleurId);
-        if (!couleurInt) {
-          return res
-            .status(404)
-            .json({ message: `Couleur intérieure ${couleurId} introuvable` });
-        }
-      }
+      await validateEntities(
+        Couleur_interieur,
+        body.couleur_interieur,
+        "Couleur intérieure"
+      );
     }
 
-    // Vérifier que la taille de jante existe si fournie
     if (body.taille_jante) {
-      const jante = await Taille_jante.findById(body.taille_jante);
-      if (!jante) {
-        return res.status(404).json({ message: "Taille de jante introuvable" });
-      }
+      await validateEntity(Taille_jante, body.taille_jante, "Taille de jante");
     }
 
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      body,
-      { new: true }
-    )
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(req.params.id, body, { new: true })
+    );
 
     if (!updatedModel_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
+      return res.status(404).json({ message: "Variante Porsche n'existe pas" });
     }
 
     return res.status(200).json({
-      message: "Modèle Porsche mis à jour avec succès",
+      message: "Variante Porsche mise à jour avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const deleteModel_porsche = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const model_porsche = await Model_porsche.findByIdAndDelete(req.params.id);
     if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
+      return res.status(404).json({ message: "Variante Porsche n'existe pas" });
     }
     return res
       .status(200)
-      .json({ message: "Modèle Porsche supprimé avec succès" });
+      .json({ message: "Variante Porsche supprimée avec succès" });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const addImages = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -350,56 +316,30 @@ const addImages = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
 
-    // Vérifier que les photos existent
-    for (let photoId of body.photo_porsche) {
-      const photo = await Photo_porsche.findById(photoId);
-      if (!photo) {
-        return res
-          .status(404)
-          .json({ message: `Photo ${photoId} introuvable` });
-      }
-    }
-
-    // Ajouter les photos sans doublons
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { photo_porsche: { $each: body.photo_porsche } } },
-      { new: true }
-    )
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $addToSet: { photo_porsche: { $each: body.photo_porsche } } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Photos ajoutées avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const removeImages = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -413,146 +353,84 @@ const removeImages = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: `Modèle Porsche n'existe pas` });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
 
-    // Vérifier que les photos existent
-    for (let photoId of body.photo_porsche) {
-      const photo = await Photo_porsche.findById(photoId);
-      if (!photo) {
-        return res
-          .status(404)
-          .json({ message: `Photo ${photoId} introuvable` });
-      }
-    }
-
-    // Retirer les photos
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { photo_porsche: { $in: body.photo_porsche } } },
-      { new: true }
-    )
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture")
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $pull: { photo_porsche: { $in: body.photo_porsche } } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Photos supprimées avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
-
-// Gestion couleur extérieure
 const addCouleurExterieur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { couleur_exterieur } = req.body;
     if (!couleur_exterieur) {
       return res.status(400).json({ message: "couleur_exterieur est requis" });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntity(
+      Couleur_exterieur,
+      couleur_exterieur,
+      "Couleur extérieure"
+    );
 
-    // Vérifier que la couleur existe
-    const couleurExt = await Couleur_exterieur.findById(couleur_exterieur);
-    if (!couleurExt) {
-      return res
-        .status(404)
-        .json({ message: "Couleur extérieure introuvable" });
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { couleur_exterieur },
-      { new: true }
-    )
-      .populate("couleur_exterieur", "nom_couleur photo_couleur description")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { couleur_exterieur },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Couleur extérieure ajoutée avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const removeCouleurExterieur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $unset: { couleur_exterieur: "" } },
-      { new: true }
-    )
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $unset: { couleur_exterieur: "" } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Couleur extérieure supprimée avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
-
-// Gestion couleurs intérieures (Many-to-Many)
 const addCouleursInterieur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { couleur_interieur } = req.body;
     if (!couleur_interieur || !Array.isArray(couleur_interieur)) {
       return res
@@ -560,302 +438,140 @@ const addCouleursInterieur = async (req, res) => {
         .json({ message: "couleur_interieur (array) est requis" });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntities(
+      Couleur_interieur,
+      couleur_interieur,
+      "Couleur intérieure"
+    );
 
-    // Vérifier que toutes les couleurs existent
-    for (let couleurId of couleur_interieur) {
-      const couleurInt = await Couleur_interieur.findById(couleurId);
-      if (!couleurInt) {
-        return res
-          .status(404)
-          .json({ message: `Couleur intérieure ${couleurId} introuvable` });
-      }
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { couleur_interieur: { $each: couleur_interieur } } },
-      { new: true }
-    )
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $addToSet: { couleur_interieur: { $each: couleur_interieur } } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Couleurs intérieures ajoutées avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const removeCouleursInterieur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { couleur_interieur } = req.body;
     if (!couleur_interieur || !Array.isArray(couleur_interieur)) {
-      return res.status(400).json({
-        message: "couleur_interieur doit être un tableau d'IDs",
-      });
+      return res
+        .status(400)
+        .json({ message: "couleur_interieur doit être un tableau d'IDs" });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntities(
+      Couleur_interieur,
+      couleur_interieur,
+      "Couleur intérieure"
+    );
 
-    // Vérifier que toutes les couleurs existent
-    for (let couleurId of couleur_interieur) {
-      const couleurInt = await Couleur_interieur.findById(couleurId);
-      if (!couleurInt) {
-        return res
-          .status(404)
-          .json({ message: `Couleur intérieure ${couleurId} introuvable` });
-      }
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { couleur_interieur: { $in: couleur_interieur } } },
-      { new: true }
-    )
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $pull: { couleur_interieur: { $in: couleur_interieur } } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Couleurs intérieures supprimées avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
-
-// Gestion taille de jante
 const addTailleJante = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     const { taille_jante } = req.body;
     if (!taille_jante) {
       return res.status(400).json({ message: "taille_jante est requis" });
     }
 
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    await validateEntity(Taille_jante, taille_jante, "Taille de jante");
 
-    // Vérifier que la taille de jante existe
-    const jante = await Taille_jante.findById(taille_jante);
-    if (!jante) {
-      return res.status(404).json({ message: "Taille de jante introuvable" });
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { taille_jante },
-      { new: true }
-    )
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { taille_jante },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Taille de jante ajoutée avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
 const removeTailleJante = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
+    await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
-    const model_porsche = await Model_porsche.findById(req.params.id);
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche n'existe pas" });
-    }
-
-    const updatedModel_porsche = await Model_porsche.findByIdAndUpdate(
-      req.params.id,
-      { $unset: { taille_jante: "" } },
-      { new: true }
-    )
-      .populate("couleur_exterieur", "nom_couleur photo_couleur")
-      .populate("couleur_interieur", "nom_couleur photo_couleur")
-      .populate("voiture", "nom_model type_voiture");
+    const updatedModel_porsche = await populateModel(
+      Model_porsche.findByIdAndUpdate(
+        req.params.id,
+        { $unset: { taille_jante: "" } },
+        { new: true }
+      )
+    );
 
     return res.status(200).json({
       message: "Taille de jante supprimée avec succès",
       model_porsche: updatedModel_porsche,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
-
-// Calculer le prix total du modèle avec toutes les options
 const calculatePrixTotal = async (req, res) => {
   try {
-    const model_porsche = await Model_porsche.findById(req.params.id)
-      .populate("voiture", "prix")
-      .populate("couleur_exterieur", "prix")
-      .populate("couleur_interieur", "prix")
-      .populate("taille_jante", "prix");
+    const model_porsche = await populateModel(
+      Model_porsche.findById(req.params.id)
+    );
 
     if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche introuvable" });
+      return res.status(404).json({ message: "Variante Porsche introuvable" });
     }
 
-    // Prix de base de la voiture
-    const prixBase = model_porsche.voiture?.prix || 0;
-
-    // Prix de la couleur extérieure
-    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
-
-    // Prix des couleurs intérieures (somme de toutes les couleurs)
-    let prixCouleursInt = 0;
-    if (
-      model_porsche.couleur_interieur &&
-      Array.isArray(model_porsche.couleur_interieur)
-    ) {
-      prixCouleursInt = model_porsche.couleur_interieur.reduce(
-        (total, couleur) => {
-          return total + (couleur?.prix || 0);
-        },
-        0
-      );
-    }
-
-    // Prix de la taille de jante
-    const prixJante = model_porsche.taille_jante?.prix || 0;
-
-    // Prix total
-    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
-
-    // Détails du calcul
-    const detailsPrix = {
-      prix_base: prixBase,
-      options: {
-        couleur_exterieur: prixCouleurExt,
-        couleurs_interieur: prixCouleursInt,
-        taille_jante: prixJante,
-      },
-      total_options: prixCouleurExt + prixCouleursInt + prixJante,
-      prix_total: prixTotal,
-    };
+    const detailsPrix = calculatePrix(model_porsche);
 
     return res.status(200).json({
       message: "Prix total calculé avec succès",
+      gamme: model_porsche.voiture?.nom_model,
+      variante: model_porsche.nom_model,
       model_id: model_porsche._id,
-      nom_model: model_porsche.nom_model,
       details_prix: detailsPrix,
     });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
-  }
-};
-
-// Obtenir le modèle complet avec le prix total calculé
-const getModel_porscheWithPrixTotal = async (req, res) => {
-  try {
-    const model_porsche = await Model_porsche.findById(req.params.id)
-      .populate("photo_porsche", "name alt")
-      .populate("voiture", "nom_model type_voiture description prix")
-      .populate(
-        "couleur_exterieur",
-        "nom_couleur photo_couleur description prix"
-      )
-      .populate(
-        "couleur_interieur",
-        "nom_couleur photo_couleur description prix"
-      )
-      .populate("taille_jante", "taille_jante couleur_jante description prix");
-
-    if (!model_porsche) {
-      return res.status(404).json({ message: "Modèle Porsche introuvable" });
-    }
-
-    // Calculer le prix total
-    const prixBase = model_porsche.voiture?.prix || 0;
-    const prixCouleurExt = model_porsche.couleur_exterieur?.prix || 0;
-
-    let prixCouleursInt = 0;
-    if (
-      model_porsche.couleur_interieur &&
-      Array.isArray(model_porsche.couleur_interieur)
-    ) {
-      prixCouleursInt = model_porsche.couleur_interieur.reduce(
-        (total, couleur) => {
-          return total + (couleur?.prix || 0);
-        },
-        0
-      );
-    }
-
-    const prixJante = model_porsche.taille_jante?.prix || 0;
-    const prixTotal = prixBase + prixCouleurExt + prixCouleursInt + prixJante;
-
-    // Créer l'objet de réponse avec le prix total
-    const response = {
-      ...model_porsche.toObject(),
-      prix_calcule: {
-        prix_base: prixBase,
-        options: {
-          couleur_exterieur: prixCouleurExt,
-          couleurs_interieur: prixCouleursInt,
-          taille_jante: prixJante,
-        },
-        total_options: prixCouleurExt + prixCouleursInt + prixJante,
-        prix_total: prixTotal,
-      },
-    };
-
-    return res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Erreur serveur", error: error.message });
   }
 };
 
@@ -874,5 +590,5 @@ export {
   addTailleJante,
   removeTailleJante,
   calculatePrixTotal,
-  getModel_porscheWithPrixTotal,
+  getConfigurationsByVoiture,
 };

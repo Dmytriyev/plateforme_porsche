@@ -6,8 +6,9 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 
-// Créer une nouvelle couleur extérieure (admin uniquement)
-const createCouleur_exterieur = async (req, res) => {
+import mongoose from "mongoose";
+
+const createCouleurExterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
       return res
@@ -35,8 +36,7 @@ const createCouleur_exterieur = async (req, res) => {
   }
 };
 
-// Récupérer toutes les couleurs extérieures (public)
-const getAllCouleur_exterieurs = async (req, res) => {
+const getAllCouleurExterieur = async (req, res) => {
   try {
     const couleur_exterieurs = await Couleur_exterieur.find()
       .sort({ nom_couleur: 1 })
@@ -47,8 +47,7 @@ const getAllCouleur_exterieurs = async (req, res) => {
   }
 };
 
-// Récupérer une couleur extérieure par ID (public)
-const getCouleur_exterieurById = async (req, res) => {
+const getCouleurExterieurById = async (req, res) => {
   try {
     const couleur_exterieur = await Couleur_exterieur.findById(
       req.params.id
@@ -64,8 +63,7 @@ const getCouleur_exterieurById = async (req, res) => {
   }
 };
 
-// Mettre à jour une couleur extérieure (admin uniquement)
-const updateCouleur_exterieur = async (req, res) => {
+const updateCouleurExterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
       return res
@@ -102,8 +100,7 @@ const updateCouleur_exterieur = async (req, res) => {
   }
 };
 
-// Supprimer une couleur extérieure (admin uniquement)
-const deleteCouleur_exterieur = async (req, res) => {
+const deleteCouleurExterieur = async (req, res) => {
   try {
     const couleur_exterieur = await Couleur_exterieur.findByIdAndDelete(
       req.params.id
@@ -124,9 +121,9 @@ const deleteCouleur_exterieur = async (req, res) => {
 };
 
 export {
-  createCouleur_exterieur,
-  getAllCouleur_exterieurs,
-  getCouleur_exterieurById,
-  updateCouleur_exterieur,
-  deleteCouleur_exterieur,
+  createCouleurExterieur,
+  getAllCouleurExterieur,
+  getCouleurExterieurById,
+  updateCouleurExterieur,
+  deleteCouleurExterieur,
 };

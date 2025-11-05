@@ -2,7 +2,7 @@ import joi from "joi";
 
 export default function couleur_accesoireValidation(body) {
   const couleur_accesoireCreate = joi.object({
-    nom_couleur: joi.string().required(),
+    nom_couleur: joi.string().required().max(100),
     photo_couleur: joi.string(),
   });
 

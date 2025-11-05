@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  createPhoto_porsche,
-  getAllPhoto_porsches,
-  getPhoto_porscheById,
-  updatePhoto_porsche,
-  deletePhoto_porsche,
-} from "../controllers/photo_porsche.controller.js";
+  createSiege,
+  getAllSieges,
+  getSiegeById,
+  updateSiege,
+  deleteSiege,
+} from "../controllers/siege.controller.js";
 import { upload } from "../middlewares/multer.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -15,25 +15,21 @@ import isStaff from "../middlewares/isStaff.js";
 const router = Router();
 
 // Routes publiques
-router.get("/all", getAllPhoto_porsches);
-router.get("/:id", validateObjectId("id"), getPhoto_porscheById);
+router.get("/all", getAllSieges);
+router.get("/:id", validateObjectId("id"), getSiegeById);
+
 // Routes staff (admin, responsable, conseillère)
-router.post("/new", auth, isStaff, upload.single("name"), createPhoto_porsche);
+router.post("/new", auth, isStaff, upload.single("photo_siege"), createSiege);
 router.put(
   "/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  upload.single("name"),
-  updatePhoto_porsche
+  upload.single("photo_siege"),
+  updateSiege
 );
+
 // Seul admin peut supprimer
-router.delete(
-  "/:id",
-  auth,
-  isAdmin,
-  validateObjectId("id"),
-  deletePhoto_porsche
-);
+router.delete("/:id", auth, isAdmin, validateObjectId("id"), deleteSiege);
 
 export default router;

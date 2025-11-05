@@ -6,8 +6,9 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 
-// Créer une nouvelle couleur intérieure (admin uniquement)
-const createCouleur_interieur = async (req, res) => {
+import mongoose from "mongoose";
+
+const createCouleurInterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
       return res
@@ -35,8 +36,7 @@ const createCouleur_interieur = async (req, res) => {
   }
 };
 
-// Récupérer toutes les couleurs intérieures avec leurs modèles (public)
-const getAllCouleur_interieurs = async (req, res) => {
+const getAllCouleurInterieur = async (req, res) => {
   try {
     const couleur_interieurs = await Couleur_interieur.find()
       .populate("model_porsche", "nom_model prix")
@@ -47,8 +47,7 @@ const getAllCouleur_interieurs = async (req, res) => {
   }
 };
 
-// Récupérer une couleur intérieure par ID (public)
-const getCouleur_interieurById = async (req, res) => {
+const getCouleurInterieurById = async (req, res) => {
   try {
     const couleur_interieur = await Couleur_interieur.findById(
       req.params.id
@@ -66,8 +65,7 @@ const getCouleur_interieurById = async (req, res) => {
   }
 };
 
-// Mettre à jour une couleur intérieure (admin uniquement)
-const updateCouleur_interieur = async (req, res) => {
+const updateCouleurInterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
       return res
@@ -104,8 +102,7 @@ const updateCouleur_interieur = async (req, res) => {
   }
 };
 
-// Supprimer une couleur intérieure (admin uniquement)
-const deleteCouleur_interieur = async (req, res) => {
+const deleteCouleurInterieur = async (req, res) => {
   try {
     const couleur_interieur = await Couleur_interieur.findByIdAndDelete(
       req.params.id
@@ -126,9 +123,9 @@ const deleteCouleur_interieur = async (req, res) => {
 };
 
 export {
-  createCouleur_interieur,
-  getAllCouleur_interieurs,
-  getCouleur_interieurById,
-  updateCouleur_interieur,
-  deleteCouleur_interieur,
+  createCouleurInterieur,
+  getAllCouleurInterieur,
+  getCouleurInterieurById,
+  updateCouleurInterieur,
+  deleteCouleurInterieur,
 };

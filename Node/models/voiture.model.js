@@ -8,21 +8,28 @@ const voitureSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
-    // Nom du modèle: 911, Cayman, Cayenne, etc.
+    // Nom du modèle: 911, Cayman, Cayenne.
     nom_model: {
       type: String,
       required: true,
+      //  nettoie automatiquement les espaces en début/fin avant validation
       trim: true,
+      maxlength: 100,
     },
     // Description générale du modèle
     description: {
       type: String,
       trim: true,
+      maxlength: 500,
     },
-    // Prix de base du modèle
+    // ⚠️ DÉPRÉCIÉ: Ce champ ne devrait PLUS être utilisé
+    // Les prix sont maintenant dans MODEL_PORSCHE (prix_base de chaque variante)
+    // Ex: 911 Carrera = 120k€, 911 GTS = 150k€, 911 Turbo = 200k€
+    // Conservé pour compatibilité descendante uniquement
     prix: {
       type: Number,
       min: 0,
+      max: 100000000,
       default: 0,
     },
     // Relation Many-to-Many: Photos associées
@@ -36,7 +43,6 @@ const voitureSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index pour accélérer les recherches
 voitureSchema.index({ type_voiture: 1 });
 voitureSchema.index({ nom_model: 1 });
 voitureSchema.index({ prix: 1 });

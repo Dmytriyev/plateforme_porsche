@@ -1,8 +1,8 @@
 import joi from "joi";
 export default function photo_voiture_actuelValidation(body) {
   const photo_voiture_actuelCreate = joi.object({
-    name: joi.string().required(),
-    alt: joi.string().required(),
+    name: joi.string().required().max(250),
+    alt: joi.string().required().max(250),
     model_porsche_actuel: joi.string().hex().length(24), // Many-to-One: un seul model_porsche_actuel
   });
   const photo_voiture_actuelUpdate = joi.object({

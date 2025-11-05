@@ -6,6 +6,7 @@ const couleur_exterieurSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     photo_couleur: {
       type: String,
@@ -14,12 +15,13 @@ const couleur_exterieurSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      maxlength: 500,
     },
-    // Prix supplémentaire pour cette couleur
     prix: {
       type: Number,
       min: 0,
       default: 0,
+      max: 100000,
     },
   },
   { timestamps: true }
