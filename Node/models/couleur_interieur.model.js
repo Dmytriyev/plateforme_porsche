@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { COULEURS_INTERIEUR } from "../utils/couleur_interieur.constants.js";
 
 const couleur_interieurSchema = new mongoose.Schema(
   {
@@ -7,6 +8,7 @@ const couleur_interieurSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 100,
+      enum: COULEURS_INTERIEUR,
     },
     photo_couleur: {
       type: String,
@@ -17,14 +19,13 @@ const couleur_interieurSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
-    // Prix supplémentaire pour cette couleur
     prix: {
       type: Number,
       min: 0,
       default: 0,
       max: 100000,
     },
-    // Relation One-to-Many: Modèles utilisant cette couleur
+    // Relation One-to-Many
     model_porsche: [
       {
         type: mongoose.Schema.Types.ObjectId,

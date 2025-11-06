@@ -1,5 +1,13 @@
-// Réponses HTTP pour l'API
-
+/*
+  Description: functions pour les réponses HTTP JSON de l'API.
+  Fonctions:
+  - sendSuccess(res, data, message, statusCode)
+  - sendError(res, message, statusCode, error)
+  - sendValidationError(res, error)
+  - sendNotFound(res, resource)
+  - sendUnauthorized(res, message)
+  - sendForbidden(res, message)
+*/
 export const sendSuccess = (res, data, message, statusCode = 200) => {
   const response = { success: true };
   if (message) response.message = message;
@@ -16,7 +24,18 @@ export const sendError = (res, message, statusCode = 500, error = null) => {
 };
 
 export const sendValidationError = (res, error) => {
-  return sendError(res, error.details[0].message, 400);
+  if (typeof error === "string") {
+    return sendError(res, error, 400);
+  }
+  if (
+    error &&
+    error.details &&
+    Array.isArray(error.details) &&
+    error.details[0]
+  ) {
+    return sendError(res, error.details[0].message, 400);
+  }
+  return sendError(res, "Données invalides", 400);
 };
 
 export const sendNotFound = (res, resource = "Ressource") => {

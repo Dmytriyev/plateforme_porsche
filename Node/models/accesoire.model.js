@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { TYPES_ACCESOIRE } from "../utils/accesoire.constants.js";
 
 const accesoireSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const accesoireSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 100,
+      enum: TYPES_ACCESOIRE,
     },
     nom_accesoire: {
       type: String,

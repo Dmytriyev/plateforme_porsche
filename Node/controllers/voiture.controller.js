@@ -1,6 +1,11 @@
+// Controller: Voiture
+// Gère les gammes de voitures ( 911, Cayenne) et leurs images.
+// Fonctions principales : CRUD de la gamme, ajout/suppression d'images, récupération des variantes (model_porsche).
+// Fournit aussi des endpoints pour récupérer voitures neuves / occasions.
 import Voiture from "../models/voiture.model.js";
 import voitureValidation from "../validations/voiture.validation.js";
 import Photo from "../models/photo_voiture.model.js";
+import { PORSCHE_MODELS } from "../utils/constants.js";
 import {
   sendSuccess,
   sendError,
@@ -46,21 +51,21 @@ const createVoiture = async (req, res) => {
   }
 };
 /**
- * Récupérer toutes les gammes de voitures (public)
- * Ex: 911, Cayenne, Cayman, Panamera
+ * Récupérer toutes les gammes de voitures (public), comme  911, Cayenne, Cayman
  */
 const getAllVoitures = async (req, res) => {
   try {
     const voitures = await Voiture.find()
       .populate("photo_voiture", "name alt")
-      .sort({ createdAt: -1 }) // Trier par date de création décroissante
-      .lean(); // Retourne des plain JS objects au lieu d'instances de documents (plus léger)
+      .sort({ createdAt: -1 }) // Trier par date de création
+      .lean(); // Retourne des plain JS objects (plus léger)
     return sendSuccess(res, voitures);
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+// Récupérer une gamme de voiture par ID (public)
 const getVoitureById = async (req, res) => {
   try {
     const voiture = await Voiture.findById(req.params.id)
@@ -75,6 +80,7 @@ const getVoitureById = async (req, res) => {
   }
 };
 
+// Mettre à jour une gamme de voiture (admin)
 const updateVoiture = async (req, res) => {
   try {
     const { body } = req;
@@ -92,7 +98,7 @@ const updateVoiture = async (req, res) => {
       return sendNotFound(res, "Gamme de voiture introuvable");
     }
 
-    // C'est une manière d'isoler le champ d'images des autres données pour le traiter
+    // Isoler le champ d'images des autres données pour le traiter
     const { photo_voiture, ...otherData } = body;
     let updateQuery = otherData;
 
@@ -134,8 +140,7 @@ const updateVoiture = async (req, res) => {
   }
 };
 /**
- * Supprimer une gamme de voiture (admin)
- * ATTENTION: Supprimera toutes les variantes MODEL_PORSCHE associées
+ * Supprimer une gamme de voiture (admin) avec les MODEL_PORSCHE associées
  */
 const deleteVoiture = async (req, res) => {
   try {
@@ -149,6 +154,7 @@ const deleteVoiture = async (req, res) => {
   }
 };
 
+// Ajouter des images à une gamme de voiture (admin)
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -195,6 +201,7 @@ const addImages = async (req, res) => {
   }
 };
 
+// Supprimer des images d'une gamme de voiture (admin)
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -206,7 +213,6 @@ const removeImages = async (req, res) => {
     if (error) {
       return sendValidationError(res, error.details[0].message);
     }
-
     const voiture = await Voiture.findById(req.params.id);
     if (!voiture) {
       return sendNotFound(
@@ -239,8 +245,7 @@ const removeImages = async (req, res) => {
   }
 };
 /**
- * Récupérer toutes les VARIANTES d'une GAMME (public)
- * Ex: Toutes les variantes de la gamme 911 (Carrera, GTS, Turbo)
+ * Récupérer toutes les VARIANTES d'une GAMME 911 (Carrera, GTS, Turbo), (public)
  */
 const getModelsPorscheByVoiture = async (req, res) => {
   try {
@@ -253,6 +258,7 @@ const getModelsPorscheByVoiture = async (req, res) => {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
 
+    // Récupérer les modèles Porsche associés à la voiture
     const models_porsche = await Model_porsche.find({ voiture: req.params.id })
       .populate("photo_porsche", "name alt")
       .populate("couleur_exterieur", "nom_couleur photo_couleur prix")
@@ -277,21 +283,22 @@ const getModelsPorscheByVoiture = async (req, res) => {
   }
 };
 
+// Récupérer toutes les voitures neuves pour le configurateur (public)
 const getVoituresNeuves = async (req, res) => {
   try {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
 
-    // 1. Récupérer voitures neuves avec photos
+    // Récupérer voitures neuves avec photos
     const voitures = await Voiture.find({ type_voiture: true })
       .populate("photo_voiture", "name alt")
       .lean();
-
+    // Gérer le cas où il n'y a pas de voitures
     if (!voitures || voitures.length === 0) {
       return sendSuccess(res, { voitures: [], count: 0 });
     }
 
-    // Récupérer variantes disponibles (optimisation: query unique)
+    // Récupérer variantes disponibles pour ces voitures
     const voitureIds = voitures.map((v) => v._id);
     const variantes = await Model_porsche.find({
       voiture: { $in: voitureIds },
@@ -300,7 +307,7 @@ const getVoituresNeuves = async (req, res) => {
       .select("voiture prix_base type_carrosserie specifications")
       .lean();
 
-    // 3. Grouper variantes par voiture_id
+    // Grouper variantes par voiture_id
     const variantesMap = {};
     variantes.forEach((v) => {
       const id = v.voiture._id.toString();
@@ -308,7 +315,7 @@ const getVoituresNeuves = async (req, res) => {
       variantesMap[id].push(v);
     });
 
-    // 4. Enrichir chaque voiture avec données agrégées
+    // Ajouter données agrégées à chaque voiture
     const voituresEnrichies = voitures
       .map((voiture) => {
         const vars = variantesMap[voiture._id.toString()];
@@ -390,7 +397,20 @@ const getVoituresOccasionFinder = async (req, res) => {
     // Query voitures occasion
     const voituresQuery = { type_voiture: false };
     if (modele) {
-      voituresQuery.nom_model = new RegExp(modele, "i");
+      // Utiliser correspondance exacte car nom_model est un enum ('911', 'Cayman', 'Cayenne')
+      // Valider que le modèle est dans les valeurs autorisées
+      if (PORSCHE_MODELS.includes(modele)) {
+        voituresQuery.nom_model = modele;
+      } else {
+        // Si le modèle n'est pas valide, retourner un résultat vide
+        return sendSuccess(res, {
+          voitures: [],
+          count: 0,
+          message: `Modèle "${modele}" non valide. Modèles disponibles: ${PORSCHE_MODELS.join(
+            ", "
+          )}`,
+        });
+      }
     }
 
     const voitures = await Voiture.find(voituresQuery).lean();

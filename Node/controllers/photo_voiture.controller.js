@@ -1,3 +1,7 @@
+// Controller: Photo voiture
+// Upload et gestion des photos pour les voitures neuves.
+// - vérifie que la voiture est de type 'neuve' avant d'accepter
+// - utilise des middlewares d'auth (isStaff) pour restreindre l'accès
 import Photo_voiture from "../models/photo_voiture.model.js";
 import photo_voitureValidation from "../validations/photo_voiture.validation.js";
 import fs from "node:fs";

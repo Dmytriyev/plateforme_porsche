@@ -1,20 +1,27 @@
 import joi from "joi";
+import { TAILLES_JANTE, COULEURS_JANTE } from "../utils/jante.constants.js";
 
 export default function taille_janteValidation(body) {
   const taille_janteCreate = joi.object({
-    taille_jante: joi.string().min(0).required(),
-    couleur_jante: joi.string().max(100),
+    taille_jante: joi
+      .string()
+      .valid(...TAILLES_JANTE)
+      .required(),
+    couleur_jante: joi
+      .string()
+      .valid(...COULEURS_JANTE)
+      .required(),
     photo_jante: joi.string(),
     description: joi.string().max(500),
-    prix: joi.number().min(0),
+    prix: joi.number().min(0).max(100000),
   });
 
   const taille_janteUpdate = joi.object({
-    taille_jante: joi.string().min(0),
-    couleur_jante: joi.string(),
+    taille_jante: joi.string().valid(...TAILLES_JANTE),
+    couleur_jante: joi.string().valid(...COULEURS_JANTE),
     photo_jante: joi.string(),
-    description: joi.string(),
-    prix: joi.number().min(0),
+    description: joi.string().max(500),
+    prix: joi.number().min(0).max(100000),
   });
 
   return {

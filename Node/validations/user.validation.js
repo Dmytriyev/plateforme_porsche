@@ -1,6 +1,9 @@
 import joi from "joi";
+import { AVAILABLE_ROLES } from "../utils/roles.constants.js";
 
 export default function userValidation(body) {
+  const mongoIdSchema = () => joi.string().hex().length(24);
+
   const userCreate = joi.object({
     email: joi.string().email().required().max(150).min(5),
     password: joi
@@ -22,6 +25,7 @@ export default function userValidation(body) {
     adresse: joi.string().required().max(250),
     code_postal: joi
       .string()
+      // code postal 5 chiffres
       .pattern(/^[0-9]{5}$/)
       .required(),
   });
@@ -40,6 +44,13 @@ export default function userValidation(body) {
     adresse: joi.string().max(250),
     code_postal: joi.string().pattern(/^[0-9]{5}$/),
   });
+  //   userRoleUpdate est séparé pour sécuriser la modification des rôles (admin).
+  const userRoleUpdate = joi.object({
+    role: joi
+      .string()
+      .valid(...AVAILABLE_ROLES)
+      .required(),
+  });
 
   const userLogin = joi.object({
     email: joi.string().email().required(),
@@ -47,7 +58,7 @@ export default function userValidation(body) {
   });
 
   const userReservation = joi.object({
-    voiture: joi.string().hex().length(24).required(),
+    voiture: mongoIdSchema().required(),
     date_reservation: joi.date().required().greater("now"),
     status: joi.boolean().default(true),
   });
@@ -59,13 +70,14 @@ export default function userValidation(body) {
     info_moteur: joi.string().max(250),
     info_transmission: joi.string().max(100),
     numero_win: joi.string().max(100),
-    couleur_exterieur: joi.string().hex().length(24),
-    couleur_interieur: joi.string().hex().length(24),
+    couleur_exterieur: mongoIdSchema(),
+    couleur_interieur: mongoIdSchema(),
   });
 
   return {
     userCreate: userCreate.validate(body),
     userUpdate: userUpdate.validate(body),
+    userRoleUpdate: userRoleUpdate.validate(body),
     userLogin: userLogin.validate(body),
     userReservation: userReservation.validate(body),
     userPorsche: userPorsche.validate(body),

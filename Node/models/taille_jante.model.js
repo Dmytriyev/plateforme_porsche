@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { TAILLES_JANTE, COULEURS_JANTE } from "../utils/jante.constants.js";
 
 const taille_janteSchema = new mongoose.Schema(
   {
@@ -7,11 +8,14 @@ const taille_janteSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 50,
+      enum: TAILLES_JANTE,
     },
     couleur_jante: {
       type: String,
+      required: true,
       trim: true,
       maxlength: 100,
+      enum: COULEURS_JANTE,
     },
     photo_jante: {
       type: String,

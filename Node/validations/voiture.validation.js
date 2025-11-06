@@ -1,24 +1,31 @@
+// Schémas Joi pour valider les requêtes liées aux gammes de voitures
 import joi from "joi";
+import { PORSCHE_MODELS } from "../utils/constants.js";
 
 export default function voitureValidation(body) {
+  const mongoIdSchema = () => joi.string().hex().length(24);
+
   const voitureCreate = joi.object({
     type_voiture: joi.boolean().required(),
-    nom_model: joi.string().required().max(250),
+    nom_model: joi
+      .string()
+      .required()
+      .valid(...PORSCHE_MODELS),
     description: joi.string().required().max(1000),
-    prix: joi.number().min(0),
-    photo_voiture: joi.array().items(joi.string().hex().length(24)),
+    photo_voiture: joi.array().items(mongoIdSchema()),
+    prix: joi.number().optional(),
   });
 
   const voitureUpdate = joi.object({
     type_voiture: joi.boolean(),
-    nom_model: joi.string(),
+    nom_model: joi.string().valid(...PORSCHE_MODELS),
     description: joi.string(),
-    prix: joi.number().min(0),
-    photo_voiture: joi.array().items(joi.string().hex().length(24)),
+    photo_voiture: joi.array().items(mongoIdSchema()),
+    prix: joi.number().optional(),
   });
 
   const voitureAddOrRemoveImage = joi.object({
-    photo_voiture: joi.array().items(joi.string().hex().length(24)).required(),
+    photo_voiture: joi.array().items(mongoIdSchema()).required(),
   });
 
   return {

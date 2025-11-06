@@ -1,3 +1,6 @@
+/*
+les photos liées aux model_porsche (champs 'name', 'alt' et association 'model_porsche').
+*/
 import joi from "joi";
 export default function photo_porscheValidation(body) {
   const photo_porscheCreate = joi.object({

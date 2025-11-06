@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
-// Représente les packs optionnels Porsche (Weissach Package)
+import { TYPES_PACKAGE } from "../utils/package.constants.js";
 const packageSchema = new mongoose.Schema(
   {
-    // Nom du package ( Weissach Package)
+    // Nom du package ( Weissach Package, Sport Chrono)
     nom_package: {
       type: String,
       required: true,
       trim: true,
+      enum: TYPES_PACKAGE,
       maxlength: 150,
     },
     description: {
@@ -25,10 +26,10 @@ const packageSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    // Disponibilité
+    // Disponibilité true=disponible, false=indisponible
     disponible: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   { timestamps: true }

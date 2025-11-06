@@ -1,3 +1,9 @@
+// Controller: Commande
+// Responsable des opérations CRUD sur les commandes et du panier utilisateur.
+// Fonctions clés:
+// - createCommande / getAllCommandes / getCommandeById / updateCommande / deleteCommande
+// - gestion du panier: getPanier, getOrCreatePanier, validerPanier, ajouterConfigurationAuPanier
+// Notes: utilise des utilitaires pour calcul prix et enrichissement des lignes.
 import Commande from "../models/Commande.model.js";
 import commandeValidation from "../validations/Commande.validation.js";
 import LigneCommande from "../models/ligneCommande.model.js";

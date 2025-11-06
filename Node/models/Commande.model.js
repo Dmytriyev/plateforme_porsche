@@ -14,7 +14,7 @@ const CommandeSchema = new mongoose.Schema(
       default: 0,
       max: 1000000,
     },
-    // Acompte versé (voiture neuve uniquement 20%)
+    // Acompte versé (voiture neuve uniquement 10%)
     acompte: {
       type: Number,
       min: 0,
@@ -24,7 +24,7 @@ const CommandeSchema = new mongoose.Schema(
     status: {
       type: Boolean,
       required: true,
-      default: false, // false = panier en cours
+      default: false,
     },
     // URL de la facture PDF générée
     factureUrl: {

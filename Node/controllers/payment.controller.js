@@ -1,3 +1,8 @@
+// Controller: Payment
+// Responsable de la création de sessions Stripe (checkout) et du traitement du webhook.
+// Points importants :
+// - createCheckoutSession construit les line_items depuis les lignes de commande (acompte ou prix)
+// - webhookHandler vérifie la signature (raw body) et met à jour la commande après paiement
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import LigneCommande from "../models/ligneCommande.model.js";
@@ -17,8 +22,8 @@ export const createCheckoutSession = async (req, res) => {
       return res.status(404).json({ message: "Commande n'existe pas" });
     }
 
-    // Vérifier que c'est un panier actif
-    if (commande.status === false) {
+    // Vérifier que c'est un panier actif (status: false = panier non validé)
+    if (commande.status === true) {
       return res
         .status(400)
         .json({ message: "Cette commande a déjà été validée" });
@@ -33,7 +38,7 @@ export const createCheckoutSession = async (req, res) => {
 
     const ligneCommande = await LigneCommande.find({ commande: id })
       .populate("accesoire", "nom_accesoire prix")
-      .populate("voiture", "nom_model prix type_voiture");
+      .populate("voiture", "nom_model type_voiture");
 
     if (ligneCommande.length === 0) {
       return res.status(400).json({ message: "Le panier est vide" });
@@ -45,20 +50,18 @@ export const createCheckoutSession = async (req, res) => {
       let productName = "Produit";
 
       // Déterminer le prix unitaire à utiliser
+      // Note: Les prix des voitures sont maintenant dans Model_porsche, pas dans Voiture
+      // Les lignes de commande doivent stocker le prix (line.prix) lors de la création
       if (line.voiture && line.acompte && line.acompte > 0) {
         // Pour les voitures avec acompte, utiliser l'acompte
         unitPrice = line.acompte;
         productName = `${line.voiture.nom_model} (Acompte)`;
-      } else if (line.voiture && line.voiture.prix) {
-        // Pour les voitures sans acompte, utiliser le prix de la voiture
-        unitPrice = line.voiture.prix;
-        productName = line.voiture.nom_model;
       } else if (line.accesoire && line.accesoire.prix) {
         // Pour les accessoires, utiliser le prix de l'accessoire
         unitPrice = line.accesoire.prix;
         productName = line.accesoire.nom_accesoire;
       } else if (line.prix) {
-        // Fallback sur le prix de la ligne
+        // Utiliser le prix stocké dans la ligne de commande
         unitPrice = line.prix;
         productName = line.voiture
           ? line.voiture.nom_model
@@ -142,7 +145,7 @@ export const webhookHandler = async (req, res) => {
         return res.status(404).json({ error: "Commande introuvable" });
       }
 
-      if (commande.status === false && commande.factureUrl) {
+      if (commande.status === true && commande.factureUrl) {
         return res.json({ received: true, message: "Déjà traité" });
       }
 
@@ -161,20 +164,20 @@ export const webhookHandler = async (req, res) => {
         return sum + prix * line.quantite;
       }, 0);
 
-      // Mettre à jour la commande
-      commande.status = false;
+      // Mettre à jour la commande (status: true = commande validée/payée)
+      commande.status = true;
       commande.factureUrl = invoice.hosted_invoice_url;
       commande.prix = total;
       commande.date_commande = new Date();
       await commande.save();
 
-      // Créer un nouveau panier pour l'utilisateur
+      // Créer un nouveau panier pour l'utilisateur (status: false = panier actif)
       const nouveauPanier = new Commande({
         user: commande.user,
         date_commande: new Date(),
         prix: 0,
         acompte: 0,
-        status: true,
+        status: false,
       });
       await nouveauPanier.save();
     } catch (error) {

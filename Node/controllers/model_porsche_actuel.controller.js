@@ -1,3 +1,6 @@
+// Controller: Model_porsche_actuel
+// Gère les Porsche d'occasion / véhicules actuels ajoutés par les utilisateurs.
+// Fonctions : CRUD, ajout/suppression d'images, gestion des couleurs/jantes, récupération des véhicules d'un utilisateur.
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
 import Photo from "../models/photo_voiture_actuel.model.js";

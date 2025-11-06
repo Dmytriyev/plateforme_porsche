@@ -1,3 +1,8 @@
+/*
+  - `model_porsche_id` requis si `type_produit` = true (voiture)
+  - `accesoire` requis si `type_produit` = false
+  - `voiture` sera rempli par le serveur 
+*/
 import joi from "joi";
 
 export default function ligneCommandeValidation(body) {
@@ -5,16 +10,16 @@ export default function ligneCommandeValidation(body) {
     type_produit: joi.boolean().required(),
     quantite: joi.number().integer().min(1).required().max(1000),
     prix: joi.number().min(0).max(100000000),
-    acompte: joi.number().min(0).max(joi.ref("prix")),
-    // SÉCURITÉ: voiture ne doit PAS être fourni par l'utilisateur (sera rempli automatiquement)
+    acompte: joi.number().min(0),
+    // voiture ne pas fourni par l'utilisateur
     voiture: joi.forbidden(),
-    // Many-to-One: Configuration Porsche (obligatoire pour voitures neuves)
+    // Many-to-One: Configuration Porsche pour voitures neuves
     model_porsche_id: joi
       .string()
       .hex()
       .length(24)
       .when("type_produit", { is: true, then: joi.required() }),
-    // Many-to-One: un seul accesoire (obligatoire pour accessoires)
+    // Many-to-One: pour accessoires
     accesoire: joi
       .string()
       .hex()

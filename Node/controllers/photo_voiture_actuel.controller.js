@@ -1,3 +1,7 @@
+// Controller: Photo voiture actuel
+// Gère les photos des véhicules d'occasion ajoutés par les utilisateurs.
+// - contrôle la propriété (seul le propriétaire peut ajouter/modifier/supprimer)
+// - nettoie les fichiers uploadés en cas d'erreur
 import Photo_voiture_actuel from "../models/photo_voiture_actuel.model.js";
 import photo_voiture_actuelValidation from "../validations/photo_voiture_actuel.validation.js";
 import fs from "node:fs";

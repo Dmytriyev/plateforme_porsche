@@ -1,3 +1,8 @@
+// Controller: LigneCommande
+// Responsable des opérations sur les lignes de commande (panier)
+// - création / modification / suppression de lignes
+// - validation des règles métiers (voiture neuve = quantité 1, vérification configuration)
+// - enrichit les lignes avec les détails de model_porsche et calcule les montants
 import LigneCommande from "../models/ligneCommande.model.js";
 import Commande from "../models/Commande.model.js";
 import ligneCommandeValidation from "../validations/ligneCommande.validation.js";

@@ -1,8 +1,12 @@
 import joi from "joi";
+import { TYPES_SIEGE } from "../utils/siege.constants.js";
 
 export default function siegeValidation(body) {
   const siegeCreate = joi.object({
-    nom_siege: joi.string().max(150).required(),
+    nom_siege: joi
+      .string()
+      .valid(...TYPES_SIEGE)
+      .required(),
     description: joi.string().max(1000),
     options_confort: joi.object({
       ventilation: joi.boolean(),
@@ -13,7 +17,7 @@ export default function siegeValidation(body) {
   });
 
   const siegeUpdate = joi.object({
-    nom_siege: joi.string().max(150),
+    nom_siege: joi.string().valid(...TYPES_SIEGE),
     description: joi.string().max(1000),
     options_confort: joi.object({
       ventilation: joi.boolean(),

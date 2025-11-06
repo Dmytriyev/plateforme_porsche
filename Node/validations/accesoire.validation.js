@@ -1,32 +1,37 @@
 import joi from "joi";
+import { TYPES_ACCESOIRE } from "../utils/accesoire.constants.js";
 
 export default function accesoireValidation(body) {
+  const mongoIdSchema = () => joi.string().hex().length(24);
+
   const accesoireCreate = joi.object({
-    type_accesoire: joi.string().required().max(150),
+    type_accesoire: joi
+      .string()
+      .required()
+      // Liste des types d'accessoires disponibles
+      .valid(...TYPES_ACCESOIRE)
+      .max(150),
     nom_accesoire: joi.string().required().max(250),
     description: joi.string().required().max(1000),
     prix: joi.number().min(0).required().max(1000000),
-    couleur_accesoire: joi.string().hex().length(24),
-    photo_accesoire: joi.array().items(joi.string().hex().length(24)),
+    couleur_accesoire: mongoIdSchema(),
+    photo_accesoire: joi.array().items(mongoIdSchema()),
   });
 
   const accesoireUpdate = joi.object({
-    type_accesoire: joi.string(),
+    type_accesoire: joi.string().valid(...TYPES_ACCESOIRE),
     nom_accesoire: joi.string(),
     description: joi.string(),
     prix: joi.number().min(0),
-    couleur_accesoire: joi.string().hex().length(24),
+    couleur_accesoire: mongoIdSchema(),
   });
 
   const accessoireAddOrRemoveImage = joi.object({
-    photo_accesoire: joi
-      .array()
-      .items(joi.string().hex().length(24))
-      .required(),
+    photo_accesoire: joi.array().items(mongoIdSchema()).required(),
   });
 
   const accessoireSetCouleur = joi.object({
-    couleur_accesoire: joi.string().hex().length(24).required(),
+    couleur_accesoire: mongoIdSchema().required(),
   });
 
   return {

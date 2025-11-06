@@ -17,7 +17,7 @@ import auth from "../middlewares/auth.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
-
+// user connecté
 router.get("/all", auth, getAllModel_porsche_actuels);
 router.get("/search", auth, searchPorschesByCriteria);
 router.get("/:id", auth, validateObjectId("id"), getModel_porsche_actuelById);

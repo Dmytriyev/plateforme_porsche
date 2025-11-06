@@ -1,10 +1,14 @@
+/*
+  - `user` est interdit côté client (sera rempli depuis le token)
+  - `date_reservation` doit être dans le futur
+*/
 import joi from "joi";
 
 export default function reservationValidation(body) {
   const reservationCreate = joi.object({
     date_reservation: joi.date().required().greater("now"),
     status: joi.boolean(),
-    // SÉCURITÉ: user ne doit PAS être fourni par l'utilisateur (sera forcé depuis le token)
+    // user ne pas fourni par l'utilisateur (fourni depuis le token)
     user: joi.forbidden(),
     voiture: joi.string().hex().length(24).required(),
   });
@@ -12,7 +16,7 @@ export default function reservationValidation(body) {
   const reservationUpdate = joi.object({
     date_reservation: joi.date(),
     status: joi.boolean(),
-    // SÉCURITÉ: Empêcher la modification du propriétaire
+    // Empêcher la modification du propriétaire
     user: joi.forbidden(),
     voiture: joi.string().hex().length(24),
   });

@@ -11,14 +11,23 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 
 const router = Router();
+const optionalUpload = (req, res, next) => {
+  // Si c'est multipart/form-data, utiliser multer
+  if (req.is("multipart/form-data")) {
+    return upload.single("photo")(req, res, next);
+  }
+  // Sinon, body-parser gère le JSON
+  next();
+};
+// Routes user authentifié
 router.get("/all", auth, getAllPhoto_voiture_actuels);
 router.get("/:id", auth, validateObjectId("id"), getPhoto_voiture_actuelById);
-router.post("/new", auth, upload.single("name"), createPhoto_voiture_actuel);
+router.post("/new", auth, optionalUpload, createPhoto_voiture_actuel);
 router.put(
   "/:id",
   auth,
   validateObjectId("id"),
-  upload.single("name"),
+  optionalUpload,
   updatePhoto_voiture_actuel
 );
 router.delete("/:id", auth, validateObjectId("id"), deletePhoto_voiture_actuel);

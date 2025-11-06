@@ -1,3 +1,8 @@
+/*
+  - Public: `register`, `login`
+  - Admin: liste complète des utilisateurs (`isAdmin`), modification des rôles
+  - Authenticated: accès au profil, gestion des réservations et des voitures personnelles
+*/
 import { Router } from "express";
 import {
   register,
@@ -5,6 +10,7 @@ import {
   getAllUsers,
   getUserById,
   updateUser,
+  updateUserRole,
   deleteUser,
   createUserReservation,
   getUserReservations,
@@ -16,6 +22,7 @@ import {
   cancelUserReservation,
   updateUserPorsche,
   getUserDashboard,
+  getAvailableUserRoles,
 } from "../controllers/user.controller.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
@@ -23,11 +30,14 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Routes publiques
 router.post("/register", register);
 router.post("/login", login);
+
 // Routes admin
 router.get("/all", auth, isAdmin, getAllUsers);
+router.get("/roles", auth, isAdmin, getAvailableUserRoles);
+router.put("/:id/role", auth, isAdmin, validateObjectId("id"), updateUserRole);
+
 // Routes utilisateur
 router.get("/:id", auth, validateObjectId("id"), getUserById);
 router.put("/:id", auth, validateObjectId("id"), updateUser);
@@ -62,7 +72,7 @@ router.delete(
   validateObjectId("reservationId"),
   deleteUserReservation
 );
-// Gestion des voitures personnelles
+// Gestion des voitures actuellles
 router.post("/:id/porsches", auth, validateObjectId("id"), addUserPorsche);
 router.get("/:id/porsches", auth, validateObjectId("id"), getUserPorsches);
 router.put(

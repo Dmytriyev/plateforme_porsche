@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { COULEURS_EXTERIEUR } from "../utils/couleur_exterieur.constants.js";
 
 const couleur_exterieurSchema = new mongoose.Schema(
   {
@@ -7,6 +8,7 @@ const couleur_exterieurSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 100,
+      enum: COULEURS_EXTERIEUR,
     },
     photo_couleur: {
       type: String,

@@ -1,3 +1,6 @@
+// Controller: Photo Porsche
+// Gère les photos des variantes Porsche (model_porsche).
+// - vérifie la présence du modèle lié, gère les fichiers uploadés et permissions (admin)
 import Photo_porsche from "../models/photo_porsche.model.js";
 import photo_porscheValidation from "../validations/photo_porsche.validation.js";
 import fs from "node:fs";

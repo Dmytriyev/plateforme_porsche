@@ -1,3 +1,7 @@
+// Controller: Siège
+// CRUD pour les types de sièges/options (utilisé dans les configurations de modèles).
+// Fonctions: createSiege, getAllSieges, getSiegeById, updateSiege, deleteSiege
+// Nouvelles fonctions: getAvailableSiegeTypes (pour React)
 import Siege from "../models/siege.model.js";
 import siegeValidation from "../validations/siege.validation.js";
 import {
@@ -5,6 +9,7 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import { getAvailableSieges } from "../utils/siege.constants.js";
 
 const createSiege = async (req, res) => {
   try {
@@ -87,4 +92,21 @@ const deleteSiege = async (req, res) => {
   }
 };
 
-export { createSiege, getAllSieges, getSiegeById, updateSiege, deleteSiege };
+// Obtenir les types de sièges disponibles (pour React)
+const getAvailableSiegeTypes = async (req, res) => {
+  try {
+    const types = getAvailableSieges();
+    return res.json(types);
+  } catch (error) {
+    return handleError(res, error, "getAvailableSiegeTypes");
+  }
+};
+
+export {
+  createSiege,
+  getAllSieges,
+  getSiegeById,
+  updateSiege,
+  deleteSiege,
+  getAvailableSiegeTypes,
+};

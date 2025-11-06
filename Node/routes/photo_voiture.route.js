@@ -1,3 +1,7 @@
+/*
+  - publics pour lecture et recherche, 
+  - staff/admin pour modification et suppression.
+*/
 import { Router } from "express";
 import {
   createPhoto_voiture,
@@ -15,20 +19,15 @@ import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
-// Routes publiques
-router.get("/all", getAllPhoto_voitures);
-router.get("/search", getPhotosByCriteria);
-router.get("/:id", validateObjectId("id"), getPhoto_voitureById);
-// Middleware pour gérer à la fois multipart et JSON
 const optionalUpload = (req, res, next) => {
   // Si c'est multipart/form-data, utiliser multer
+  // Le champ "photo" correspond au nom du champ dans le formulaire multipart
   if (req.is("multipart/form-data")) {
-    return upload.single("name")(req, res, next);
+    return upload.single("photo")(req, res, next);
   }
-  // Sinon, continuer sans multer (body-parser gère le JSON)
+  // Sinon, body-parser gère le JSON
   next();
 };
-
 // Routes staff (admin, responsable, conseillère)
 router.post("/new", auth, isStaff, optionalUpload, createPhoto_voiture);
 router.put(
@@ -39,7 +38,11 @@ router.put(
   optionalUpload,
   updatePhoto_voiture
 );
-// Seul admin peut supprimer
+// Routes publiques
+router.get("/all", getAllPhoto_voitures);
+router.get("/search", getPhotosByCriteria);
+router.get("/:id", validateObjectId("id"), getPhoto_voitureById);
+// admin uniquement
 router.delete(
   "/:id",
   auth,

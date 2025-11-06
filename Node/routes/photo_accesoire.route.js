@@ -1,3 +1,8 @@
+/*
+  - Public: lecture seule
+  - Staff: upload/édition
+  - Admin: suppression
+*/
 import { Router } from "express";
 import {
   createPhoto_accesoire,
@@ -14,25 +19,27 @@ import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
-// Routes publiques
-router.get("/all", getAllPhoto_accesoires);
-router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
+const optionalUpload = (req, res, next) => {
+  // Si c'est multipart/form-data, utiliser multer
+  if (req.is("multipart/form-data")) {
+    return upload.single("photo")(req, res, next);
+  }
+  // Sinon, body-parser gère le JSON
+  next();
+};
 // Routes staff (admin, responsable, conseillère)
-router.post(
-  "/new",
-  auth,
-  isStaff,
-  upload.single("name"),
-  createPhoto_accesoire
-);
+router.post("/new", auth, isStaff, optionalUpload, createPhoto_accesoire);
 router.put(
   "/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  upload.single("name"),
+  optionalUpload,
   updatePhoto_accesoire
 );
+// Routes publiques
+router.get("/all", getAllPhoto_accesoires);
+router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
 // Routes admin uniquement
 router.delete(
   "/:id",

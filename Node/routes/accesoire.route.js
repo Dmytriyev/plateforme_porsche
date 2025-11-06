@@ -10,26 +10,27 @@ import {
   setCouleur,
   removeCouleur,
   getAccessoiresByCriteria,
+  getAvailableTypesAccesoireOptions,
 } from "../controllers/accesoire.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
-import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
 // Routes publiques
+router.get("/types", getAvailableTypesAccesoireOptions);
 router.get("/all", getAllAccesoires);
-router.get("/search", getAccessoiresByCriteria); // Recherche par critères
+router.get("/search", getAccessoiresByCriteria);
 router.get("/:id", validateObjectId("id"), getAccesoireById);
-// Routes staff (admin, responsable, conseillère)
-router.post("/new", auth, isStaff, createAccesoire);
-router.put("/:id", auth, isStaff, validateObjectId("id"), updateAccesoire);
-router.put("/:id/images/add", auth, isStaff, validateObjectId("id"), addImages);
+// Routes admin uniquement
+router.post("/new", auth, isAdmin, createAccesoire);
+router.put("/:id", auth, isAdmin, validateObjectId("id"), updateAccesoire);
+router.put("/:id/images/add", auth, isAdmin, validateObjectId("id"), addImages);
 router.put(
   "/:id/images/remove",
   auth,
-  isStaff,
+  isAdmin,
   validateObjectId("id"),
   removeImages
 );
@@ -37,18 +38,17 @@ router.put(
 router.put(
   "/:id/couleur/set",
   auth,
-  isStaff,
+  isAdmin,
   validateObjectId("id"),
   setCouleur
 );
 router.delete(
   "/:id/couleur/remove",
   auth,
-  isStaff,
+  isAdmin,
   validateObjectId("id"),
   removeCouleur
 );
-// Routes admin uniquement
 router.delete("/:id", auth, isAdmin, validateObjectId("id"), deleteAccesoire);
 
 export default router;

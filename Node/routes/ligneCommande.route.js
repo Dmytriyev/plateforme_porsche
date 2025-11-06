@@ -1,3 +1,7 @@
+/*
+  - Des routes pour vider le panier, récupérer les lignes du panier et modifier quantité.
+  - Routes admin pour lecture complète des lignes.
+*/
 import { Router } from "express";
 import {
   createLigneCommande,

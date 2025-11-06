@@ -1,3 +1,7 @@
+// Controller: Model_porsche
+// Gère les variantes/configurations Porsche pour une gamme de voitures.
+// Fonctions principales : CRUD des variantes, ajout/suppression d'images, calcul du prix total
+// Utilise des helpers pour valider les entités liées (voiture, couleurs, jantes, photos).
 import Model_porsche from "../models/model_porsche.model.js";
 import model_porscheValidation from "../validations/model_porsche.validation.js";
 import Voiture from "../models/voiture.model.js";
@@ -5,6 +9,12 @@ import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import Couleur_interieur from "../models/couleur_interieur.model.js";
 import Taille_jante from "../models/taille_jante.model.js";
 import Photo_porsche from "../models/photo_porsche.model.js";
+import {
+  getVariantesByModel,
+  getAvailableCarrosseries,
+  getCarrosseriesByModel,
+  VARIANTES_PAR_MODELE,
+} from "../utils/model_porsche.constants.js";
 
 const POPULATE_FIELDS = {
   photo_porsche: "name alt",
@@ -44,11 +54,11 @@ const populateModel = (query) => {
 
 const calculatePrix = (model) => {
   const prixBase = model.prix_base || 0;
-  const prixCouleurExt = model.couleur_exterieur?.prix || 0;
+  let prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
 
-  let prixCouleursInt = 0;
+  let prixCouleursInterieur = 0;
   if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
-    prixCouleursInt = model.couleur_interieur.reduce(
+    prixCouleursInterieur = model.couleur_interieur.reduce(
       (total, couleur) => total + (couleur?.prix || 0),
       0
     );
@@ -59,8 +69,8 @@ const calculatePrix = (model) => {
   const prixSiege = model.siege?.prix || 0;
   const prixTotal =
     prixBase +
-    prixCouleurExt +
-    prixCouleursInt +
+    prixCouleurExterieur +
+    prixCouleursInterieur +
     prixJante +
     prixPackage +
     prixSiege;
@@ -69,14 +79,18 @@ const calculatePrix = (model) => {
   return {
     prix_base_variante: prixBase,
     options: {
-      couleur_exterieur: prixCouleurExt,
-      couleurs_interieur: prixCouleursInt,
+      couleur_exterieur: prixCouleurExterieur,
+      couleurs_interieur: prixCouleursInterieur,
       jante: prixJante,
       package: prixPackage,
       siege: prixSiege,
     },
     total_options:
-      prixCouleurExt + prixCouleursInt + prixJante + prixPackage + prixSiege,
+      prixCouleurExterieur +
+      prixCouleursInterieur +
+      prixJante +
+      prixPackage +
+      prixSiege,
     prix_total: prixTotal,
     acompte_requis: acompte,
     pourcentage_acompte: "20%",
@@ -575,6 +589,96 @@ const calculatePrixTotal = async (req, res) => {
   }
 };
 
+/**
+ * Récupère tous les types de carrosserie disponibles
+ * @route GET /api/model_porsche/carrosseries
+ * @access Public
+ */
+const getAllCarrosseries = async (req, res) => {
+  try {
+    const carrosseries = getAvailableCarrosseries();
+    return res.json({
+      success: true,
+      data: carrosseries,
+      message: "Types de carrosserie récupérés avec succès",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des types de carrosserie",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupère les variantes disponibles pour un modèle de voiture spécifique
+ * @route GET /api/model_porsche/variantes/:nomModel
+ * @access Public
+ */
+const getVariantesByVoitureModel = async (req, res) => {
+  try {
+    const { nomModel } = req.params;
+
+    // Vérifier si le modèle existe dans nos constantes
+    if (!VARIANTES_PAR_MODELE[nomModel]) {
+      return res.status(404).json({
+        success: false,
+        message: `Modèle "${nomModel}" non trouvé. Modèles disponibles: ${Object.keys(
+          VARIANTES_PAR_MODELE
+        ).join(", ")}`,
+      });
+    }
+
+    const variantes = getVariantesByModel(nomModel);
+    const carrosseries = getCarrosseriesByModel(nomModel);
+
+    return res.json({
+      success: true,
+      data: {
+        modele: nomModel,
+        variantes: variantes,
+        carrosseries: carrosseries,
+      },
+      message: `Variantes et carrosseries pour ${nomModel} récupérées avec succès`,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des variantes",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupère toutes les variantes avec leurs modèles associés
+ * @route GET /api/model_porsche/variantes
+ * @access Public
+ */
+const getAllVariantes = async (req, res) => {
+  try {
+    const allVariantes = Object.entries(VARIANTES_PAR_MODELE).map(
+      ([model, variantes]) => ({
+        modele: model,
+        variantes: variantes.map((v) => ({ value: v, label: v })),
+      })
+    );
+
+    return res.json({
+      success: true,
+      data: allVariantes,
+      message: "Toutes les variantes récupérées avec succès",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des variantes",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createModel_porsche,
   getAllModel_porsches,
@@ -591,4 +695,7 @@ export {
   removeTailleJante,
   calculatePrixTotal,
   getConfigurationsByVoiture,
+  getAllCarrosseries,
+  getVariantesByVoitureModel,
+  getAllVariantes,
 };

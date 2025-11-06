@@ -1,3 +1,8 @@
+// Controller: Photo accessoire
+// Gère upload/CRUD des photos associées aux accessoires.
+// Points clés:
+// - nettoie le fichier uploadé en cas d'erreur
+// - contrôle les droits (admin) pour création/modification/suppression
 import Photo_accesoire from "../models/photo_accesoire.model.js";
 import photo_accesoireValidation from "../validations/photo_accesoire.validation.js";
 import fs from "node:fs";

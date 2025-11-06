@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  TYPES_CARROSSERIE_ACTUEL,
+  TYPES_TRANSMISSION,
+} from "../utils/model_porsche_actuel.constants.js";
 
 const model_porsche_actuelSchema = new mongoose.Schema(
   {
@@ -15,13 +19,14 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 50,
+      enum: TYPES_CARROSSERIE_ACTUEL,
     },
     annee_production: {
       type: Date,
       required: true,
       max: Date.now(),
     },
-    // Moteur: Flat-6 3.4L, V6, V8, Hybrid
+    // Moteur: Flat-6 3.0L, V8, E-Hybrid
     info_moteur: {
       type: String,
       default: "N/A",
@@ -34,8 +39,9 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       trim: true,
       default: "N/A",
       maxlength: 50,
+      enum: TYPES_TRANSMISSION,
     },
-    // unique: true, sparse: true dit que les valeurs présentes doivent être uniques, mais l'absence de valeur est autorisée pour plusieurs documents
+    // unique: true, sparse: true dit que les valeurs présentes sont uniques, mais l'absence de valeur est autorisée pour plusieurs documents
     // Numéro de série unique (VIN)
     numero_win: {
       type: String,
@@ -44,6 +50,7 @@ const model_porsche_actuelSchema = new mongoose.Schema(
       uppercase: true,
       trim: true,
       maxlength: 17,
+      default: "N/A",
     },
     // Relation Many-to-One: Propriétaire
     user: {

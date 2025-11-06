@@ -1,3 +1,6 @@
+// Controller: Couleur d'accessoire
+// CRUD pour les couleurs applicables aux accessoires.
+// Utilisé principalement par l'admin pour gérer les couleurs disponibles.
 import Couleur_accesoire from "../models/couleur_accesoire.model.js";
 import couleur_accesoireValidation from "../validations/couleur_accesoire.validation.js";
 import {

@@ -1,13 +1,24 @@
 import joi from "joi";
+import {
+  TYPES_CARROSSERIE_ACTUEL,
+  TYPES_TRANSMISSION,
+} from "../utils/model_porsche_actuel.constants.js";
 
 const mongoIdSchema = () => joi.string().hex().length(24);
 
 const createSchema = joi.object({
   type_model: joi.string().required().max(300),
-  type_carrosserie: joi.string().required().max(150),
+  type_carrosserie: joi
+    .string()
+    .required()
+    .valid(...TYPES_CARROSSERIE_ACTUEL)
+    .max(150),
   annee_production: joi.date().required().max("now"),
   info_moteur: joi.string().max(500),
-  info_transmission: joi.string().max(100),
+  info_transmission: joi
+    .string()
+    .valid(...TYPES_TRANSMISSION)
+    .max(100),
   numero_win: joi.string().uppercase().max(17),
   couleur_interieur: mongoIdSchema(),
   couleur_exterieur: mongoIdSchema(),
@@ -17,10 +28,10 @@ const createSchema = joi.object({
 
 const updateSchema = joi.object({
   type_model: joi.string(),
-  type_carrosserie: joi.string(),
+  type_carrosserie: joi.string().valid(...TYPES_CARROSSERIE_ACTUEL),
   annee_production: joi.date().max("now"),
   info_moteur: joi.string(),
-  info_transmission: joi.string(),
+  info_transmission: joi.string().valid(...TYPES_TRANSMISSION),
   numero_win: joi.string().uppercase(),
   couleur_interieur: mongoIdSchema(),
   couleur_exterieur: mongoIdSchema(),
@@ -28,11 +39,7 @@ const updateSchema = joi.object({
 });
 
 const addOrRemoveImageSchema = joi.object({
-  photo_voiture_actuel: joi
-    .array()
-    .items(mongoIdSchema().required())
-    .min(1)
-    .required(),
+  photo_voiture_actuel: joi.array().items(mongoIdSchema()),
 });
 
 const setCouleurSchema = joi.object({

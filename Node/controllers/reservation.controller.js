@@ -1,3 +1,9 @@
+// Controller: Reservation
+// Gère les réservations pour les voitures d'occasion.
+// Règles importantes:
+// - Seules les voitures d'occasion (type_voiture = false) sont réservables
+// - L'utilisateur doit être authentifié et ne peut créer que ses réservations
+// - Vérifie les conflits de date et empêche les réservations passées
 import Reservation from "../models/reservation.model.js";
 import reservationValidation from "../validations/reservation.validation.js";
 import Voiture from "../models/voiture.model.js";
@@ -108,7 +114,7 @@ const getAllReservations = async (req, res) => {
 
     return sendSuccess(res, reservations);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -124,7 +130,7 @@ const getReservationById = async (req, res) => {
 
     return sendSuccess(res, reservation);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -192,7 +198,7 @@ const updateReservation = async (req, res) => {
 
     return sendSuccess(res, updatedReservation, "Réservation mise à jour");
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -205,7 +211,7 @@ const deleteReservation = async (req, res) => {
 
     return sendSuccess(res, null, "Réservation supprimée avec succès");
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -224,7 +230,7 @@ const getReservationsByUser = async (req, res) => {
 
     return sendSuccess(res, reservations);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -243,7 +249,7 @@ const getReservationsByVoiture = async (req, res) => {
 
     return sendSuccess(res, reservations);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -281,7 +287,7 @@ const checkReservations = async (req, res) => {
         : "Voiture déjà réservée pour cette date",
     });
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 

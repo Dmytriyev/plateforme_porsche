@@ -6,10 +6,10 @@ const reservationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    // Status: true = confirmée, false = en attente
+    // Status: true = réservation active/confirmée, false = annulée
     status: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     // Relation Many-to-One: Utilisateur
     user: {

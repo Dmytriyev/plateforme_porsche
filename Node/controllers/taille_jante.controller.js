@@ -1,3 +1,7 @@
+// Controller: Taille de jante
+// CRUD pour les tailles et options de jantes (utilisées dans les configurations de véhicules).
+// Fonctions: createTaille_jante, getAllTaille_jantes, getTaille_janteById, updateTaille_jante, deleteTaille_jante
+// Nouvelles fonctions: getJanteOptions (pour React)
 import Taille_jante from "../models/taille_jante.model.js";
 import taille_janteValidation from "../validations/taille_jante.validation.js";
 import {
@@ -5,6 +9,7 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import { getJanteOptions } from "../utils/jante.constants.js";
 
 const createTaille_jante = async (req, res) => {
   try {
@@ -88,10 +93,21 @@ const deleteTaille_jante = async (req, res) => {
   }
 };
 
+// Obtenir les options de jantes disponibles (tailles et couleurs pour React)
+const getAvailableJanteOptions = async (req, res) => {
+  try {
+    const options = getJanteOptions();
+    return res.json(options);
+  } catch (error) {
+    return handleError(res, error, "getAvailableJanteOptions");
+  }
+};
+
 export {
   createTaille_jante,
   getAllTaille_jantes,
   getTaille_janteById,
   updateTaille_jante,
   deleteTaille_jante,
+  getAvailableJanteOptions,
 };

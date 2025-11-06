@@ -1,3 +1,9 @@
+// Controller: User
+// Gestion des utilisateurs: inscription, connexion, CRUD utilisateur et actions liées (réservations, paniers, voitures personnelles).
+// Points clés:
+// - crée un panier vide à la création d'un utilisateur
+// - sécurise certaines opérations (seul l'utilisateur ou l'admin peut modifier/supprimer)
+// - la modification des rôles est strictement réservée aux admins
 import User from "../models/user.model.js";
 import userValidation from "../validations/user.validation.js";
 import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
@@ -8,6 +14,7 @@ import Reservation from "../models/reservation.model.js";
 import Voiture from "../models/voiture.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
+import { getAvailableRoles, hasPermission } from "../utils/roles.constants.js";
 
 const register = async (req, res) => {
   try {
@@ -145,10 +152,19 @@ const updateUser = async (req, res) => {
     }
 
     // Empêcher la modification des champs sensibles par un utilisateur non-admin
+    // Les rôles sont gérés via updateUserRole (route séparée)
     if (!req.user.isAdmin) {
       delete body.isAdmin;
       delete body.role;
       delete body.panier;
+    }
+
+    // Si un admin essaie de modifier le rôle via cette route, le bloquer
+    if (body.role || body.isAdmin !== undefined) {
+      return res.status(400).json({
+        message:
+          "Pour modifier le rôle, utilisez la route dédiée PUT /api/users/:id/role",
+      });
     }
 
     const { error } = userValidation(body).userUpdate;
@@ -417,8 +433,8 @@ const getUserProfile = async (req, res) => {
       };
     }
 
-    // Obtenir l'historique des commandes
-    const historique = await Commande.find({ user: userId, status: false })
+    // Obtenir l'historique des commandes (status: true = commandes validées)
+    const historique = await Commande.find({ user: userId, status: true })
       .sort({ date_commande: -1 })
       .limit(5);
 
@@ -649,7 +665,10 @@ const getUserDashboard = async (req, res) => {
         .populate("voiture", "nom_model type_voiture prix");
 
       const total = lignesCommande.reduce((sum, ligne) => {
-        return sum + (ligne.prix_unitaire * ligne.quantite || 0);
+        // Si c'est une voiture avec acompte, utiliser l'acompte, sinon le prix
+        const montant =
+          ligne.type_produit && ligne.acompte > 0 ? ligne.acompte : ligne.prix;
+        return sum + (montant * ligne.quantite || 0);
       }, 0);
 
       panierDetails = {
@@ -668,10 +687,10 @@ const getUserDashboard = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(3);
 
-    // Statistiques rapides
+    // Statistiques rapides (commandes validées = status: true)
     const totalCommandes = await Commande.countDocuments({
       user: userId,
-      status: false,
+      status: true,
     });
     const totalReservations = await Reservation.countDocuments({
       user: userId,
@@ -699,12 +718,79 @@ const getUserDashboard = async (req, res) => {
   }
 };
 
+// Obtenir la liste des rôles disponibles (pour React)
+const getAvailableUserRoles = async (req, res) => {
+  try {
+    // Cette route peut être accessible aux admins uniquement ou à tous selon vos besoins
+    // Actuellement ouverte aux utilisateurs authentifiés pour affichage dans UI
+    const roles = getAvailableRoles();
+    return res.status(200).json(roles);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
+// Modifier le rôle d'un utilisateur (admin uniquement)
+const updateUserRole = async (req, res) => {
+  try {
+    // Vérification supplémentaire: seul un admin peut modifier un rôle
+    if (!req.user.isAdmin) {
+      return res.status(403).json({
+        message:
+          "Accès refusé. Seuls les administrateurs peuvent modifier les rôles.",
+      });
+    }
+
+    const { body } = req;
+    const userId = req.params.id;
+
+    if (!body || Object.keys(body).length === 0) {
+      return res.status(400).json({
+        message: "Pas de données dans la requête",
+      });
+    }
+
+    // Validation spécifique pour la modification de rôle
+    const { error } = userValidation(body).userRoleUpdate;
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    // Empêcher un admin de se rétrograder lui-même
+    if (req.user.id === userId && body.role !== "admin") {
+      return res.status(400).json({
+        message:
+          "Vous ne pouvez pas rétrograder votre propre compte. Demandez à un autre administrateur.",
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur n'existe pas" });
+    }
+
+    // Mettre à jour le rôle
+    user.role = body.role;
+    await user.save();
+
+    const updatedUser = await User.findById(userId).select("-password");
+
+    return res.status(200).json({
+      message: `Rôle mis à jour avec succès pour ${updatedUser.email}`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};
+
 export {
   register,
   login,
   getAllUsers,
   getUserById,
   updateUser,
+  updateUserRole,
   deleteUser,
   createUserReservation,
   getUserReservations,
@@ -716,4 +802,5 @@ export {
   cancelUserReservation,
   updateUserPorsche,
   getUserDashboard,
+  getAvailableUserRoles,
 };

@@ -1,3 +1,8 @@
+/*
+  - Crée le dossier `uploads/` si nécessaire.
+  - Renomme les fichiers avec le timestamp pour éviter collisions.
+  - Filtre les types MIME image et limite la taille/nombre des fichiers (10MB, max 20 fichiers).
+*/
 import multer from "multer";
 import path from "node:path";
 import fs from "node:fs";
@@ -36,12 +41,12 @@ const fileFilter = (req, file, cb) => {
     cb(new Error("Type de fichier non autorisé"), false);
   }
 };
-// Limiter la taille des fichiers à 10MB et le nombre de fichiers à 20
+// Limiter la taille des fichiers à 20MB et le nombre de fichiers à 20
 export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: 20 * 1024 * 1024,
     files: 20,
   },
 });

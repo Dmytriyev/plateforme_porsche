@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
+import { TYPES_SIEGE } from "../utils/siege.constants.js";
 
 const siegeSchema = new mongoose.Schema(
   {
-    // Nom de siège "Sièges sport", "Sièges sport adaptatifs Plus", "Sièges baquets légers"
+    // Nom de siège "Sièges sport", "Sièges sport adaptatifs Plus"
     nom_siege: {
       type: String,
       required: true,
       trim: true,
+      enum: TYPES_SIEGE,
       maxlength: 150,
     },
     description: {
@@ -14,6 +16,7 @@ const siegeSchema = new mongoose.Schema(
       trim: true,
       maxlength: 1000,
     },
+    // Options de confort true=présent, false=non
     options_confort: {
       ventilation: {
         type: Boolean,

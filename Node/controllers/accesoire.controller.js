@@ -1,7 +1,14 @@
+// Controller: Accessoire
+// Gère la création, lecture, mise à jour, suppression des accessoires.
+// Fonctions clés:
+// - createAccesoire, getAllAccesoires, getAccesoireById, updateAccesoire, deleteAccesoire
+// - gestion des images: addImages / removeImages
+// - gestion de la couleur d'accessoire: setCouleur / removeCouleur
 import Accesoire from "../models/accesoire.model.js";
 import accesoireValidation from "../validations/accesoire.validation.js";
 import PhotoAccesoire from "../models/photo_accesoire.model.js";
 import Couleur_accesoire from "../models/couleur_accesoire.model.js";
+import { getAvailableTypesAccesoire } from "../utils/accesoire.constants.js";
 import {
   sendSuccess,
   sendError,
@@ -53,7 +60,7 @@ const createAccesoire = async (req, res) => {
       201
     );
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -67,7 +74,7 @@ const getAllAccesoires = async (req, res) => {
 
     return sendSuccess(res, accesoires);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -84,7 +91,7 @@ const getAccesoireById = async (req, res) => {
 
     return sendSuccess(res, accesoire);
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -127,7 +134,7 @@ const updateAccesoire = async (req, res) => {
       "Accessoire mis à jour avec succès"
     );
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -140,7 +147,7 @@ const deleteAccesoire = async (req, res) => {
 
     return sendSuccess(res, null, "Accessoire supprimé avec succès");
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -184,7 +191,7 @@ const addImages = async (req, res) => {
       "Photos ajoutées avec succès"
     );
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -227,7 +234,7 @@ const removeImages = async (req, res) => {
       "Photos supprimées avec succès"
     );
   } catch (error) {
-    return sendError(res, "Erreur serveur", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -354,6 +361,24 @@ const getAccessoiresByCriteria = async (req, res) => {
   }
 };
 
+/**
+ * Récupère la liste des types d'accessoires disponibles
+ * @route GET /api/accesoire/types
+ * @access Public
+ */
+const getAvailableTypesAccesoireOptions = async (req, res) => {
+  try {
+    const types = getAvailableTypesAccesoire();
+    return res.json({
+      success: true,
+      data: types,
+      message: "Types d'accessoires récupérés avec succès",
+    });
+  } catch (error) {
+    return sendError(res, "getAvailableTypesAccesoireOptions", error);
+  }
+};
+
 export {
   createAccesoire,
   getAllAccesoires,
@@ -365,4 +390,5 @@ export {
   setCouleur,
   removeCouleur,
   getAccessoiresByCriteria,
+  getAvailableTypesAccesoireOptions,
 };

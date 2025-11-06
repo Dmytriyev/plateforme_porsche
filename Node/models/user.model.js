@@ -1,5 +1,16 @@
+/*
+  - Le mot de passe est hashé automatiquement avant `save` et `findOneAndUpdate`.
+  - Le champ `role` est synchronisé avec `isAdmin` (si rôle = 'admin', isAdmin = true).
+  - `telephone` est unique et utilisé pour contact.
+  - Les rôles sont définis dans utils/roles.constants.js pour garantir la cohérence.
+*/
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import {
+  AVAILABLE_ROLES,
+  DEFAULT_ROLE,
+  isAdminRole,
+} from "../utils/roles.constants.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -25,8 +36,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "responsable", "conseillere", "admin"],
-      default: "user",
+      enum: AVAILABLE_ROLES,
+      default: DEFAULT_ROLE,
     },
     nom: {
       type: String,
@@ -66,17 +77,17 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+// Indexes pour optimiser les recherches courantes
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ role: 1 });
-
+// Avant de sauvegarder ou mettre à jour, hasher le mot de passe si modifié
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
   }
 
   if (this.isModified("role")) {
-    this.isAdmin = this.role === "admin";
+    this.isAdmin = isAdminRole(this.role);
   }
 
   if (this.isModified("isAdmin") && this.isAdmin) {
@@ -85,7 +96,7 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
+// Middleware avant `findOneAndUpdate` pour hasher le mot de passe si modifié
 userSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
 
@@ -94,7 +105,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   }
 
   if (update.role) {
-    update.isAdmin = update.role === "admin";
+    update.isAdmin = isAdminRole(update.role);
   }
 
   if (update.isAdmin !== undefined && update.isAdmin === true) {

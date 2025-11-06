@@ -4,7 +4,7 @@ export default function CommandeValidation(body) {
   const CommandeCreate = joi.object({
     date_commande: joi.date().greater("now"),
     prix: joi.number().min(0).max(100000000),
-    acompte: joi.number().min(0).max(joi.ref("prix")),
+    acompte: joi.number().min(0),
     status: joi.boolean(),
     factureUrl: joi.string(),
     user: joi.string().hex().length(24),

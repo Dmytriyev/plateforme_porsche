@@ -1,15 +1,12 @@
 import Model_porsche from "../models/model_porsche.model.js";
 /**
  * Calcule le prix total d'un `model_porsche` avec ses options (couleur ext/int, jantes).
- * Entrée:
  * - modelPorscheId (String) : identifiant du model_porsche configuré
- * Sortie (en cas de succès)- objet contenant:
  * - model_porsche_id : _id du document model_porsche
  * - prix_base : prix de la voiture elle-même (champ `prix` dans la collection voiture)
  * - options : objet listant le prix de chaque option (couleur ext/int, jantes)
  * - total_options : somme des prix des options
  * - prix_total_avec_options : prix_base + total_options
- * - gère les cas où une option peut être absente (fallback à 0)
  */
 export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
   try {
@@ -22,28 +19,40 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
       .populate("package", "prix nom_package")
       .populate("siege", "prix nom_siege");
 
-    if (!modelPorsche) return null;
+    if (!modelPorsche)
+      throw new Error(`model_porsche introuvable pour l'id ${modelPorscheId}`);
 
-    // Prix de base de la VARIANTE (ex: 911 Carrera = 120k€, 911 GTS = 150k€)
-    const prixBase = modelPorsche.prix_base || 0;
-    const prixCouleurExt = modelPorsche.couleur_exterieur?.prix || 0;
-    // La couleur intérieure peut être un tableau : on additionne les prix.
-    // Si couleur_interieur est absent ou vide, on obtient 0.
-    const prixCouleursInt =
-      modelPorsche.couleur_interieur?.reduce(
-        (sum, couleur) => sum + (couleur.prix || 0),
-        0
-      ) || 0;
+    // Calcul des prix de base
+    const prixBase = Number(modelPorsche.prix_base) || 0;
+    const prixCouleurExterieur =
+      Number(modelPorsche.couleur_exterieur?.prix) || 0;
 
-    const prixJante = modelPorsche.taille_jante?.prix || 0;
-    const prixPackage = modelPorsche.package?.prix || 0;
-    const prixSiege = modelPorsche.siege?.prix || 0;
+    // couleur_interieur peut être un tableau, un objet ou undefined.
+    let prixCouleursInterieur = 0;
+    const couleursInterieur = modelPorsche.couleur_interieur;
+    if (Array.isArray(couleursInterieur)) {
+      prixCouleursInterieur =
+        couleursInterieur.reduce(
+          (sum, couleur) => sum + (Number(couleur?.prix) || 0),
+          0
+        ) || 0;
+    } else if (couleursInterieur && typeof couleursInterieur === "object") {
+      prixCouleursInterieur = Number(couleursInterieur.prix) || 0;
+    }
+
+    const prixJante = Number(modelPorsche.taille_jante?.prix) || 0;
+    const prixPackage = Number(modelPorsche.package?.prix) || 0;
+    const prixSiege = Number(modelPorsche.siege?.prix) || 0;
 
     // Somme des options
     const totalOptions =
-      prixCouleurExt + prixCouleursInt + prixJante + prixPackage + prixSiege;
+      prixCouleurExterieur +
+      prixCouleursInterieur +
+      prixJante +
+      prixPackage +
+      prixSiege;
     const prixTotal = prixBase + totalOptions;
-    const acompte = prixTotal * 0.2; // Acompte de 20%
+    const acompte = prixTotal * 0.1; // Acompte de 10%
 
     return {
       model_porsche_id: modelPorsche._id,
@@ -51,8 +60,8 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
       gamme: modelPorsche.voiture?.nom_model,
       prix_base_variante: prixBase,
       options: {
-        couleur_exterieur: prixCouleurExt,
-        couleurs_interieur: prixCouleursInt,
+        couleur_exterieur: prixCouleurExterieur,
+        couleurs_interieur: prixCouleursInterieur,
         taille_jante: prixJante,
         package: prixPackage,
         siege: prixSiege,
@@ -62,8 +71,10 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
       acompte_requis: acompte,
     };
   } catch (error) {
-    console.error("Erreur calcul prix model_porsche:", error);
-    return null;
+    // une erreur contrôlée et le message original pour le debug.
+    const err = new Error(`Erreur calcul prix model_porsche: ${error.message}`);
+    err.original = error;
+    throw err;
   }
 };
 /**
@@ -76,12 +87,21 @@ export const enrichirLigneAvecModelPorsche = async (ligne) => {
   const ligneObj = ligne.toObject ? ligne.toObject() : ligne;
   // Vérifie que la ligne représente bien un produit de type voiture avec un model_porsche_id
   if (ligneObj.type_produit && ligneObj.model_porsche_id) {
-    // Récupère les détails de prix (prix de base + options)
-    const prixDetails = await calculerPrixTotalModelPorsche(
-      ligneObj.model_porsche_id
-    );
-    if (prixDetails) {
+    try {
+      // Récupère les détails de prix (prix de base + options)
+      const prixDetails = await calculerPrixTotalModelPorsche(
+        ligneObj.model_porsche_id
+      );
       ligneObj.model_porsche_details = prixDetails;
+    } catch (error) {
+      ligneObj.model_porsche_details = null;
+
+      ligneObj.model_porsche_error = {
+        message: error.message || "Erreur inconnue lors du calcul des prix",
+        code: "CALCUL_PRIX_ERROR",
+      };
+
+      console.error("enrichirLigneAvecModelPorsche - erreur:", error);
     }
   }
 

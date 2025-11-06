@@ -1,3 +1,7 @@
+/*
+  - Public: lecture, calcul prix, récupération des variantes et carrosseries
+  - Admin uniquement: création/modification et gestion des relations (photos, couleurs, jantes), suppression
+*/
 import { Router } from "express";
 import {
   createModel_porsche,
@@ -15,6 +19,9 @@ import {
   removeTailleJante,
   calculatePrixTotal,
   getConfigurationsByVoiture,
+  getAllCarrosseries,
+  getVariantesByVoitureModel,
+  getAllVariantes,
 } from "../controllers/model_porsche.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -23,6 +30,10 @@ import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
+// Routes publiques
+router.get("/carrosseries", getAllCarrosseries);
+router.get("/variantes", getAllVariantes);
+router.get("/variantes/:nomModel", getVariantesByVoitureModel);
 router.get("/all", getAllModel_porsches);
 router.get("/:id", validateObjectId("id"), getModel_porscheById);
 router.get("/:id/prix-total", validateObjectId("id"), calculatePrixTotal);
@@ -32,6 +43,7 @@ router.get(
   getConfigurationsByVoiture
 );
 
+// Routes staff (création/modification)
 router.post("/new", auth, isStaff, createModel_porsche);
 router.put("/:id", auth, isStaff, validateObjectId("id"), updateModel_porsche);
 router.put("/:id/images/add", auth, isStaff, validateObjectId("id"), addImages);
@@ -88,6 +100,7 @@ router.delete(
   removeTailleJante
 );
 
+// Suppression admin uniquement
 router.delete(
   "/:id",
   auth,

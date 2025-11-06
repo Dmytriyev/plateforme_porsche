@@ -1,8 +1,5 @@
 import mongoose from "mongoose";
-/**
- * Middleware pour valider les ObjectId MongoDB
- * Protège contre les injections NoSQL
- */
+// Protège contre les injections NoSQL en validant les IDs MongoDB
 const validateObjectId = (paramName = "id") => {
   return (req, res, next) => {
     const id = req.params[paramName];

@@ -15,7 +15,7 @@ const ligneCommandeSchema = new mongoose.Schema(
       max: 1000,
       validate: {
         validator: function (value) {
-          // RÈGLE MÉTIER: Les voitures neuves ne peuvent avoir qu'une quantité de 1
+          // Les voitures neuves ne peuvent avoir qu'une quantité de 1
           if (this.type_produit === true && value > 1) {
             return false;
           }
@@ -31,7 +31,7 @@ const ligneCommandeSchema = new mongoose.Schema(
       default: 0,
       max: 1000000,
     },
-    // Acompte versé (voiture neuve uniquement: 20%)
+    // Acompte versé (voiture neuve uniquement: 10%)
     acompte: {
       type: Number,
       min: 0,
@@ -46,7 +46,7 @@ const ligneCommandeSchema = new mongoose.Schema(
         return this.type_produit === true;
       },
     },
-    // Relation Many-to-One: Configuration Porsche (pour voitures neuves personnalisées)
+    // Relation Many-to-One (pour voitures neuves personnalisées)
     model_porsche_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Model_porsche",
@@ -62,7 +62,7 @@ const ligneCommandeSchema = new mongoose.Schema(
         return this.type_produit === false;
       },
     },
-    // Relation Many-to-One: Commande parent
+    // Relation Many-to-One: Commande
     commande: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Commande",
@@ -81,7 +81,7 @@ ligneCommandeSchema.index({ model_porsche_id: 1 });
 ligneCommandeSchema.index({ accesoire: 1 });
 ligneCommandeSchema.index({ type_produit: 1 });
 
-// Validation: l'acompte ne peut pas dépasser le prix
+// l'acompte ne peut pas dépasser le prix
 ligneCommandeSchema.pre("save", function (next) {
   if (this.acompte > this.prix) {
     next(new Error("L'acompte ne peut pas dépasser le prix total"));

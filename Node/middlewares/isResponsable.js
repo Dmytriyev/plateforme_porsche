@@ -1,3 +1,4 @@
+// Autorise l'accès aux rôles `admin` et `responsable` uniquement.
 const isResponsable = (req, res, next) => {
   const allowedRoles = ["admin", "responsable"];
 

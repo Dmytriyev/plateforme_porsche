@@ -1,5 +1,8 @@
+// Controller: Couleur intérieure
+// Gère les couleurs intérieures (CRUD), souvent liées à des configurations de modèle Porsche.
 import Couleur_interieur from "../models/couleur_interieur.model.js";
 import couleur_interieurValidation from "../validations/couleur_interieur.validation.js";
+import { getAvailableCouleursInterieur } from "../utils/couleur_interieur.constants.js";
 import {
   handleError,
   isEmptyBody,
@@ -122,10 +125,29 @@ const deleteCouleurInterieur = async (req, res) => {
   }
 };
 
+/**
+ * Récupère la liste des couleurs intérieures disponibles
+ * @route GET /api/couleur_interieur/couleurs
+ * @access Public
+ */
+const getAvailableCouleursInterieurOptions = async (req, res) => {
+  try {
+    const couleurs = getAvailableCouleursInterieur();
+    return res.json({
+      success: true,
+      data: couleurs,
+      message: "Couleurs intérieures récupérées avec succès",
+    });
+  } catch (error) {
+    return handleError(res, error, "getAvailableCouleursInterieurOptions");
+  }
+};
+
 export {
   createCouleurInterieur,
   getAllCouleurInterieur,
   getCouleurInterieurById,
   updateCouleurInterieur,
   deleteCouleurInterieur,
+  getAvailableCouleursInterieurOptions,
 };

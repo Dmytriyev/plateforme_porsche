@@ -1,3 +1,4 @@
+// Autorise l'accès au personnel (roles: admin, responsable, conseillere).
 const isStaff = (req, res, next) => {
   const allowedRoles = ["admin", "responsable", "conseillere"];
 

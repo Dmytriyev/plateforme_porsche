@@ -1,5 +1,8 @@
+// Controller: Couleur extérieure
+// Gère les couleurs extérieures (CRUD) et fournit des listes pour les formulaires.
 import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import couleur_exterieurValidation from "../validations/couleur_exterieur.validation.js";
+import { getAvailableCouleursExterieur } from "../utils/couleur_exterieur.constants.js";
 import {
   handleError,
   isEmptyBody,
@@ -120,10 +123,29 @@ const deleteCouleurExterieur = async (req, res) => {
   }
 };
 
+/**
+ * Récupère la liste des couleurs extérieures disponibles
+ * @route GET /api/couleur_exterieur/couleurs
+ * @access Public
+ */
+const getAvailableCouleursExterieurOptions = async (req, res) => {
+  try {
+    const couleurs = getAvailableCouleursExterieur();
+    return res.json({
+      success: true,
+      data: couleurs,
+      message: "Couleurs extérieures récupérées avec succès",
+    });
+  } catch (error) {
+    return handleError(res, error, "getAvailableCouleursExterieurOptions");
+  }
+};
+
 export {
   createCouleurExterieur,
   getAllCouleurExterieur,
   getCouleurExterieurById,
   updateCouleurExterieur,
   deleteCouleurExterieur,
+  getAvailableCouleursExterieurOptions,
 };

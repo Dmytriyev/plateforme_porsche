@@ -1,3 +1,4 @@
+// Autorise l'accès aux conseillères ainsi qu'aux responsables et admin.
 const isConseillere = (req, res, next) => {
   const allowedRoles = ["admin", "responsable", "conseillere"];
 

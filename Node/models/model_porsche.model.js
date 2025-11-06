@@ -1,36 +1,52 @@
-import mongoose from "mongoose";
-
 /**
- * 1. USER visite /model-start/911
- * 2. USER choisit une VARIANTE (Carrera, Carrera S, GTS, Turbo, etc.)
+ * Schéma Mongoose pour les configurations de modèles Porsche.
+ * 1. USER visite voiture une model-start(911)
+ * 2. USER choisit model_porsche une VARIANTE (Carrera, Carrera S, GTS, Turbo)
  * 3. Chaque variante a ses specs (puissance, transmission, accélération)
  * 4. USER configure: couleurs, jantes, sièges, package, options
- * 5. Système calcule prix total (prix_base_variante + options)
+ * 5. calcule prix total (prix_base_variante + options)
  * model_porsche = Configuration complète d'une variante spécifique
  */
+import mongoose from "mongoose";
+import {
+  TYPES_CARROSSERIE,
+  TOUTES_VARIANTES,
+} from "../utils/model_porsche.constants.js";
+
 const model_porscheSchema = new mongoose.Schema(
   {
     // Nom de la variante: "911 Carrera", "911 Carrera S", "911 GTS", "911 Turbo"
+    // Valeurs prédéfinies selon le modèle de voiture (911, Cayenne, Cayman)
     nom_model: {
       type: String,
       required: true,
       trim: true,
+      enum: {
+        values: TOUTES_VARIANTES,
+        message:
+          "La variante {VALUE} n'est pas valide. Veuillez choisir une variante correspondant au modèle Porsche.",
+      },
       maxlength: 100,
     },
     // Carrosserie: Coupe, Cabriolet, Targa
     type_carrosserie: {
       type: String,
       required: true,
-      enum: ["Coupé", "Cabriolet", "Targa", "SUV"],
+      enum: {
+        values: TYPES_CARROSSERIE,
+        message:
+          "Le type de carrosserie {VALUE} n'est pas valide. Choisissez parmi: " +
+          TYPES_CARROSSERIE.join(", "),
+      },
       trim: true,
     },
     // Année de production
     annee_production: {
       type: Date,
     },
-    // SPÉCIFICATIONS TECHNIQUES DE LA VARIANTE
+    // specifications techniques détaillées
     specifications: {
-      // Moteur: "Flat-6 3.0L bi-turbo", "Flat-6 3.7L"
+      // Moteur: "Flat-6 4.0L bi-turbo", "V8 3.0L"
       moteur: {
         type: String,
         required: true,
@@ -50,11 +66,12 @@ const model_porscheSchema = new mongoose.Schema(
         min: 0,
         max: 1500,
       },
-      // Transmission: "PDK", "Manuelle 7 vitesses"
+      // Transmission: "PDK 8 rapports"
       transmission: {
         type: String,
         required: true,
-        enum: ["PDK", "Manuelle", "PDK 8 rapports", "Manuelle 7 vitesses"],
+        trim: true,
+        maxlength: 100,
       },
       // Accélération 0-100 km/h en secondes
       acceleration_0_100: {
@@ -77,12 +94,6 @@ const model_porscheSchema = new mongoose.Schema(
         min: 0,
         max: 50,
       },
-      // Émissions CO2 en g/km
-      emissions_co2: {
-        type: Number,
-        min: 0,
-        max: 500,
-      },
     },
     // Description commerciale
     description: {
@@ -91,14 +102,8 @@ const model_porscheSchema = new mongoose.Schema(
       trim: true,
       maxlength: 2000,
     },
-    // Disponibilité de la variante
-    disponible: {
-      type: Boolean,
-      default: true,
-    },
-    // PRIX DE BASE DE LA VARIANTE SPÉCIFIQUE
     // Ex: 911 Carrera = 120 000€, 911 GTS = 150 000€, 911 Turbo = 200 000€
-    // Le prix total = prix_base + options (couleurs, jantes, package, etc.)
+    // Le prix total = prix_base + options
     prix_base: {
       type: Number,
       required: true,
@@ -106,62 +111,43 @@ const model_porscheSchema = new mongoose.Schema(
       max: 10000000,
     },
 
-    // RELATIONS - Modèle de base (911, Cayenne, Cayman, etc.)
+    // Modèle de base (911, Cayenne, Cayman, etc.)
     voiture: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voiture",
       required: true,
     },
 
-    // CONFIGURATION UTILISATEUR (comme sur site Porsche)
-    // Étape 1: Couleur extérieure
+    // configuration options choisies par l'utilisateur
     couleur_exterieur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Couleur_exterieur",
     },
-    // Étape 2: Couleur(s) intérieure(s)
     couleur_interieur: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Couleur_interieur",
       },
     ],
-    // Étape 3: Jantes
     taille_jante: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Taille_jante",
     },
-    // Étape 4: Sièges
     siege: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Siege",
     },
-    // Étape 5: Package (Weissach, Sport Chrono, etc.)
+    // Package (Weissach, Sport Chrono)
     package: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Package",
     },
-    // Photos de la configuration
     photo_porsche: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Photo_porsche",
       },
     ],
-
-    // INFORMATIONS COMMANDE (pour voitures configurées et commandées)
-    // Statut de la configuration
-    statut: {
-      type: String,
-      enum: [
-        "configuration", // En cours de configuration
-        "sauvegardee", // Configuration sauvegardée
-        "commandee", // Commande passée
-        "en_production", // En cours de fabrication
-        "livree", // Livrée au client
-      ],
-      default: "configuration",
-    },
     // Numéro VIN (attribué lors de la production)
     numero_vin: {
       type: String,
@@ -177,10 +163,6 @@ const model_porscheSchema = new mongoose.Schema(
       trim: true,
       maxlength: 400,
     },
-    // Date de livraison estimée
-    date_livraison_estimee: {
-      type: Date,
-    },
   },
   { timestamps: true }
 );
@@ -194,10 +176,7 @@ model_porscheSchema.index({ disponible: 1 });
 model_porscheSchema.index({ concessionnaire: 1 });
 model_porscheSchema.index({ createdAt: -1 });
 
-/**
- * Méthode d'instance: calcule le prix total dynamiquement
- * Prix total = prix_base_variante + couleurs + jantes + package + siege
- */
+// Prix total = prix_base_variante + couleurs + jantes + package + siege
 model_porscheSchema.methods.calculerPrixTotal = async function () {
   await this.populate([
     { path: "couleur_exterieur", select: "prix" },
@@ -209,6 +188,7 @@ model_porscheSchema.methods.calculerPrixTotal = async function () {
 
   // Prix de base de la variante (ex: 911 Carrera, 911 GTS)
   const prixBase = this.prix_base || 0;
+  // Prix des options sélectionnées ou null si non sélectionnées
   const prixCouleurExt = this.couleur_exterieur?.prix || 0;
   const prixCouleursInt = Array.isArray(this.couleur_interieur)
     ? this.couleur_interieur.reduce((sum, c) => sum + (c.prix || 0), 0)
@@ -227,20 +207,14 @@ model_porscheSchema.methods.calculerPrixTotal = async function () {
   );
 };
 
-/**
- * Méthode d'instance: calcule l'acompte (20% par défaut du prix total)
- */
 model_porscheSchema.methods.calculerAcompte = async function (
-  pourcentage = 0.2
+  pourcentage = 0.1
 ) {
   const prixTotal = await this.calculerPrixTotal();
   return prixTotal * pourcentage;
 };
 
-/**
- * Méthode d'instance: obtenir un résumé de la configuration
- * Utile pour affichage récapitulatif comme sur le site Porsche
- */
+// Résumé complet de la configuration et du prix
 model_porscheSchema.methods.obtenirResume = async function () {
   await this.populate([
     { path: "voiture", select: "nom_model type_voiture description" },
@@ -275,10 +249,7 @@ model_porscheSchema.methods.obtenirResume = async function () {
   };
 };
 
-/**
- * Méthode statique: obtenir toutes les variantes disponibles d'une voiture
- * Ex: toutes les variantes de 911 (Carrera, Carrera S, GTS, Turbo)
- */
+// toutes les variantes disponibles pour un modèle de voiture
 model_porscheSchema.statics.obtenirVariantesDisponibles = async function (
   voitureId
 ) {
@@ -291,10 +262,7 @@ model_porscheSchema.statics.obtenirVariantesDisponibles = async function (
     .sort({ "specifications.puissance": 1 });
 };
 
-/**
- * Méthode statique: rechercher par spécifications
- * Ex: toutes les 911 avec plus de 450CV
- */
+// rechercher par spécifications
 model_porscheSchema.statics.rechercherParSpecifications = async function (
   criteres
 ) {
