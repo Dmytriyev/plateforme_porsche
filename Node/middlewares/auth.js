@@ -1,4 +1,5 @@
 // Vérifie la présence et la validité d'un token JWT dans Authorization. Si valide, attache req.user.
+import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
   const authHeader = req.headers["authorization"];

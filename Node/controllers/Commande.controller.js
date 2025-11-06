@@ -337,8 +337,9 @@ const ajouterConfigurationAuPanier = async (req, res) => {
 
     const prixTotal = prixDetails.prix_total_avec_options;
 
-    // 4. Calculer l'acompte (20%)
-    const acompte = Math.round(prixTotal * 0.2);
+    // 4. Utiliser l'acompte calculé par l'utilitaire (déjà arrondi)
+    const acompte =
+      Number(prixDetails.acompte_requis) || Math.round(prixTotal * 0.1);
 
     // 5. Récupérer ou créer le panier
     let panier = await Commande.findOne({
