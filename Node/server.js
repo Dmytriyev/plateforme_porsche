@@ -39,7 +39,7 @@ app.use(helmet());
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 100,
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -47,7 +47,7 @@ const globalLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 10,
   message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -55,19 +55,19 @@ const loginLimiter = rateLimit({
 
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 100,
+  max: 10,
   message: "Trop d'inscriptions, réessayez dans 1 heure",
 });
 
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 200,
+  max: 20,
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 500,
+  max: 50,
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
@@ -79,7 +79,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.get("/", (req, res) => {
   res.send("This is Porsche API");
 });
-
 app.use("/photo_voiture", uploadLimiter, photo_voitureRoutes);
 app.use("/photo_voiture_actuel", uploadLimiter, photo_voiture_actuelRoutes);
 app.use("/photo_accesoire", uploadLimiter, photo_accesoireRoutes);
