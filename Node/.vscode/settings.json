@@ -1,3 +1,12 @@
 {
-    "postman.settings.dotenv-detection-notification-visibility": false
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "json.schemaDownload.enable": false,
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "package.json"
+            ],
+            "url": "https://json.schemastore.org/package.json"
+        }
+    ]
 }
