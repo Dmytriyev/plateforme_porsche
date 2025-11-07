@@ -1,7 +1,4 @@
-// Controller: Voiture
-// Gère les gammes de voitures ( 911, Cayenne) et leurs images.
-// Fonctions principales : CRUD de la gamme, ajout/suppression d'images, récupération des variantes (model_porsche).
-// Fournit aussi des endpoints pour récupérer voitures neuves / occasions.
+// Gère les gammes de voitures ( 911, Cayenne, Cayman)
 import Voiture from "../models/voiture.model.js";
 import voitureValidation from "../validations/voiture.validation.js";
 import Photo from "../models/photo_voiture.model.js";
