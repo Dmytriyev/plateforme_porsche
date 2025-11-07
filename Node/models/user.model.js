@@ -104,6 +104,13 @@ userSchema.pre("findOneAndUpdate", async function (next) {
     update.password = await bcrypt.hash(update.password, 10);
   }
 
+  // Normaliser l'email si fourni dans une mise à jour
+  if (update.email) {
+    if (typeof update.email === "string") {
+      update.email = update.email.toLowerCase().trim();
+    }
+  }
+
   if (update.role) {
     update.isAdmin = isAdminRole(update.role);
   }

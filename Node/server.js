@@ -7,6 +7,8 @@ import helmet from "helmet";
 
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
+import logger from "./utils/logger.js";
+import errorMiddleware from "./middlewares/error.js";
 
 import userRoutes from "./routes/user.route.js";
 import reservationRoutes from "./routes/reservation.route.js";
@@ -91,6 +93,18 @@ app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 // Parser JSON pour le reste des endpoints
 app.use(express.json());
 
+// Logger des requêtes entrantes
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    logger.info(
+      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+    );
+  });
+  next();
+});
+
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);
 
@@ -130,6 +144,37 @@ app.use("/voiture", voitureRoutes);
 app.use("/accesoire", accesoireRoutes);
 
 // Démarrage du serveur
-app.listen(port, () => {
-  console.log(`Le serveur est démarré sur le port ${port}`);
+// Error handler (doit être après les routes)
+app.use(errorMiddleware);
+
+const server = app.listen(port, () => {
+  logger.info(`Le serveur est démarré sur le port ${port}`);
+});
+// Gestion de l'arrêt du serveur
+const gracefulShutdown = (signal, err) => {
+  logger.warn(`Received ${signal}. Shutting down gracefully...`);
+  if (err)
+    logger.error("Shutdown reason", { stack: err.stack || err.message || err });
+  server.close(() => {
+    logger.info("Closed out remaining connections");
+    process.exit(err ? 1 : 0);
+  });
+  // si après 10s toujours pas fermé, forcer la sortie
+  setTimeout(() => {
+    logger.error("Forcing shutdown");
+    process.exit(1);
+  }, 10000).unref();
+};
+
+// Capturer les erreurs non gérées
+process.on("unhandledRejection", (reason) => {
+  logger.error("Unhandled Rejection", {
+    reason: (reason && (reason.stack || reason.message)) || String(reason),
+  });
+  gracefulShutdown("unhandledRejection", reason);
+});
+// Capturer les exceptions non gérées
+process.on("uncaughtException", (err) => {
+  logger.error("Uncaught Exception", { stack: err.stack || err.message });
+  gracefulShutdown("uncaughtException", err);
 });

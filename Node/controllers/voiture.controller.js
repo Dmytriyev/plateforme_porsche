@@ -47,9 +47,7 @@ const createVoiture = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-/**
- * Récupérer toutes les gammes de voitures (public), comme  911, Cayenne, Cayman
- */
+// Récupérer toutes les gammes de voitures 911, Cayenne, Cayman
 const getAllVoitures = async (req, res) => {
   try {
     const voitures = await Voiture.find()
@@ -62,7 +60,7 @@ const getAllVoitures = async (req, res) => {
   }
 };
 
-// Récupérer une gamme de voiture par ID (public)
+// Récupérer une gamme de voiture par ID
 const getVoitureById = async (req, res) => {
   try {
     const voiture = await Voiture.findById(req.params.id)
@@ -77,7 +75,7 @@ const getVoitureById = async (req, res) => {
   }
 };
 
-// Mettre à jour une gamme de voiture (admin)
+// Mettre à jour une gamme de voiture
 const updateVoiture = async (req, res) => {
   try {
     const { body } = req;
@@ -136,9 +134,7 @@ const updateVoiture = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-/**
- * Supprimer une gamme de voiture (admin) avec les MODEL_PORSCHE associées
- */
+// Supprimer une gamme de voiture avec model_porsche
 const deleteVoiture = async (req, res) => {
   try {
     const voiture = await Voiture.findByIdAndDelete(req.params.id);
@@ -151,7 +147,7 @@ const deleteVoiture = async (req, res) => {
   }
 };
 
-// Ajouter des images à une gamme de voiture (admin)
+// Ajouter des images à une gamme de voiture
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -198,7 +194,7 @@ const addImages = async (req, res) => {
   }
 };
 
-// Supprimer des images d'une gamme de voiture (admin)
+// Supprimer des images d'une gamme de voiture
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -228,6 +224,7 @@ const removeImages = async (req, res) => {
     // Supprimer les photos spécifiées de la voiture
     const updatedVoiture = await Voiture.findByIdAndUpdate(
       req.params.id,
+      // $pull pour supprimer les photos spécifiées
       { $pull: { photo_voiture: { $in: body.photo_voiture } } },
       { new: true }
     ).populate("photo_voiture", "name alt");
@@ -241,9 +238,7 @@ const removeImages = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-/**
- * Récupérer toutes les VARIANTES d'une GAMME 911 (Carrera, GTS, Turbo), (public)
- */
+// Récupérer tous les modèles Porsche associés à une gamme de voiture
 const getModelsPorscheByVoiture = async (req, res) => {
   try {
     const voiture = await Voiture.findById(req.params.id);
@@ -255,7 +250,6 @@ const getModelsPorscheByVoiture = async (req, res) => {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
 
-    // Récupérer les modèles Porsche associés à la voiture
     const models_porsche = await Model_porsche.find({ voiture: req.params.id })
       .populate("photo_porsche", "name alt")
       .populate("couleur_exterieur", "nom_couleur photo_couleur prix")
@@ -280,7 +274,7 @@ const getModelsPorscheByVoiture = async (req, res) => {
   }
 };
 
-// Récupérer toutes les voitures neuves pour le configurateur (public)
+// Récupérer toutes les voitures neuves pour le configurateur
 const getVoituresNeuves = async (req, res) => {
   try {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
@@ -318,28 +312,12 @@ const getVoituresNeuves = async (req, res) => {
         const vars = variantesMap[voiture._id.toString()];
         if (!vars || vars.length === 0) return null;
 
-        // Extraction carburant depuis moteur
-        const carburants = new Set();
-        vars.forEach((v) => {
-          const moteur = (v.specifications?.moteur || "").toLowerCase();
-          if (moteur.includes("électrique") || moteur.includes("electric"))
-            carburants.add("Électrique");
-          else if (moteur.includes("hybride") || moteur.includes("hybrid"))
-            carburants.add("Hybride");
-          else if (
-            moteur.includes("essence") ||
-            moteur.includes("turbo") ||
-            moteur.includes("flat")
-          )
-            carburants.add("Essence");
-        });
-
-        // Extraction carrosseries (Coupé, Cabriolet, Targa, SUV)
+        // carrosseries (Coupé, Cabriolet, Targa, SUV)
         const carrosseries = [
           ...new Set(vars.map((v) => v.type_carrosserie).filter(Boolean)),
         ];
 
-        // Extraction transmissions
+        // transmissions
         const transmissions = new Set();
         vars.forEach((v) => {
           const trans = v.specifications?.transmission || "";
@@ -347,21 +325,17 @@ const getVoituresNeuves = async (req, res) => {
           if (trans.includes("Manuelle")) transmissions.add("Manuelle");
         });
 
-        // Calcul prix minimal (prix_depuis) - utilise prix_base de chaque VARIANTE
+        // Calcul prix_base de chaque voiture
         const prixListe = vars
           .map((v) => v.prix_base || 0)
           .filter((p) => p > 0);
         const prixMin = prixListe.length > 0 ? Math.min(...prixListe) : 0;
-
-        // Validation minimale
         if (carrosseries.length === 0 || prixMin === 0) return null;
-
         return {
           _id: voiture._id,
           nom_model: voiture.nom_model,
           description: voiture.description,
           photo_voiture: voiture.photo_voiture || [],
-          types_carburant: Array.from(carburants),
           carrosseries_disponibles: carrosseries,
           transmissions_disponibles: Array.from(transmissions),
           prix_depuis: prixMin,
@@ -382,19 +356,16 @@ const getVoituresNeuves = async (req, res) => {
     );
   }
 };
-
+// Recherche de voiture d'occasion
 const getVoituresOccasionFinder = async (req, res) => {
   try {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
-
-    // Filtres depuis query params
     const { modele, carrosserie, annee_min, annee_max, prix_max } = req.query;
-
-    // Query voitures occasion
+    // Récupérer les voitures occasion (type_voiture: false)
     const voituresQuery = { type_voiture: false };
     if (modele) {
-      // Utiliser correspondance exacte car nom_model est un enum ('911', 'Cayman', 'Cayenne')
+      // nom_model est un enum ('911', 'Cayman', 'Cayenne')
       // Valider que le modèle est dans les valeurs autorisées
       if (PORSCHE_MODELS.includes(modele)) {
         voituresQuery.nom_model = modele;
@@ -409,12 +380,10 @@ const getVoituresOccasionFinder = async (req, res) => {
         });
       }
     }
-
     const voitures = await Voiture.find(voituresQuery).lean();
     if (!voitures || voitures.length === 0) {
       return sendSuccess(res, { voitures: [], count: 0 });
     }
-
     // Filtres model_porsche
     const filters = {
       voiture: { $in: voitures.map((v) => v._id) },
@@ -429,12 +398,10 @@ const getVoituresOccasionFinder = async (req, res) => {
       if (annee_min) filters.annee_production.$gte = new Date(annee_min);
       if (annee_max) filters.annee_production.$lte = new Date(annee_max);
     }
-
     // Filtrer par prix_base de la variante
     if (prix_max) {
       filters.prix_base = { $lte: parseInt(prix_max) };
     }
-
     // Récupérer occasions
     const occasions = await Model_porsche.find(filters)
       .populate("voiture", "nom_model description photo_voiture")
@@ -442,13 +409,11 @@ const getVoituresOccasionFinder = async (req, res) => {
       .populate("couleur_interieur", "nom_couleur")
       .sort({ annee_production: -1 })
       .lean();
-
+    // Appliquer les filtres et formater les résultats Porsche Certified
     const occasionsFiltrees = occasions;
-
-    // Formater selon Porsche Approved (champs existants uniquement)
     const voituresFormatees = occasionsFiltrees.map((occasion) => {
       const voiture = occasion.voiture || {};
-
+      // Assembler les données formatées
       return {
         _id: occasion._id,
         nom_model: occasion.nom_model,
@@ -478,7 +443,7 @@ const getVoituresOccasionFinder = async (req, res) => {
         disponible: occasion.disponible,
       };
     });
-
+    // Retourner les résultats avec les filtres appliqués
     return sendSuccess(res, {
       voitures: voituresFormatees,
       count: voituresFormatees.length,
