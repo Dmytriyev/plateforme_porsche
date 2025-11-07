@@ -1,7 +1,4 @@
-// Controller: Taille de jante
-// CRUD pour les tailles et options de jantes (utilisées dans les configurations de véhicules).
-// Fonctions: createTaille_jante, getAllTaille_jantes, getTaille_janteById, updateTaille_jante, deleteTaille_jante
-// Nouvelles fonctions: getJanteOptions (pour React)
+// CRUD pour les tailles et options de jantes
 import Taille_jante from "../models/taille_jante.model.js";
 import taille_janteValidation from "../validations/taille_jante.validation.js";
 import {
