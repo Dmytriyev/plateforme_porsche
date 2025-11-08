@@ -280,11 +280,11 @@ const getVoituresNeuves = async (req, res) => {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
 
-    // Récupérer voitures neuves avec photos
+    // Récupérer voitures neuves avec photos associées (type_voiture: true)
     const voitures = await Voiture.find({ type_voiture: true })
       .populate("photo_voiture", "name alt")
       .lean();
-    // Gérer le cas où il n'y a pas de voitures
+    // Gérer le cas où il n'y a pas de voitures disponibles
     if (!voitures || voitures.length === 0) {
       return sendSuccess(res, { voitures: [], count: 0 });
     }
@@ -298,7 +298,7 @@ const getVoituresNeuves = async (req, res) => {
       .select("voiture prix_base type_carrosserie specifications")
       .lean();
 
-    // Grouper variantes par voiture_id
+    // Grouper variantes par voiture_id pour un accès facile
     const variantesMap = {};
     variantes.forEach((v) => {
       const id = v.voiture._id.toString();
@@ -317,7 +317,7 @@ const getVoituresNeuves = async (req, res) => {
           ...new Set(vars.map((v) => v.type_carrosserie).filter(Boolean)),
         ];
 
-        // transmissions
+        // transmissions (Automatique, Manuelle)
         const transmissions = new Set();
         vars.forEach((v) => {
           const trans = v.specifications?.transmission || "";
@@ -362,10 +362,10 @@ const getVoituresOccasionFinder = async (req, res) => {
     const Model_porsche = (await import("../models/model_porsche.model.js"))
       .default;
     const { modele, carrosserie, annee_min, annee_max, prix_max } = req.query;
-    // Récupérer les voitures occasion (type_voiture: false)
+    // Récupérer les voitures d'occasion associées (type_voiture: false)
     const voituresQuery = { type_voiture: false };
     if (modele) {
-      // nom_model est un enum ('911', 'Cayman', 'Cayenne')
+      // nom_model est un enum ('911', 'Cayman', 'Cayenne') dans le modèle Voiture
       // Valider que le modèle est dans les valeurs autorisées
       if (PORSCHE_MODELS.includes(modele)) {
         voituresQuery.nom_model = modele;
@@ -383,10 +383,12 @@ const getVoituresOccasionFinder = async (req, res) => {
     const voitures = await Voiture.find(voituresQuery).lean();
     if (!voitures || voitures.length === 0) {
       return sendSuccess(res, { voitures: [], count: 0 });
+      // Pas de voitures correspondant aux critères
     }
     // Filtres model_porsche
     const filters = {
       voiture: { $in: voitures.map((v) => v._id) },
+      // Seulement les voitures d'occasion disponibles
       disponible: true,
     };
 
@@ -395,14 +397,15 @@ const getVoituresOccasionFinder = async (req, res) => {
     }
     if (annee_min || annee_max) {
       filters.annee_production = {};
+      // Filtrer par année de production
       if (annee_min) filters.annee_production.$gte = new Date(annee_min);
       if (annee_max) filters.annee_production.$lte = new Date(annee_max);
     }
-    // Filtrer par prix_base de la variante
+    // Filtrer par prix_base
     if (prix_max) {
       filters.prix_base = { $lte: parseInt(prix_max) };
     }
-    // Récupérer occasions
+    // Récupérer occasions avec les filtres appliqués
     const occasions = await Model_porsche.find(filters)
       .populate("voiture", "nom_model description photo_voiture")
       .populate("couleur_exterieur", "nom_couleur")
@@ -413,7 +416,7 @@ const getVoituresOccasionFinder = async (req, res) => {
     const occasionsFiltrees = occasions;
     const voituresFormatees = occasionsFiltrees.map((occasion) => {
       const voiture = occasion.voiture || {};
-      // Assembler les données formatées
+      // Assembler les données formatées de la voiture d'occasion
       return {
         _id: occasion._id,
         nom_model: occasion.nom_model,
@@ -443,7 +446,7 @@ const getVoituresOccasionFinder = async (req, res) => {
         disponible: occasion.disponible,
       };
     });
-    // Retourner les résultats avec les filtres appliqués
+    // Retourner les résultats avec les filtres appliqués et le compte total
     return sendSuccess(res, {
       voitures: voituresFormatees,
       count: voituresFormatees.length,

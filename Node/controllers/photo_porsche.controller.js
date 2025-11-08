@@ -1,6 +1,3 @@
-// Controller: Photo Porsche
-// Gère les photos des variantes Porsche (model_porsche).
-// - vérifie la présence du modèle lié, gère les fichiers uploadés et permissions (admin)
 import Photo_porsche from "../models/photo_porsche.model.js";
 import photo_porscheValidation from "../validations/photo_porsche.validation.js";
 import fs from "node:fs";
@@ -10,20 +7,21 @@ import Model_porsche from "../models/model_porsche.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+// Créer une nouvelle photo Porsche
 const createPhoto_porsche = async (req, res) => {
   try {
     // Vérifier l'authentification
     if (!req.user) {
       if (req.file) {
+        // Supprimer le fichier uploadé en cas de non-authentification
         fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
-
     // Vérifier que l'utilisateur est admin
     if (!req.user.isAdmin) {
       if (req.file) {
+        // Supprimer le fichier uploadé en cas d'absence de droits admin
         fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
       }
       return res
@@ -31,6 +29,7 @@ const createPhoto_porsche = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
+    // Valider les données de la requête
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
@@ -40,6 +39,7 @@ const createPhoto_porsche = async (req, res) => {
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+    // Si un fichier est uploadé, ajouter le champ name avec l'URL complète de l'image
     if (req.file) {
       body.name =
         req.protocol +
@@ -48,6 +48,7 @@ const createPhoto_porsche = async (req, res) => {
         "/uploads/model_porsche/" +
         req.file.filename;
     }
+
     const { error } = photo_porscheValidation(body).photo_porscheCreate;
     if (error) {
       if (req.file) {
@@ -65,10 +66,11 @@ const createPhoto_porsche = async (req, res) => {
       return res.status(404).json({ message: "Modèle Porsche introuvable" });
     }
 
+    // Créer et sauvegarder la nouvelle photo Porsche
     const photo_porsche = new Photo_porsche(body);
     const newPhoto_porsche = await photo_porsche.save();
 
-    // Retourner avec populate
+    // Retourner la nouvelle photo créée
     const populatedPhoto = await Photo_porsche.findById(
       newPhoto_porsche._id
     ).populate("model_porsche", "nom_model numero_win");
@@ -85,6 +87,7 @@ const createPhoto_porsche = async (req, res) => {
   }
 };
 
+// Récupérer toutes les photos Porsche
 const getAllPhoto_porsches = async (req, res) => {
   try {
     const photo_porsches = await Photo_porsche.find()
@@ -96,6 +99,7 @@ const getAllPhoto_porsches = async (req, res) => {
   }
 };
 
+// Récupérer une photo Porsche par ID
 const getPhoto_porscheById = async (req, res) => {
   try {
     const photo_porsche = await Photo_porsche.findById(req.params.id).populate(
@@ -110,20 +114,19 @@ const getPhoto_porscheById = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
-
+// Mettre à jour une photo Porsche
 const updatePhoto_porsche = async (req, res) => {
   try {
-    // Vérifier l'authentification
     if (!req.user) {
       if (req.file) {
         fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
-
     // Vérifier que l'utilisateur est admin
     if (!req.user.isAdmin) {
       if (req.file) {
+        // Supprimer le fichier uploadé en cas d'absence de droits admin
         fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
       }
       return res
@@ -131,16 +134,15 @@ const updatePhoto_porsche = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
+    // Valider les données de la requête
     const { body } = req;
-
-    // Vérifier qu'il y a des données (body ou file)
+    // Vérifier qu'il y a des données (body ou file) à mettre à jour
     if ((!body || Object.keys(body).length === 0) && !req.file) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
-    // Si un fichier est uploadé, mettre à jour le champ name
+    // Si un fichier est uploadé, mettre à jour le champ name avec l'URL complète de l'image
     if (req.file) {
       body.name =
         req.protocol +
@@ -149,7 +151,6 @@ const updatePhoto_porsche = async (req, res) => {
         "/uploads/model_porsche/" +
         req.file.filename;
     }
-
     // Valider seulement si body n'est pas vide
     if (body && Object.keys(body).length > 0) {
       const { error } = photo_porscheValidation(body).photo_porscheUpdate;
@@ -161,8 +162,7 @@ const updatePhoto_porsche = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message });
       }
     }
-
-    // Vérifier que le modèle Porsche existe si fourni
+    // Vérifier que le modèle Porsche existe si fourni dans la mise à jour des données
     if (body.model_porsche) {
       const model_porsche = await Model_porsche.findById(body.model_porsche);
       if (!model_porsche) {
@@ -182,8 +182,7 @@ const updatePhoto_porsche = async (req, res) => {
       }
       return res.status(404).json({ message: "Photo Porsche n'existe pas" });
     }
-
-    // Si on remplace l'image, supprimer l'ancienne
+    // Si on remplace l'image, supprimer l'ancienne du système de fichiers
     if (req.file && oldPhoto.name) {
       const oldPath = path.join(
         __dirname,
@@ -197,13 +196,12 @@ const updatePhoto_porsche = async (req, res) => {
       }
     }
 
-    // Mettre à jour la photo
+    // Mettre à jour la photo Porsche dans la base de données
     const updatedPhoto_porsche = await Photo_porsche.findByIdAndUpdate(
       req.params.id,
       body,
       { new: true }
     ).populate("model_porsche", "nom_model numero_win");
-
     return res.status(200).json({
       message: "Photo Porsche mise à jour avec succès",
       photo: updatedPhoto_porsche,
@@ -219,13 +217,13 @@ const updatePhoto_porsche = async (req, res) => {
   }
 };
 
+// Supprimer une photo Porsche
 const deletePhoto_porsche = async (req, res) => {
   try {
     // Vérifier l'authentification
     if (!req.user) {
       return res.status(401).json({ message: "Non autorisé" });
     }
-
     // Vérifier que l'utilisateur est admin
     if (!req.user.isAdmin) {
       return res
@@ -233,10 +231,12 @@ const deletePhoto_porsche = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
+    // Trouver la photo Porsche à supprimer
     const photo_porsche = await Photo_porsche.findById(req.params.id);
     if (!photo_porsche) {
       return res.status(404).json({ message: "Photo Porsche n'existe pas" });
     }
+    // Supprimer le fichier image du système de fichiers s'il existe
     if (photo_porsche.name) {
       const oldPath = path.join(
         __dirname,

@@ -41,11 +41,12 @@ const register = async (req, res) => {
         .status(409)
         .json({ message: "Utilisateur existe déjà avec cet email" });
     }
-    // Créer l'utilisateur et le panier dans une transaction
+    // Créer l'utilisateur et le panier dans une transaction MongoDB
     let newUser = null;
     const session = await User.startSession();
     try {
       try {
+        // Utiliser une transaction MongoDB
         await session.withTransaction(async () => {
           const user = new User(body);
           await user.save({ session });
@@ -59,10 +60,8 @@ const register = async (req, res) => {
           });
 
           await commande.save({ session });
-
           user.panier = commande._id;
           await user.save({ session });
-
           newUser = user;
         });
       } catch (txError) {
@@ -74,7 +73,7 @@ const register = async (req, res) => {
         // Tentative sans transaction
         const user = new User(body);
         await user.save();
-        // Créer un panier
+        // Créer un panier pour l'utilisateur créé
         const commande = new Commande({
           user: user._id,
           date_commande: new Date(),
@@ -90,7 +89,7 @@ const register = async (req, res) => {
     } finally {
       session.endSession();
     }
-    // Retourner l'utilisateur sans le mot de passe
+    // Retourner l'utilisateur sans le mot de passe dans la réponse
     const userResponse = newUser.toObject();
     delete userResponse.password;
 
@@ -103,24 +102,24 @@ const register = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Connexion d'un utilisateur
+// Connexion d'un utilisateur existant
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    // Vérifier que des données sont fournies
     if (!req.body || Object.keys(req.body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
+    // Validation des données de connexion
     const { error } = userValidation(req.body).userLogin;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
-    // Normaliser l'email pour la recherche
+    // Normaliser l'email pour la recherche d'utilisateur
     const emailToFind = email ? email.toLowerCase() : email;
+    // Rechercher l'utilisateur par email avec le mot de passe
     const user = await User.findOne({ email: emailToFind }).select("+password");
     if (!user) {
       return res.status(400).json({ message: "Identifiants invalides" });
@@ -139,7 +138,7 @@ const login = async (req, res) => {
       role: user.role,
       isAdmin: user.isAdmin,
     };
-
+    // Retourner le token JWT et les informations utilisateur
     res.status(200).json({
       message: user.email + " est connecté",
       user: userForToken,
@@ -177,10 +176,11 @@ const getAllUsers = async (req, res) => {
 // Obtenir un utilisateur par ID
 const getUserById = async (req, res) => {
   try {
+    // Vérifier l'autorisation d'accès
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
-    // Récupérer l'utilisateur sans le mot de passe
+    // Récupérer l'utilisateur sans le mot de passe dans la réponse
     const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
@@ -194,21 +194,20 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-
+// Mettre à jour un utilisateur existant
 const updateUser = async (req, res) => {
   try {
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
-
+    // Vérifier que des données sont fournies
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
-    // Empêcher la modification des champs sensibles par un utilisateur
+    // Empêcher la modification des champs sensibles par un utilisateur non admin
     if (!req.user.isAdmin) {
       delete body.isAdmin;
       delete body.role;
@@ -230,11 +229,10 @@ const updateUser = async (req, res) => {
     if (body.email) {
       body.email = body.email.toLowerCase();
     }
-
+    // Mettre à jour l'utilisateur dans la base de données, sans mot de passe dans la réponse.
     const updatedUser = await User.findByIdAndUpdate(req.params.id, body, {
       new: true,
     }).select("-password");
-
     if (!updatedUser) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
@@ -265,13 +263,15 @@ const deleteUser = async (req, res) => {
 
     // Supprimer les lignes de commande liées aux commandes de l'utilisateur
     const commandes = await Commande.find({ user: req.params.id });
+    // Récupérer les IDs des commandes pour supprimer les lignes associées
     const commandeIds = commandes.map((c) => c._id);
     if (commandeIds.length > 0) {
+      // Supprimer les lignes de commande associées
       await LigneCommande.deleteMany({ commande: { $in: commandeIds } });
     }
     await Commande.deleteMany({ user: req.params.id });
 
-    // Supprimer l'utilisateur
+    // Supprimer cet utilisateur
     await User.findByIdAndDelete(req.params.id);
     return res
       .status(200)
@@ -313,6 +313,7 @@ const createUserReservation = async (req, res) => {
     // Vérifier que la date de réservation n'est pas dans le passé
     const dateReservation = new Date(body.date_reservation);
     const today = new Date();
+    // Mettre à zéro les heures pour la comparaison
     today.setHours(0, 0, 0, 0);
     // Comparer uniquement les dates sans l'heure
     if (dateReservation < today) {
@@ -339,7 +340,7 @@ const createUserReservation = async (req, res) => {
       date_reservation: dateReservation,
       status: true,
     });
-
+    // Si une réservation existe déjà pour cette voiture à cette date
     if (existingReservation) {
       return res.status(409).json({
         message: "Cette voiture est déjà réservée pour cette date",
@@ -353,6 +354,7 @@ const createUserReservation = async (req, res) => {
     });
 
     const newReservation = await reservation.save();
+    // Récupérer les détails de la réservation avant de retourner
     const populatedReservation = await Reservation.findById(newReservation._id)
       .populate("user", "nom prenom email telephone")
       .populate("voiture", "nom_model type_voiture description prix");
@@ -370,7 +372,7 @@ const createUserReservation = async (req, res) => {
 const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;
-
+    // Vérifier l'autorisation d'accès
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
@@ -378,7 +380,7 @@ const getUserReservations = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-
+    // Récupérer les réservations de l'utilisateur avec les détails de la voiture
     const reservations = await Reservation.find({ user: userId })
       .populate("voiture", "nom_model type_voiture description prix")
       .sort({ date_reservation: -1 });
@@ -391,17 +393,16 @@ const getUserReservations = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-
 // Ajouter une Porsche personnelle à l'utilisateur
 const addUserPorsche = async (req, res) => {
   try {
     const { body } = req;
     const userId = req.params.id;
-
+    // Vérifier l'autorisation d'accès
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
-
+    // Vérifier que des données sont fournies
     if (!body || Object.keys(body).length === 0) {
       return res.status(400).json({
         message: "Données de la Porsche requises",
@@ -413,12 +414,12 @@ const addUserPorsche = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
+    // Vérifier que l'utilisateur existe
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-    // Créer la Porsche personnelle
+    // Créer la Porsche personnelle pour l'utilisateur
     const porsche = new Model_porsche_actuel({
       ...body,
       user: userId,
@@ -447,7 +448,7 @@ const getUserPorsches = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-
+    // Récupérer les Porsches personnelles de l'utilisateur avec les détails nécessaires
     const porsches = await Model_porsche_actuel.find({ user: userId })
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
@@ -474,19 +475,19 @@ const getUserProfile = async (req, res) => {
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
-
+    // Obtenir les informations de l'utilisateur
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Obtenir les réservations
+    // Obtenir les réservations récentes de l'utilisateur
     const reservations = await Reservation.find({ user: userId })
       .populate("voiture", "nom_model type_voiture description prix")
       .sort({ date_reservation: -1 })
       .limit(5); // 5 dernières
 
-    // Obtenir les Porsches personnelles
+    // Obtenir les Porsches personnelles de l'utilisateur
     const porsches = await Model_porsche_actuel.find({ user: userId })
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
@@ -498,7 +499,7 @@ const getUserProfile = async (req, res) => {
     // Obtenir le panier actuel (status: false = panier actif)
     const panier = await Commande.findOne({ user: userId, status: false });
     let panierDetails = null;
-    // Si un panier existe, obtenir ses lignes de commande
+    // Si un panier existe, obtenir ses lignes de commande et le total
     if (panier) {
       const ligneCommandes = await LigneCommande.find({ commande: panier._id })
         .populate("accesoire", "nom_accesoire prix")
@@ -525,7 +526,7 @@ const getUserProfile = async (req, res) => {
     const historique = await Commande.find({ user: userId, status: true })
       .sort({ date_commande: -1 })
       .limit(5);
-    // Assembler le profil complet
+    // Assembler le profil complet de l'utilisateur à retourner
     const profile = {
       user,
       reservations,
@@ -570,7 +571,7 @@ const deleteUserReservation = async (req, res) => {
           "Réservation introuvable ou n'appartient pas à cet utilisateur",
       });
     }
-
+    //  Supprimer la réservation
     await Reservation.findByIdAndDelete(reservationId);
     return res
       .status(200)
@@ -599,7 +600,7 @@ const deleteUserPorsche = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-
+    // Vérifier que la Porsche appartient à l'utilisateur
     const porsche = await Model_porsche_actuel.findOne({
       _id: porscheId,
       user: userId,
@@ -609,7 +610,6 @@ const deleteUserPorsche = async (req, res) => {
         message: "Porsche introuvable ou n'appartient pas à cet utilisateur",
       });
     }
-
     await Model_porsche_actuel.findByIdAndDelete(porscheId);
     return res.status(200).json({ message: "Porsche supprimée avec succès" });
   } catch (error) {
@@ -635,7 +635,7 @@ const cancelUserReservation = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-
+    // Vérifier que la réservation appartient à l'utilisateur
     const reservation = await Reservation.findOne({
       _id: reservationId,
       user: userId,
@@ -681,12 +681,12 @@ const updateUserPorsche = async (req, res) => {
     if (req.user.id !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès non autorisé" });
     }
-    // Vérifier que des données sont fournies
     if (!body || Object.keys(body).length === 0) {
       return res.status(400).json({
         message: "Données de mise à jour requises",
       });
     }
+    // Validation des données de la Porsche à mettre à jour
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelUpdate;
     if (error) {
@@ -696,6 +696,7 @@ const updateUserPorsche = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
+    // Vérifier que la Porsche appartient à l'utilisateur
     const porsche = await Model_porsche_actuel.findOne({
       _id: porscheId,
       user: userId,
@@ -706,7 +707,7 @@ const updateUserPorsche = async (req, res) => {
         message: "Porsche introuvable ou n'appartient pas à cet utilisateur",
       });
     }
-    // Mettre à jour la Porsche
+    // Mettre à jour la Porsche personnelle de l'utilisateur dans la base de données
     const updatedPorsche = await Model_porsche_actuel.findByIdAndUpdate(
       porscheId,
       body,
@@ -743,7 +744,7 @@ const getUserDashboard = async (req, res) => {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
 
-    // Réservations à venir
+    // Réservations à venir (status: true = réservations actives)
     const today = new Date();
     const reservationsAvenir = await Reservation.find({
       user: userId,
@@ -771,7 +772,7 @@ const getUserDashboard = async (req, res) => {
         .populate("voiture", "nom_model type_voiture prix");
 
       const total = lignesCommande.reduce((sum, ligne) => {
-        // Si c'est une voiture avec acompte, utiliser l'acompte, sinon le prix
+        // Si c'est une voiture avec acompte, utiliser l'acompte, sinon le prix de l'accessoire ou le prix de la voiture
         const montant =
           ligne.type_produit && ligne.acompte > 0 ? ligne.acompte : ligne.prix;
         return sum + (montant * ligne.quantite || 0);
@@ -785,7 +786,7 @@ const getUserDashboard = async (req, res) => {
       };
     }
 
-    // Porsches personnelles récentes
+    // Porsches personnelles récentes (3 dernières)
     const porschesRecentes = await Model_porsche_actuel.find({ user: userId })
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
@@ -798,13 +799,16 @@ const getUserDashboard = async (req, res) => {
       user: userId,
       status: true,
     });
+    // Statistiques rapides (réservations actives = status: true)
     const totalReservations = await Reservation.countDocuments({
       user: userId,
+      status: true,
     });
+    // Statistiques rapides (total Porsches personnelles)
     const totalPorsches = await Model_porsche_actuel.countDocuments({
       user: userId,
     });
-    // Assembler le dashboard
+    // Assembler le dashboard complet à retourner
     const dashboard = {
       utilisateur: user,
       stats: {
@@ -873,7 +877,7 @@ const updateUserRole = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur n'existe pas" });
     }
-    // Mettre à jour le rôle
+    // Mettre à jour le rôle de l'utilisateur
     user.role = body.role;
     await user.save();
     const updatedUser = await User.findById(userId).select("-password");
