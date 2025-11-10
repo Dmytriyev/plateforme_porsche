@@ -2,7 +2,7 @@
 
 ## Résumé
 
-API REST pour la vente de voitures Porsche (neuves & occasion) et accessoires. Stack : Node.js, Express, MongoDB. Rôles : Admin, Conseiller, User.
+API REST pour la vente de voitures Porsche (neuves & occasion) et accesoires. Stack : Node.js, Express, MongoDB. Rôles : Admin, Conseiller, User.
 
 ## Installation
 
@@ -23,14 +23,14 @@ Authorization: Bearer TOKEN
 
 ## Rôles
 
-- **Admin** : CRUD complet (catalogue, options, accessoires, photos)
+- **Admin** : CRUD complet (catalogue, options, accesoires, photos)
 - **Conseiller** : consulter réservations, valider propositions vente
 - **User** : profil, réserver, commander, gérer ses voitures
 
 ## Endpoints principaux
 
 - Auth : `/api/users/register`, `/api/users/login`, `/api/users/profile`
-- Accessoires : `/api/accesoire`, `/api/couleur-accesoire`, `/api/photo-accesoire`
+- Accesoires : `/api/accesoire`, `/api/couleur-accesoire`, `/api/photo-accesoire`
 - Voitures : `/api/voiture`, `/api/model-porsche`, `/api/photo-voiture`, `/api/photo-porsche`
 - Options : `/api/couleur-exterieur`, `/api/couleur-interieur`, `/api/taille-jante`
 - Voiture user : `/api/model-porsche-actuel`, `/api/photo-voiture-actuel`
@@ -43,7 +43,7 @@ Authorization: Bearer TOKEN
 - **Voiture neuve** : créer options → `voiture` → `model-porsche` → photos
 - **Voiture occasion** : créer `model-porsche` → photos
 - **Commander neuve** : configurer → acompte 500€ → livraison
-- **Commander accessoires** : créer `commande` → paiement
+- **Commander accesoires** : créer `commande` → paiement
 - **Réserver occasion** : `POST /api/reservation` (délai 48h)
 
 ## Structure
@@ -105,7 +105,7 @@ npm start
 
 ## Résumé
 
-Cette API REST permet de gérer le catalogue (voitures neuves & d'occasion), une boutique d'accessoires, les réservations et les commandes. Le projet utilise Node.js, Express et MongoDB. Les trois rôles principaux sont : Admin, Conseiller et User.
+Cette API REST permet de gérer le catalogue (voitures neuves & d'occasion), une boutique d'accesoires, les réservations et les commandes. Le projet utilise Node.js, Express et MongoDB. Les trois rôles principaux sont : Admin, Conseiller et User.
 
 ## Fonctionnalités ADMIN
 
@@ -116,11 +116,11 @@ POST / api / users / register; // Créer un compte admin
 POST / api / users / login; // Se connecter
 ```
 
-### Gestion des Accessoires
+### Gestion des Accesoires
 
-L'admin peut gérer la boutique d'accessoires en 3 étapes :
+L'admin peut gérer la boutique d'accesoires en 3 étapes :
 
-#### Étape 1 Créer les couleurs d'accessoires
+#### Étape 1 Créer les couleurs d'accesoires
 
 ```javascript
 POST   /api/couleur-accesoire     // Créer une couleur (ex: noir, rouge)
@@ -129,16 +129,16 @@ PUT    /api/couleur-accesoire/:id // Modifier une couleur
 DELETE /api/couleur-accesoire/:id // Supprimer une couleur
 ```
 
-#### Étape 2 : Créer l'accessoire
+#### Étape 2 : Créer l'accesoire
 
 ```javascript
 POST   /api/accesoire     // Créer un accessoire
-GET    /api/accesoire     // Voir tous les accessoires
+GET    /api/accesoire     // Voir tous les accesoires
 PUT    /api/accesoire/:id // Modifier un accessoire
 DELETE /api/accesoire/:id // Supprimer un accessoire
 ```
 
-#### Étape 3 : Ajouter des photos à l'accessoire
+#### Étape 3 : Ajouter des photos à l'accesoire
 
 ```javascript
 POST   /api/photo-accesoire     // Ajouter une photo (liée à l'accessoire et sa couleur)

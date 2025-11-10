@@ -1,9 +1,3 @@
-// Controller: Accessoire
-// Gère la création, lecture, mise à jour, suppression des accessoires.
-// Fonctions clés:
-// - createAccesoire, getAllAccesoires, getAccesoireById, updateAccesoire, deleteAccesoire
-// - gestion des images: addImages / removeImages
-// - gestion de la couleur d'accessoire: setCouleur / removeCouleur
 import Accesoire from "../models/accesoire.model.js";
 import accesoireValidation from "../validations/accesoire.validation.js";
 import PhotoAccesoire from "../models/photo_accesoire.model.js";
@@ -16,9 +10,11 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
+// Créer un nouvel accesoire dans la base de données
 const createAccesoire = async (req, res) => {
   try {
     const { body } = req;
+    // Vérifier que le corps de la requête n'est pas vide
     if (!body || Object.keys(body).length === 0) {
       return sendValidationError(res, "Pas de données dans la requête");
     }
@@ -46,9 +42,10 @@ const createAccesoire = async (req, res) => {
       }
     }
 
+    // Créer et sauvegarder le nouvel accesoire
     const accesoire = new Accesoire(body);
     const newAccesoire = await accesoire.save();
-
+    // Recharger l'accesoire avec les informations nécessaires
     const populatedAccesoire = await Accesoire.findById(newAccesoire._id)
       .populate("photo_accesoire", "name alt")
       .populate("couleur_accesoire", "nom_couleur photo_couleur");
@@ -64,6 +61,7 @@ const createAccesoire = async (req, res) => {
   }
 };
 
+// Récupérer tous les accesoires de la base de données
 const getAllAccesoires = async (req, res) => {
   try {
     const accesoires = await Accesoire.find()
@@ -78,6 +76,7 @@ const getAllAccesoires = async (req, res) => {
   }
 };
 
+//  Récupérer un accesoire par son ID
 const getAccesoireById = async (req, res) => {
   try {
     const accesoire = await Accesoire.findById(req.params.id)
@@ -95,9 +94,11 @@ const getAccesoireById = async (req, res) => {
   }
 };
 
+// Mettre à jour un accesoire existant dans la base de données
 const updateAccesoire = async (req, res) => {
   try {
     const { body } = req;
+    // Vérifier que le corps de la requête n'est pas vide
     if (!body || Object.keys(body).length === 0) {
       return sendValidationError(res, "Pas de données dans la requête");
     }
@@ -106,20 +107,21 @@ const updateAccesoire = async (req, res) => {
     if (error) {
       return sendValidationError(res, error.details[0].message);
     }
-
+    // Vérifier que l'accesoire existe avant de le mettre à jour
     const accesoireExist = await Accesoire.findById(req.params.id);
     if (!accesoireExist) {
-      return sendNotFound(res, "Accessoire introuvable");
+      return sendNotFound(res, "Accesoire introuvable");
     }
 
     // Vérifier que la couleur existe si fournie
     if (body.couleur_accesoire) {
       const couleur = await Couleur_accesoire.findById(body.couleur_accesoire);
       if (!couleur) {
-        return sendNotFound(res, "Couleur d'accessoire introuvable");
+        return sendNotFound(res, "Couleur d'accesoire introuvable");
       }
     }
 
+    // Mettre à jour l'accesoire dans la base de données et retourner le nouvel objet
     const updatedAccesoire = await Accesoire.findByIdAndUpdate(
       req.params.id,
       body,
@@ -138,19 +140,21 @@ const updateAccesoire = async (req, res) => {
   }
 };
 
+// Supprimer un accesoire de la base de données par son ID
 const deleteAccesoire = async (req, res) => {
   try {
     const accesoire = await Accesoire.findByIdAndDelete(req.params.id);
     if (!accesoire) {
-      return sendNotFound(res, "Accessoire introuvable");
+      return sendNotFound(res, "Accesoire introuvable");
     }
 
-    return sendSuccess(res, null, "Accessoire supprimé avec succès");
+    return sendSuccess(res, null, "Accesoire supprimé avec succès");
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
+// Ajouter des images à un accesoire existant dans la base de données
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -158,11 +162,11 @@ const addImages = async (req, res) => {
       return sendValidationError(res, "Pas de données dans la requête");
     }
 
-    const { error } = accesoireValidation(body).accessoireAddOrRemoveImage;
+    const { error } = accesoireValidation(body).accesoireAddOrRemoveImage;
     if (error) {
       return sendValidationError(res, error.details[0].message);
     }
-
+    // Vérifier que l'accesoire existe avant d'ajouter des images
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
       return sendNotFound(res, `Accesoire ${req.params.id} introuvable`);
@@ -171,12 +175,13 @@ const addImages = async (req, res) => {
     // Vérifier que toutes les photos existent
     for (let photo_accesoireId of body.photo_accesoire) {
       const photo_accesoire = await PhotoAccesoire.findById(photo_accesoireId);
+      // Vérifier que chaque photo existe avant de l'ajouter
       if (!photo_accesoire) {
         return sendNotFound(res, `Photo ${photo_accesoireId} introuvable`);
       }
     }
 
-    // $addToSet évite les doublons
+    // $addToSet évite les doublons dans le tableau
     const updatedAccesoire = await Accesoire.findByIdAndUpdate(
       req.params.id,
       { $addToSet: { photo_accesoire: { $each: body.photo_accesoire } } },
@@ -195,6 +200,7 @@ const addImages = async (req, res) => {
   }
 };
 
+// Supprimer des images d'un accesoire existant dans la base de données
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -202,7 +208,7 @@ const removeImages = async (req, res) => {
       return sendValidationError(res, "Pas de données dans la requête");
     }
 
-    const { error } = accesoireValidation(body).accessoireAddOrRemoveImage;
+    const { error } = accesoireValidation(body).accesoireAddOrRemoveImage;
     if (error) {
       return sendValidationError(res, error.details[0].message);
     }
@@ -220,6 +226,7 @@ const removeImages = async (req, res) => {
       }
     }
 
+    // Retirer les photos spécifiées du tableau photo_accesoire
     const updatedAccesoire = await Accesoire.findByIdAndUpdate(
       req.params.id,
       { $pull: { photo_accesoire: { $in: body.photo_accesoire } } },
@@ -238,6 +245,7 @@ const removeImages = async (req, res) => {
   }
 };
 
+// Définir la couleur d'un accesoire existant dans la base de données
 const setCouleur = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -252,6 +260,7 @@ const setCouleur = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
+    // Vérifier que le corps de la requête n'est pas vide
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       return res
@@ -259,15 +268,15 @@ const setCouleur = async (req, res) => {
         .json({ message: "Pas de données dans la requête" });
     }
 
-    const { error } = accesoireValidation(body).accessoireSetCouleur;
+    const { error } = accesoireValidation(body).accesoireSetCouleur;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Vérifier que l'accessoire existe
+    // Vérifier que l'accesoire existe
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return res.status(404).json({ message: "Accessoire n'existe pas" });
+      return res.status(404).json({ message: "Accesoire n'existe pas" });
     }
 
     // Vérifier que la couleur existe
@@ -275,7 +284,7 @@ const setCouleur = async (req, res) => {
     if (!couleur) {
       return res
         .status(404)
-        .json({ message: "Couleur d'accessoire introuvable" });
+        .json({ message: "Couleur d'accesoire introuvable" });
     }
 
     // Mettre à jour la couleur
@@ -289,13 +298,14 @@ const setCouleur = async (req, res) => {
 
     return res.status(200).json({
       message: "Couleur définie avec succès",
-      accessoire: updatedAccesoire,
+      accesoire: updatedAccesoire,
     });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
 
+// Retirer la couleur d'un accesoire existant dans la base de données
 const removeCouleur = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -310,46 +320,52 @@ const removeCouleur = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
-    // Vérifier que l'accessoire existe
+    // Vérifier que l'accesoire existe
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return res.status(404).json({ message: "Accessoire n'existe pas" });
+      return res.status(404).json({ message: "Accesoire n'existe pas" });
     }
 
     // Retirer la couleur
     const updatedAccesoire = await Accesoire.findByIdAndUpdate(
       req.params.id,
+      // Retirer la couleur en utilisant $unset
       { $unset: { couleur_accesoire: "" } },
       { new: true }
     ).populate("photo_accesoire", "name alt");
 
     return res.status(200).json({
       message: "Couleur supprimée avec succès",
-      accessoire: updatedAccesoire,
+      accesoire: updatedAccesoire,
     });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
 };
 
-const getAccessoiresByCriteria = async (req, res) => {
+// Récupère les accesoires en fonction de critères spécifiques
+const getAccesoiresByCriteria = async (req, res) => {
   try {
+    // Extraire les critères de la requête query
     const { type_accesoire, couleur_accesoire, prix_min, prix_max } = req.query;
-
+    // Construire la requête dynamique en fonction des critères fournis
     let query = {};
-
+    // Ajouter les critères à la requête si présents
     if (type_accesoire) query.type_accesoire = type_accesoire;
     if (couleur_accesoire) query.couleur_accesoire = couleur_accesoire;
+    // Ajouter les critères de prix si présents
     if (prix_min || prix_max) {
       query.prix = {};
+      // Ajouter les conditions de prix minimum et maximum
       if (prix_min) query.prix.$gte = Number(prix_min);
       if (prix_max) query.prix.$lte = Number(prix_max);
     }
 
+    // Exécuter la requête avec les critères construits et peupler les références
     const accesoires = await Accesoire.find(query)
       .populate("photo_accesoire", "name alt")
       .populate("couleur_accesoire", "nom_couleur photo_couleur")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 }); // Trier par date de création décroissante
 
     return res.status(200).json({
       count: accesoires.length,
@@ -361,18 +377,14 @@ const getAccessoiresByCriteria = async (req, res) => {
   }
 };
 
-/**
- * Récupère la liste des types d'accessoires disponibles
- * @route GET /api/accesoire/types
- * @access Public
- */
+// Récupérer les types d'accesoires disponibles
 const getAvailableTypesAccesoireOptions = async (req, res) => {
   try {
     const types = getAvailableTypesAccesoire();
     return res.json({
       success: true,
       data: types,
-      message: "Types d'accessoires récupérés avec succès",
+      message: "Types d'accesoires récupérés avec succès",
     });
   } catch (error) {
     return sendError(res, "getAvailableTypesAccesoireOptions", error);
@@ -389,6 +401,6 @@ export {
   removeImages,
   setCouleur,
   removeCouleur,
-  getAccessoiresByCriteria,
+  getAccesoiresByCriteria,
   getAvailableTypesAccesoireOptions,
 };

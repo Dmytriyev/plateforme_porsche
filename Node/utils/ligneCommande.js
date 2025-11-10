@@ -7,10 +7,10 @@
  *   - erreur si acompte > prixTotal
  * - Si `body.type_produit === true` et `body.voiture` présent (sans model_porsche_id) :
  *   - Voiture d'occasion : erreur (réservation uniquement)
- * - Si `body.type_produit === false` et `body.accesoire` présent - c'est un accessoire.
- *   - On récupère l'accessoire via `Accesoire.findById`.
+ * - Si `body.type_produit === false` et `body.accesoire` présent - c'est un accesoire.
+ *   - On récupère l'accesoire via `Accesoire.findById`.
  *   - prixUnitaire = accesoire.prix
- *   - acompte = 0 (aucun acompte pour les accessoires)
+ *   - acompte = 0 (aucun acompte pour les accesoires)
  * Retour : { prix, acompte, error }
  * - `prix` : valeur à utiliser comme prix total
  * - `acompte` : acompte à conserver/afficher
@@ -128,7 +128,7 @@ export const calculerPrixEtAcompte = async (body) => {
       return {
         error: {
           message: "Accesoire introuvable",
-          code: "ACCESSOIRE_NOT_FOUND",
+          code: "ACCESOIRE_NOT_FOUND",
         },
       };
     }

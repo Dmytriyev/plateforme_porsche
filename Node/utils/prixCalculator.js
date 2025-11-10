@@ -112,7 +112,7 @@ export const enrichirLigneAvecModelPorsche = async (ligne) => {
  * Calcule le montant à payer pour une ligne de commande.
  * - si `ligne.type_produit` est exact (voiture) ET `ligne.acompte > 0`,
  *   on prend l'acompte comme montant à payer;
- * - sinon on prend `ligne.prix` (prix l'accessoire).
+ * - sinon on prend `ligne.prix` (prix l'accesoire).
  * - le montant final est multiplié par `ligne.quantite`.
  */
 export const calculerMontantLigne = (ligne) => {

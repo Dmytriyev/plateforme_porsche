@@ -54,7 +54,7 @@ export const createCheckoutSession = async (req, res) => {
         unitPrice = line.acompte;
         productName = `${line.voiture.nom_model} (Acompte)`;
       } else if (line.accesoire && line.accesoire.prix) {
-        // Pour les accessoires, utiliser le prix de l'accessoire
+        // Pour les accessoires, utiliser le prix de l'accesoire
         unitPrice = line.accesoire.prix;
         productName = line.accesoire.nom_accesoire;
       } else if (line.prix) {

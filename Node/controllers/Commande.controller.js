@@ -395,24 +395,24 @@ const ajouterConfigurationAuPanier = async (req, res) => {
       }).save();
     }
 
-    // 7. Récupérer le panier mis à jour
+    // Récupérer le panier mis à jour avec les détails complets
     const panierMisAJour = await Commande.findById(panier._id).populate(
       "user",
       "nom prenom email"
     );
-
+    // Récupérer les lignes de commande associées au panier
     const lignesCommande = await LigneCommande.find({
       commande: panier._id,
     })
       .populate("voiture", "nom_model prix type_voiture")
       .populate("accesoire", "nom_accesoire prix");
 
-    // Enrichir avec détails model_porsche
+    // détails model_porsche pour chaque ligne de commande
     const lignesEnrichies = await Promise.all(
       lignesCommande.map((line) => enrichirLigneAvecModelPorsche(line))
     );
 
-    // Calculer total à payer (somme des acomptes pour voitures, prix pour accessoires)
+    // Calculer total à payer (somme des acomptes pour voitures, prix pour accesoires)
     const totalAPayer = lignesCommande.reduce((sum, line) => {
       return sum + (line.type_produit ? line.acompte : line.prix);
     }, 0);
@@ -434,22 +434,22 @@ const ajouterConfigurationAuPanier = async (req, res) => {
   }
 };
 
+// Supprimer une ligne de commande du panier
 const supprimerLignePanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
   try {
-    const { ligne_id } = req.params;
-
     // Vérifier que la ligne existe et appartient au panier de l'utilisateur
+    const { ligne_id } = req.params;
     const ligne = await LigneCommande.findById(ligne_id).populate({
       path: "commande",
       match: { user: req.user.id, status: false },
     });
-
+    // Vérifier si la ligne de commande existe et appartient au panier
     if (!ligne || !ligne.commande) {
       return sendNotFound(res, "Ligne de commande dans votre panier");
     }
-
+    // Supprimer la ligne de commande du panier
     await LigneCommande.findByIdAndDelete(ligne_id);
 
     return sendSuccess(res, null, "Article supprimé du panier");
@@ -458,13 +458,15 @@ const supprimerLignePanier = async (req, res) => {
   }
 };
 
+// Modifier la quantité d'une ligne de commande dans le panier
 const modifierQuantitePanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
   try {
+    // Récupérer les paramètres de la requête
     const { ligne_id } = req.params;
     const { quantite } = req.body;
-
+    // Valider la quantité
     if (!quantite || quantite < 1) {
       return sendValidationError(res, {
         details: [{ message: "Quantité doit être >= 1" }],
@@ -476,11 +478,11 @@ const modifierQuantitePanier = async (req, res) => {
       path: "commande",
       match: { user: req.user.id, status: false },
     });
-
+    // Vérifier si la ligne de commande existe et appartient au panier
     if (!ligne || !ligne.commande) {
       return sendNotFound(res, "Ligne de commande dans votre panier");
     }
-
+    // Mettre à jour la quantité de la ligne de commande
     ligne.quantite = quantite;
     await ligne.save();
 

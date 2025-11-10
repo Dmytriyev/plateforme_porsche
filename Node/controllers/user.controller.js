@@ -506,7 +506,7 @@ const getUserProfile = async (req, res) => {
         .populate("voiture", "nom_model type_voiture prix");
 
       const total = ligneCommandes.reduce((sum, line) => {
-        // Si c'est une voiture, utiliser l'acompte, sinon le prix de l'accessoire
+        // Si c'est une voiture, utiliser l'acompte, sinon le prix de l'accesoire
         const prix = line.type_produit
           ? line.acompte
           : line.accesoire
@@ -772,7 +772,7 @@ const getUserDashboard = async (req, res) => {
         .populate("voiture", "nom_model type_voiture prix");
 
       const total = lignesCommande.reduce((sum, ligne) => {
-        // Si c'est une voiture avec acompte, utiliser l'acompte, sinon le prix de l'accessoire ou le prix de la voiture
+        // Si c'est une voiture avec acompte, utiliser l'acompte, sinon le prix de l'accesoire ou le prix de la voiture
         const montant =
           ligne.type_produit && ligne.acompte > 0 ? ligne.acompte : ligne.prix;
         return sum + (montant * ligne.quantite || 0);

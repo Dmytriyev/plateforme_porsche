@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 // Pour obtenir le répertoire du fichier courant
 const __dirname = path.dirname(__filename);
 
-// Créer une nouvelle photo d'accessoire
+// Créer une nouvelle photo d'accesoire
 const createPhoto_accesoire = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -60,11 +60,11 @@ const createPhoto_accesoire = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Créer et sauvegarder la nouvelle photo d'accessoire
+    // Créer et sauvegarder la nouvelle photo d'accesoire
     const photo_accesoire = new Photo_accesoire(body);
     const newPhoto_accesoire = await photo_accesoire.save();
     return res.status(201).json({
-      message: "Photo d'accessoire créée avec succès",
+      message: "Photo d'accesoire créée avec succès",
       photo: newPhoto_accesoire,
     });
   } catch (error) {
@@ -75,7 +75,7 @@ const createPhoto_accesoire = async (req, res) => {
   }
 };
 
-// Récupérer toutes les photos d'accessoires
+// Récupérer toutes les photos d'accesoires
 const getAllPhoto_accesoires = async (req, res) => {
   try {
     const photo_accesoires = await Photo_accesoire.find();
@@ -85,14 +85,14 @@ const getAllPhoto_accesoires = async (req, res) => {
   }
 };
 
-// Récupérer une photo d'accessoire par ID
+// Récupérer une photo d'accesoire par ID
 const getPhoto_accesoireById = async (req, res) => {
   try {
     const photo_accesoire = await Photo_accesoire.findById(req.params.id);
     if (!photo_accesoire) {
       return res
         .status(404)
-        .json({ message: "Photo d'accessoire n'existe pas" });
+        .json({ message: "Photo d'accesoire n'existe pas" });
     }
     return res.status(200).json(photo_accesoire);
   } catch (error) {
@@ -100,7 +100,7 @@ const getPhoto_accesoireById = async (req, res) => {
   }
 };
 
-// Mettre à jour une photo d'accessoire
+// Mettre à jour une photo d'accesoire
 const updatePhoto_accesoire = async (req, res) => {
   try {
     if (!req.user) {
@@ -158,7 +158,7 @@ const updatePhoto_accesoire = async (req, res) => {
       }
       return res
         .status(404)
-        .json({ message: "Photo d'accessoire n'existe pas" });
+        .json({ message: "Photo d'accesoire n'existe pas" });
     }
 
     // Si on remplace l'image, supprimer l'ancienne  du serveur de fichiers
@@ -175,14 +175,14 @@ const updatePhoto_accesoire = async (req, res) => {
       }
     }
 
-    // Mettre à jour la photo d'accessoire dans la base de données
+    // Mettre à jour la photo d'accesoire dans la base de données
     const updatedPhoto_accesoire = await Photo_accesoire.findByIdAndUpdate(
       req.params.id,
       body,
       { new: true }
     );
     return res.status(200).json({
-      message: "Photo d'accessoire mise à jour avec succès",
+      message: "Photo d'accesoire mise à jour avec succès",
       photo: updatedPhoto_accesoire,
     });
   } catch (error) {
@@ -196,7 +196,7 @@ const updatePhoto_accesoire = async (req, res) => {
   }
 };
 
-// Supprimer une photo d'accessoire
+// Supprimer une photo d'accesoire
 const deletePhoto_accesoire = async (req, res) => {
   try {
     if (!req.user) {
@@ -209,12 +209,12 @@ const deletePhoto_accesoire = async (req, res) => {
         .json({ message: "Accès réservé aux administrateurs" });
     }
 
-    // Vérifier que la photo d'accessoire existe
+    // Vérifier que la photo d'accesoire existe
     const photo_accesoire = await Photo_accesoire.findById(req.params.id);
     if (!photo_accesoire) {
       return res
         .status(404)
-        .json({ message: "Photo d'accessoire n'existe pas" });
+        .json({ message: "Photo d'accesoire n'existe pas" });
     }
     // Supprimer le fichier associé si existant
     if (photo_accesoire.name) {
@@ -227,11 +227,11 @@ const deletePhoto_accesoire = async (req, res) => {
         fs.unlinkSync(oldPath);
       }
     }
-    // Supprimer la photo d'accessoire de la base de données
+    // Supprimer la photo d'accesoire de la base de données
     await photo_accesoire.deleteOne();
     return res
       .status(200)
-      .json({ message: "Photo d'accessoire supprimée avec succès" });
+      .json({ message: "Photo d'accesoire supprimée avec succès" });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error: error });
   }

@@ -32,9 +32,9 @@ const createLigneCommande = async (req, res) => {
         400
       );
     }
-    //  Validation accessoire pour les produits non-voitures
+    //  Validation accesoire pour les produits non-voitures
     if (body.type_produit === false && !body.accesoire) {
-      return sendError(res, "Un accessoire est requis pour ce type", 400);
+      return sendError(res, "Un accesoire est requis pour ce type", 400);
     }
 
     // Empêcher la création directe avec le champ voiture rempli
@@ -217,7 +217,7 @@ const updateLigneCommande = async (req, res) => {
     ) {
       return sendError(
         res,
-        "Impossible de modifier le type de produit, la voiture, la configuration ou l'accessoire. Supprimez et recréez la ligne.",
+        "Impossible de modifier le type de produit, la voiture, la configuration ou l'accesoire. Supprimez et recréez la ligne.",
         403
       );
     }

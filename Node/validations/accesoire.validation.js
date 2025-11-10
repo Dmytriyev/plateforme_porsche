@@ -8,7 +8,7 @@ export default function accesoireValidation(body) {
     type_accesoire: joi
       .string()
       .required()
-      // Liste des types d'accessoires disponibles
+      // Liste des types d'accesoires disponibles
       .valid(...TYPES_ACCESOIRE)
       .max(150),
     nom_accesoire: joi.string().required().max(250),
@@ -26,18 +26,18 @@ export default function accesoireValidation(body) {
     couleur_accesoire: mongoIdSchema(),
   });
 
-  const accessoireAddOrRemoveImage = joi.object({
+  const accesoireAddOrRemoveImage = joi.object({
     photo_accesoire: joi.array().items(mongoIdSchema()).required(),
   });
 
-  const accessoireSetCouleur = joi.object({
+  const accesoireSetCouleur = joi.object({
     couleur_accesoire: mongoIdSchema().required(),
   });
 
   return {
     accesoireCreate: accesoireCreate.validate(body),
     accesoireUpdate: accesoireUpdate.validate(body),
-    accessoireAddOrRemoveImage: accessoireAddOrRemoveImage.validate(body),
-    accessoireSetCouleur: accessoireSetCouleur.validate(body),
+    accesoireAddOrRemoveImage: accesoireAddOrRemoveImage.validate(body),
+    accesoireSetCouleur: accesoireSetCouleur.validate(body),
   };
 }

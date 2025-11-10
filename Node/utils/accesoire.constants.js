@@ -1,4 +1,4 @@
-// les types d'accessoires prédéfinis
+// les types d'accesoires prédéfinis
 export const TYPES_ACCESOIRE = [
   "porte-clés",
   "vetement",
@@ -10,7 +10,7 @@ export const isValidTypeAccesoire = (type) => {
   return TYPES_ACCESOIRE.includes(type);
 };
 
-// la liste des types d'accessoires disponibles
+// la liste des types d'accesoires disponibles
 export const getAvailableTypesAccesoire = () => {
   return TYPES_ACCESOIRE.map((type) => ({
     value: type,
@@ -21,7 +21,7 @@ export const TYPE_ACCESOIRE_DESCRIPTIONS = {
   porte_cles: "Porte-clés aux couleurs Porsche",
   vetement: "Vêtements et textiles collection Porsche",
   decoration: "Objets décoratifs et miniatures de collection",
-  life_style: "Articles lifestyle et accessoires du quotidien",
+  life_style: "Articles lifestyle et accesoires du quotidien",
 };
 export const getTypeAccesoireDescription = (type) => {
   return TYPE_ACCESOIRE_DESCRIPTIONS[type] || "";
