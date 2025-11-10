@@ -1,8 +1,8 @@
 // variantes disponibles par modèle Porsche et les types de carrosserie.
-export const TYPES_CARROSSERIE = ["Coupé", "Cabriolet", "Targa", "SUV"];
+export const TYPES_CARROSSERIE = ["Coupe", "Cabriolet", "Targa", "SUV"];
 
 export const VARIANTES_PAR_MODELE = {
-  911: ["Carrera S", "GTS", "Turbo", "GT3", "GT3 RS"],
+  911: ["Carrera S", "GTS", "Turbo", "GT3", "GT3 RS", "Targa GTS", "Targa 4S"],
   Cayman: ["GTS", "GT4 RS"],
   Cayenne: ["E-Hybrid", "S", "GTS"],
 };
@@ -17,8 +17,8 @@ export const TOUTES_VARIANTES = Object.values(VARIANTES_PAR_MODELE).flat();
 
 // des types de carrosserie typiques par modèle
 export const CARROSSERIES_PAR_MODELE = {
-  911: ["Coupé", "Cabriolet", "Targa"],
-  Cayman: ["Coupé"],
+  911: ["Coupe", "Cabriolet", "Targa"],
+  Cayman: ["Coupe"],
   Cayenne: ["SUV"],
 };
 

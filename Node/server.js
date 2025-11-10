@@ -60,8 +60,8 @@ const globalLimiter = rateLimit({
 
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // max 10 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -69,22 +69,22 @@ const loginLimiter = rateLimit({
 
 // Limiteur pour les inscriptions utilisateurs
 const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 10,
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 5, // max 5 inscriptions par IP
   message: "Trop d'inscriptions, réessayez dans 1 heure",
 });
 
 // Limiteur pour les endpoints de paiement
 const paymentLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 20,
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 20, // max 20 tentatives de paiement par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 // Limiteur pour uploads d'images
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 50,
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 50, // max 50 uploads par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
