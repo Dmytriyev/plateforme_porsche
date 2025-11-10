@@ -1,6 +1,3 @@
-// Controller: Couleur d'accessoire
-// CRUD pour les couleurs applicables aux accessoires.
-// Utilisé principalement par l'admin pour gérer les couleurs disponibles.
 import Couleur_accesoire from "../models/couleur_accesoire.model.js";
 import couleur_accesoireValidation from "../validations/couleur_accesoire.validation.js";
 import {
@@ -9,7 +6,7 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 
-// Créer une nouvelle couleur d'accessoire (admin uniquement)
+// Créer une nouvelle couleur d'accessoire
 const createCouleur_accesoire = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
@@ -21,11 +18,13 @@ const createCouleur_accesoire = async (req, res) => {
     const validation = couleur_accesoireValidation(
       req.body
     ).couleur_accesoireCreate;
+    // Vérification des erreurs de validation des données
     const validationError = getValidationError(validation);
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
 
+    // Création et sauvegarde de la nouvelle couleur d'accessoire
     const couleur_accesoire = new Couleur_accesoire(req.body);
     const newCouleur_accesoire = await couleur_accesoire.save();
 
@@ -38,7 +37,7 @@ const createCouleur_accesoire = async (req, res) => {
   }
 };
 
-// Récupérer toutes les couleurs d'accessoires (public)
+// Récupérer toutes les couleurs d'accessoires
 const getAllCouleur_accesoires = async (req, res) => {
   try {
     const couleur_accesoires = await Couleur_accesoire.find().sort({
@@ -50,7 +49,7 @@ const getAllCouleur_accesoires = async (req, res) => {
   }
 };
 
-// Récupérer une couleur d'accessoire par ID (public)
+// Récupérer une couleur d'accessoire par ID
 const getCouleur_accesoireById = async (req, res) => {
   try {
     const couleur_accesoire = await Couleur_accesoire.findById(req.params.id);
@@ -67,7 +66,7 @@ const getCouleur_accesoireById = async (req, res) => {
   }
 };
 
-// Mettre à jour une couleur d'accessoire (admin uniquement)
+// Mettre à jour une couleur d'accessoire
 const updateCouleur_accesoire = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
@@ -83,13 +82,13 @@ const updateCouleur_accesoire = async (req, res) => {
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
-
+    // Mise à jour de la couleur d'accessoire dans la base de données
     const updatedCouleur_accesoire = await Couleur_accesoire.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-
+    // Vérification si la couleur d'accessoire existe après mise à jour
     if (!updatedCouleur_accesoire) {
       return res
         .status(404)
@@ -105,7 +104,7 @@ const updateCouleur_accesoire = async (req, res) => {
   }
 };
 
-// Supprimer une couleur d'accessoire (admin uniquement)
+// Supprimer une couleur d'accessoire
 const deleteCouleur_accesoire = async (req, res) => {
   try {
     const couleur_accesoire = await Couleur_accesoire.findByIdAndDelete(
@@ -117,7 +116,6 @@ const deleteCouleur_accesoire = async (req, res) => {
         .status(404)
         .json({ message: "Couleur d'accessoire n'existe pas" });
     }
-
     return res
       .status(200)
       .json({ message: "Couleur d'accessoire supprimée avec succès" });

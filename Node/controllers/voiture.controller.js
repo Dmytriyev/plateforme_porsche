@@ -1,4 +1,14 @@
 // Gère les gammes de voitures ( 911, Cayenne, Cayman)
+/**
+ * Schéma Mongoose pour les configurations de modèles Porsche.
+ * 1. USER visite voiture une model-start(911)
+ * 2. USER choisit model_porsche une VARIANTE (Carrera, Carrera S, GTS, Turbo)
+ * 3. Chaque variante a ses specs (puissance, transmission, accélération)
+ * 4. USER configure: couleurs, jantes, sièges, package, options
+ * 5. calcule prix total (prix_base_variante + options)
+ * voiture = Modèle de voiture général (911, Cayman, Cayenne)
+ */
+
 import Voiture from "../models/voiture.model.js";
 import voitureValidation from "../validations/voiture.validation.js";
 import Photo from "../models/photo_voiture.model.js";

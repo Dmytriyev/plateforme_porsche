@@ -1,5 +1,3 @@
-// Controller: Couleur intérieure
-// Gère les couleurs intérieures (CRUD), souvent liées à des configurations de modèle Porsche.
 import Couleur_interieur from "../models/couleur_interieur.model.js";
 import couleur_interieurValidation from "../validations/couleur_interieur.validation.js";
 import { getAvailableCouleursInterieur } from "../utils/couleur_interieur.constants.js";
@@ -9,27 +7,29 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 
-import mongoose from "mongoose";
-
+// Controller pour gérer les couleurs intérieures
 const createCouleurInterieur = async (req, res) => {
   try {
+    // Vérifier si le corps de la requête est vide
     if (isEmptyBody(req.body)) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
 
+    // Valider les données de la requête
     const validation = couleur_interieurValidation(
       req.body
     ).couleur_interieurCreate;
+    // Récupérer l'erreur de validation s'il y en a une
     const validationError = getValidationError(validation);
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
 
+    // Créer une nouvelle couleur intérieure et la sauvegarder dans la base de données
     const couleur_interieur = new Couleur_interieur(req.body);
     const newCouleur_interieur = await couleur_interieur.save();
-
     return res.status(201).json({
       message: "Couleur intérieure créée avec succès",
       couleur: newCouleur_interieur,
@@ -39,8 +39,10 @@ const createCouleurInterieur = async (req, res) => {
   }
 };
 
+// Récupérer toutes les couleurs intérieures
 const getAllCouleurInterieur = async (req, res) => {
   try {
+    // Récupérer toutes les couleurs intérieures de la base de données du modèle Porsche associé
     const couleur_interieurs = await Couleur_interieur.find()
       .populate("model_porsche", "nom_model prix")
       .sort({ nom_couleur: 1 });
@@ -50,12 +52,13 @@ const getAllCouleurInterieur = async (req, res) => {
   }
 };
 
+// Récupérer une couleur intérieure par ID
 const getCouleurInterieurById = async (req, res) => {
   try {
     const couleur_interieur = await Couleur_interieur.findById(
       req.params.id
     ).populate("model_porsche", "nom_model prix description");
-
+    // Vérifier si la couleur intérieure existe
     if (!couleur_interieur) {
       return res
         .status(404)
@@ -68,6 +71,7 @@ const getCouleurInterieurById = async (req, res) => {
   }
 };
 
+// Mettre à jour une couleur intérieure par ID
 const updateCouleurInterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
@@ -83,13 +87,13 @@ const updateCouleurInterieur = async (req, res) => {
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
-
+    // Mettre à jour la couleur intérieure dans la base de données
     const updatedCouleur_interieur = await Couleur_interieur.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-
+    // Vérifier si la couleur intérieure existe après mise à jour
     if (!updatedCouleur_interieur) {
       return res
         .status(404)
@@ -105,12 +109,14 @@ const updateCouleurInterieur = async (req, res) => {
   }
 };
 
+// Supprimer une couleur intérieure par ID
 const deleteCouleurInterieur = async (req, res) => {
   try {
+    // Supprimer la couleur intérieure de la base de données
     const couleur_interieur = await Couleur_interieur.findByIdAndDelete(
       req.params.id
     );
-
+    // Vérifier si la couleur intérieure existe avant suppression
     if (!couleur_interieur) {
       return res
         .status(404)
@@ -125,11 +131,7 @@ const deleteCouleurInterieur = async (req, res) => {
   }
 };
 
-/**
- * Récupère la liste des couleurs intérieures disponibles
- * @route GET /api/couleur_interieur/couleurs
- * @access Public
- */
+// Récupérer les options disponibles pour les couleurs intérieures
 const getAvailableCouleursInterieurOptions = async (req, res) => {
   try {
     const couleurs = getAvailableCouleursInterieur();

@@ -121,13 +121,13 @@ export const calculerPrixEtAcompte = async (body) => {
       },
     };
   }
-  // accessoire : Aucun acompte pour les accessoires
+  // accesoire : Aucun acompte pour les accesoires
   else if (body.type_produit === false && body.accesoire) {
     const accesoire = await Accesoire.findById(body.accesoire);
     if (!accesoire) {
       return {
         error: {
-          message: "Accessoire introuvable",
+          message: "Accesoire introuvable",
           code: "ACCESSOIRE_NOT_FOUND",
         },
       };

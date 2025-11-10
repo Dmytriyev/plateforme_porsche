@@ -32,7 +32,7 @@ const createAccesoire = async (req, res) => {
     if (body.couleur_accesoire) {
       const couleur = await Couleur_accesoire.findById(body.couleur_accesoire);
       if (!couleur) {
-        return sendNotFound(res, "Couleur d'accessoire introuvable");
+        return sendNotFound(res, "Couleur d'accesoire introuvable");
       }
     }
 
@@ -55,8 +55,8 @@ const createAccesoire = async (req, res) => {
 
     return sendSuccess(
       res,
-      { accessoire: populatedAccesoire },
-      "Accessoire créé avec succès",
+      { accesoire: populatedAccesoire },
+      "Accesoire créé avec succès",
       201
     );
   } catch (error) {
@@ -86,7 +86,7 @@ const getAccesoireById = async (req, res) => {
       .lean(); // Retourne un objet JS pur
 
     if (!accesoire) {
-      return sendNotFound(res, "Accessoire introuvable");
+      return sendNotFound(res, "Accesoire introuvable");
     }
 
     return sendSuccess(res, accesoire);
@@ -130,8 +130,8 @@ const updateAccesoire = async (req, res) => {
 
     return sendSuccess(
       res,
-      { accessoire: updatedAccesoire },
-      "Accessoire mis à jour avec succès"
+      { accesoire: updatedAccesoire },
+      "Accesoire mis à jour avec succès"
     );
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
@@ -165,7 +165,7 @@ const addImages = async (req, res) => {
 
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return sendNotFound(res, `Accessoire ${req.params.id} introuvable`);
+      return sendNotFound(res, `Accesoire ${req.params.id} introuvable`);
     }
 
     // Vérifier que toutes les photos existent
@@ -187,7 +187,7 @@ const addImages = async (req, res) => {
 
     return sendSuccess(
       res,
-      { accessoire: updatedAccesoire },
+      { accesoire: updatedAccesoire },
       "Photos ajoutées avec succès"
     );
   } catch (error) {
@@ -209,7 +209,7 @@ const removeImages = async (req, res) => {
 
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return sendNotFound(res, `Accessoire ${req.params.id} introuvable`);
+      return sendNotFound(res, `Accesoire ${req.params.id} introuvable`);
     }
 
     // Vérifier que toutes les photos existent
@@ -230,7 +230,7 @@ const removeImages = async (req, res) => {
 
     return sendSuccess(
       res,
-      { accessoire: updatedAccesoire },
+      { accesoire: updatedAccesoire },
       "Photos supprimées avec succès"
     );
   } catch (error) {

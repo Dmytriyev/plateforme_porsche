@@ -19,7 +19,7 @@ export default function ligneCommandeValidation(body) {
       .hex()
       .length(24)
       .when("type_produit", { is: true, then: joi.required() }),
-    // Many-to-One: pour accessoires
+    // Many-to-One: pour accesoires
     accesoire: joi
       .string()
       .hex()

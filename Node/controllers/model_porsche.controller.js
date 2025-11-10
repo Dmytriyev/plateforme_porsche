@@ -1,7 +1,12 @@
-// Controller: Model_porsche
-// Gère les variantes/configurations Porsche pour une gamme de voitures.
-// Fonctions principales : CRUD des variantes, ajout/suppression d'images, calcul du prix total
-// Utilise des helpers pour valider les entités liées (voiture, couleurs, jantes, photos).
+/**
+ * Schéma Mongoose pour les configurations de modèles Porsche.
+ * 1. USER visite voiture une model-start(911)
+ * 2. USER choisit model_porsche une VARIANTE (Carrera, Carrera S, GTS, Turbo)
+ * 3. Chaque variante a ses specs (puissance, transmission, accélération)
+ * 4. USER configure: couleurs, jantes, sièges, package, options
+ * 5. calcule prix total (prix_base_variante + options)
+ * model_porsche = Configuration complète d'une variante spécifique
+ */
 import Model_porsche from "../models/model_porsche.model.js";
 import model_porscheValidation from "../validations/model_porsche.validation.js";
 import Voiture from "../models/voiture.model.js";
@@ -16,6 +21,7 @@ import {
   VARIANTES_PAR_MODELE,
 } from "../utils/model_porsche.constants.js";
 
+// Champs pour les références dans Model_porsche
 const POPULATE_FIELDS = {
   photo_porsche: "name alt",
   voiture: "nom_model type_voiture description",
@@ -26,21 +32,28 @@ const POPULATE_FIELDS = {
   siege: "nom_siege prix",
 };
 
+// Fonction pour valider l'existence d'une entité par son ID
 const validateEntity = async (Model, id, entityName) => {
+  // Rechercher l'entité par son ID dans le modèle spécifié
   const entity = await Model.findById(id);
   if (!entity) {
+    // Lancer une erreur si l'entité n'existe pas
     throw new Error(`${entityName} introuvable`);
   }
   return entity;
 };
 
+// Fonction pour valider plusieurs entités par leurs IDs
 const validateEntities = async (Model, ids, entityName) => {
+  // Créer un tableau de promesses de validation pour chaque ID
   const validationPromises = ids.map((id) =>
+    // Valider chaque entité individuellement
     validateEntity(Model, id, entityName)
   );
   await Promise.all(validationPromises);
 };
 
+// Fonction pour les références dans Model_porsche
 const populateModel = (query) => {
   return query
     .populate("photo_porsche", POPULATE_FIELDS.photo_porsche)
@@ -52,21 +65,28 @@ const populateModel = (query) => {
     .populate("siege", POPULATE_FIELDS.siege);
 };
 
+// Fonction pour calculer le prix total d'un modèle Porsche avec options
 const calculatePrix = (model) => {
+  // Calcul du prix de base de la variante
   const prixBase = model.prix_base || 0;
+  // Calcul du prix de la couleur extérieure
   let prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
-
+  // Calcul du prix des couleurs intérieures
   let prixCouleursInterieur = 0;
+  // Vérifier si couleur_interieur est défini et est un tableau
   if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
+    // Sommer les prix de chaque couleur intérieure sélectionnée
     prixCouleursInterieur = model.couleur_interieur.reduce(
       (total, couleur) => total + (couleur?.prix || 0),
       0
     );
   }
 
-  const prixJante = model.taille_jante?.prix || 0;
-  const prixPackage = model.package?.prix || 0;
-  const prixSiege = model.siege?.prix || 0;
+  // Calcul du prix des autres options
+  const prixJante = model.taille_jante?.prix || 0; // Calcul du prix des jantes
+  const prixPackage = model.package?.prix || 0; // Calcul du prix du package
+  const prixSiege = model.siege?.prix || 0; // Calcul du prix des sièges
+  // Calcul du prix total et de l'acompte requis (10%)
   const prixTotal =
     prixBase +
     prixCouleurExterieur +
@@ -74,9 +94,9 @@ const calculatePrix = (model) => {
     prixJante +
     prixPackage +
     prixSiege;
-  const acompte = prixTotal * 0.2;
-
+  const acompte = prixTotal * 0.1;
   return {
+    // Prix de base de la variante
     prix_base_variante: prixBase,
     options: {
       couleur_exterieur: prixCouleurExterieur,
@@ -85,6 +105,7 @@ const calculatePrix = (model) => {
       package: prixPackage,
       siege: prixSiege,
     },
+    // Somme des prix des options
     total_options:
       prixCouleurExterieur +
       prixCouleursInterieur +
@@ -93,13 +114,15 @@ const calculatePrix = (model) => {
       prixSiege,
     prix_total: prixTotal,
     acompte_requis: acompte,
-    pourcentage_acompte: "20%",
+    pourcentage_acompte: "10%",
   };
 };
 
+// Créer une nouvelle configuration de modèle Porsche
 const createModel_porsche = async (req, res) => {
   try {
     const { body } = req;
+    // Vérifier si le corps de la requête est vide ou non défini
     if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
@@ -110,16 +133,16 @@ const createModel_porsche = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
+    // Valider l'existence de la voiture associée
     await validateEntity(Voiture, body.voiture, "Voiture");
-
+    // Valider que le prix de base est défini et supérieur à 0
     if (!body.prix_base || body.prix_base <= 0) {
       return res.status(400).json({
         message:
           "Le prix_base de la variante est requis et doit être supérieur à 0",
       });
     }
-
+    // Valider l'existence de la couleur extérieure associée
     if (body.couleur_exterieur) {
       await validateEntity(
         Couleur_exterieur,
@@ -127,7 +150,7 @@ const createModel_porsche = async (req, res) => {
         "Couleur extérieure"
       );
     }
-
+    // Valider l'existence des couleurs intérieures associées
     if (body.couleur_interieur && Array.isArray(body.couleur_interieur)) {
       await validateEntities(
         Couleur_interieur,
@@ -135,18 +158,19 @@ const createModel_porsche = async (req, res) => {
         "Couleur intérieure"
       );
     }
-
+    // Valider l'existence de la taille de jante associée
     if (body.taille_jante) {
       await validateEntity(Taille_jante, body.taille_jante, "Taille de jante");
     }
-
+    // Valider l'existence des photos associées
     if (body.photo_porsche && Array.isArray(body.photo_porsche)) {
       await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
     }
-
+    // Créer et sauvegarder la nouvelle configuration de modèle Porsche
     const model_porsche = new Model_porsche(body);
+    // Sauvegarder dans la base de données
     const newModel_porsche = await model_porsche.save();
-
+    // Récupérer le modèle créé avec les références peuplées
     const populatedModel = await populateModel(
       Model_porsche.findById(newModel_porsche._id)
     );
@@ -162,17 +186,19 @@ const createModel_porsche = async (req, res) => {
   }
 };
 
+// Récupérer toutes les configurations de modèles Porsche
 const getAllModel_porsches = async (req, res) => {
   try {
+    // Récupérer toutes les configurations de modèles Porsche avec les références
     const model_porsches = await populateModel(Model_porsche.find()).sort({
       annee_production: -1,
     });
-
+    // Calculer le prix pour chaque modèle et ajouter au résultat final
     const model_porschesWithPrix = model_porsches.map((model) => ({
       ...model.toObject(),
       prix_calcule: calculatePrix(model),
     }));
-
+    // Retourner la liste des modèles avec les prix calculés
     return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
     return res
@@ -181,25 +207,28 @@ const getAllModel_porsches = async (req, res) => {
   }
 };
 
+// Récupérer toutes les configurations pour une voiture spécifique
 const getConfigurationsByVoiture = async (req, res) => {
   try {
     const voitureId = req.params.voiture_id;
-
+    // Valider l'existence de la voiture spécifique
     const voiture = await validateEntity(
       Voiture,
       voitureId,
       "Gamme de voiture"
     );
 
+    // Récupérer toutes les configurations associées à cette voiture avec les références
     const configurations = await populateModel(
       Model_porsche.find({ voiture: voitureId })
-    ).sort({ prix_base: 1 });
+    ).sort({ prix_base: 1 }); // Trier par prix de base croissant
 
+    // Calculer le prix pour chaque configuration et ajouter au résultat final
     const configurationsAvecPrix = configurations.map((config) => ({
       ...config.toObject(),
       prix_calcule: calculatePrix(config),
     }));
-
+    // Retourner les configurations avec les détails de la voiture et le nombre total de configurations
     return res.status(200).json({
       voiture: {
         _id: voiture._id,
@@ -217,16 +246,16 @@ const getConfigurationsByVoiture = async (req, res) => {
   }
 };
 
+// Récupérer une configuration de modèle Porsche par son ID
 const getModel_porscheById = async (req, res) => {
   try {
     const model_porsche = await populateModel(
       Model_porsche.findById(req.params.id)
     );
-
     if (!model_porsche) {
       return res.status(404).json({ message: "Variante Porsche n'existe pas" });
     }
-
+    // Calculer le prix et l'ajouter à la réponse finale
     const response = {
       ...model_porsche.toObject(),
       prix_calcule: calculatePrix(model_porsche),
@@ -240,9 +269,11 @@ const getModel_porscheById = async (req, res) => {
   }
 };
 
+// Mettre à jour une configuration de modèle Porsche par son ID
 const updateModel_porsche = async (req, res) => {
   try {
     const { body } = req;
+    // Vérifier si le corps de la requête est vide ou non défini
     if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
@@ -254,12 +285,13 @@ const updateModel_porsche = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
+    // Valider l'existence du modèle Porsche à mettre à jour
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
     if (body.voiture) {
       await validateEntity(Voiture, body.voiture, "Voiture");
     }
-
+    // Valider l'existence de la couleur extérieure associée
     if (body.couleur_exterieur) {
       await validateEntity(
         Couleur_exterieur,
@@ -267,7 +299,7 @@ const updateModel_porsche = async (req, res) => {
         "Couleur extérieure"
       );
     }
-
+    // Valider l'existence des couleurs intérieures associées
     if (body.couleur_interieur && Array.isArray(body.couleur_interieur)) {
       await validateEntities(
         Couleur_interieur,
@@ -275,7 +307,7 @@ const updateModel_porsche = async (req, res) => {
         "Couleur intérieure"
       );
     }
-
+    // Valider l'existence de la taille de jante associée
     if (body.taille_jante) {
       await validateEntity(Taille_jante, body.taille_jante, "Taille de jante");
     }
@@ -283,11 +315,9 @@ const updateModel_porsche = async (req, res) => {
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(req.params.id, body, { new: true })
     );
-
     if (!updatedModel_porsche) {
       return res.status(404).json({ message: "Variante Porsche n'existe pas" });
     }
-
     return res.status(200).json({
       message: "Variante Porsche mise à jour avec succès",
       model_porsche: updatedModel_porsche,
@@ -299,6 +329,7 @@ const updateModel_porsche = async (req, res) => {
   }
 };
 
+// Supprimer une configuration de modèle Porsche par son ID
 const deleteModel_porsche = async (req, res) => {
   try {
     const model_porsche = await Model_porsche.findByIdAndDelete(req.params.id);
@@ -315,32 +346,36 @@ const deleteModel_porsche = async (req, res) => {
   }
 };
 
+// Ajouter des images à une configuration de modèle Porsche existante
 const addImages = async (req, res) => {
   try {
     const { body } = req;
+    // Vérifier si le corps de la requête est vide ou non défini
     if (!body || Object.keys(body).length === 0) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
+    // Valider les données d'ajout d'images
     const { error } =
       model_porscheValidation(body).model_porscheAddOrRemoveImage;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-
+    // Valider l'existence du modèle Porsche
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
+    // Valider l'existence des photos à ajouter
     await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
 
+    // Mettre à jour le modèle Porsche en ajoutant les nouvelles photos sans doublons
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
+        // Ajouter les nouvelles photos sans doublons
         { $addToSet: { photo_porsche: { $each: body.photo_porsche } } },
         { new: true }
       )
     );
-
     return res.status(200).json({
       message: "Photos ajoutées avec succès",
       model_porsche: updatedModel_porsche,
@@ -352,6 +387,7 @@ const addImages = async (req, res) => {
   }
 };
 
+// Supprimer des images d'une configuration de modèle Porsche existante
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -370,6 +406,7 @@ const removeImages = async (req, res) => {
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
     await validateEntities(Photo_porsche, body.photo_porsche, "Photo");
 
+    // Mettre à jour le modèle Porsche en supprimant les photos spécifiées
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
@@ -388,6 +425,8 @@ const removeImages = async (req, res) => {
       .json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+// Ajouter une couleur extérieure à une configuration de modèle Porsche existante
 const addCouleurExterieur = async (req, res) => {
   try {
     const { couleur_exterieur } = req.body;
@@ -402,6 +441,7 @@ const addCouleurExterieur = async (req, res) => {
       "Couleur extérieure"
     );
 
+    // Mettre à jour le modèle Porsche avec la nouvelle couleur extérieure
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
@@ -421,18 +461,20 @@ const addCouleurExterieur = async (req, res) => {
   }
 };
 
+// Supprimer la couleur extérieure d'une configuration de modèle Porsche existante
 const removeCouleurExterieur = async (req, res) => {
   try {
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
+    // Mettre à jour le modèle Porsche en supprimant la couleur extérieure
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
+        // Supprimer la référence à la couleur extérieure
         { $unset: { couleur_exterieur: "" } },
         { new: true }
       )
     );
-
     return res.status(200).json({
       message: "Couleur extérieure supprimée avec succès",
       model_porsche: updatedModel_porsche,
@@ -443,6 +485,8 @@ const removeCouleurExterieur = async (req, res) => {
       .json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+// Ajouter des couleurs intérieures à une configuration de modèle Porsche existante
 const addCouleursInterieur = async (req, res) => {
   try {
     const { couleur_interieur } = req.body;
@@ -452,6 +496,7 @@ const addCouleursInterieur = async (req, res) => {
         .json({ message: "couleur_interieur (array) est requis" });
     }
 
+    // Valider l'existence du modèle Porsche et des couleurs intérieures à ajouter
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
     await validateEntities(
       Couleur_interieur,
@@ -459,6 +504,7 @@ const addCouleursInterieur = async (req, res) => {
       "Couleur intérieure"
     );
 
+    // Mettre à jour le modèle Porsche en ajoutant les nouvelles couleurs intérieures sans doublons
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
@@ -466,7 +512,6 @@ const addCouleursInterieur = async (req, res) => {
         { new: true }
       )
     );
-
     return res.status(200).json({
       message: "Couleurs intérieures ajoutées avec succès",
       model_porsche: updatedModel_porsche,
@@ -478,15 +523,18 @@ const addCouleursInterieur = async (req, res) => {
   }
 };
 
+// Supprimer des couleurs intérieures d'une configuration de modèle Porsche existante
 const removeCouleursInterieur = async (req, res) => {
   try {
     const { couleur_interieur } = req.body;
+    // Vérifier que couleur_interieur est fourni et est un tableau
     if (!couleur_interieur || !Array.isArray(couleur_interieur)) {
       return res
         .status(400)
         .json({ message: "couleur_interieur doit être un tableau d'IDs" });
     }
 
+    // Valider l'existence du modèle Porsche et des couleurs intérieures à supprimer
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
     await validateEntities(
       Couleur_interieur,
@@ -494,14 +542,15 @@ const removeCouleursInterieur = async (req, res) => {
       "Couleur intérieure"
     );
 
+    // Mettre à jour le modèle Porsche en supprimant les couleurs intérieures spécifiées
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
+        // Supprimer les couleurs intérieures spécifiées
         { $pull: { couleur_interieur: { $in: couleur_interieur } } },
         { new: true }
       )
     );
-
     return res.status(200).json({
       message: "Couleurs intérieures supprimées avec succès",
       model_porsche: updatedModel_porsche,
@@ -512,6 +561,8 @@ const removeCouleursInterieur = async (req, res) => {
       .json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+// Ajouter une taille de jante à une configuration de modèle Porsche existante
 const addTailleJante = async (req, res) => {
   try {
     const { taille_jante } = req.body;
@@ -519,6 +570,7 @@ const addTailleJante = async (req, res) => {
       return res.status(400).json({ message: "taille_jante est requis" });
     }
 
+    // Valider l'existence du modèle Porsche et de la taille de jante associée
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
     await validateEntity(Taille_jante, taille_jante, "Taille de jante");
 
@@ -541,10 +593,12 @@ const addTailleJante = async (req, res) => {
   }
 };
 
+// Supprimer la taille de jante d'une configuration de modèle Porsche existante
 const removeTailleJante = async (req, res) => {
   try {
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
 
+    // Mettre à jour le modèle Porsche en supprimant la taille de jante
     const updatedModel_porsche = await populateModel(
       Model_porsche.findByIdAndUpdate(
         req.params.id,
@@ -552,7 +606,6 @@ const removeTailleJante = async (req, res) => {
         { new: true }
       )
     );
-
     return res.status(200).json({
       message: "Taille de jante supprimée avec succès",
       model_porsche: updatedModel_porsche,
@@ -563,6 +616,8 @@ const removeTailleJante = async (req, res) => {
       .json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+// Calculer le prix total d'une configuration de modèle Porsche spécifique en fonction des options sélectionnées
 const calculatePrixTotal = async (req, res) => {
   try {
     const model_porsche = await populateModel(
@@ -572,9 +627,9 @@ const calculatePrixTotal = async (req, res) => {
     if (!model_porsche) {
       return res.status(404).json({ message: "Variante Porsche introuvable" });
     }
-
+    // Calculer les détails du prix en fonction des options sélectionnées
     const detailsPrix = calculatePrix(model_porsche);
-
+    // Retourner les détails du prix total calculé
     return res.status(200).json({
       message: "Prix total calculé avec succès",
       gamme: model_porsche.voiture?.nom_model,
@@ -589,11 +644,7 @@ const calculatePrixTotal = async (req, res) => {
   }
 };
 
-/**
- * Récupère tous les types de carrosserie disponibles
- * @route GET /api/model_porsche/carrosseries
- * @access Public
- */
+// Récupère tous les types de carrosseries disponibles
 const getAllCarrosseries = async (req, res) => {
   try {
     const carrosseries = getAvailableCarrosseries();
@@ -611,11 +662,7 @@ const getAllCarrosseries = async (req, res) => {
   }
 };
 
-/**
- * Récupère les variantes disponibles pour un modèle de voiture spécifique
- * @route GET /api/model_porsche/variantes/:nomModel
- * @access Public
- */
+// Récupère les variantes et carrosseries pour un modèle de voiture spécifique
 const getVariantesByVoitureModel = async (req, res) => {
   try {
     const { nomModel } = req.params;
@@ -626,13 +673,14 @@ const getVariantesByVoitureModel = async (req, res) => {
         success: false,
         message: `Modèle "${nomModel}" non trouvé. Modèles disponibles: ${Object.keys(
           VARIANTES_PAR_MODELE
-        ).join(", ")}`,
+        ).join(", ")}`, // Liste des modèles disponibles
       });
     }
 
+    // Récupérer les variantes et carrosseries pour le modèle spécifié
     const variantes = getVariantesByModel(nomModel);
     const carrosseries = getCarrosseriesByModel(nomModel);
-
+    // Retourner les variantes et carrosseries
     return res.json({
       success: true,
       data: {
@@ -651,20 +699,16 @@ const getVariantesByVoitureModel = async (req, res) => {
   }
 };
 
-/**
- * Récupère toutes les variantes avec leurs modèles associés
- * @route GET /api/model_porsche/variantes
- * @access Public
- */
+// Récupère toutes les variantes avec leurs modèles associés
 const getAllVariantes = async (req, res) => {
   try {
+    // Transformer les constantes en un format structuré pour la réponse API
     const allVariantes = Object.entries(VARIANTES_PAR_MODELE).map(
       ([model, variantes]) => ({
         modele: model,
         variantes: variantes.map((v) => ({ value: v, label: v })),
       })
     );
-
     return res.json({
       success: true,
       data: allVariantes,

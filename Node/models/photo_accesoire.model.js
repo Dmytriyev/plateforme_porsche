@@ -14,7 +14,7 @@ const photo_accesoireSchema = new mongoose.Schema(
       trim: true,
       maxlength: 100,
     },
-    // Relation Many-to-One: Accessoire associé
+    // Relation Many-to-One: accesoire associé
     accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",

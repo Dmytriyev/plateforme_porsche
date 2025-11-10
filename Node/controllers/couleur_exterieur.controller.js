@@ -1,5 +1,3 @@
-// Controller: Couleur extérieure
-// Gère les couleurs extérieures (CRUD) et fournit des listes pour les formulaires.
 import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import couleur_exterieurValidation from "../validations/couleur_exterieur.validation.js";
 import { getAvailableCouleursExterieur } from "../utils/couleur_exterieur.constants.js";
@@ -9,8 +7,7 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 
-import mongoose from "mongoose";
-
+// Créer une nouvelle couleur extérieure
 const createCouleurExterieur = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
@@ -19,14 +16,17 @@ const createCouleurExterieur = async (req, res) => {
         .json({ message: "Pas de données dans la requête" });
     }
 
+    // Valider les données de la requête
     const validation = couleur_exterieurValidation(
       req.body
     ).couleur_exterieurCreate;
+    // Récupérer l'erreur de validation s'il y en a une
     const validationError = getValidationError(validation);
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
 
+    // Créer et sauvegarder la nouvelle couleur extérieure
     const couleur_exterieur = new Couleur_exterieur(req.body);
     const newCouleur_exterieur = await couleur_exterieur.save();
 
@@ -39,22 +39,25 @@ const createCouleurExterieur = async (req, res) => {
   }
 };
 
+// Récupérer toutes les couleurs extérieures
 const getAllCouleurExterieur = async (req, res) => {
   try {
     const couleur_exterieurs = await Couleur_exterieur.find()
       .sort({ nom_couleur: 1 })
-      .lean(); // Retourne des objets JS purs (30-50% plus rapide)
+      .lean(); // Retourne des objets JS purs au lieu des documents Mongoose
     return res.status(200).json(couleur_exterieurs);
   } catch (error) {
     return handleError(res, error, "getAllCouleur_exterieurs");
   }
 };
 
+// Récupérer une couleur extérieure par ID
 const getCouleurExterieurById = async (req, res) => {
   try {
     const couleur_exterieur = await Couleur_exterieur.findById(
       req.params.id
     ).lean();
+    // Vérifier si la couleur extérieure existe
     if (!couleur_exterieur) {
       return res
         .status(404)
@@ -66,14 +69,16 @@ const getCouleurExterieurById = async (req, res) => {
   }
 };
 
+// Mettre à jour une couleur extérieure par ID
 const updateCouleurExterieur = async (req, res) => {
   try {
+    // Vérifier si le corps de la requête est vide
     if (isEmptyBody(req.body)) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
+    // Valider les données de la requête pour la mise à jour
     const validation = couleur_exterieurValidation(
       req.body
     ).couleur_exterieurUpdate;
@@ -81,13 +86,13 @@ const updateCouleurExterieur = async (req, res) => {
     if (validationError) {
       return res.status(400).json({ message: validationError });
     }
-
+    // Mettre à jour la couleur extérieure dans la base de données
     const updatedCouleur_exterieur = await Couleur_exterieur.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-
+    // Vérifier si la couleur extérieure existe après mise à jour
     if (!updatedCouleur_exterieur) {
       return res
         .status(404)
@@ -103,6 +108,7 @@ const updateCouleurExterieur = async (req, res) => {
   }
 };
 
+// Supprimer une couleur extérieure par ID
 const deleteCouleurExterieur = async (req, res) => {
   try {
     const couleur_exterieur = await Couleur_exterieur.findByIdAndDelete(
@@ -123,11 +129,7 @@ const deleteCouleurExterieur = async (req, res) => {
   }
 };
 
-/**
- * Récupère la liste des couleurs extérieures disponibles
- * @route GET /api/couleur_exterieur/couleurs
- * @access Public
- */
+// Récupérer les options de couleurs extérieures disponibles
 const getAvailableCouleursExterieurOptions = async (req, res) => {
   try {
     const couleurs = getAvailableCouleursExterieur();

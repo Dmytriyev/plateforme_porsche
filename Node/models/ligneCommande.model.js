@@ -54,7 +54,7 @@ const ligneCommandeSchema = new mongoose.Schema(
         return this.type_produit === true;
       },
     },
-    // Relation Many-to-One: Accessoire commandé (si type_produit = false)
+    // Relation Many-to-One: accesoire commandé (si type_produit = false)
     accesoire: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",
