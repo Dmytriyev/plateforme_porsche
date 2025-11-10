@@ -9,7 +9,7 @@ import {
   removeImages,
   setCouleur,
   removeCouleur,
-  getAccessoiresByCriteria,
+  getAccesoiresByCriteria,
   getAvailableTypesAccesoireOptions,
 } from "../controllers/accesoire.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
@@ -21,7 +21,7 @@ const router = Router();
 // Routes publiques
 router.get("/types", getAvailableTypesAccesoireOptions);
 router.get("/all", getAllAccesoires);
-router.get("/search", getAccessoiresByCriteria);
+router.get("/search", getAccesoiresByCriteria);
 router.get("/:id", validateObjectId("id"), getAccesoireById);
 // Routes admin uniquement
 router.post("/new", auth, isAdmin, createAccesoire);
