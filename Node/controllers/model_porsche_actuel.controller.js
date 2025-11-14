@@ -146,6 +146,12 @@ const updateModel_porsche_actuel = async (req, res) => {
     }
     // Empêcher la modification du champ user
     delete body.user;
+
+    // photo_voiture_actuel est géré via /addImages et /deleteImages, pas via update
+    if (body.photo_voiture_actuel) {
+      delete body.photo_voiture_actuel;
+    }
+
     // Valider les données d'entrée avec Joi
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelUpdate;

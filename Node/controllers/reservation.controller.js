@@ -2,7 +2,7 @@
 // - L'utilisateur doit être authentifié et ne peut créer que ses réservations
 import Reservation from "../models/reservation.model.js";
 import reservationValidation from "../validations/reservation.validation.js";
-import Voiture from "../models/voiture.model.js";
+import Model_porsche from "../models/model_porsche.model.js";
 import User from "../models/user.model.js";
 import {
   sendSuccess,
@@ -46,14 +46,18 @@ const createReservation = async (req, res) => {
         return sendNotFound(res, "Utilisateur introuvable");
       }
     }
-    // Vérifier que la voiture existe et est d'occasion avant de créer la réservation
-    if (body.voiture) {
-      const voitureExists = await Voiture.findById(body.voiture);
-      if (!voitureExists) {
+    // Vérifier que le model_porsche existe et est d'occasion avant de créer la réservation
+    if (body.model_porsche) {
+      const modelExists = await Model_porsche.findById(
+        body.model_porsche
+      ).populate("voiture", "type_voiture nom_model");
+
+      if (!modelExists) {
         return sendNotFound(res, "Voiture introuvable");
       }
+
       // Seules les voitures d'occasion (type_voiture = false) sont réservables
-      if (voitureExists.type_voiture !== false) {
+      if (modelExists.voiture.type_voiture !== false) {
         return sendValidationError(
           res,
           "Seules les voitures d'occasion peuvent être réservées. Les voitures neuves doivent être achetées via une commande."
@@ -61,9 +65,9 @@ const createReservation = async (req, res) => {
       }
     }
     // Vérifier qu'il n'y a pas déjà une réservation active pour cette date et cette voiture
-    if (body.voiture && body.date_reservation) {
+    if (body.model_porsche && body.date_reservation) {
       const existingReservation = await Reservation.findOne({
-        voiture: body.voiture,
+        model_porsche: body.model_porsche,
         date_reservation: body.date_reservation,
         status: true,
       });
@@ -79,7 +83,13 @@ const createReservation = async (req, res) => {
     // Récupérer les informations complètes de la réservation créée avec les détails utilisateur et voiture
     const infoReservation = await Reservation.findById(newReservation._id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "nom_model type_voiture description prix");
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture description",
+        },
+      });
     return sendSuccess(
       res,
       infoReservation,
@@ -95,7 +105,13 @@ const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find()
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "nom_model type_voiture description prix")
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture description",
+        },
+      })
       .sort({ date_reservation: -1 });
 
     return sendSuccess(res, reservations);
@@ -108,7 +124,13 @@ const getReservationById = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "nom_model type_voiture description prix");
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture description",
+        },
+      });
 
     if (!reservation) {
       return sendNotFound(res, "Réservation introuvable");
@@ -146,10 +168,10 @@ const updateReservation = async (req, res) => {
     }
 
     // Vérifier les conflits de réservation avec d'autres réservations existantes
-    if (body.voiture && body.date_reservation) {
+    if (body.model_porsche && body.date_reservation) {
       const existingReservation = await Reservation.findOne({
         _id: { $ne: req.params.id },
-        voiture: body.voiture,
+        model_porsche: body.model_porsche,
         date_reservation: body.date_reservation,
         status: true,
       });
@@ -177,7 +199,13 @@ const updateReservation = async (req, res) => {
       { new: true }
     )
       .populate("user", "nom prenom email telephone")
-      .populate("voiture", "nom_model type_voiture description prix");
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture description",
+        },
+      });
     return sendSuccess(res, updatedReservation, "Réservation mise à jour");
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
@@ -205,7 +233,13 @@ const getReservationsByUser = async (req, res) => {
     }
     // Récupérer les réservations avec les détails de la voiture
     const reservations = await Reservation.find({ user: userId })
-      .populate("voiture", "nom_model type_voiture description prix")
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture description",
+        },
+      })
       .sort({ date_reservation: -1 });
     return sendSuccess(res, reservations);
   } catch (error) {
@@ -216,12 +250,12 @@ const getReservationsByUser = async (req, res) => {
 const getReservationsByVoiture = async (req, res) => {
   try {
     const { voitureId } = req.params;
-    const voitureExists = await Voiture.findById(voitureId);
-    if (!voitureExists) {
+    const modelExists = await Model_porsche.findById(voitureId);
+    if (!modelExists) {
       return sendNotFound(res, "Voiture introuvable");
     }
     // Récupérer les réservations avec les détails de l'utilisateur
-    const reservations = await Reservation.find({ voiture: voitureId })
+    const reservations = await Reservation.find({ model_porsche: voitureId })
       .populate("user", "nom prenom email telephone")
       .sort({ date_reservation: -1 });
 
@@ -242,13 +276,13 @@ const checkReservations = async (req, res) => {
         "La date est requise (format: YYYY-MM-DD)"
       );
     }
-    const voitureExists = await Voiture.findById(voitureId);
-    if (!voitureExists) {
+    const modelExists = await Model_porsche.findById(voitureId);
+    if (!modelExists) {
       return sendNotFound(res, "Voiture introuvable");
     }
     // Vérifier s'il existe une réservation active pour cette voiture à la date donnée
     const existReservation = await Reservation.findOne({
-      voiture: voitureId,
+      model_porsche: voitureId,
       date_reservation: new Date(date),
       status: true,
     });

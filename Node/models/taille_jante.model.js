@@ -12,7 +12,6 @@ const taille_janteSchema = new mongoose.Schema(
     },
     couleur_jante: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 100,
       enum: COULEURS_JANTE,

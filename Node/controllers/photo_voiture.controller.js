@@ -19,30 +19,45 @@ const __dirname = path.dirname(__filename);
 const createPhoto_voiture = async (req, res) => {
   try {
     // Vérification auth/staff gérée par les middlewares (auth + isStaff)
-    const { body } = req;
-    if (!body || Object.keys(body).length === 0) {
-      if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      }
+    // Assurer que body est un objet même si req.body est undefined
+    let body = req.body || {};
+    // Si la requête ne contient ni body ni fichier, rejeter
+    if ((Object.keys(body).length === 0 || body === null) && !req.file) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-    // Si un fichier est uploadé, définir le champ name avec l'URL complète de l'image
+    // Si un fichier est uploadé, définir/écraser le champ name avec l'URL complète de l'image
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/voiture/" +
-        req.file.filename;
+      body.name = "/uploads/voiture/" + req.file.filename;
+    }
+
+    // `voiture` peut être envoyé comme JSON string, CSV ou simple id
+    if (body.voiture && typeof body.voiture === "string") {
+      const trimmed = body.voiture.trim();
+      // Tenter de parser comme JSON array d'abord
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        try {
+          body.voiture = JSON.parse(trimmed);
+        } catch (err) {}
+        // Si ce n'est pas un tableau après parsing, le remettre en string pour validation
+      } else if (trimmed.includes(",")) {
+        // CSV string -> array
+        body.voiture = trimmed
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      } else {
+        // Single id -> array with one element (Joi attend un tableau)
+        body.voiture = [trimmed];
+      }
     }
 
     const { error } = photo_voitureValidation(body).photo_voitureCreate;
     if (error) {
       // Nettoyer le fichier uploadé en cas d'erreur de validation
       if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -53,7 +68,7 @@ const createPhoto_voiture = async (req, res) => {
         const voiture = await Voiture.findById(voitureId);
         if (!voiture) {
           if (req.file) {
-            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+            removeUploadedFile(req.file.filename);
           }
           return res
             .status(404)
@@ -62,7 +77,7 @@ const createPhoto_voiture = async (req, res) => {
         // Vérifier que c'est une voiture neuve avant d'ajouter une photo
         if (voiture.type_voiture !== true) {
           if (req.file) {
-            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+            removeUploadedFile(req.file.filename);
           }
           return res.status(400).json({
             message: `Les photos de voiture ne peuvent être ajoutées qu'aux voitures neuves (type_voiture = true)`,
@@ -79,7 +94,7 @@ const createPhoto_voiture = async (req, res) => {
       if (!couleurExt) {
         // Nettoyer le fichier uploadé en cas d'erreur de validation
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res
           .status(404)
@@ -93,7 +108,7 @@ const createPhoto_voiture = async (req, res) => {
       );
       if (!couleurInt) {
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res
           .status(404)
@@ -105,7 +120,7 @@ const createPhoto_voiture = async (req, res) => {
       const tailleJante = await Taille_jante.findById(body.taille_jante);
       if (!tailleJante) {
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(404).json({ message: "Taille de jante introuvable" });
       }
@@ -128,7 +143,7 @@ const createPhoto_voiture = async (req, res) => {
     });
   } catch (error) {
     if (req.file) {
-      fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -179,12 +194,7 @@ const updatePhoto_voiture = async (req, res) => {
     }
     // Si un fichier est uploadé, mettre à jour le champ name avec l'URL complète de l'image
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/voiture/" +
-        req.file.filename;
+      body.name = "/uploads/voiture/" + req.file.filename;
     }
     // Valider seulement si body n'est pas vide (quelques champs à mettre à jour)
     if (body && Object.keys(body).length > 0) {
@@ -192,7 +202,7 @@ const updatePhoto_voiture = async (req, res) => {
       if (error) {
         // Nettoyer le fichier uploadé en cas d'erreur de validation
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(400).json({ message: error.details[0].message });
       }
@@ -203,7 +213,7 @@ const updatePhoto_voiture = async (req, res) => {
         const voiture = await Voiture.findById(voitureId);
         if (!voiture) {
           if (req.file) {
-            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+            removeUploadedFile(req.file.filename);
           }
           return res
             .status(404)
@@ -212,7 +222,7 @@ const updatePhoto_voiture = async (req, res) => {
         // Vérifier que c'est une voiture neuve avant d'ajouter une photo
         if (voiture.type_voiture !== true) {
           if (req.file) {
-            fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+            removeUploadedFile(req.file.filename);
           }
           return res.status(400).json({
             message: `Les photos de voiture ne peuvent être ajoutées qu'aux voitures neuves`,
@@ -227,7 +237,7 @@ const updatePhoto_voiture = async (req, res) => {
       );
       if (!couleurExt) {
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res
           .status(404)
@@ -241,7 +251,7 @@ const updatePhoto_voiture = async (req, res) => {
       );
       if (!couleurInt) {
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res
           .status(404)
@@ -254,7 +264,7 @@ const updatePhoto_voiture = async (req, res) => {
       const tailleJante = await Taille_jante.findById(body.taille_jante);
       if (!tailleJante) {
         if (req.file) {
-          fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(404).json({ message: "Taille de jante introuvable" });
       }
@@ -265,23 +275,14 @@ const updatePhoto_voiture = async (req, res) => {
     if (!oldPhoto) {
       // Nettoyer le nouveau fichier si la photo n'existe pas
       if (req.file) {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(404).json({ message: "photo de voiture n'existe pas" });
     }
     // Si on remplace l'image, supprimer l'ancienne du serveur
     if (req.file && oldPhoto.name) {
       // Supprimer l'ancien fichier image
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/voiture/",
-        oldPhoto.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        try {
-          fs.unlinkSync(oldPath);
-        } catch (err) {}
-      }
+      removeUploadedFile(oldPhoto.name.split("/").at(-1));
     }
 
     // Mettre à jour la photo de voiture dans la base de données
@@ -302,11 +303,25 @@ const updatePhoto_voiture = async (req, res) => {
   } catch (error) {
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
-      try {
-        fs.unlinkSync("./uploads/voiture/" + req.file.filename);
-      } catch (err) {}
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Supprimer un fichier uploadé
+const removeUploadedFile = (FilenameOrPath) => {
+  try {
+    // Accepte soit un chemin absolu, soit juste le nom de fichier
+    const filePath = path.isAbsolute(FilenameOrPath)
+      ? FilenameOrPath
+      : path.join(__dirname, "../uploads/voiture/", FilenameOrPath);
+    // Supprimer le fichier s'il existe
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    console.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 
@@ -339,14 +354,7 @@ const deletePhoto_voiture = async (req, res) => {
     }
     // Supprimer le fichier image du serveur
     if (photo_voiture.name) {
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/voiture/",
-        photo_voiture.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      removeUploadedFile(photo_voiture.name.split("/").at(-1));
     }
     await photo_voiture.deleteOne();
     return res

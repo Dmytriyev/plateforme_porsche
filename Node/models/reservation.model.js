@@ -17,10 +17,10 @@ const reservationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    // Relation Many-to-One: Voiture (occasion uniquement)
-    voiture: {
+    // Relation Many-to-One: model_porsche (occasion uniquement)
+    model_porsche: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Voiture",
+      ref: "Model_porsche",
       required: true,
     },
   },
@@ -29,9 +29,9 @@ const reservationSchema = new mongoose.Schema(
 
 // Index pour accélérer les recherches
 reservationSchema.index({ user: 1 });
-reservationSchema.index({ voiture: 1 });
+reservationSchema.index({ model_porsche: 1 });
 reservationSchema.index({ date_reservation: 1 });
 reservationSchema.index({ status: 1 });
-reservationSchema.index({ voiture: 1, date_reservation: 1, status: 1 });
+reservationSchema.index({ model_porsche: 1, date_reservation: 1, status: 1 });
 
 export default mongoose.model("Reservation", reservationSchema);

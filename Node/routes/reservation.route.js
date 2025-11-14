@@ -1,8 +1,3 @@
-/*
-  - Certaines routes publiques permettent de vérifier la disponibilité d'une voiture.
-  - Routes admin pour la gestion globale (`isAdmin`).
-  - Routes utilisateur pour CRUD de réservations.
-*/
 import { Router } from "express";
 import {
   createReservation,
@@ -22,7 +17,7 @@ const router = Router();
 
 // Routes publiques
 router.get(
-  "/disponibilite/:voitureId",
+  "/check/:voitureId",
   validateObjectId("voitureId"),
   checkReservations
 );
@@ -33,7 +28,7 @@ router.get(
   "/voiture/:voitureId",
   auth,
   isAdmin,
-  validateObjectId("voitureId"),
+  validateObjectId("voitureId"), //id voiture
   getReservationsByVoiture
 );
 
@@ -41,14 +36,14 @@ router.get(
 router.get(
   "/user/:userId",
   auth,
-  validateObjectId("userId"),
+  validateObjectId("userId"), //id utilisateur
   getReservationsByUser
 );
 
-// Routes utilisateur - :id générique
+// Routes utilisateur - :id réservation
 router.post("/new", auth, createReservation);
 router.get("/:id", auth, validateObjectId("id"), getReservationById);
-router.put("/:id", auth, validateObjectId("id"), updateReservation);
-router.delete("/:id", auth, validateObjectId("id"), deleteReservation);
+router.put("/update/:id", auth, validateObjectId("id"), updateReservation);
+router.delete("/delete/:id", auth, validateObjectId("id"), deleteReservation);
 
 export default router;

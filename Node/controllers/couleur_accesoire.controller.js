@@ -5,14 +5,24 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import { removeUploadedFile } from "../utils/fileConstants.js";
 
 // Créer une nouvelle couleur d'accesoire
 const createCouleur_accesoire = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_accesoire");
+      }
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Si un fichier est uploadé, ajouter le chemin complet de la photo
+    if (req.file) {
+      req.body.photo_couleur =
+        "/uploads/couleur_accesoire/" + req.file.filename;
     }
 
     const validation = couleur_accesoireValidation(
@@ -21,6 +31,10 @@ const createCouleur_accesoire = async (req, res) => {
     // Vérification des erreurs de validation des données
     const validationError = getValidationError(validation);
     if (validationError) {
+      // Supprimer le fichier uploadé en cas d'erreur de validation
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_accesoire");
+      }
       return res.status(400).json({ message: validationError });
     }
 
@@ -33,6 +47,9 @@ const createCouleur_accesoire = async (req, res) => {
       couleur: newCouleur_accesoire,
     });
   } catch (error) {
+    if (req.file) {
+      removeUploadedFile(req.file.filename, "couleur_accesoire");
+    }
     return handleError(res, error, "createCouleur_accesoire");
   }
 };
@@ -69,10 +86,16 @@ const getCouleur_accesoireById = async (req, res) => {
 // Mettre à jour une couleur d'accesoire
 const updateCouleur_accesoire = async (req, res) => {
   try {
-    if (isEmptyBody(req.body)) {
+    if (isEmptyBody(req.body) && !req.file) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Si un fichier est uploadé, ajouter le chemin complet de la photo
+    if (req.file) {
+      req.body.photo_couleur =
+        "/uploads/couleur_accesoire/" + req.file.filename;
     }
 
     const validation = couleur_accesoireValidation(
@@ -80,8 +103,21 @@ const updateCouleur_accesoire = async (req, res) => {
     ).couleur_accesoireUpdate;
     const validationError = getValidationError(validation);
     if (validationError) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_accesoire");
+      }
       return res.status(400).json({ message: validationError });
     }
+
+    // Récupérer l'ancienne couleur pour supprimer l'ancienne photo si une nouvelle est uploadée
+    if (req.file) {
+      const oldCouleur = await Couleur_accesoire.findById(req.params.id);
+      if (oldCouleur && oldCouleur.photo_couleur) {
+        const oldFilename = oldCouleur.photo_couleur.split("/").pop();
+        removeUploadedFile(oldFilename, "couleur_accesoire");
+      }
+    }
+
     // Mise à jour de la couleur d'accesoire dans la base de données
     const updatedCouleur_accesoire = await Couleur_accesoire.findByIdAndUpdate(
       req.params.id,
@@ -90,6 +126,9 @@ const updateCouleur_accesoire = async (req, res) => {
     );
     // Vérification si la couleur d'accesoire existe après mise à jour
     if (!updatedCouleur_accesoire) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_accesoire");
+      }
       return res
         .status(404)
         .json({ message: "Couleur d'accesoire n'existe pas" });
@@ -100,6 +139,9 @@ const updateCouleur_accesoire = async (req, res) => {
       couleur: updatedCouleur_accesoire,
     });
   } catch (error) {
+    if (req.file) {
+      removeUploadedFile(req.file.filename, "couleur_accesoire");
+    }
     return handleError(res, error, "updateCouleur_accesoire");
   }
 };
@@ -116,6 +158,13 @@ const deleteCouleur_accesoire = async (req, res) => {
         .status(404)
         .json({ message: "Couleur d'accesoire n'existe pas" });
     }
+
+    // Supprimer la photo associée si elle existe
+    if (couleur_accesoire.photo_couleur) {
+      const filename = couleur_accesoire.photo_couleur.split("/").pop();
+      removeUploadedFile(filename, "couleur_accesoire");
+    }
+
     return res
       .status(200)
       .json({ message: "Couleur d'accesoire supprimée avec succès" });

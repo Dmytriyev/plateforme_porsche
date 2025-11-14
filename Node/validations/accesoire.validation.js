@@ -24,6 +24,7 @@ export default function accesoireValidation(body) {
     description: joi.string(),
     prix: joi.number().min(0),
     couleur_accesoire: mongoIdSchema(),
+    photo_accesoire: joi.array().items(mongoIdSchema()),
   });
 
   const accesoireAddOrRemoveImage = joi.object({

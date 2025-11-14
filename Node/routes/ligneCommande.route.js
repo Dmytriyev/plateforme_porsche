@@ -1,7 +1,3 @@
-/*
-  - Des routes pour vider le panier, récupérer les lignes du panier et modifier quantité.
-  - Routes admin pour lecture complète des lignes.
-*/
 import { Router } from "express";
 import {
   createLigneCommande,
@@ -22,22 +18,32 @@ const router = Router();
 
 // Routes admin
 router.get("/all", auth, isAdmin, getAllLigneCommandes);
-// Routes utilisateur
+
+// Routes user
+
 // panier
 router.get("/panier", auth, getMesLignesPanier);
 router.delete("/panier/vider", auth, viderPanier);
+
 // commande
 router.get(
   "/commande/:commandeId",
   auth,
-  validateObjectId("commandeId"),
+  validateObjectId("commandeId"), // id commande
   getLignesByCommande
 );
+
 // ligne de commande
 router.post("/new", auth, createLigneCommande);
 router.get("/:id", auth, validateObjectId("id"), getLigneCommandeById);
-router.put("/:id", auth, validateObjectId("id"), updateLigneCommande);
-router.put("/:id/quantite", auth, validateObjectId("id"), updateQuantite);
-router.delete("/:id", auth, validateObjectId("id"), deleteLigneCommande);
+router.put("/update/:id", auth, validateObjectId("id"), updateLigneCommande);
+router.patch(
+  "/updateQuantite/:id",
+  auth,
+  validateObjectId("id"), // id ligne commande
+  updateQuantite
+);
+
+router.delete("/delete/:id", auth, validateObjectId("id"), deleteLigneCommande);
 
 export default router;

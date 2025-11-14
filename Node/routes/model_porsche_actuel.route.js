@@ -15,35 +15,68 @@ import {
 } from "../controllers/model_porsche_actuel.controller.js";
 import auth from "../middlewares/auth.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
+import { upload } from "../middlewares/multer.js";
 
 const router = Router();
+
+// Middleware flexible pour accepter multipart/form-data
+const optionalUpload = (req, res, next) => {
+  const contentType = req.headers && req.headers["content-type"];
+  const isMultipart =
+    contentType && contentType.includes("multipart/form-data");
+  if (!isMultipart) return next();
+  // Si c'est multipart/form-data, utiliser multer
+  return upload.any()(req, res, (err) => {
+    if (err) return next(err);
+    // multer met les champs texte dans req.body et les fichiers dans req.files
+    // Normaliser pour compatibilité : si un seul fichier, exposer req.file
+    if (req.files && req.files.length > 0) {
+      req.file = req.files[0];
+    }
+    next();
+  });
+};
+
 // user connecté
 router.get("/all", auth, getAllModel_porsche_actuels);
 router.get("/search", auth, searchPorschesByCriteria);
 router.get("/:id", auth, validateObjectId("id"), getModel_porsche_actuelById);
 router.post("/new", auth, createModel_porsche_actuel);
-router.get("/user/mes-porsches", auth, getMesPorsches);
-router.put("/:id", auth, validateObjectId("id"), updateModel_porsche_actuel);
-router.delete(
-  "/:id/delete",
+router.get("/user/mesPorsches", auth, getMesPorsches);
+
+router.put(
+  "/update/:id",
   auth,
   validateObjectId("id"),
-  deleteModel_porsche_actuel
+  optionalUpload,
+  updateModel_porsche_actuel
 );
-router.put("/:id/addImages", auth, validateObjectId("id"), addImages);
-router.delete("/:id/deleteImages", auth, validateObjectId("id"), removeImages);
-router.put(
-  "/:id/couleur-exterieur",
+router.patch("/addImages/:id", auth, validateObjectId("id"), addImages);
+router.patch("/removeImages/:id", auth, validateObjectId("id"), removeImages);
+router.patch(
+  "/setCouleurExterieur/:id",
   auth,
   validateObjectId("id"),
   setCouleurExterieur
 );
-router.put(
-  "/:id/couleur-interieur",
+router.patch(
+  "/setCouleurInterieur/:id",
   auth,
   validateObjectId("id"),
   setCouleurInterieur
 );
-router.put("/:id/taille-jante", auth, validateObjectId("id"), setTailleJante);
+router.patch(
+  "/setTailleJante/:id",
+  auth,
+  validateObjectId("id"),
+  setTailleJante
+);
+
+router.delete(
+  "/delete/:id",
+  auth,
+  validateObjectId("id"),
+  deleteModel_porsche_actuel
+);
 
 export default router;

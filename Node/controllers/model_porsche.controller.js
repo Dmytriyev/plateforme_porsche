@@ -723,6 +723,78 @@ const getAllVariantes = async (req, res) => {
   }
 };
 
+// Récupère uniquement les voitures d'occasion disponibles
+const getModelPorscheOccasions = async (req, res) => {
+  try {
+    // Récupérer toutes les voitures de type occasion (type_voiture = false)
+    const voituresOccasion = await Voiture.find({ type_voiture: false });
+    const voitureIds = voituresOccasion.map((v) => v._id);
+
+    // Récupérer les model_porsche liés aux voitures d'occasion
+    const occasions = await populateModel(
+      Model_porsche.find({
+        voiture: { $in: voitureIds },
+        disponible: true,
+      })
+    ).sort({ annee_production: -1 });
+
+    // Retourner les occasions avec leur prix fixe
+    const occasionsWithPrix = occasions.map((model) => ({
+      ...model.toObject(),
+      prix_fixe: model.prix_base,
+      type: "occasion",
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: occasionsWithPrix,
+      message: "Voitures d'occasion récupérées avec succès",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des voitures d'occasion",
+      error: error.message,
+    });
+  }
+};
+
+// Récupère uniquement les voitures neuves (configurateur)
+const getModelPorscheNeuves = async (req, res) => {
+  try {
+    // Récupérer toutes les voitures de type neuf (type_voiture = true)
+    const voituresNeuves = await Voiture.find({ type_voiture: true });
+    const voitureIds = voituresNeuves.map((v) => v._id);
+
+    // Récupérer les model_porsche liés aux voitures neuves
+    const neuves = await populateModel(
+      Model_porsche.find({
+        voiture: { $in: voitureIds },
+        disponible: true,
+      })
+    ).sort({ prix_base: 1 });
+
+    // Calculer le prix total pour chaque voiture neuve
+    const neuvesWithPrix = neuves.map((model) => ({
+      ...model.toObject(),
+      prix_calcule: calculatePrix(model),
+      type: "neuf",
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: neuvesWithPrix,
+      message: "Voitures neuves récupérées avec succès",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des voitures neuves",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createModel_porsche,
   getAllModel_porsches,
@@ -742,4 +814,6 @@ export {
   getAllCarrosseries,
   getVariantesByVoitureModel,
   getAllVariantes,
+  getModelPorscheOccasions,
+  getModelPorscheNeuves,
 };

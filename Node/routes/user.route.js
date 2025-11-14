@@ -1,8 +1,3 @@
-/*
-  - Public: `register`, `login`
-  - Admin: liste complète des utilisateurs (`isAdmin`), modification des rôles
-  - Authenticated: accès au profil, gestion des réservations et des voitures personnelles
-*/
 import { Router } from "express";
 import {
   register,
@@ -30,63 +25,64 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
+// Routes publiques
 router.post("/register", register);
 router.post("/login", login);
 
 // Routes admin
 router.get("/all", auth, isAdmin, getAllUsers);
 router.get("/roles", auth, isAdmin, getAvailableUserRoles);
-router.put("/:id/role", auth, isAdmin, validateObjectId("id"), updateUserRole);
+router.put("/role/:id", auth, isAdmin, validateObjectId("id"), updateUserRole);
 
 // Routes utilisateur
 router.get("/:id", auth, validateObjectId("id"), getUserById);
-router.put("/:id", auth, validateObjectId("id"), updateUser);
-router.delete("/:id", auth, validateObjectId("id"), deleteUser);
+router.put("/update/:id", auth, validateObjectId("id"), updateUser);
+router.delete("/delete/:id", auth, validateObjectId("id"), deleteUser);
 // Profil
-router.get("/:id/profile", auth, validateObjectId("id"), getUserProfile);
-router.get("/:id/dashboard", auth, validateObjectId("id"), getUserDashboard);
+router.get("/profile/:id", auth, validateObjectId("id"), getUserProfile);
+router.get("/dashboard/:id", auth, validateObjectId("id"), getUserDashboard);
 // Gestion des réservations
 router.post(
-  "/:id/reservations",
+  "/reservations/new/:id",
   auth,
-  validateObjectId("id"),
+  validateObjectId("id"), //id utilisateur
   createUserReservation
 );
 router.get(
-  "/:id/reservations",
+  "/reservations/:id",
   auth,
-  validateObjectId("id"),
+  validateObjectId("id"), //id utilisateur
   getUserReservations
 );
-router.put(
-  "/:id/reservations/:reservationId/cancel",
+router.patch(
+  "/cancel/reservations/:id/:reservationId",
   auth,
-  validateObjectId("id"),
-  validateObjectId("reservationId"),
+  validateObjectId("id"), //id utilisateur
+  validateObjectId("reservationId"), //id réservation
   cancelUserReservation
 );
 router.delete(
-  "/:id/reservations/:reservationId",
+  "/delete/reservations/:id/:reservationId",
   auth,
-  validateObjectId("id"),
-  validateObjectId("reservationId"),
+  validateObjectId("id"), //id utilisateur
+  validateObjectId("reservationId"), //id réservation
   deleteUserReservation
 );
 // Gestion des voitures actuellles
-router.post("/:id/porsches", auth, validateObjectId("id"), addUserPorsche);
-router.get("/:id/porsches", auth, validateObjectId("id"), getUserPorsches);
-router.put(
-  "/:id/porsches/:porscheId",
+router.post("/porsches/new/:id", auth, validateObjectId("id"), addUserPorsche);
+router.get("/porsches/:id", auth, validateObjectId("id"), getUserPorsches);
+router.patch(
+  "/update/porsches/:id/:porscheId",
   auth,
-  validateObjectId("id"),
-  validateObjectId("porscheId"),
+  validateObjectId("id"), //id utilisateur
+  validateObjectId("porscheId"), //id porsche
   updateUserPorsche
 );
 router.delete(
-  "/:id/porsches/:porscheId",
+  "/delete/porsches/:id/:porscheId",
   auth,
-  validateObjectId("id"),
-  validateObjectId("porscheId"),
+  validateObjectId("id"), //id utilisateur
+  validateObjectId("porscheId"), //id porsche
   deleteUserPorsche
 );
 

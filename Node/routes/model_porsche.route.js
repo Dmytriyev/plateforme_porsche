@@ -22,78 +22,117 @@ import {
   getAllCarrosseries,
   getVariantesByVoitureModel,
   getAllVariantes,
+  getModelPorscheOccasions,
+  getModelPorscheNeuves,
 } from "../controllers/model_porsche.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 import isStaff from "../middlewares/isStaff.js";
+import { upload } from "../middlewares/multer.js";
 
 const router = Router();
 
+// Middleware flexible pour accepter multipart/form-data
+const optionalUpload = (req, res, next) => {
+  const contentType = req.headers && req.headers["content-type"];
+  const isMultipart =
+    contentType && contentType.includes("multipart/form-data");
+  if (!isMultipart) return next();
+  // Si c'est multipart/form-data, utiliser multer
+  return upload.any()(req, res, (err) => {
+    if (err) return next(err);
+    // multer met les champs texte dans req.body et les fichiers dans req.files
+    // Normaliser pour compatibilité : si un seul fichier, exposer req.file
+    if (req.files && req.files.length > 0) {
+      req.file = req.files[0];
+    }
+    next();
+  });
+};
+
 // Routes publiques
-router.get("/carrosseries", getAllCarrosseries);
-router.get("/variantes", getAllVariantes);
-router.get("/variantes/:nomModel", getVariantesByVoitureModel);
-router.get("/all", getAllModel_porsches);
-router.get("/:id", validateObjectId("id"), getModel_porscheById);
-router.get("/:id/prix-total", validateObjectId("id"), calculatePrixTotal);
+router.get("/carrosseries", getAllCarrosseries); // toutes carrosseries disponibles (SUV, Coupé, Cabriolet, etc.)
+router.get("/variantes", getAllVariantes); // toutes variantes disponibles (ex: 911, Cayenne, Macan, etc.)
+router.get("/variantes/:nomModel", getVariantesByVoitureModel); // ex: /variantes/911 (retourne toutes variantes de la 911)
+router.get("/occasions", getModelPorscheOccasions); // modèles d'occasion
+router.get("/neuves", getModelPorscheNeuves); // modèles neufs
+router.get("/all", getAllModel_porsches); // tous les modèles Porsche
+router.get("/prixTotal/:id", validateObjectId("id"), calculatePrixTotal); // calcul prix total avec options (couleurs, jantes, accessoires)
 router.get(
-  "/par-voiture/:voiture_id",
-  validateObjectId("voiture_id"),
+  "/voiture/:voiture_id",
+  validateObjectId("voiture_id"), // id de la voiture
   getConfigurationsByVoiture
-);
+); // récupérer configurations d'une voiture spécifique (avec couleurs, jantes, accessoires)
+// Route paramétrée id (doit être après les routes plus spécifiques)
+router.get("/:id", validateObjectId("id"), getModel_porscheById);
 
 // Routes staff (création/modification)
-router.post("/new", auth, isStaff, createModel_porsche);
-router.put("/:id", auth, isStaff, validateObjectId("id"), updateModel_porsche);
-router.put("/:id/images/add", auth, isStaff, validateObjectId("id"), addImages);
-router.delete(
-  "/:id/images/remove",
+router.post("/new", auth, isStaff, optionalUpload, createModel_porsche);
+router.put(
+  "/update/:id",
   auth,
   isStaff,
-  validateObjectId("id"),
+  validateObjectId("id"), // id du modèle Porsche
+  optionalUpload,
+  updateModel_porsche
+);
+router.patch(
+  "/addImages/:id",
+  auth,
+  isStaff,
+  validateObjectId("id"), // id du modèle Porsche
+  optionalUpload,
+  addImages
+);
+router.patch(
+  "/removeImages/:id",
+  auth,
+  isStaff,
+  validateObjectId("id"), // id du modèle Porsche
+  optionalUpload,
   removeImages
 );
 
-router.put(
-  "/:id/couleur-exterieur/add",
+router.patch(
+  "/addCouleurExterieur/:id",
   auth,
   isStaff,
-  validateObjectId("id"),
+  validateObjectId("id"), // id du modèle Porsche
   addCouleurExterieur
 );
-router.delete(
-  "/:id/couleur-exterieur/remove",
+router.patch(
+  "/removeCouleurExterieur/:id",
   auth,
   isStaff,
-  validateObjectId("id"),
+  validateObjectId("id"), // id du modèle Porsche
   removeCouleurExterieur
 );
 
-router.put(
-  "/:id/couleurs-interieur/add",
+router.patch(
+  "/addCouleursInterieur/:id",
   auth,
   isStaff,
   validateObjectId("id"),
   addCouleursInterieur
 );
-router.delete(
-  "/:id/couleurs-interieur/remove",
+router.patch(
+  "/removeCouleursInterieur/:id",
   auth,
   isStaff,
   validateObjectId("id"),
   removeCouleursInterieur
 );
 
-router.put(
-  "/:id/taille-jante/add",
+router.patch(
+  "/addTailleJante/:id",
   auth,
   isStaff,
   validateObjectId("id"),
   addTailleJante
 );
-router.delete(
-  "/:id/taille-jante/remove",
+router.patch(
+  "/removeTailleJante/:id",
   auth,
   isStaff,
   validateObjectId("id"),
@@ -102,7 +141,7 @@ router.delete(
 
 // Suppression admin uniquement
 router.delete(
-  "/:id",
+  "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),

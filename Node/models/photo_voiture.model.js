@@ -10,7 +10,6 @@ const photo_voitureSchema = new mongoose.Schema(
     },
     alt: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 100,
     },

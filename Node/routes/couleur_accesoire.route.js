@@ -1,8 +1,3 @@
-/*
-  - Public: lecture
-  - Staff (admin, responsable, conseillère): création/édition
-  - Admin: suppression
-*/
 import { Router } from "express";
 import {
   createCouleur_accesoire,
@@ -18,6 +13,8 @@ import isAdmin from "../middlewares/isAdmin.js";
 import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
+
+// Middleware flexible pour accepter multipart/form-data
 const optionalUpload = (req, res, next) => {
   // Si c'est multipart/form-data, utiliser multer
   if (req.is("multipart/form-data")) {
@@ -26,21 +23,25 @@ const optionalUpload = (req, res, next) => {
   // Sinon, body-parser gère le JSON
   next();
 };
+
 // Routes publiques
 router.get("/all", getAllCouleur_accesoires);
 router.get("/:id", validateObjectId("id"), getCouleur_accesoireById);
+
 // Routes staff
 router.post("/new", auth, isStaff, optionalUpload, createCouleur_accesoire);
 router.put(
-  "/:id",
+  "/update/:id",
   auth,
   isStaff,
   validateObjectId("id"),
+  optionalUpload,
   updateCouleur_accesoire
 );
-// Routes admin uniquement
+
+// Routes admin
 router.delete(
-  "/:id",
+  "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),

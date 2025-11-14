@@ -10,7 +10,7 @@ export default function packageValidation(body) {
       .string()
       .valid(...TYPES_PACKAGE)
       .required(),
-    description: joi.string().max(1000).required(),
+    description: joi.string().max(1000),
     prix: joi.number().min(0).max(100000),
     photo_package: joi.string(),
     disponible: joi.boolean(),

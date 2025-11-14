@@ -6,15 +6,25 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import { removeUploadedFile } from "../utils/fileConstants.js";
 
 // Controller pour gérer les couleurs intérieures
 const createCouleurInterieur = async (req, res) => {
   try {
     // Vérifier si le corps de la requête est vide
     if (isEmptyBody(req.body)) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_interieur");
+      }
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Si un fichier est uploadé, ajouter le chemin complet de la photo
+    if (req.file) {
+      req.body.photo_couleur =
+        "/uploads/couleur_interieur/" + req.file.filename;
     }
 
     // Valider les données de la requête
@@ -24,6 +34,9 @@ const createCouleurInterieur = async (req, res) => {
     // Récupérer l'erreur de validation s'il y en a une
     const validationError = getValidationError(validation);
     if (validationError) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_interieur");
+      }
       return res.status(400).json({ message: validationError });
     }
 
@@ -35,6 +48,9 @@ const createCouleurInterieur = async (req, res) => {
       couleur: newCouleur_interieur,
     });
   } catch (error) {
+    if (req.file) {
+      removeUploadedFile(req.file.filename, "couleur_interieur");
+    }
     return handleError(res, error, "createCouleur_interieur");
   }
 };
@@ -74,10 +90,16 @@ const getCouleurInterieurById = async (req, res) => {
 // Mettre à jour une couleur intérieure par ID
 const updateCouleurInterieur = async (req, res) => {
   try {
-    if (isEmptyBody(req.body)) {
+    if (isEmptyBody(req.body) && !req.file) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
+    }
+
+    // Si un fichier est uploadé, ajouter le chemin complet de la photo
+    if (req.file) {
+      req.body.photo_couleur =
+        "/uploads/couleur_interieur/" + req.file.filename;
     }
 
     const validation = couleur_interieurValidation(
@@ -85,8 +107,21 @@ const updateCouleurInterieur = async (req, res) => {
     ).couleur_interieurUpdate;
     const validationError = getValidationError(validation);
     if (validationError) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_interieur");
+      }
       return res.status(400).json({ message: validationError });
     }
+
+    // Récupérer l'ancienne couleur pour supprimer l'ancienne photo si une nouvelle est uploadée
+    if (req.file) {
+      const oldCouleur = await Couleur_interieur.findById(req.params.id);
+      if (oldCouleur && oldCouleur.photo_couleur) {
+        const oldFilename = oldCouleur.photo_couleur.split("/").pop();
+        removeUploadedFile(oldFilename, "couleur_interieur");
+      }
+    }
+
     // Mettre à jour la couleur intérieure dans la base de données
     const updatedCouleur_interieur = await Couleur_interieur.findByIdAndUpdate(
       req.params.id,
@@ -95,6 +130,9 @@ const updateCouleurInterieur = async (req, res) => {
     );
     // Vérifier si la couleur intérieure existe après mise à jour
     if (!updatedCouleur_interieur) {
+      if (req.file) {
+        removeUploadedFile(req.file.filename, "couleur_interieur");
+      }
       return res
         .status(404)
         .json({ message: "Couleur intérieure n'existe pas" });
@@ -105,6 +143,9 @@ const updateCouleurInterieur = async (req, res) => {
       couleur: updatedCouleur_interieur,
     });
   } catch (error) {
+    if (req.file) {
+      removeUploadedFile(req.file.filename, "couleur_interieur");
+    }
     return handleError(res, error, "updateCouleur_interieur");
   }
 };
@@ -121,6 +162,12 @@ const deleteCouleurInterieur = async (req, res) => {
       return res
         .status(404)
         .json({ message: "Couleur intérieure n'existe pas" });
+    }
+
+    // Supprimer la photo associée si elle existe
+    if (couleur_interieur.photo_couleur) {
+      const filename = couleur_interieur.photo_couleur.split("/").pop();
+      removeUploadedFile(filename, "couleur_interieur");
     }
 
     return res

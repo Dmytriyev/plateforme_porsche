@@ -10,7 +10,6 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
     },
     alt: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 100,
     },
@@ -19,6 +18,16 @@ const photo_voiture_actuelSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Model_porsche_actuel",
       required: true,
+    },
+    // Relation Many-to-One: Couleur extérieure
+    couleur_exterieur: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Couleur_exterieur",
+    },
+    // Relation Many-to-One: Couleur intérieure
+    couleur_interieur: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Couleur_interieur",
     },
   },
   { timestamps: true }

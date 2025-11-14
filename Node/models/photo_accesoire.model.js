@@ -10,7 +10,6 @@ const photo_accesoireSchema = new mongoose.Schema(
     },
     alt: {
       type: String,
-      required: true,
       trim: true,
       maxlength: 100,
     },
@@ -19,6 +18,11 @@ const photo_accesoireSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Accesoire",
       required: true,
+    },
+    // Relation Many-to-One: couleur spécifique
+    couleur_accesoire: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Couleur_accesoire",
     },
   },
   { timestamps: true }

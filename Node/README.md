@@ -13,6 +13,21 @@ npm start
 
 Variables d'environnement : `MONGO_URI`, `JWT_SECRET`, `PORT`
 
+## Architecture Générale
+
+L'application utilise une architecture en 2 niveaux pour gérer les voitures :
+
+```
+VOITURE (modèle de base)
+    |
+    +-- type_voiture: true  -> Voiture NEUVE
+    |
+    +-- type_voiture: false -> Voiture d'OCCASION
+        |
+        v
+MODEL_PORSCHE (variante spécifique avec caractéristiques)
+```
+
 ## Authentification
 
 Toutes les routes nécessitent un JWT (sauf register/login) :
@@ -27,7 +42,7 @@ Authorization: Bearer TOKEN
 - **Conseiller** : consulter réservations, valider propositions vente
 - **User** : profil, réserver, commander, gérer ses voitures
 
-## Endpoints principaux
+## Endpoints principaux.
 
 - Auth : `/api/users/register`, `/api/users/login`, `/api/users/profile`
 - Accesoires : `/api/accesoire`, `/api/couleur-accesoire`, `/api/photo-accesoire`
@@ -38,7 +53,7 @@ Authorization: Bearer TOKEN
 - Commandes : `/api/commande`
 - Paiement : `/api/payment`
 
-## Workflows
+## Workflows.
 
 - **Voiture neuve** : créer options → `voiture` → `model-porsche` → photos
 - **Voiture occasion** : créer `model-porsche` → photos

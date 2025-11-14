@@ -10,7 +10,7 @@ export default function reservationValidation(body) {
     status: joi.boolean(),
     // user ne pas fourni par l'utilisateur (fourni depuis le token)
     user: joi.forbidden(),
-    voiture: joi.string().hex().length(24).required(),
+    model_porsche: joi.string().hex().length(24).required(),
   });
 
   const reservationUpdate = joi.object({
@@ -18,7 +18,7 @@ export default function reservationValidation(body) {
     status: joi.boolean(),
     // Empêcher la modification du propriétaire
     user: joi.forbidden(),
-    voiture: joi.string().hex().length(24),
+    model_porsche: joi.string().hex().length(24),
   });
 
   return {

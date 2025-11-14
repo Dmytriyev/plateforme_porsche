@@ -7,6 +7,7 @@ import Model_porsche from "../models/model_porsche.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 // Créer une nouvelle photo Porsche
 const createPhoto_porsche = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const createPhoto_porsche = async (req, res) => {
     if (!req.user) {
       if (req.file) {
         // Supprimer le fichier uploadé en cas de non-authentification
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
@@ -22,7 +23,7 @@ const createPhoto_porsche = async (req, res) => {
     if (!req.user.isAdmin) {
       if (req.file) {
         // Supprimer le fichier uploadé en cas d'absence de droits admin
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
@@ -33,7 +34,7 @@ const createPhoto_porsche = async (req, res) => {
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(400)
@@ -41,18 +42,13 @@ const createPhoto_porsche = async (req, res) => {
     }
     // Si un fichier est uploadé, ajouter le champ name avec l'URL complète de l'image
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/model_porsche/" +
-        req.file.filename;
+      body.name = "/uploads/model_porsche/" + req.file.filename;
     }
 
     const { error } = photo_porscheValidation(body).photo_porscheCreate;
     if (error) {
       if (req.file) {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -61,7 +57,7 @@ const createPhoto_porsche = async (req, res) => {
     const model_porsche = await Model_porsche.findById(body.model_porsche);
     if (!model_porsche) {
       if (req.file) {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(404).json({ message: "Modèle Porsche introuvable" });
     }
@@ -81,7 +77,7 @@ const createPhoto_porsche = async (req, res) => {
     });
   } catch (error) {
     if (req.file) {
-      fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -119,7 +115,7 @@ const updatePhoto_porsche = async (req, res) => {
   try {
     if (!req.user) {
       if (req.file) {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
@@ -127,7 +123,7 @@ const updatePhoto_porsche = async (req, res) => {
     if (!req.user.isAdmin) {
       if (req.file) {
         // Supprimer le fichier uploadé en cas d'absence de droits admin
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
@@ -144,12 +140,7 @@ const updatePhoto_porsche = async (req, res) => {
     }
     // Si un fichier est uploadé, mettre à jour le champ name avec l'URL complète de l'image
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/model_porsche/" +
-        req.file.filename;
+      body.name = "/uploads/model_porsche/" + req.file.filename;
     }
     // Valider seulement si body n'est pas vide
     if (body && Object.keys(body).length > 0) {
@@ -157,7 +148,7 @@ const updatePhoto_porsche = async (req, res) => {
       if (error) {
         // Nettoyer le fichier uploadé en cas d'erreur de validation
         if (req.file) {
-          fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(400).json({ message: error.details[0].message });
       }
@@ -167,7 +158,7 @@ const updatePhoto_porsche = async (req, res) => {
       const model_porsche = await Model_porsche.findById(body.model_porsche);
       if (!model_porsche) {
         if (req.file) {
-          fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(404).json({ message: "Modèle Porsche introuvable" });
       }
@@ -178,22 +169,13 @@ const updatePhoto_porsche = async (req, res) => {
     if (!oldPhoto) {
       // Nettoyer le nouveau fichier si la photo n'existe pas
       if (req.file) {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(404).json({ message: "Photo Porsche n'existe pas" });
     }
     // Si on remplace l'image, supprimer l'ancienne du système de fichiers
     if (req.file && oldPhoto.name) {
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/model_porsche/",
-        oldPhoto.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        try {
-          fs.unlinkSync(oldPath);
-        } catch (err) {}
-      }
+      removeUploadedFile(oldPhoto.name.split("/").at(-1));
     }
 
     // Mettre à jour la photo Porsche dans la base de données
@@ -209,11 +191,25 @@ const updatePhoto_porsche = async (req, res) => {
   } catch (error) {
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
-      try {
-        fs.unlinkSync("./uploads/model_porsche/" + req.file.filename);
-      } catch (err) {}
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Supprimer un fichier uploadé
+const removeUploadedFile = (FilenameOrPath) => {
+  try {
+    // Accepte soit un chemin absolu, soit juste le nom de fichier
+    const filePath = path.isAbsolute(FilenameOrPath)
+      ? FilenameOrPath
+      : path.join(__dirname, "../uploads/model_porsche/", FilenameOrPath);
+    // Supprimer le fichier s'il existe
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    console.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 
@@ -238,14 +234,7 @@ const deletePhoto_porsche = async (req, res) => {
     }
     // Supprimer le fichier image du système de fichiers s'il existe
     if (photo_porsche.name) {
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/model_porsche/",
-        photo_porsche.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      removeUploadedFile(photo_porsche.name.split("/").at(-1));
     }
     await photo_porsche.deleteOne();
     return res

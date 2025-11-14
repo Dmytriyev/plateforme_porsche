@@ -52,7 +52,7 @@ app.use(helmet()); // Définit des headers de sécurité HTTP
 // Limiteur global pour éviter le DDoS attaques
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // fenêtre de 15 minutes
-  max: 100, // max 100 requêtes par IP
+  max: 1000, // max 100 requêtes par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -61,7 +61,7 @@ const globalLimiter = rateLimit({
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // max 10 tentatives par IP
+  max: 100, // max 10 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -70,21 +70,21 @@ const loginLimiter = rateLimit({
 // Limiteur pour les inscriptions utilisateurs
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 5, // max 5 inscriptions par IP
+  max: 50, // max 5 inscriptions par IP
   message: "Trop d'inscriptions, réessayez dans 1 heure",
 });
 
 // Limiteur pour les endpoints de paiement
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 20, // max 20 tentatives de paiement par IP
+  max: 200, // max 20 tentatives de paiement par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 // Limiteur pour uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50, // max 50 uploads par IP
+  max: 500, // max 50 uploads par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
@@ -93,6 +93,8 @@ app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 
 // Parser JSON pour le reste des endpoints
 app.use(express.json());
+// Parser des bodies encodés en application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 // Logger des requêtes entrantes
 app.use((req, res, next) => {
@@ -136,6 +138,7 @@ app.use("/user", userRoutes);
 // Paiement avec limiteur payment
 app.use("/api/payment", paymentLimiter, paymentRoutes);
 
+// Routes user
 app.use("/reservation", reservationRoutes);
 app.use("/commande", commandeRoutes);
 app.use("/ligneCommande", ligneCommandeRoutes);
@@ -160,11 +163,11 @@ const gracefulShutdown = (signal, err) => {
     logger.info("Closed out remaining connections");
     process.exit(err ? 1 : 0);
   });
-  // si après 10s toujours pas fermé, forcer la sortie
+  // si après 20s toujours pas fermé, forcer la sortie
   setTimeout(() => {
     logger.error("Forcing shutdown");
     process.exit(1);
-  }, 10000).unref();
+  }, 20000).unref();
 };
 
 // Capturer les erreurs non gérées

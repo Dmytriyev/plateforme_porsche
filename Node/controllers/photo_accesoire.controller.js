@@ -16,7 +16,7 @@ const createPhoto_accesoire = async (req, res) => {
     if (!req.user) {
       // Supprimer le fichier uploadé en cas de non-authentification
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
@@ -25,7 +25,7 @@ const createPhoto_accesoire = async (req, res) => {
     if (!req.user.isAdmin) {
       if (req.file) {
         // Supprimer le fichier uploadé en cas de non-autorisation
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
@@ -34,30 +34,29 @@ const createPhoto_accesoire = async (req, res) => {
 
     // Vérifier la présence de données dans le body
     const { body } = req;
-    if (!body || Object.keys(body).length === 0) {
+
+    if ((!body || Object.keys(body).length === 0) && !req.file) {
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
+
     // Ajouter le champ name avec le chemin du fichier uploadé
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/accesoire/" +
-        req.file.filename;
+      body.name = "/uploads/accesoire/" + req.file.filename;
     }
 
     const { error } = photo_accesoireValidation(body).photo_accesoireCreate;
     if (error) {
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
-      return res.status(400).json({ message: error.details[0].message });
+      return res.status(400).json({
+        message: error.details[0].message,
+      });
     }
 
     // Créer et sauvegarder la nouvelle photo d'accesoire
@@ -69,7 +68,7 @@ const createPhoto_accesoire = async (req, res) => {
     });
   } catch (error) {
     if (req.file) {
-      fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
   }
@@ -105,14 +104,14 @@ const updatePhoto_accesoire = async (req, res) => {
   try {
     if (!req.user) {
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
     // Vérifier que l'utilisateur est admin
     if (!req.user.isAdmin) {
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
@@ -129,12 +128,7 @@ const updatePhoto_accesoire = async (req, res) => {
     }
     // Si un fichier est uploadé, mettre à jour le champ name
     if (req.file) {
-      body.name =
-        req.protocol +
-        "://" +
-        req.get("host") +
-        "/uploads/accesoire/" +
-        req.file.filename;
+      body.name = "/uploads/accesoire/" + req.file.filename;
     }
 
     // Valider seulement si body n'est pas vide
@@ -143,7 +137,7 @@ const updatePhoto_accesoire = async (req, res) => {
       if (error) {
         // Nettoyer le fichier uploadé en cas d'erreur de validation
         if (req.file) {
-          fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+          removeUploadedFile(req.file.filename);
         }
         return res.status(400).json({ message: error.details[0].message });
       }
@@ -154,7 +148,7 @@ const updatePhoto_accesoire = async (req, res) => {
     if (!oldPhoto) {
       // Nettoyer le nouveau fichier si la photo n'existe pas
       if (req.file) {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
+        removeUploadedFile(req.file.filename);
       }
       return res
         .status(404)
@@ -163,16 +157,7 @@ const updatePhoto_accesoire = async (req, res) => {
 
     // Si on remplace l'image, supprimer l'ancienne  du serveur de fichiers
     if (req.file && oldPhoto.name) {
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/accesoire/",
-        oldPhoto.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        try {
-          fs.unlinkSync(oldPath);
-        } catch (err) {}
-      }
+      removeUploadedFile(oldPhoto.name.split("/").at(-1));
     }
 
     // Mettre à jour la photo d'accesoire dans la base de données
@@ -188,11 +173,25 @@ const updatePhoto_accesoire = async (req, res) => {
   } catch (error) {
     // Nettoyer le fichier en cas d'erreur serveur
     if (req.file) {
-      try {
-        fs.unlinkSync("./uploads/accesoire/" + req.file.filename);
-      } catch (err) {}
+      removeUploadedFile(req.file.filename);
     }
     res.status(500).json({ message: "Erreur serveur", error: error });
+  }
+};
+
+// Supprimer un fichier uploadé
+const removeUploadedFile = (FilenameOrPath) => {
+  try {
+    // Accepte soit un chemin absolu, soit juste le nom de fichier
+    const filePath = path.isAbsolute(FilenameOrPath)
+      ? FilenameOrPath
+      : path.join(__dirname, "../uploads/accesoire/", FilenameOrPath);
+    // Vérifier l'existence du fichier avant de le supprimer
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (err) {
+    console.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 
@@ -218,14 +217,7 @@ const deletePhoto_accesoire = async (req, res) => {
     }
     // Supprimer le fichier associé si existant
     if (photo_accesoire.name) {
-      const oldPath = path.join(
-        __dirname,
-        "../uploads/accesoire/",
-        photo_accesoire.name.split("/").at(-1)
-      );
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+      removeUploadedFile(photo_accesoire.name.split("/").at(-1));
     }
     // Supprimer la photo d'accesoire de la base de données
     await photo_accesoire.deleteOne();

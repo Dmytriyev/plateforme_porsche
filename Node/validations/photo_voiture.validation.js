@@ -8,7 +8,7 @@ export default function photo_voitureValidation(body) {
 
   const photo_voitureCreate = joi.object({
     name: joi.string().required().max(250),
-    alt: joi.string().required().max(250),
+    alt: joi.string().max(250),
     voiture: joi.array().items(mongoIdSchema().required()), // Many-to-Many: plusieurs voitures
     couleur_exterieur: mongoIdSchema(), // Many-to-One: une seule couleur
     couleur_interieur: mongoIdSchema(), // Many-to-One: une seule couleur

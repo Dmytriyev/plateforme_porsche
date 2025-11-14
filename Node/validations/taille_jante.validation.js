@@ -7,10 +7,7 @@ export default function taille_janteValidation(body) {
       .string()
       .valid(...TAILLES_JANTE)
       .required(),
-    couleur_jante: joi
-      .string()
-      .valid(...COULEURS_JANTE)
-      .required(),
+    couleur_jante: joi.string().valid(...COULEURS_JANTE),
     photo_jante: joi.string(),
     description: joi.string().max(500),
     prix: joi.number().min(0).max(100000),

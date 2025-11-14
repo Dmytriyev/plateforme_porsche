@@ -1,7 +1,3 @@
-/*
-  - Public: lecture et récupération des couleurs
-  - Admin uniquement: création/édition/suppression
-*/
 import { Router } from "express";
 import {
   createCouleurInterieur,
@@ -17,6 +13,8 @@ import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 
 const router = Router();
+
+// Middleware flexible pour accepter multipart/form-data
 const optionalUpload = (req, res, next) => {
   // Si c'est multipart/form-data, utiliser multer
   if (req.is("multipart/form-data")) {
@@ -25,22 +23,24 @@ const optionalUpload = (req, res, next) => {
   // Sinon, body-parser gère le JSON
   next();
 };
+
 // Routes publiques
 router.get("/couleurs", getAvailableCouleursInterieurOptions);
 router.get("/all", getAllCouleurInterieur);
 router.get("/:id", validateObjectId("id"), getCouleurInterieurById);
 
-// Routes admin uniquement
+// Routes admin
 router.post("/new", auth, isAdmin, optionalUpload, createCouleurInterieur);
 router.put(
-  "/:id",
+  "/update/:id",
   auth,
   isAdmin,
-  validateObjectId("id"),
+  validateObjectId("id"), // id couleur intérieur
+  optionalUpload,
   updateCouleurInterieur
 );
 router.delete(
-  "/:id",
+  "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),

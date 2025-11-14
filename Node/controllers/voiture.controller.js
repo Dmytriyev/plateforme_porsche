@@ -354,6 +354,24 @@ const getVoituresNeuves = async (req, res) => {
       })
       .filter(Boolean);
 
+    // Si aucune variante détaillée n'a été trouvée, retourner les voitures de base
+    if (!voituresEnrichies || voituresEnrichies.length === 0) {
+      const voituresSimples = voitures.map((voiture) => ({
+        _id: voiture._id,
+        nom_model: voiture.nom_model,
+        description: voiture.description,
+        photo_voiture: voiture.photo_voiture || [],
+        type_voiture: voiture.type_voiture,
+        message:
+          "Variantes détaillées non disponibles - Contactez le concessionnaire",
+      }));
+
+      return sendSuccess(res, {
+        voitures: voituresSimples,
+        count: voituresSimples.length,
+      });
+    }
+
     return sendSuccess(res, {
       voitures: voituresEnrichies,
       count: voituresEnrichies.length,
@@ -390,11 +408,18 @@ const getVoituresOccasionFinder = async (req, res) => {
         });
       }
     }
-    const voitures = await Voiture.find(voituresQuery).lean();
+    const voitures = await Voiture.find(voituresQuery)
+      .populate("photo_voiture", "name alt")
+      .lean();
+
     if (!voitures || voitures.length === 0) {
-      return sendSuccess(res, { voitures: [], count: 0 });
-      // Pas de voitures correspondant aux critères
+      return sendSuccess(res, {
+        voitures: [],
+        count: 0,
+        message: "Aucune voiture d'occasion ne correspond aux critères",
+      });
     }
+
     // Filtres model_porsche
     const filters = {
       voiture: { $in: voitures.map((v) => v._id) },
@@ -422,6 +447,32 @@ const getVoituresOccasionFinder = async (req, res) => {
       .populate("couleur_interieur", "nom_couleur")
       .sort({ annee_production: -1 })
       .lean();
+
+    // Si aucune variante Model_porsche n'existe, retourner les Voitures d'occasion de base
+    if (!occasions || occasions.length === 0) {
+      const voituresSimples = voitures.map((voiture) => ({
+        _id: voiture._id,
+        nom_model: voiture.nom_model,
+        description: voiture.description,
+        photo_voiture: voiture.photo_voiture || [],
+        type_voiture: voiture.type_voiture,
+        message:
+          "Variantes détaillées non disponibles - Contactez le concessionnaire",
+      }));
+
+      return sendSuccess(res, {
+        voitures: voituresSimples,
+        count: voituresSimples.length,
+        filtres_appliques: {
+          modele: modele || "tous",
+          carrosserie: carrosserie || "toutes",
+          annee:
+            annee_min && annee_max ? `${annee_min}-${annee_max}` : "toutes",
+          prix_max: prix_max || "illimité",
+        },
+      });
+    }
+
     // Appliquer les filtres et formater les résultats Porsche Certified
     const occasionsFiltrees = occasions;
     const voituresFormatees = occasionsFiltrees.map((occasion) => {
