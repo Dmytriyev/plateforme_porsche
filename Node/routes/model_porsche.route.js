@@ -69,7 +69,7 @@ router.get("/:id", validateObjectId("id"), getModel_porscheById);
 
 // Routes staff (création/modification)
 router.post("/new", auth, isStaff, optionalUpload, createModel_porsche);
-router.put(
+router.patch(
   "/update/:id",
   auth,
   isStaff,

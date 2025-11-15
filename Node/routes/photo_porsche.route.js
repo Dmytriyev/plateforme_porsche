@@ -14,11 +14,17 @@ import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
-// Middleware flexible pour accepter différents noms de champ
+// Middleware flexible pour accepter différents noms de champ (tolérant)
 const optionalUpload = (req, res, next) => {
-  // Si c'est multipart/form-data, utiliser multer
+  // Si c'est multipart/form-data, utiliser multer.any() puis normaliser req.file
   if (req.is("multipart/form-data")) {
-    return upload.single("photo")(req, res, next);
+    return upload.any()(req, res, (err) => {
+      if (err) return next(err);
+      if (req.files && req.files.length > 0) {
+        req.file = req.files[0];
+      }
+      return next();
+    });
   }
   // Sinon, body-parser gère le JSON
   next();

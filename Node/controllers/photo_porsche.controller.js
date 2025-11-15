@@ -19,19 +19,38 @@ const createPhoto_porsche = async (req, res) => {
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
+    // Vérifier que l'utilisateur est admin ou staff
+    if (!(req.user.isAdmin || req.user.isStaff)) {
       if (req.file) {
-        // Supprimer le fichier uploadé en cas d'absence de droits admin
+        // Supprimer le fichier uploadé en cas d'absence de droits
         removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
+        .json({ message: "Accès réservé aux administrateurs ou au personnel" });
     }
 
     // Valider les données de la requête
-    const { body } = req;
+    let body = req.body || {};
+    // Si un fichier est uploadé, ajouter le champ name avec l'URL complète de l'image
+    if (req.file) {
+      body.name = "/uploads/model_porsche/" + req.file.filename;
+    }
+
+    // Supprimer du body les champs correspondant aux fichiers envoyés (ex: "photo")
+    if (req.files && Array.isArray(req.files)) {
+      for (const f of req.files) {
+        if (
+          f &&
+          f.fieldname &&
+          body &&
+          Object.prototype.hasOwnProperty.call(body, f.fieldname)
+        ) {
+          delete body[f.fieldname];
+        }
+      }
+    }
+
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
         removeUploadedFile(req.file.filename);
@@ -39,10 +58,6 @@ const createPhoto_porsche = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
-    }
-    // Si un fichier est uploadé, ajouter le champ name avec l'URL complète de l'image
-    if (req.file) {
-      body.name = "/uploads/model_porsche/" + req.file.filename;
     }
 
     const { error } = photo_porscheValidation(body).photo_porscheCreate;
@@ -53,13 +68,15 @@ const createPhoto_porsche = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Vérifier que le modèle Porsche existe
-    const model_porsche = await Model_porsche.findById(body.model_porsche);
-    if (!model_porsche) {
-      if (req.file) {
-        removeUploadedFile(req.file.filename);
+    // Vérifier que le modèle Porsche existe si fourni
+    if (body.model_porsche) {
+      const model_porsche = await Model_porsche.findById(body.model_porsche);
+      if (!model_porsche) {
+        if (req.file) {
+          removeUploadedFile(req.file.filename);
+        }
+        return res.status(404).json({ message: "Modèle Porsche introuvable" });
       }
-      return res.status(404).json({ message: "Modèle Porsche introuvable" });
     }
 
     // Créer et sauvegarder la nouvelle photo Porsche
@@ -119,15 +136,15 @@ const updatePhoto_porsche = async (req, res) => {
       }
       return res.status(401).json({ message: "Non autorisé" });
     }
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
+    // Vérifier que l'utilisateur est admin ou staff
+    if (!(req.user.isAdmin || req.user.isStaff)) {
       if (req.file) {
-        // Supprimer le fichier uploadé en cas d'absence de droits admin
+        // Supprimer le fichier uploadé en cas d'absence de droits
         removeUploadedFile(req.file.filename);
       }
       return res
         .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
+        .json({ message: "Accès réservé aux administrateurs ou au personnel" });
     }
 
     // Valider les données de la requête
@@ -141,6 +158,19 @@ const updatePhoto_porsche = async (req, res) => {
     // Si un fichier est uploadé, mettre à jour le champ name avec l'URL complète de l'image
     if (req.file) {
       body.name = "/uploads/model_porsche/" + req.file.filename;
+    }
+    // Supprimer du body les champs correspondant aux fichiers envoyés (ex: "photo")
+    if (req.files && Array.isArray(req.files)) {
+      for (const f of req.files) {
+        if (
+          f &&
+          f.fieldname &&
+          body &&
+          Object.prototype.hasOwnProperty.call(body, f.fieldname)
+        ) {
+          delete body[f.fieldname];
+        }
+      }
     }
     // Valider seulement si body n'est pas vide
     if (body && Object.keys(body).length > 0) {
