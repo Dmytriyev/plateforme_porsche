@@ -28,7 +28,7 @@ const accesoireSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
-      max: 1000000,
+      max: 100000,
     },
     // Relation Many-to-One: Couleur de l'accessoire
     couleur_accesoire: {

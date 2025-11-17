@@ -3,7 +3,7 @@ import joi from "joi";
 export default function CommandeValidation(body) {
   const CommandeCreate = joi.object({
     date_commande: joi.date().greater("now"),
-    prix: joi.number().min(0).max(100000000),
+    prix: joi.number().min(0).max(10000000),
     acompte: joi.number().min(0),
     status: joi.boolean(),
     factureUrl: joi.string(),

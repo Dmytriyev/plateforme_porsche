@@ -49,20 +49,23 @@ db();
 const allowedOrigins = [
   process.env.FRONTEND_URL || "http://localhost:5173",
   "http://localhost:3000",
-].map((url) => url.replace(/\/$/, "")); // Normaliser en retirant le slash final
+].map((url) => url.replace(/\/$/, "")); // retirer le slash final
 
+// Options CORS personnalisées
 const corsOptions = {
   origin: (origin, callback) => {
-    // Permettre les requêtes sans origin (Postman, curl, apps mobiles)
+    // Permettre les requêtes sans origin
     if (!origin) return callback(null, true);
-
+    // Vérifier si l'origine est dans la liste des autorisées
     const normalizedOrigin = origin.replace(/\/$/, "");
     if (allowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
+      // Rejeter les origines non autorisées
       callback(new Error(`Origin ${origin} non autorisée par CORS`));
     }
   },
+  // Autoriser les cookies et les credentials
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -86,7 +89,7 @@ const globalLimiter = rateLimit({
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // max 10 tentatives par IP
-  message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
+  message: "Trop de tentatives de connexion, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -95,7 +98,7 @@ const loginLimiter = rateLimit({
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
   max: 5, // max 5 inscriptions par IP
-  message: "Trop d'inscriptions, réessayez dans 1 heure",
+  message: "Trop d'inscriptions, réessayez plus tard",
 });
 
 // Limiteur pour les endpoints de paiement
@@ -120,52 +123,51 @@ app.use(express.json());
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// Déduplication des requêtes en double (navigateur Chrome envoie parfois 2 requêtes identiques)
-// Cache temporaire : key = "METHOD:URL:IP", value = timestamp
-const requestCache = new Map();
-const DEDUPE_WINDOW_MS = 100; // Ignorer les doublons dans une fenêtre de 100ms
+// // Cache pour la déduplication des logs de requêtes
+// const requestCache = new Map();
+// // Fenêtre de déduplication en ms
+// const DEDUPE_WINDOW_MS = 100;
 
-// Logger des requêtes entrantes avec déduplication
-app.use((req, res, next) => {
-  // Ignorer favicon et OPTIONS
-  if (req.originalUrl === "/favicon.ico" || req.method === "OPTIONS") {
-    return next();
-  }
+// // Logger des requêtes entrantes avec déduplication
+// app.use((req, res, next) => {
+//   // Ignorer favicon et OPTIONS
+//   if (req.originalUrl === "/favicon.ico" || req.method === "OPTIONS") {
+//     return next();
+//   }
+//   const ip = req.ip || req.connection?.remoteAddress || "unknown";
+//   const key = `${req.method}:${req.originalUrl}:${ip}`;
+//   const now = Date.now();
+//   const lastRequestTime = requestCache.get(key);
 
-  const ip = req.ip || req.connection?.remoteAddress || "unknown";
-  const key = `${req.method}:${req.originalUrl}:${ip}`;
-  const now = Date.now();
-  const lastRequestTime = requestCache.get(key);
+//   // Si une requête identique a été loggée il y a moins de 100ms, on la skip
+//   if (lastRequestTime && now - lastRequestTime < DEDUPE_WINDOW_MS) {
+//     return next(); // Passe sans logger
+//   }
 
-  // Si une requête identique a été loggée il y a moins de 100ms, on la skip
-  if (lastRequestTime && now - lastRequestTime < DEDUPE_WINDOW_MS) {
-    return next(); // Passe sans logger
-  }
+//   // Mettre à jour le cache
+//   requestCache.set(key, now);
 
-  // Mettre à jour le cache
-  requestCache.set(key, now);
+//   // Nettoyer les anciennes entrées du cache toutes les 1000 requêtes
+//   if (requestCache.size > 1000) {
+//     const threshold = now - DEDUPE_WINDOW_MS * 2;
+//     for (const [k, timestamp] of requestCache.entries()) {
+//       if (timestamp < threshold) {
+//         requestCache.delete(k);
+//       }
+//     }
+//   }
 
-  // Nettoyer les anciennes entrées du cache toutes les 1000 requêtes
-  if (requestCache.size > 1000) {
-    const threshold = now - DEDUPE_WINDOW_MS * 2;
-    for (const [k, timestamp] of requestCache.entries()) {
-      if (timestamp < threshold) {
-        requestCache.delete(k);
-      }
-    }
-  }
-
-  const start = Date.now();
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    const ua = req.headers["user-agent"] || "-";
-    logger.info(
-      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
-      { ip, ua }
-    );
-  });
-  next();
-});
+//   const start = Date.now();
+//   res.on("finish", () => {
+//     const duration = Date.now() - start;
+//     const ua = req.headers["user-agent"] || "-";
+//     logger.info(
+//       `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
+//       { ip, ua }
+//     );
+//   });
+//   next();
+// });
 
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);

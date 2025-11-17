@@ -1,6 +1,3 @@
-/*
-  liées aux gammes/variantes (associations avec voiture/couleurs/jantes).
-*/
 import joi from "joi";
 
 export default function photo_voitureValidation(body) {

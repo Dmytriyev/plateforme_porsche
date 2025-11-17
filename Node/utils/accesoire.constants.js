@@ -17,12 +17,14 @@ export const getAvailableTypesAccesoire = () => {
     label: type.charAt(0).toUpperCase() + type.slice(1),
   }));
 };
+// Descriptions détaillées
 export const TYPE_ACCESOIRE_DESCRIPTIONS = {
   porte_cles: "Porte-clés aux couleurs Porsche",
   vetement: "Vêtements et textiles collection Porsche",
   decoration: "Objets décoratifs et miniatures de collection",
   life_style: "Articles lifestyle et accesoires du quotidien",
 };
+// Récupère la description d'un type d'accesoire
 export const getTypeAccesoireDescription = (type) => {
   return TYPE_ACCESOIRE_DESCRIPTIONS[type] || "";
 };

@@ -37,7 +37,7 @@ export const TRANSMISSION_DESCRIPTIONS = {
   Tiptronic:
     "Transmission automatique avec mode manuel - confort et polyvalence",
 };
-
+// Récupère la description d'un type de transmission
 export const getTransmissionDescription = (transmission) => {
   return TRANSMISSION_DESCRIPTIONS[transmission] || "";
 };

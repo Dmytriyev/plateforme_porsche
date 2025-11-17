@@ -68,7 +68,7 @@ export const calculerPrixEtAcompte = async (body) => {
     } else if (couleursInterieur && typeof couleursInterieur === "object") {
       prixCouleursInterieur = Number(couleursInterieur.prix) || 0;
     }
-
+    // Calcul des autres options
     const prixJante = Number(modelPorsche.taille_jante?.prix) || 0;
     const prixPackage = Number(modelPorsche.package?.prix) || 0;
     const prixSiege = Number(modelPorsche.siege?.prix) || 0;

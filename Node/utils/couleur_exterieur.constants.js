@@ -10,6 +10,7 @@ export const COULEURS_EXTERIEUR = [
 ];
 
 export const DEFAULT_COULEUR_EXTERIEUR = COULEURS_EXTERIEUR[0];
+// Vérifie si une couleur extérieure est valide
 export const isValidCouleurExterieur = (couleur) => {
   return COULEURS_EXTERIEUR.includes(couleur);
 };
@@ -30,6 +31,7 @@ export const COULEUR_EXTERIEUR_DESCRIPTIONS = {
   yellow: "Jaune Racing - audace et performance",
   gray: "Gris Agate - sophistication moderne",
 };
+// Récupère la description d'une couleur extérieure
 export const getCouleurExterieurDescription = (couleur) => {
   return COULEUR_EXTERIEUR_DESCRIPTIONS[couleur] || "";
 };

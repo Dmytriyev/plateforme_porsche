@@ -1,20 +1,11 @@
-/*
-  Description: functions pour les réponses HTTP JSON de l'API.
-  Fonctions:
-  - sendSuccess(res, data, message, statusCode)
-  - sendError(res, message, statusCode, error)
-  - sendValidationError(res, error)
-  - sendNotFound(res, resource)
-  - sendUnauthorized(res, message)
-  - sendForbidden(res, message)
-*/
+// Generic success response sender
 export const sendSuccess = (res, data, message, statusCode = 200) => {
   const response = { success: true };
   if (message) response.message = message;
   if (data) response.data = data;
   return res.status(statusCode).json(response);
 };
-
+// Generic error response sender
 export const sendError = (res, message, statusCode = 500, error = null) => {
   const response = { success: false, message };
   if (error && process.env.NODE_ENV === "development") {
@@ -22,11 +13,12 @@ export const sendError = (res, message, statusCode = 500, error = null) => {
   }
   return res.status(statusCode).json(response);
 };
-
+// Validation error sender
 export const sendValidationError = (res, error) => {
   if (typeof error === "string") {
     return sendError(res, error, 400);
   }
+  // Joi validation error handling
   if (
     error &&
     error.details &&
@@ -37,15 +29,15 @@ export const sendValidationError = (res, error) => {
   }
   return sendError(res, "Données invalides", 400);
 };
-
+// Common specific error responses
 export const sendNotFound = (res, resource = "Ressource") => {
   return sendError(res, `${resource} introuvable`, 404);
 };
-
+// 401 Unauthorized response sender
 export const sendUnauthorized = (res, message = "Non autorisé") => {
   return sendError(res, message, 401);
 };
-
+// 403 Forbidden response sender
 export const sendForbidden = (res, message = "Accès interdit") => {
   return sendError(res, message, 403);
 };

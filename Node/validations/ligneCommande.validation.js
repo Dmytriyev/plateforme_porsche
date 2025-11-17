@@ -1,8 +1,3 @@
-/*
-  - `model_porsche_id` requis si `type_produit` = true (voiture)
-  - `accesoire` requis si `type_produit` = false
-  - `voiture` sera rempli par le serveur 
-*/
 import joi from "joi";
 
 export default function ligneCommandeValidation(body) {

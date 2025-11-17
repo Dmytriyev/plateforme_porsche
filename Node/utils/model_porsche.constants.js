@@ -37,7 +37,7 @@ export const isCarrosserieCompatible = (nomModel, typeCarrosserie) => {
   const carrosseries = CARROSSERIES_PAR_MODELE[nomModel];
   return carrosseries ? carrosseries.includes(typeCarrosserie) : false;
 };
-
+// Liste des variantes disponibles pour un modèle donné
 export const getVariantesByModel = (nomModel) => {
   const variantes = VARIANTES_PAR_MODELE[nomModel] || [];
   return variantes.map((variante) => ({
@@ -45,7 +45,7 @@ export const getVariantesByModel = (nomModel) => {
     label: variante,
   }));
 };
-
+// Liste des types de carrosserie disponibles
 export const getAvailableCarrosseries = () => {
   return TYPES_CARROSSERIE.map((type) => ({
     value: type,
@@ -98,12 +98,12 @@ export const VARIANTE_DESCRIPTIONS = {
     GTS: "Version Gran Turismo Sport du Cayenne avec moteur V8 bi-turbo de 460 CV",
   },
 };
-
+// Récupère la description d'une variante pour un modèle donné
 export const getVarianteDescription = (variante, nomModel = null) => {
   if (nomModel && VARIANTE_DESCRIPTIONS[nomModel]) {
     return VARIANTE_DESCRIPTIONS[nomModel][variante] || "";
   }
-
+  // Recherche globale si le modèle n'est pas spécifié
   for (const model of Object.keys(VARIANTE_DESCRIPTIONS)) {
     if (
       Object.prototype.hasOwnProperty.call(

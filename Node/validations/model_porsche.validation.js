@@ -1,6 +1,4 @@
-/*
-  la création et la mise à jour des variantes Model_porsche.
-*/
+// les requêtes liées aux gammes/variantes de Porsche
 import joi from "joi";
 import {
   TYPES_CARROSSERIE,
@@ -22,8 +20,7 @@ export default function model_porscheValidation(body) {
       .valid(...TYPES_CARROSSERIE)
       .max(100),
     annee_production: joi.date(),
-    // Prix de base de modèle Porsche
-    prix_base: joi.number().min(0).max(100000000).required(),
+    prix_base: joi.number().min(0).max(10000000).required(),
     specifications: joi
       .object({
         moteur: joi.string().required().max(150),
@@ -52,7 +49,7 @@ export default function model_porscheValidation(body) {
     nom_model: joi.string().valid(...TOUTES_VARIANTES),
     type_carrosserie: joi.string().valid(...TYPES_CARROSSERIE),
     annee_production: joi.date(),
-    prix_base: joi.number().min(0).max(100000000),
+    prix_base: joi.number().min(0).max(10000000),
     specifications: joi.object({
       moteur: joi.string().max(150),
       puissance: joi.number().min(0).max(1500),

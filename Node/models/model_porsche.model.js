@@ -108,7 +108,7 @@ const model_porscheSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
-      max: 10000000,
+      max: 1000000,
     },
 
     // Modèle de base (911, Cayenne, Cayman, etc.)
@@ -190,9 +190,11 @@ model_porscheSchema.methods.calculerPrixTotal = async function () {
   const prixBase = this.prix_base || 0;
   // Prix des options sélectionnées ou null si non sélectionnées
   const prixCouleurExt = this.couleur_exterieur?.prix || 0;
+  // Prix des couleurs d'intérieur (peut être multiple)
   const prixCouleursInt = Array.isArray(this.couleur_interieur)
     ? this.couleur_interieur.reduce((sum, c) => sum + (c.prix || 0), 0)
     : 0;
+  // Prix des autres options sélectionnées
   const prixJante = this.taille_jante?.prix || 0;
   const prixPackage = this.package?.prix || 0;
   const prixSiege = this.siege?.prix || 0;

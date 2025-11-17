@@ -1,4 +1,4 @@
-// Schémas Joi pour valider les requêtes liées aux gammes de voitures
+// les requêtes liées aux gammes de voitures
 import joi from "joi";
 import { PORSCHE_MODELS } from "../utils/constants.js";
 

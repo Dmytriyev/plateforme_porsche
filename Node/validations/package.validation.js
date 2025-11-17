@@ -1,6 +1,3 @@
-/*
- packages/options (nom, description, prix, image).
-*/
 import joi from "joi";
 import { TYPES_PACKAGE } from "../utils/package.constants.js";
 

@@ -13,7 +13,7 @@ export default function accesoireValidation(body) {
       .max(150),
     nom_accesoire: joi.string().required().max(250),
     description: joi.string().required().max(1000),
-    prix: joi.number().min(0).required().max(1000000),
+    prix: joi.number().min(0).required().max(100000),
     couleur_accesoire: mongoIdSchema(),
     photo_accesoire: joi.array().items(mongoIdSchema()),
   });

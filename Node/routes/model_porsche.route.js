@@ -1,7 +1,3 @@
-/*
-  - Public: lecture, calcul prix, récupération des variantes et carrosseries
-  - Admin uniquement: création/modification et gestion des relations (photos, couleurs, jantes), suppression
-*/
 import { Router } from "express";
 import {
   createModel_porsche,

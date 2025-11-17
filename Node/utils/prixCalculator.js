@@ -32,6 +32,7 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
     const couleursInterieur = modelPorsche.couleur_interieur;
     if (Array.isArray(couleursInterieur)) {
       prixCouleursInterieur =
+        // Somme des prix des couleurs d'intérieur si c'est un tableau
         couleursInterieur.reduce(
           (sum, couleur) => sum + (Number(couleur?.prix) || 0),
           0

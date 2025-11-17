@@ -1,13 +1,7 @@
-/*
-  Gestion centralisée des erreurs pour les routes Express.
-  - handleError(res, error, context) : envoie une réponse JSON standardisée selon le type d'erreur.
-  - isEmptyBody(body) : helper pour détecter un body vide.
-  - getValidationError(validation) : extrait un message depuis le résultat Joi.
-*/
-
+// Gère les erreurs et envoie une réponse appropriée
 export const handleError = (res, error, context = "") => {
   console.error(`[${context}]`, error);
-
+  // ValidationError: données invalides
   if (error && error.name === "ValidationError") {
     return res
       .status(400)
@@ -32,10 +26,11 @@ export const handleError = (res, error, context = "") => {
   }
   return res.status(500).json({ message: "Erreur serveur" });
 };
+// Vérifie si le corps de la requête est vide
 export const isEmptyBody = (body) => {
   return !body || Object.keys(body).length === 0;
 };
-
+// Récupère l'erreur de validation d'un objet de validation (ex: Joi)
 export const getValidationError = (validation) => {
   if (validation && validation.error) {
     return { message: validation.error.details[0].message };
