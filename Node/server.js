@@ -46,10 +46,8 @@ const port = process.env.PORT || 3000;
 db();
 
 // Configuration CORS sécurisée
-const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
-  "http://localhost:3000",
-].map((url) => url.replace(/\/$/, "")); // retirer le slash final
+const allowedOrigins =
+  [process.env.FRONTEND_URL].map((url) => url.replace(/\/$/, "")) || 5173; // retirer le slash final
 
 // Options CORS personnalisées
 const corsOptions = {
@@ -122,52 +120,6 @@ app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 app.use(express.json());
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-
-// // Cache pour la déduplication des logs de requêtes
-// const requestCache = new Map();
-// // Fenêtre de déduplication en ms
-// const DEDUPE_WINDOW_MS = 100;
-
-// // Logger des requêtes entrantes avec déduplication
-// app.use((req, res, next) => {
-//   // Ignorer favicon et OPTIONS
-//   if (req.originalUrl === "/favicon.ico" || req.method === "OPTIONS") {
-//     return next();
-//   }
-//   const ip = req.ip || req.connection?.remoteAddress || "unknown";
-//   const key = `${req.method}:${req.originalUrl}:${ip}`;
-//   const now = Date.now();
-//   const lastRequestTime = requestCache.get(key);
-
-//   // Si une requête identique a été loggée il y a moins de 100ms, on la skip
-//   if (lastRequestTime && now - lastRequestTime < DEDUPE_WINDOW_MS) {
-//     return next(); // Passe sans logger
-//   }
-
-//   // Mettre à jour le cache
-//   requestCache.set(key, now);
-
-//   // Nettoyer les anciennes entrées du cache toutes les 1000 requêtes
-//   if (requestCache.size > 1000) {
-//     const threshold = now - DEDUPE_WINDOW_MS * 2;
-//     for (const [k, timestamp] of requestCache.entries()) {
-//       if (timestamp < threshold) {
-//         requestCache.delete(k);
-//       }
-//     }
-//   }
-
-//   const start = Date.now();
-//   res.on("finish", () => {
-//     const duration = Date.now() - start;
-//     const ua = req.headers["user-agent"] || "-";
-//     logger.info(
-//       `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
-//       { ip, ua }
-//     );
-//   });
-//   next();
-// });
 
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);
