@@ -1,5 +1,3 @@
-// - vérifie que la voiture est de type 'neuve' avant d'accepter
-// - utilise des middlewares d'auth (isStaff) pour l'accès
 import Photo_voiture from "../models/photo_voiture.model.js";
 import photo_voitureValidation from "../validations/photo_voiture.validation.js";
 import fs from "node:fs";
@@ -15,13 +13,12 @@ const __filename = fileURLToPath(import.meta.url);
 // Pour obtenir le répertoire du fichier courant
 const __dirname = path.dirname(__filename);
 
-// Créer une photo de voiture (associer une photo à une voiture neuve)
+// Créer une photo de voiture
 const createPhoto_voiture = async (req, res) => {
   try {
-    // Vérification auth/staff gérée par les middlewares (auth + isStaff)
     // Assurer que body est un objet même si req.body est undefined
     let body = req.body || {};
-    // Si la requête ne contient ni body ni fichier, rejeter
+    // Si la requête ne contient ni body ni fichier, rejeter la requête
     if ((Object.keys(body).length === 0 || body === null) && !req.file) {
       return res
         .status(400)
@@ -31,31 +28,29 @@ const createPhoto_voiture = async (req, res) => {
     if (req.file) {
       body.name = "/uploads/voiture/" + req.file.filename;
     }
-
-    // `voiture` peut être envoyé comme JSON string, CSV ou simple id
+    // Gérer le cas où "voiture" est une chaîne (string) au lieu d'un tableau
     if (body.voiture && typeof body.voiture === "string") {
       const trimmed = body.voiture.trim();
-      // Tenter de parser comme JSON array d'abord
+      // Gérer le cas où "voiture" est une chaîne JSON représentant un tableau
       if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
         try {
           body.voiture = JSON.parse(trimmed);
         } catch (err) {}
         // Si ce n'est pas un tableau après parsing, le remettre en string pour validation
       } else if (trimmed.includes(",")) {
-        // CSV string -> array
         body.voiture = trimmed
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
       } else {
-        // Single id -> array with one element (Joi attend un tableau)
+        // Simple string, le convertir en tableau avec un seul élément
         body.voiture = [trimmed];
       }
     }
 
     const { error } = photo_voitureValidation(body).photo_voitureCreate;
     if (error) {
-      // Nettoyer le fichier uploadé en cas d'erreur de validation
+      // supprimer le fichier uploadé en cas d'erreur de validation
       if (req.file) {
         removeUploadedFile(req.file.filename);
       }

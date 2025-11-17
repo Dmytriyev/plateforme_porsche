@@ -1,5 +1,3 @@
-// - Seules les voitures d'occasion (type_voiture = false) sont réservables
-// - L'utilisateur doit être authentifié et ne peut créer que ses réservations
 import Reservation from "../models/reservation.model.js";
 import reservationValidation from "../validations/reservation.validation.js";
 import Model_porsche from "../models/model_porsche.model.js";
@@ -10,6 +8,7 @@ import {
   sendNotFound,
   sendValidationError,
 } from "../utils/responses.js";
+
 // Créer une réservation d'une voiture d'occasion
 const createReservation = async (req, res) => {
   try {

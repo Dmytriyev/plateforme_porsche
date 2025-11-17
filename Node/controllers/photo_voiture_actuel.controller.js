@@ -1,5 +1,3 @@
-// - seul le propriétaire peut ajouter/modifier/supprimer une photo
-// - vérifie que le model_porsche_actuel existe et appartient à l'utilisateur
 import Photo_voiture_actuel from "../models/photo_voiture_actuel.model.js";
 import photo_voiture_actuelValidation from "../validations/photo_voiture_actuel.validation.js";
 import fs from "node:fs";

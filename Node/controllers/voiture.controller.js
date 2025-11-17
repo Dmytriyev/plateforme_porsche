@@ -20,6 +20,7 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
+// Créer une nouvelle gamme de voiture
 const createVoiture = async (req, res) => {
   try {
     const { body } = req;

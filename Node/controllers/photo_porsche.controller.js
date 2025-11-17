@@ -50,7 +50,7 @@ const createPhoto_porsche = async (req, res) => {
         }
       }
     }
-
+    // Vérifier qu'il y a des données (body) à créer
     if (!body || Object.keys(body).length === 0) {
       if (req.file) {
         removeUploadedFile(req.file.filename);

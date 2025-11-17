@@ -1,4 +1,3 @@
-// CRUD pour les tailles et options de jantes
 import Taille_jante from "../models/taille_jante.model.js";
 import taille_janteValidation from "../validations/taille_jante.validation.js";
 import {

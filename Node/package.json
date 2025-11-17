@@ -1,7 +1,7 @@
 {
-  "name": "node_e-commerce-v1",
+  "name": "porsche_node",
   "version": "1.0.0",
-  "description": "API REST pour la plateforme e-commerce Porsche",
+  "description": "API REST pour la plateforme Porsche",
   "main": "server.js",
   "type": "module",
   "scripts": {

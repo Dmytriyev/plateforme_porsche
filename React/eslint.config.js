@@ -1,29 +1,44 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+// Configuration ESLint pour le projet React quelles règles appliquer, quels fichiers analyser.
+// pour lancer : npx eslint ou npm run lint .
+
+import js from "@eslint/js"; // preset recommandé d'ESLint pour JS
+import globals from "globals"; // liste de variables globales (browser/node/etc.)
+import reactHooks from "eslint-plugin-react-hooks"; // règles pour les React Hooks
+import reactRefresh from "eslint-plugin-react-refresh"; // règles liées à React Refresh / Vite
+import { defineConfig, globalIgnores } from "eslint/config"; // utilitaires pour la config
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Ignorer le dossiers
+  globalIgnores(["dist", "node_modules", "build"]),
   {
-    files: ['**/*.{js,jsx}'],
+    // Cible les fichiers JS et JSX du projet
+    files: ["**/*.{js,jsx}"],
+    // Étend des configurations prêtes à l'emploi
     extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
+      js.configs.recommended, // règles ESLint recommandées pour JS
+      reactHooks.configs.flat.recommended, // vérifications spécifiques aux Hooks React
+      reactRefresh.configs.vite, // règles utiles quand on utilise Vite + React Refresh
     ],
     languageOptions: {
+      // Version ECMAScript par défaut pour certaines vérifications
       ecmaVersion: 2020,
+      // Déclare que l'environnement cible est le navigateur
       globals: globals.browser,
       parserOptions: {
-        ecmaVersion: 'latest',
+        // Utiliser les dernières fonctionnalités JS pour le parsing
+        ecmaVersion: "latest",
+        // Autoriser la syntaxe JSX
         ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+        // Le code utilise des modules ES
+        sourceType: "module",
       },
     },
+    // Règles personnalisées ou surcharges
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Erreur si une variable n'est jamais utilisée, sauf si elle commence
+      // par une majuscule ou un underscore. Utile pour ignorer certains
+      // composants React (majuscules) ou variables privées commençant par `_`.
+      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
     },
   },
-])
+]);

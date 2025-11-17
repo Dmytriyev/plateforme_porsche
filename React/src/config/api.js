@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Configuration de base de l'API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.NODE_API_URL || "http://localhost:3000";
 
 // Instance axios configurée
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 10000, // 10 secondes
 });
@@ -15,7 +15,7 @@ const apiClient = axios.create({
 // Intercepteur pour ajouter le token JWT aux requêtes
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,12 +32,12 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expiré ou invalide
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
 );
 
-export { apiClient, API_BASE_URL };
+export { apiClient, API_URL };
 export default apiClient;

@@ -1,4 +1,3 @@
-// CRUD pour les types de sièges/options (utilisé dans les configurations de modèles).
 import Siege from "../models/siege.model.js";
 import siegeValidation from "../validations/siege.validation.js";
 import {

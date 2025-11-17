@@ -1,4 +1,3 @@
-// CRUD pour les packages/options vendus en complément des véhicules
 import Package from "../models/package.model.js";
 import packageValidation from "../validations/package.validation.js";
 import { getAvailablePackages } from "../utils/package.constants.js";
