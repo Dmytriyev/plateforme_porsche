@@ -42,17 +42,41 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Connexion à la base de données (db/db.js)
+// Connexion à la base de données MongoDB
 db();
 
+// Configuration CORS sécurisée
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:3000",
+].map((url) => url.replace(/\/$/, "")); // Normaliser en retirant le slash final
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Permettre les requêtes sans origin (Postman, curl, apps mobiles)
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} non autorisée par CORS`));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 // Middlewares globaux
-app.use(cors()); // Autorise les requêtes entre origines CORS
+app.use(cors(corsOptions)); // Autorise les requêtes entre origines CORS
 app.use(helmet()); // Définit des headers de sécurité HTTP
 
 // Limiteur global pour éviter le DDoS attaques
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // fenêtre de 15 minutes
-  max: 1000, // max 100 requêtes par IP
+  max: 100, // max 100 requêtes par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -61,7 +85,7 @@ const globalLimiter = rateLimit({
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // max 10 tentatives par IP
+  max: 10, // max 10 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez dans 15 minutes",
   standardHeaders: true,
   legacyHeaders: false,
@@ -70,21 +94,21 @@ const loginLimiter = rateLimit({
 // Limiteur pour les inscriptions utilisateurs
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50, // max 5 inscriptions par IP
+  max: 5, // max 5 inscriptions par IP
   message: "Trop d'inscriptions, réessayez dans 1 heure",
 });
 
 // Limiteur pour les endpoints de paiement
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 200, // max 20 tentatives de paiement par IP
+  max: 20, // max 20 tentatives de paiement par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 // Limiteur pour uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 500, // max 50 uploads par IP
+  max: 50, // max 50 uploads par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
@@ -96,13 +120,48 @@ app.use(express.json());
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// Logger des requêtes entrantes
+// Déduplication des requêtes en double (navigateur Chrome envoie parfois 2 requêtes identiques)
+// Cache temporaire : key = "METHOD:URL:IP", value = timestamp
+const requestCache = new Map();
+const DEDUPE_WINDOW_MS = 100; // Ignorer les doublons dans une fenêtre de 100ms
+
+// Logger des requêtes entrantes avec déduplication
 app.use((req, res, next) => {
+  // Ignorer favicon et OPTIONS
+  if (req.originalUrl === "/favicon.ico" || req.method === "OPTIONS") {
+    return next();
+  }
+
+  const ip = req.ip || req.connection?.remoteAddress || "unknown";
+  const key = `${req.method}:${req.originalUrl}:${ip}`;
+  const now = Date.now();
+  const lastRequestTime = requestCache.get(key);
+
+  // Si une requête identique a été loggée il y a moins de 100ms, on la skip
+  if (lastRequestTime && now - lastRequestTime < DEDUPE_WINDOW_MS) {
+    return next(); // Passe sans logger
+  }
+
+  // Mettre à jour le cache
+  requestCache.set(key, now);
+
+  // Nettoyer les anciennes entrées du cache toutes les 1000 requêtes
+  if (requestCache.size > 1000) {
+    const threshold = now - DEDUPE_WINDOW_MS * 2;
+    for (const [k, timestamp] of requestCache.entries()) {
+      if (timestamp < threshold) {
+        requestCache.delete(k);
+      }
+    }
+  }
+
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
+    const ua = req.headers["user-agent"] || "-";
     logger.info(
-      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+      `${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`,
+      { ip, ua }
     );
   });
   next();
@@ -147,10 +206,10 @@ app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);
 app.use("/accesoire", accesoireRoutes);
 
-// Démarrage du serveur
 // Error handler (doit être après les routes)
 app.use(errorMiddleware);
 
+// Démarrage du serveur
 const server = app.listen(port, () => {
   logger.info(`Le serveur est démarré sur le port ${port}`);
 });

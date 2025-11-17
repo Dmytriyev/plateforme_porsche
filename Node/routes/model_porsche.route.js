@@ -52,12 +52,13 @@ const optionalUpload = (req, res, next) => {
 };
 
 // Routes publiques
+router.get("/", getAllModel_porsches); // Route racine: tous les modèles Porsche
 router.get("/carrosseries", getAllCarrosseries); // toutes carrosseries disponibles (SUV, Coupé, Cabriolet, etc.)
 router.get("/variantes", getAllVariantes); // toutes variantes disponibles (ex: 911, Cayenne, Macan, etc.)
 router.get("/variantes/:nomModel", getVariantesByVoitureModel); // ex: /variantes/911 (retourne toutes variantes de la 911)
 router.get("/occasions", getModelPorscheOccasions); // modèles d'occasion
 router.get("/neuves", getModelPorscheNeuves); // modèles neufs
-router.get("/all", getAllModel_porsches); // tous les modèles Porsche
+router.get("/all", getAllModel_porsches); // tous les modèles Porsche (alias de la racine)
 router.get("/prixTotal/:id", validateObjectId("id"), calculatePrixTotal); // calcul prix total avec options (couleurs, jantes, accessoires)
 router.get(
   "/voiture/:voiture_id",
