@@ -18,13 +18,20 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      const data = await voitureService.getAllVoitures();
+      const response = await voitureService.getAllVoitures();
+      
+      // Vérifier que la réponse est bien un tableau
+      const data = Array.isArray(response) ? response : [];
+      
+      console.log('Données reçues:', data);
       
       // Filtrer pour avoir uniquement 911, Cayman, Cayenne (neuves)
       const modelesAffiches = data.filter(v => 
         v.type_voiture === true && 
         ['911', 'Cayman', 'Cayenne'].includes(v.nom_model)
       );
+      
+      console.log('Modèles filtrés:', modelesAffiches);
       
       // Garder un seul exemplaire de chaque modèle (le premier trouvé)
       const uniqueModeles = [];
@@ -37,6 +44,7 @@ const Home = () => {
         }
       });
       
+      console.log('Modèles uniques:', uniqueModeles);
       setModeles(uniqueModeles);
     } catch (error) {
       console.error('Erreur chargement modèles:', error);
