@@ -1,82 +1,119 @@
-/* Button Component Styles */
+/**
+ * Composant Button - Charte Graphique Porsche
+ * Boutons selon les spécifications Porsche
+ */
 
-.btn {
-  font-weight: 600;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Variants */
+/* Bouton Primaire - Rouge Porsche */
 .btn-primary {
-  background-color: #000;
-  color: #fff;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  
+  background-color: var(--color-red-porsche);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
+  
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #333;
+.btn-primary:hover {
+  background-color: var(--color-red-porsche-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-grey-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Bouton Secondaire - Contour Noir */
 .btn-secondary {
-  background-color: #e5e7eb;
-  color: #000;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #d1d5db;
-}
-
-.btn-danger {
-  background-color: #dc2626;
-  color: #fff;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #b91c1c;
-}
-
-.btn-outline {
+  padding: calc(var(--spacing-sm) - 2px) calc(var(--spacing-lg) - 2px);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  
   background-color: transparent;
-  border: 2px solid #000;
-  color: #000;
+  color: var(--color-black);
+  border: var(--border-width) solid var(--color-black);
+  border-radius: var(--border-radius-sm);
+  
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
-.btn-outline:hover:not(:disabled) {
-  background-color: #000;
-  color: #fff;
+.btn-secondary:hover {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-/* Sizes */
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary:disabled {
+  border-color: var(--color-grey-disabled);
+  color: var(--color-grey-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Bouton Tertiaire - Texte seulement */
+.btn-tertiary {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-primary);
+  
+  background-color: transparent;
+  color: var(--color-black);
+  border: none;
+  
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
+}
+
+.btn-tertiary:hover {
+  color: var(--color-red-porsche);
+  transform: translateX(4px);
+}
+
+.btn-tertiary:disabled {
+  color: var(--color-grey-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tailles */
 .btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-}
-
-.btn-md {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-secondary);
 }
 
 .btn-lg {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-body);
 }
 
-/* Full width */
-.btn-full {
+.btn-fullwidth {
   width: 100%;
-  display: block;
+  text-align: center;
 }
-

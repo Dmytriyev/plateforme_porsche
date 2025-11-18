@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.jsx';
 import { usePanier } from '../../hooks/usePanier.jsx';
+import './Navbar.css';
 
 /**
- * Composant Navbar - Barre de navigation principale
+ * Composant Navbar - Barre de navigation principale selon charte Porsche
  */
 const Navbar = () => {
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
@@ -16,12 +17,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-black text-white shadow-lg sticky top-0 z-40 opacity-100" style={{ backgroundColor: '#000000' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <nav className="navbar">
+      <div className="navbar-container">
+        <div className="navbar-content">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <span className="text-3xl font-bold tracking-wider">PORSCHE</span>
+          <Link to="/" className="navbar-logo">
+            <span className="navbar-logo-text">PORSCHE</span>
           </Link>
 
           {/* Navigation Desktop */}
