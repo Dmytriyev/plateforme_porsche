@@ -25,16 +25,12 @@ const AccessoiresParCategorie = () => {
       setLoading(true);
       setError('');
       
-      // Récupérer tous les accessoires
-      const response = await accesoireService.getAllAccessoires();
+      // OPTIMISÉ: Utiliser l'endpoint de recherche directement au lieu de filtrer côté client
+      // Backend: GET /accesoire/search?type=categorie
+      const response = await accesoireService.getAccessoiresByType(decodeURIComponent(categorie));
       
       // Vérifier que la réponse est bien un tableau
-      const allAccessoires = Array.isArray(response) ? response : [];
-      
-      // Filtrer par catégorie
-      const filteredAccessoires = allAccessoires.filter(
-        acc => acc.type_accesoire === decodeURIComponent(categorie)
-      );
+      const filteredAccessoires = Array.isArray(response) ? response : [];
       
       setAccessoires(filteredAccessoires);
     } catch (err) {

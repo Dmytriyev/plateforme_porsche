@@ -28,19 +28,20 @@ const ListeVariantes = () => {
       setLoading(true);
       setError('');
       
-      // Récupérer le modèle
-      const modeleData = await voitureService.getById(modeleId);
+      // Récupérer le modèle (CORRIGÉ: getVoitureById au lieu de getById)
+      const modeleData = await voitureService.getVoitureById(modeleId);
       setModele(modeleData);
       
-      // Récupérer toutes les variantes de ce modèle
-      const response = await modelPorscheService.getAllModels();
+      // Récupérer les variantes de ce modèle via l'endpoint dédié
+      // Backend: GET /model_porsche/voiture/:voiture_id
+      const variantesData = await modelPorscheService.getConfigurationsByVoiture(modeleId);
       
       // Vérifier que la réponse est bien un tableau
-      const allVariantes = Array.isArray(response) ? response : [];
+      const allVariantes = Array.isArray(variantesData) ? variantesData : [];
       
-      // Filtrer les variantes qui correspondent à ce modèle et type
+      // Filtrer selon le type (neuf/occasion) si nécessaire
+      // Le backend devrait déjà filtrer, mais on sécurise
       const filteredVariantes = allVariantes.filter(variante => 
-        variante.voiture?._id === modeleId &&
         variante.voiture?.type_voiture === isNeuf
       );
       

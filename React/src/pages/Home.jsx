@@ -18,16 +18,18 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      const response = await voitureService.getAllVoitures();
+      
+      // OPTIMISÉ: Utiliser l'endpoint dédié pour voitures neuves
+      // Backend: GET /voiture/neuve
+      const response = await voitureService.getVoituresNeuves();
       
       // Vérifier que la réponse est bien un tableau
       const data = Array.isArray(response) ? response : [];
       
       console.log('Données reçues:', data);
       
-      // Filtrer pour avoir uniquement 911, Cayman, Cayenne (neuves)
+      // Filtrer pour avoir uniquement 911, Cayman, Cayenne
       const modelesAffiches = data.filter(v => 
-        v.type_voiture === true && 
         ['911', 'Cayman', 'Cayenne'].includes(v.nom_model)
       );
       

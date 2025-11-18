@@ -26,19 +26,17 @@ const CatalogueModeles = () => {
       setLoading(true);
       setError('');
       
-      // Récupérer tous les modèles de voitures
-      const response = await voitureService.getAllVoitures();
+      // OPTIMISÉ: Utiliser l'endpoint dédié du backend au lieu de filtrer côté client
+      // Backend: GET /voiture/neuve ou GET /voiture/occasion
+      const response = isNeuf 
+        ? await voitureService.getVoituresNeuves()
+        : await voitureService.getVoituresOccasion();
       
       // Vérifier que la réponse est bien un tableau
       const data = Array.isArray(response) ? response : [];
       
-      // Filtrer selon le type (neuf/occasion)
-      const filteredModeles = data.filter(voiture => 
-        voiture.type_voiture === isNeuf
-      );
-      
       // Grouper par nom_model pour éviter les doublons
-      const uniqueModeles = filteredModeles.reduce((acc, voiture) => {
+      const uniqueModeles = data.reduce((acc, voiture) => {
         if (!acc.find(m => m.nom_model === voiture.nom_model)) {
           acc.push(voiture);
         }

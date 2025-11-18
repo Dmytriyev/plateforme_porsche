@@ -25,7 +25,8 @@ const VoitureDetail = () => {
       try {
         setLoading(true);
         setError('');
-        const data = await voitureService.getById(id);
+        // CORRIGÉ: Utiliser getVoitureById au lieu de getById
+        const data = await voitureService.getVoitureById(id);
         setVoiture(data);
       } catch (err) {
         setError('Erreur lors du chargement de la voiture');
