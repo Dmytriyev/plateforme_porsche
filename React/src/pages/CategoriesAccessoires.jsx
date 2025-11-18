@@ -74,22 +74,24 @@ const CategoriesAccessoires = () => {
     navigate(`/accessoires/categorie/${encodeURIComponent(categorie)}`);
   };
 
-  const getCategorieIcon = (type) => {
-    const icons = {
-      'porte-clés': '🔑',
-      'porte-cles': '🔑',
-      'casquettes': '🧢',
-      'casquette': '🧢',
-      'decoration': '🎨',
-      'décoration': '🎨',
-      'vetements': '👕',
-      'vêtements': '👕',
-      'bagages': '🧳',
-      'miniatures': '🏎️',
-      'livres': '📚',
-      'technologie': '💻'
+  const getCategorieLabel = (type) => {
+    // Retourne le label propre pour la catégorie (conforme charte graphique Porsche)
+    const labels = {
+      'porte-clés': 'Porte-clés',
+      'porte-cles': 'Porte-clés',
+      'casquettes': 'Casquettes',
+      'casquette': 'Casquettes',
+      'decoration': 'Décoration',
+      'décoration': 'Décoration',
+      'vetements': 'Vêtements',
+      'vêtements': 'Vêtements',
+      'bagages': 'Bagages',
+      'miniatures': 'Miniatures',
+      'livres': 'Livres',
+      'technologie': 'Technologie'
     };
-    return icons[type.toLowerCase()] || '🎁';
+    const formatted = type.charAt(0).toUpperCase() + type.slice(1);
+    return labels[type.toLowerCase()] || formatted;
   };
 
   if (loading) {
@@ -147,9 +149,8 @@ const CategoriesAccessoires = () => {
 
                 {/* Contenu */}
                 <div className="categorie-content">
-                  <div className="categorie-icon">{getCategorieIcon(cat.type)}</div>
                   <h2 className="categorie-name">
-                    {cat.type.charAt(0).toUpperCase() + cat.type.slice(1)}
+                    {getCategorieLabel(cat.type)}
                   </h2>
                   <p className="categorie-count">{cat.count} article{cat.count > 1 ? 's' : ''}</p>
                 </div>
@@ -165,7 +166,7 @@ const CategoriesAccessoires = () => {
         {/* Information complémentaire */}
         <div className="categories-info">
           <div className="categories-info-card">
-            <h3>✨ Collection Premium</h3>
+            <h3>Collection Premium</h3>
             <p>
               Tous nos accessoires Porsche sont authentiques et conçus pour offrir 
               la même qualité et le même design que nos véhicules.

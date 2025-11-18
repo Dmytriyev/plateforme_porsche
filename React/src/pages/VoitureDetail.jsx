@@ -119,9 +119,9 @@ const VoitureDetail = () => {
           {/* Badge type */}
           <div>
             {voiture.voiture?.type_voiture === true ? (
-              <span className="voiture-badge voiture-badge-new">✨ Neuve</span>
+              <span className="voiture-badge voiture-badge-new">Neuve</span>
             ) : voiture.voiture?.type_voiture === false ? (
-              <span className="voiture-badge voiture-badge-used">🔄 Occasion certifiée</span>
+              <span className="voiture-badge voiture-badge-used">Occasion Porsche Approved</span>
             ) : null}
           </div>
         </div>

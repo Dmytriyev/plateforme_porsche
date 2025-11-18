@@ -186,7 +186,7 @@ const AccessoireDetail = () => {
 
             {/* Informations complémentaires */}
             <div className="detail-info-card">
-              <h3>✨ Accessoire Porsche Authentique</h3>
+              <h3>Accessoire Porsche Authentique</h3>
               <p>
                 Tous nos accessoires sont authentiques et bénéficient de la même 
                 qualité et attention aux détails que nos véhicules.

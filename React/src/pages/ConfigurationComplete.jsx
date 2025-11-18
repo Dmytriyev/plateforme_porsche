@@ -154,12 +154,12 @@ const ConfigurationComplete = () => {
   };
 
   const etapes = [
-    { num: 1, titre: 'Couleur extérieure', icon: '🎨' },
-    { num: 2, titre: 'Couleur intérieure', icon: '🪑' },
-    { num: 3, titre: 'Jantes', icon: '⚙️' },
-    { num: 4, titre: 'Sièges', icon: '💺' },
-    { num: 5, titre: 'Packages', icon: '📦' },
-    { num: 6, titre: 'Résumé', icon: '✅' },
+    { num: 1, titre: 'Couleur extérieure' },
+    { num: 2, titre: 'Couleur intérieure' },
+    { num: 3, titre: 'Jantes' },
+    { num: 4, titre: 'Sièges' },
+    { num: 5, titre: 'Packages' },
+    { num: 6, titre: 'Résumé' },
   ];
 
   if (loading) {
@@ -279,7 +279,6 @@ const ConfigurationComplete = () => {
             onClick={() => setEtapeActive(etape.num)}
             className={`config-step-btn ${etapeActive === etape.num ? 'config-step-active' : ''}`}
           >
-            <span className="config-step-icon">{etape.icon}</span>
             <span className="config-step-num">{etape.num}</span>
             <span className="config-step-titre">{etape.titre}</span>
           </button>
@@ -291,7 +290,7 @@ const ConfigurationComplete = () => {
         {/* Étape 1: Couleur extérieure */}
         {etapeActive === 1 && (
           <div className="config-step">
-            <h2 className="config-step-title">🎨 Choisissez votre couleur extérieure</h2>
+            <h2 className="config-step-title">Choisissez votre couleur extérieure</h2>
             <div className="config-colors-grid">
               {couleursExt.map((couleur) => (
                 <button
@@ -378,7 +377,7 @@ const ConfigurationComplete = () => {
         {/* Étape 3: Jantes */}
         {etapeActive === 3 && (
           <div className="config-step">
-            <h2 className="config-step-title">⚙️ Choisissez vos jantes</h2>
+            <h2 className="config-step-title">Choisissez vos jantes</h2>
             <div className="config-options-grid">
               {jantes.map((jante) => (
                 <button
@@ -388,7 +387,6 @@ const ConfigurationComplete = () => {
                     config.taille_jante?._id === jante._id ? 'config-option-selected' : ''
                   }`}
                 >
-                  <div className="config-option-icon">⚙️</div>
                   <h3 className="config-option-name">{jante.taille_jante}"</h3>
                   {jante.couleur_jante && (
                     <p className="config-option-desc">{jante.couleur_jante}</p>
@@ -405,7 +403,7 @@ const ConfigurationComplete = () => {
         {/* Étape 4: Sièges */}
         {etapeActive === 4 && (
           <div className="config-step">
-            <h2 className="config-step-title">💺 Choisissez vos sièges</h2>
+            <h2 className="config-step-title">Choisissez vos sièges</h2>
             <div className="config-options-grid">
               {sieges.map((siege) => (
                 <button
@@ -415,7 +413,6 @@ const ConfigurationComplete = () => {
                     config.siege?._id === siege._id ? 'config-option-selected' : ''
                   }`}
                 >
-                  <div className="config-option-icon">💺</div>
                   <h3 className="config-option-name">{siege.nom_siege}</h3>
                   {siege.prix > 0 && (
                     <p className="config-option-price">+{formatPrice(siege.prix)}</p>
@@ -429,7 +426,7 @@ const ConfigurationComplete = () => {
         {/* Étape 5: Packages */}
         {etapeActive === 5 && (
           <div className="config-step">
-            <h2 className="config-step-title">📦 Choisissez vos packages</h2>
+            <h2 className="config-step-title">Choisissez vos packages</h2>
             <div className="config-options-grid">
               {packages.map((pkg) => (
                 <button
@@ -439,7 +436,6 @@ const ConfigurationComplete = () => {
                     config.package?._id === pkg._id ? 'config-option-selected' : ''
                   }`}
                 >
-                  <div className="config-option-icon">📦</div>
                   <h3 className="config-option-name">{pkg.nom_package}</h3>
                   {pkg.description && (
                     <p className="config-option-desc">{pkg.description}</p>
@@ -456,7 +452,7 @@ const ConfigurationComplete = () => {
         {/* Étape 6: Résumé */}
         {etapeActive === 6 && (
           <div className="config-step">
-            <h2 className="config-step-title">✅ Résumé de votre configuration</h2>
+            <h2 className="config-step-title">Résumé de votre configuration</h2>
             <div className="config-summary-grid">
               <div className="config-summary-card">
                 <h3>Variante</h3>

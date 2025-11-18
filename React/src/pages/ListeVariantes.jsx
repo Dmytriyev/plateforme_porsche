@@ -133,14 +133,14 @@ const ListeVariantes = () => {
 
                 {/* Informations */}
                 <div className="variante-info">
-                  {/* Badges */}
+                  {/* Badges */}                  
                   <div className="variante-badges">
                     <span className={`variante-badge ${isNeuf ? 'variante-badge-new' : 'variante-badge-used'}`}>
-                      {isNeuf ? '✨ Neuve' : '🔄 Occasion'}
+                      {isNeuf ? 'Neuve' : 'Occasion'}
                     </span>
                     {variante.disponible && (
                       <span className="variante-badge variante-badge-disponible">
-                        ✅ Disponible
+                        Disponible
                       </span>
                     )}
                   </div>
@@ -161,19 +161,19 @@ const ListeVariantes = () => {
                     <div className="variante-specs">
                       {variante.specifications.puissance && (
                         <div className="variante-spec-item">
-                          <span className="variante-spec-label">💪</span>
+                          <span className="variante-spec-label">Puissance</span>
                           <span className="variante-spec-value">{variante.specifications.puissance} ch</span>
                         </div>
                       )}
                       {variante.specifications.acceleration_0_100 && (
                         <div className="variante-spec-item">
-                          <span className="variante-spec-label">🚀</span>
-                          <span className="variante-spec-value">0-100: {variante.specifications.acceleration_0_100}s</span>
+                          <span className="variante-spec-label">Accélération</span>
+                          <span className="variante-spec-value">0-100 km/h: {variante.specifications.acceleration_0_100}s</span>
                         </div>
                       )}
                       {variante.type_carrosserie && (
                         <div className="variante-spec-item">
-                          <span className="variante-spec-label">🏎️</span>
+                          <span className="variante-spec-label">Carrosserie</span>
                           <span className="variante-spec-value">{variante.type_carrosserie}</span>
                         </div>
                       )}

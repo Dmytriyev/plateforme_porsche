@@ -123,22 +123,22 @@ const DashboardAdmin = () => {
           <h2 className="dashboard-actions-title">Actions Rapides</h2>
           <div className="dashboard-actions-grid">
             <Button onClick={() => navigate('/admin/voitures')} className="dashboard-action-btn">
-              🚗 Gérer les voitures
+              Gérer les voitures
             </Button>
             <Button onClick={() => navigate('/admin/options')} className="dashboard-action-btn">
-              🎨 Gérer les options
+              Gérer les options
             </Button>
             <Button onClick={() => navigate('/admin/accessoires')} className="dashboard-action-btn">
-              🛍️ Gérer les accessoires
+              Gérer les accessoires
             </Button>
             <Button onClick={() => navigate('/admin/utilisateurs')} className="dashboard-action-btn">
-              👥 Gérer les utilisateurs
+              Gérer les utilisateurs
             </Button>
             <Button onClick={() => navigate('/admin/commandes')} className="dashboard-action-btn">
-              📦 Gérer les commandes
+              Gérer les commandes
             </Button>
             <Button onClick={() => navigate('/admin/reservations')} className="dashboard-action-btn">
-              📝 Gérer les réservations
+              Gérer les réservations
             </Button>
           </div>
         </div>

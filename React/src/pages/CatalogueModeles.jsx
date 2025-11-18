@@ -81,7 +81,7 @@ const CatalogueModeles = () => {
             ← Retour au choix
           </button>
           <h1 className="catalogue-modeles-title">
-            {isNeuf ? '✨ Porsche Neuves' : '🔄 Porsche d\'Occasion'}
+            {isNeuf ? 'Porsche Neuves' : 'Porsche d\'Occasion'}
           </h1>
           <p className="catalogue-modeles-subtitle">
             {isNeuf 
@@ -139,7 +139,7 @@ const CatalogueModeles = () => {
                     </p>
                   )}
                   <div className="catalogue-modele-badge">
-                    {isNeuf ? '✨ Neuve' : '🔄 Occasion'}
+                    {isNeuf ? 'Neuve' : 'Occasion'}
                   </div>
                 </div>
 

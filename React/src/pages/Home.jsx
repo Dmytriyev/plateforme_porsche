@@ -81,26 +81,24 @@ const Home = () => {
             Découvrez l'excellence automobile. Choisissez votre expérience Porsche.
           </p>
           
-          {/* Choix Neuf/Occasion */}
-          <div className="hero-choice">
-            <Link to="/catalogue/neuve" className="choice-card choice-card-new">
-              <div className="choice-icon">✨</div>
-              <h2 className="choice-title">Voitures Neuves</h2>
-              <p className="choice-description">
-                Configurez votre Porsche sur mesure avec toutes les options disponibles
-              </p>
-              <span className="choice-cta">Configurer →</span>
-            </Link>
+                {/* Choix Neuf/Occasion */}
+                <div className="hero-choice">
+                  <Link to="/catalogue/neuve" className="choice-card choice-card-new">
+                    <h2 className="choice-title">Voitures Neuves</h2>
+                    <p className="choice-description">
+                      Configurez votre Porsche sur mesure avec toutes les options disponibles
+                    </p>
+                    <span className="choice-cta">Configurer →</span>
+                  </Link>
 
-            <Link to="/catalogue/occasion" className="choice-card choice-card-used">
-              <div className="choice-icon">🏎️</div>
-              <h2 className="choice-title">Voitures d'Occasion</h2>
-              <p className="choice-description">
-                Découvrez notre sélection de Porsche d'occasion certifiées
-              </p>
-              <span className="choice-cta">Découvrir →</span>
-            </Link>
-          </div>
+                  <Link to="/catalogue/occasion" className="choice-card choice-card-used">
+                    <h2 className="choice-title">Voitures d'Occasion</h2>
+                    <p className="choice-description">
+                      Découvrez notre sélection de Porsche d'occasion certifiées
+                    </p>
+                    <span className="choice-cta">Découvrir →</span>
+                  </Link>
+                </div>
         </div>
       </section>
 
@@ -173,7 +171,6 @@ const Home = () => {
             </Link>
           </div>
           <div className="accessoires-visual">
-            <div className="accessoires-icon">🛍️</div>
             <div className="accessoires-categories">
               <span className="accessoires-tag">Porte-clés</span>
               <span className="accessoires-tag">Casquettes</span>

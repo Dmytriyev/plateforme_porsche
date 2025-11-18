@@ -286,11 +286,11 @@ const Voitures = () => {
                         {/* Badge Neuf/Occasion basé sur le modèle parent */}
                         {voiture.voiture?.type_voiture === true ? (
                           <span className="voiture-badge voiture-badge-new">
-                            ✨ Neuve
+                            Neuve
                           </span>
                         ) : voiture.voiture?.type_voiture === false ? (
                           <span className="voiture-badge voiture-badge-used">
-                            🔄 Occasion
+                            Occasion
                           </span>
                         ) : null}
                         

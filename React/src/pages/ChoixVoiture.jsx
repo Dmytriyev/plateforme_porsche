@@ -34,16 +34,15 @@ const ChoixVoiture = () => {
             onMouseEnter={() => setHoveredCard('neuve')}
             onMouseLeave={() => setHoveredCard(null)}
           >
-            <div className="choix-card-icon">✨</div>
             <h2 className="choix-card-title">Voiture Neuve</h2>
             <p className="choix-card-description">
               Configurez votre Porsche selon vos envies
             </p>
             <ul className="choix-card-features">
-              <li>🎨 Personnalisation complète</li>
-              <li>⚙️ Choix des options</li>
-              <li>🎯 Configuration sur mesure</li>
-              <li>🚗 Derniers modèles disponibles</li>
+              <li>Personnalisation complète</li>
+              <li>Choix des options</li>
+              <li>Configuration sur mesure</li>
+              <li>Derniers modèles disponibles</li>
             </ul>
             <div className="choix-card-cta">
               Configurer ma Porsche →
@@ -57,16 +56,15 @@ const ChoixVoiture = () => {
             onMouseEnter={() => setHoveredCard('occasion')}
             onMouseLeave={() => setHoveredCard(null)}
           >
-            <div className="choix-card-icon">🔄</div>
             <h2 className="choix-card-title">Voiture d'Occasion</h2>
             <p className="choix-card-description">
               Découvrez nos Porsche certifiées disponibles immédiatement
             </p>
             <ul className="choix-card-features">
-              <li>✅ Porsche Approved</li>
-              <li>📋 Historique complet</li>
-              <li>🛡️ Garantie constructeur</li>
-              <li>🚀 Disponibilité immédiate</li>
+              <li>Porsche Approved</li>
+              <li>Historique complet</li>
+              <li>Garantie constructeur</li>
+              <li>Disponibilité immédiate</li>
             </ul>
             <div className="choix-card-cta">
               Voir les occasions →
@@ -77,7 +75,7 @@ const ChoixVoiture = () => {
         {/* Information complémentaire */}
         <div className="choix-info">
           <div className="choix-info-card">
-            <h3>🎯 Notre engagement</h3>
+            <h3>Notre engagement</h3>
             <p>Que vous choisissiez une Porsche neuve ou d'occasion, nous vous garantissons une expérience d'achat exceptionnelle et un service après-vente de qualité.</p>
           </div>
         </div>
