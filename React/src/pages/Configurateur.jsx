@@ -211,15 +211,29 @@ const Configurateur = () => {
           </div>
         </div>
 
-        {/* Visualisation (placeholder) */}
+        {/* Visualisation */}
         <div className="configurateur-visual">
-          <div className="configurateur-visual-placeholder">
+          {config.variante?.photo_porsche && config.variante.photo_porsche.length > 0 ? (
+            <img
+              src={`http://localhost:3000${config.variante.photo_porsche[0].name}`}
+              alt={config.variante.nom_model}
+              className="configurateur-visual-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div 
+            className="configurateur-visual-placeholder"
+            style={{ display: config.variante?.photo_porsche && config.variante.photo_porsche.length > 0 ? 'none' : 'flex' }}
+          >
             <span className="configurateur-visual-letter">
               {config.variante?.nom_model?.charAt(0) || '?'}
             </span>
           </div>
           <p className="configurateur-visual-caption">
-            {config.variante?.nom_model || 'Sélectionnez une variante'}
+            {config.variante?.nom_model ? `${config.variante.voiture?.nom_model || ''} ${config.variante.nom_model}` : 'Sélectionnez une variante'}
           </p>
         </div>
 
@@ -271,9 +285,23 @@ const Configurateur = () => {
                     }`}
                     title={couleur.nom_couleur}
                   >
+                    {couleur.photo_couleur ? (
+                      <img
+                        src={`http://localhost:3000${couleur.photo_couleur}`}
+                        alt={couleur.nom_couleur}
+                        className="configurateur-color-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                    ) : null}
                     <div
                       className="configurateur-color-swatch"
-                      style={{ backgroundColor: couleur.code_hex || '#ccc' }}
+                      style={{ 
+                        backgroundColor: couleur.code_hex || '#ccc',
+                        display: couleur.photo_couleur ? 'none' : 'block'
+                      }}
                     />
                     <span className="configurateur-color-name">{couleur.nom_couleur}</span>
                     {couleur.prix > 0 && (
@@ -289,6 +317,7 @@ const Configurateur = () => {
           {couleursInt.length > 0 && (
             <div className="configurateur-section">
               <h2 className="configurateur-section-title">3. Couleur intérieure</h2>
+              <p className="configurateur-section-hint">Sélection multiple possible</p>
               <div className="configurateur-colors-grid">
                 {couleursInt.map((couleur) => (
                   <button
@@ -301,9 +330,23 @@ const Configurateur = () => {
                     }`}
                     title={couleur.nom_couleur}
                   >
+                    {couleur.photo_couleur ? (
+                      <img
+                        src={`http://localhost:3000${couleur.photo_couleur}`}
+                        alt={couleur.nom_couleur}
+                        className="configurateur-color-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                    ) : null}
                     <div
                       className="configurateur-color-swatch"
-                      style={{ backgroundColor: couleur.code_hex || '#ccc' }}
+                      style={{ 
+                        backgroundColor: couleur.code_hex || '#ccc',
+                        display: couleur.photo_couleur ? 'none' : 'block'
+                      }}
                     />
                     <span className="configurateur-color-name">{couleur.nom_couleur}</span>
                     {couleur.prix > 0 && (

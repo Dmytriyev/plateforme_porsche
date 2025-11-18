@@ -69,6 +69,18 @@ const personnalisationService = {
    * Récupérer toutes les tailles de jantes
    * @returns {Promise} Liste des jantes
    */
+  getJantes: async () => {
+    try {
+      const response = await apiClient.get('/taille_jante');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Alias pour getTaillesJante (pour compatibilité)
+   */
   getTaillesJante: async () => {
     try {
       const response = await apiClient.get('/taille_jante');
