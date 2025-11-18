@@ -18,6 +18,7 @@
     "axios": "^1.13.2",
     "commander": "^14.0.2",
     "date-fns": "^4.1.0",
+    "dompurify": "^3.3.0",
     "flowbite": "^4.0.1",
     "jwt-decode": "^4.0.0",
     "react": "^19.2.0",
