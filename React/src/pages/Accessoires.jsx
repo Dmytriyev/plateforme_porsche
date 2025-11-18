@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import accesoireService from '../services/accesoire.service.jsx';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Card, Button, Alert } from '../components/common';
-import { formatPrice } from '../utils/format.js';
 import './Accessoires.css';
 
 /**
@@ -168,10 +167,10 @@ const Accessoires = () => {
                     </div>
                   )}
 
-                  {/* Prix */}
-                  <p className="accessoire-price">
-                    {formatPrice(accessoire.prix)}
-                  </p>
+                        {/* Prix */}
+                        <p className="accessoire-price">
+                          {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(accessoire.prix)}
+                        </p>
 
                   {/* Bouton */}
                   <Button

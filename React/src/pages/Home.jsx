@@ -1,127 +1,175 @@
-import { Link } from 'react-router-dom';
-import { Button, Card } from '../components/common';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { voitureService } from '../services';
 import './Home.css';
 
 /**
- * Page d'accueil
+ * Page d'accueil - Affiche 911, Cayman, Cayenne avec photos réelles
  */
 const Home = () => {
+  const navigate = useNavigate();
+  const [modeles, setModeles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchModeles();
+  }, []);
+
+  const fetchModeles = async () => {
+    try {
+      setLoading(true);
+      const data = await voitureService.getAll();
+      
+      // Filtrer pour avoir uniquement 911, Cayman, Cayenne (neuves)
+      const modelesAffiches = data.filter(v => 
+        v.type_voiture === true && 
+        ['911', 'Cayman', 'Cayenne'].includes(v.nom_model)
+      );
+      
+      // Garder un seul exemplaire de chaque modèle (le premier trouvé)
+      const uniqueModeles = [];
+      const nomsVus = new Set();
+      
+      modelesAffiches.forEach(voiture => {
+        if (!nomsVus.has(voiture.nom_model)) {
+          nomsVus.add(voiture.nom_model);
+          uniqueModeles.push(voiture);
+        }
+      });
+      
+      setModeles(uniqueModeles);
+    } catch (error) {
+      console.error('Erreur chargement modèles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModeleClick = (modele) => {
+    // Rediriger vers la liste des variantes de ce modèle (neuves)
+    navigate(`/variantes/neuve/${modele._id}`);
+  };
+
+  const getModelDescription = (nomModel) => {
+    const descriptions = {
+      '911': 'L\'icône intemporelle de Porsche',
+      'Cayman': 'La voiture de sport biplace à moteur central',
+      'Cayenne': 'Le SUV sportif de luxe'
+    };
+    return descriptions[nomModel] || 'Découvrez ce modèle emblématique';
+  };
+
   return (
     <div className="home-container">
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">
-            Votre voyage Porsche commence ici
-          </h1>
+          <h1 className="hero-title">Bienvenue chez Porsche</h1>
           <p className="hero-subtitle">
-            Découvrez notre collection exclusive de voitures neuves et d'occasion
+            Découvrez l'excellence automobile. Configurez votre Porsche ou explorez notre sélection d'accessoires premium.
           </p>
-          <div className="hero-buttons">
-            <Link to="/voitures">
-              <Button size="lg">Explorer les voitures</Button>
+          <div className="hero-cta">
+            <Link to="/choix-voiture" className="cta-button cta-primary">
+              Nos Voitures
             </Link>
-            <Link to="/accessoires">
-              <Button variant="outline" size="lg">
-                Voir les accessoires
-              </Button>
+            <Link to="/accessoires" className="cta-button cta-secondary">
+              Accessoires
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Section Modèles populaires */}
-      <section className="section section-white">
-        <div className="section-container">
-          <h2 className="section-title">Modèles emblématiques</h2>
-          
+      {/* Featured Models */}
+      <section className="featured-section">
+        <h2 className="section-title">Modèles Vedettes</h2>
+        {loading ? (
+          <div className="models-loading">Chargement des modèles...</div>
+        ) : (
           <div className="models-grid">
-            {/* 911 */}
-            <Card hover padding="lg">
-              <div className="model-content">
-                <h3 className="model-title">911</h3>
-                <p className="model-description">
-                  Voiture de sport biplace à moteur central.
-                </p>
-                <p className="model-fuel">Essence</p>
-                <Link to="/voitures?modele=911">
-                  <Button>Configurer votre 911</Button>
-                </Link>
-              </div>
-            </Card>
-
-            {/* Taycan */}
-            <Card hover padding="lg">
-              <div className="model-content">
-                <h3 className="model-title">Taycan</h3>
-                <p className="model-description">
-                  L'expression pure d'une voiture de sport électrique.
-                </p>
-                <p className="model-fuel">Électrique</p>
-                <Link to="/voitures?modele=taycan">
-                  <Button>Configurer votre Taycan</Button>
-                </Link>
-              </div>
-            </Card>
-
-            {/* Panamera */}
-            <Card hover padding="lg">
-              <div className="model-content">
-                <h3 className="model-title">Panamera</h3>
-                <p className="model-description">
-                  La voiture de sport au design élégant et à la praticité quotidienne.
-                </p>
-                <p className="model-fuel">Essence • Hybride</p>
-                <Link to="/voitures?modele=panamera">
-                  <Button>Configurer votre Panamera</Button>
-                </Link>
-              </div>
-            </Card>
-
-            {/* 718 */}
-            <Card hover padding="lg">
-              <div className="model-content">
-                <h3 className="model-title">718</h3>
-                <p className="model-description">
-                  La voiture de sport biplace à moteur central pour deux.
-                </p>
-                <p className="model-fuel">Essence</p>
-                <Link to="/voitures?modele=718">
-                  <Button>Configurer votre 718</Button>
-                </Link>
-              </div>
-            </Card>
+            {modeles.map((modele) => (
+              <button
+                key={modele._id}
+                onClick={() => handleModeleClick(modele)}
+                className="model-card"
+              >
+                <div className="model-image">
+                  {modele.photo_voiture && modele.photo_voiture.length > 0 ? (
+                    <img
+                      src={`http://localhost:3000${modele.photo_voiture[0].name}`}
+                      alt={`Porsche ${modele.nom_model}`}
+                      className="model-photo"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div 
+                    className="model-placeholder"
+                    style={{ display: modele.photo_voiture && modele.photo_voiture.length > 0 ? 'none' : 'flex' }}
+                  >
+                    {modele.nom_model}
+                  </div>
+                </div>
+                <div className="model-info">
+                  <h3 className="model-name">Porsche {modele.nom_model}</h3>
+                  <p className="model-description">
+                    {modele.description || getModelDescription(modele.nom_model)}
+                  </p>
+                  <span className="model-link">
+                    Découvrir →
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
-        </div>
+        )}
       </section>
 
-      {/* Section Voitures d'occasion */}
-      <section className="section section-gray">
-        <div className="section-container center-content">
-          <h2 className="section-title">Porsche d'occasion</h2>
-          <p className="section-subtitle">
-            Découvrez notre sélection de Porsche d'occasion certifiées, 
-            alliant performance exceptionnelle et fiabilité garantie.
-          </p>
-          <Link to="/voitures?type=occasion">
-            <Button size="lg">Voir les voitures d'occasion</Button>
+      {/* Services Section */}
+      <section className="services-section">
+        <div className="services-grid">
+          <Link to="/catalogue/neuve" className="service-card service-card-link">
+            <div className="service-icon">🚗</div>
+            <h3 className="service-title">Voitures Neuves</h3>
+            <p className="service-description">
+              Créez votre Porsche sur mesure avec notre configurateur en ligne
+            </p>
+          </Link>
+
+          <Link to="/accessoires" className="service-card service-card-link">
+            <div className="service-icon">🛍️</div>
+            <h3 className="service-title">Accessoires</h3>
+            <p className="service-description">
+              Découvrez notre gamme d'accessoires Porsche authentiques
+            </p>
+          </Link>
+
+          <Link to="/catalogue/occasion" className="service-card service-card-link">
+            <div className="service-icon">💼</div>
+            <h3 className="service-title">Voitures d'Occasion</h3>
+            <p className="service-description">
+              Explorez notre sélection de Porsche d'occasion certifiées
+            </p>
           </Link>
         </div>
       </section>
 
-      {/* Section Accessoires */}
-      <section className="section section-black">
-        <div className="section-container center-content">
-          <h2 className="section-title">Accessoires Porsche</h2>
-          <p className="section-subtitle">
-            Personnalisez votre expérience Porsche avec notre collection 
-            d'accessoires premium et d'articles lifestyle.
+      {/* Call to Action Final */}
+      <section className="cta-section">
+        <div className="cta-content">
+          <h2 className="cta-title">Prêt à commencer votre aventure Porsche ?</h2>
+          <p className="cta-text">
+            Configurez votre véhicule de rêve ou découvrez notre sélection d'occasions certifiées
           </p>
-          <Link to="/accessoires">
-            <Button variant="outline" size="lg">
-              Découvrir les accessoires
-            </Button>
-          </Link>
+          <div className="cta-buttons">
+            <Link to="/choix-voiture" className="cta-button cta-primary">
+              Commencer la configuration
+            </Link>
+            <Link to="/accessoires" className="cta-button cta-secondary">
+              Voir les accessoires
+            </Link>
+          </div>
         </div>
       </section>
     </div>
