@@ -23,26 +23,45 @@ const CategoriesAccessoires = () => {
       setLoading(true);
       setError('');
       
-      // Récupérer tous les accessoires
-      const allAccessoires = await accesoireService.getAllAccessoires();
+      // OPTIMISÉ: Utiliser endpoint dédié pour récupérer types + compteurs
+      // Backend: GET /accesoire/types
+      const typesData = await accesoireService.getAvailableTypes();
       
-      // Extraire les catégories uniques avec compteur
-      const categoriesMap = {};
-      allAccessoires.forEach(acc => {
-        if (acc.type_accesoire) {
-          if (!categoriesMap[acc.type_accesoire]) {
-            categoriesMap[acc.type_accesoire] = {
-              type: acc.type_accesoire,
-              count: 0,
-              photo: acc.photo_accesoire?.[0] || null
-            };
+      // Si le backend retourne déjà le format correct avec types et compteurs
+      if (Array.isArray(typesData) && typesData.length > 0 && typeof typesData[0] === 'object') {
+        // Format: [{ type: "porte-cles", count: 5 }]
+        const categoriesWithIcons = typesData.map(cat => ({
+          type: cat.type || cat._id,
+          count: cat.count || 0,
+          photo: null // Les photos seront chargées depuis les accessoires de la catégorie
+        }));
+        setCategories(categoriesWithIcons);
+      } else if (Array.isArray(typesData)) {
+        // Format simple: ["porte-cles", "casquette", ...]
+        const categoriesWithIcons = typesData.map(type => ({
+          type: type,
+          count: 0, // Le backend ne fournit pas le compteur
+          photo: null
+        }));
+        setCategories(categoriesWithIcons);
+      } else {
+        // Fallback: charger tous les accessoires (ancien comportement)
+        const allAccessoires = await accesoireService.getAllAccessoires();
+        const categoriesMap = {};
+        allAccessoires.forEach(acc => {
+          if (acc.type_accesoire) {
+            if (!categoriesMap[acc.type_accesoire]) {
+              categoriesMap[acc.type_accesoire] = {
+                type: acc.type_accesoire,
+                count: 0,
+                photo: acc.photo_accesoire?.[0] || null
+              };
+            }
+            categoriesMap[acc.type_accesoire].count++;
           }
-          categoriesMap[acc.type_accesoire].count++;
-        }
-      });
-      
-      const categoriesArray = Object.values(categoriesMap);
-      setCategories(categoriesArray);
+        });
+        setCategories(Object.values(categoriesMap));
+      }
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des catégories');
       console.error(err);
