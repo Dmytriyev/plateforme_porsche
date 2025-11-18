@@ -11,7 +11,7 @@ const accesoireService = {
    */
   getAllAccessoires: async () => {
     try {
-      const response = await apiClient.get('/accesoire');
+      const response = await apiClient.get('/accesoire/all');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -39,7 +39,7 @@ const accesoireService = {
    */
   getAccessoiresByType: async (type) => {
     try {
-      const response = await apiClient.get(`/accesoire?type=${type}`);
+      const response = await apiClient.get(`/accesoire/search?type=${type}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
