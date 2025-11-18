@@ -163,6 +163,17 @@ const model_porscheSchema = new mongoose.Schema(
       trim: true,
       maxlength: 400,
     },
+    // Statut de la configuration (en_production, disponible, vendue, reservée)
+    statut: {
+      type: String,
+      enum: ["en_production", "disponible", "vendue", "reservee"],
+      default: "disponible",
+    },
+    // Disponibilité pour la vente
+    disponible: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

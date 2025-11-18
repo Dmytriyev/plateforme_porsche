@@ -189,18 +189,38 @@ const createModel_porsche = async (req, res) => {
 // Récupérer toutes les configurations de modèles Porsche
 const getAllModel_porsches = async (req, res) => {
   try {
-    // Récupérer toutes les configurations de modèles Porsche avec les références
-    const model_porsches = await populateModel(Model_porsche.find()).sort({
-      annee_production: -1,
-    });
+    console.log("📍 getAllModel_porsches - Début");
+    
+    // Récupérer toutes les configurations sans populate d'abord
+    const model_porsches_raw = await Model_porsche.find().sort({ createdAt: -1 });
+    console.log(`📊 Trouvé ${model_porsches_raw.length} modèles bruts`);
+    
+    // Si pas de données, retourner un tableau vide
+    if (!model_porsches_raw || model_porsches_raw.length === 0) {
+      console.log("⚠️ Aucun modèle trouvé - retourne tableau vide");
+      return res.status(200).json([]);
+    }
+    
+    // Populate les références
+    console.log("🔄 Début populate...");
+    const model_porsches = await populateModel(
+      Model_porsche.find()
+    ).sort({ createdAt: -1 });
+    console.log(`✅ Populate terminé: ${model_porsches.length} modèles`);
+    
     // Calculer le prix pour chaque modèle et ajouter au résultat final
+    console.log("💰 Calcul des prix...");
     const model_porschesWithPrix = model_porsches.map((model) => ({
       ...model.toObject(),
       prix_calcule: calculatePrix(model),
     }));
+    console.log(`✅ Prix calculés pour ${model_porschesWithPrix.length} modèles`);
+    
     // Retourner la liste des modèles avec les prix calculés
     return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
+    console.error("❌ Erreur dans getAllModel_porsches:", error);
+    console.error("Stack:", error.stack);
     return res
       .status(500)
       .json({ message: "Erreur serveur", error: error.message });
