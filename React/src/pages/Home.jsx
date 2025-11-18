@@ -18,7 +18,7 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      const data = await voitureService.getAll();
+      const data = await voitureService.getAllVoitures();
       
       // Filtrer pour avoir uniquement 911, Cayman, Cayenne (neuves)
       const modelesAffiches = data.filter(v => 
@@ -40,6 +40,8 @@ const Home = () => {
       setModeles(uniqueModeles);
     } catch (error) {
       console.error('Erreur chargement modèles:', error);
+      // Afficher un message d'erreur à l'utilisateur
+      setModeles([]);
     } finally {
       setLoading(false);
     }
