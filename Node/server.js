@@ -47,19 +47,27 @@ const port = process.env.PORT || 3000;
 db();
 
 // Configuration CORS sécurisée
-const allowedOrigins =
-  [process.env.FRONTEND_URL].map((url) => url.replace(/\/$/, "")) || 5173; // retirer le slash final
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+].filter(Boolean).map((url) => url.replace(/\/$/, "")); // retirer le slash final
 
 // Options CORS personnalisées
 const corsOptions = {
   origin: (origin, callback) => {
-    // Permettre les requêtes sans origin
+    // Permettre les requêtes sans origin (ex: Postman, curl)
     if (!origin) return callback(null, true);
     // Vérifier si l'origine est dans la liste des autorisées
     const normalizedOrigin = origin.replace(/\/$/, "");
     if (allowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
+      // En développement, autoriser localhost
+      if (normalizedOrigin.startsWith('http://localhost') || normalizedOrigin.startsWith('http://127.0.0.1')) {
+        return callback(null, true);
+      }
       // Rejeter les origines non autorisées
       callback(new Error(`Origin ${origin} non autorisée par CORS`));
     }
@@ -67,13 +75,18 @@ const corsOptions = {
   // Autoriser les cookies et les credentials
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 
 // Middlewares globaux
 app.use(cors(corsOptions)); // Autorise les requêtes entre origines CORS
-app.use(helmet()); // Définit des headers de sécurité HTTP
+
+// Helmet avec configuration pour permettre le chargement des images
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Permet le chargement des images depuis d'autres origines
+  crossOriginEmbedderPolicy: false, // Désactive pour compatibilité avec les images
+}));
 
 // Limiteur global pour éviter le DDoS attaques
 const globalLimiter = rateLimit({
