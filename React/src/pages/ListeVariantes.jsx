@@ -33,7 +33,10 @@ const ListeVariantes = () => {
       setModele(modeleData);
       
       // Récupérer toutes les variantes de ce modèle
-      const allVariantes = await modelPorscheService.getAllModels();
+      const response = await modelPorscheService.getAllModels();
+      
+      // Vérifier que la réponse est bien un tableau
+      const allVariantes = Array.isArray(response) ? response : [];
       
       // Filtrer les variantes qui correspondent à ce modèle et type
       const filteredVariantes = allVariantes.filter(variante => 

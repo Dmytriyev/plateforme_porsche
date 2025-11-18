@@ -26,7 +26,10 @@ const AccessoiresParCategorie = () => {
       setError('');
       
       // Récupérer tous les accessoires
-      const allAccessoires = await accesoireService.getAllAccessoires();
+      const response = await accesoireService.getAllAccessoires();
+      
+      // Vérifier que la réponse est bien un tableau
+      const allAccessoires = Array.isArray(response) ? response : [];
       
       // Filtrer par catégorie
       const filteredAccessoires = allAccessoires.filter(
