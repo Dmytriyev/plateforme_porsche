@@ -29,6 +29,9 @@ import Panier from './pages/Panier.jsx';
 import MonCompte from './pages/MonCompte.jsx';
 import MesVoitures from './pages/MesVoitures.jsx';
 import MesReservations from './pages/MesReservations.jsx';
+import MesCommandes from './pages/MesCommandes.jsx';
+import DashboardAdmin from './pages/DashboardAdmin.jsx';
+import DashboardConseiller from './pages/DashboardConseiller.jsx';
 
 import './App.css';
 
@@ -79,6 +82,33 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <MesReservations />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/mes-commandes"
+                    element={
+                      <ProtectedRoute>
+                        <MesCommandes />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/admin"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardAdmin />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/conseiller"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardConseiller />
                       </ProtectedRoute>
                     }
                   />

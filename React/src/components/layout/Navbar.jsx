@@ -67,11 +67,25 @@ const Navbar = () => {
             {isAuthenticated() ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm">Bonjour, {user?.prenom}</span>
+                
+                {/* Dashboard selon le rôle */}
+                {isAdmin() && (
+                  <Link to="/dashboard/admin" className="hover:text-gray-300 transition-colors font-medium">
+                    Dashboard Admin
+                  </Link>
+                )}
+                {(user?.role === 'conseillere' || isAdmin()) && (
+                  <Link to="/dashboard/conseiller" className="hover:text-gray-300 transition-colors font-medium">
+                    Dashboard Conseiller
+                  </Link>
+                )}
+                
+                {/* Liens utilisateur */}
                 <Link to="/mes-voitures" className="hover:text-gray-300 transition-colors font-medium">
                   Mes Voitures
                 </Link>
-                <Link to="/mes-reservations" className="hover:text-gray-300 transition-colors font-medium">
-                  Mes Réservations
+                <Link to="/mes-commandes" className="hover:text-gray-300 transition-colors font-medium">
+                  Mes Commandes
                 </Link>
                 <Link to="/mon-compte" className="hover:text-gray-300 transition-colors font-medium">
                   Mon Compte
@@ -135,20 +149,31 @@ const Navbar = () => {
 
               {isAuthenticated() ? (
                 <>
+                  {/* Dashboards selon le rôle */}
+                  {isAdmin() && (
+                    <Link to="/dashboard/admin" className="hover:text-gray-300 transition-colors font-medium text-blue-400">
+                      Dashboard Admin
+                    </Link>
+                  )}
+                  {(user?.role === 'conseillere' || isAdmin()) && (
+                    <Link to="/dashboard/conseiller" className="hover:text-gray-300 transition-colors font-medium text-yellow-400">
+                      Dashboard Conseiller
+                    </Link>
+                  )}
+                  
+                  {/* Liens utilisateur */}
                   <Link to="/mes-voitures" className="hover:text-gray-300 transition-colors font-medium">
                     Mes Voitures
                   </Link>
                   <Link to="/mes-reservations" className="hover:text-gray-300 transition-colors font-medium">
                     Mes Réservations
                   </Link>
+                  <Link to="/mes-commandes" className="hover:text-gray-300 transition-colors font-medium">
+                    Mes Commandes
+                  </Link>
                   <Link to="/mon-compte" className="hover:text-gray-300 transition-colors font-medium">
                     Mon Compte
                   </Link>
-                  {isAdmin() && (
-                    <Link to="/admin" className="hover:text-gray-300 transition-colors font-medium text-red-400">
-                      Administration
-                    </Link>
-                  )}
                   <button
                     onClick={logout}
                     className="text-left hover:text-gray-300 transition-colors font-medium"
