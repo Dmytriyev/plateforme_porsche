@@ -1,0 +1,280 @@
+/* Page détail voiture */
+.voiture-detail-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.voiture-detail-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Breadcrumb */
+.voiture-detail-breadcrumb {
+  margin-bottom: 2rem;
+}
+
+.breadcrumb-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #000;
+}
+
+/* Header */
+.voiture-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.voiture-detail-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.voiture-detail-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Badge */
+.voiture-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.voiture-badge-new {
+  background-color: #10b981;
+  color: #fff;
+}
+
+.voiture-badge-used {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+/* Grid principal */
+.voiture-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+@media (max-width: 1024px) {
+  .voiture-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Galerie photos */
+.voiture-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.voiture-gallery-main {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.voiture-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: #fff;
+}
+
+.voiture-image-letter {
+  font-size: 6rem;
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+/* Miniatures */
+.voiture-gallery-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.voiture-thumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: none;
+  padding: 0;
+}
+
+.voiture-thumbnail:hover {
+  border-color: #6b7280;
+}
+
+.voiture-thumbnail-active {
+  border-color: #000;
+}
+
+.voiture-image-placeholder-small {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Informations */
+.voiture-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Prix */
+.voiture-price-section {
+  background-color: #f3f4f6;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+}
+
+.voiture-price-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.voiture-price-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+/* Spécifications */
+.voiture-specs,
+.voiture-config {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.voiture-specs-title,
+.voiture-config-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.voiture-specs-grid,
+.voiture-config-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.voiture-spec-item,
+.voiture-config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.voiture-spec-item:last-child,
+.voiture-config-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.voiture-spec-label,
+.voiture-config-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.voiture-spec-value,
+.voiture-config-value {
+  font-size: 0.875rem;
+  color: #000;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Actions */
+.voiture-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Informations livraison */
+.voiture-delivery-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  border-left: 4px solid #10b981;
+}
+
+.voiture-delivery-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.voiture-delivery-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* Error container */
+.error-container {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+

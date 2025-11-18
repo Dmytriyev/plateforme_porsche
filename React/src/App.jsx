@@ -20,6 +20,8 @@ import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Voitures from './pages/Voitures.jsx';
+import VoitureDetail from './pages/VoitureDetail.jsx';
+import Configurateur from './pages/Configurateur.jsx';
 import Accessoires from './pages/Accessoires.jsx';
 import Panier from './pages/Panier.jsx';
 
@@ -45,9 +47,11 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/voitures" element={<Voitures />} />
-                  <Route path="/accessoires" element={<Accessoires />} />
-                  <Route path="/panier" element={<Panier />} />
+            <Route path="/voitures" element={<Voitures />} />
+            <Route path="/voitures/:id" element={<VoitureDetail />} />
+            <Route path="/configurateur/:voitureId" element={<Configurateur />} />
+            <Route path="/accessoires" element={<Accessoires />} />
+            <Route path="/panier" element={<Panier />} />
 
                   {/* Routes protégées - Nécessitent authentification */}
                   <Route
