@@ -189,41 +189,68 @@ const createModel_porsche = async (req, res) => {
 // Récupérer toutes les configurations de modèles Porsche
 const getAllModel_porsches = async (req, res) => {
   try {
-    console.log("📍 getAllModel_porsches - Début");
+    console.log("📍 getAllModel_porsches - START");
     
-    // Récupérer toutes les configurations sans populate d'abord
-    const model_porsches_raw = await Model_porsche.find().sort({ createdAt: -1 });
-    console.log(`📊 Trouvé ${model_porsches_raw.length} modèles bruts`);
+    // Récupérer sans populate d'abord pour debug
+    const model_porsches = await Model_porsche.find()
+      .populate("photo_porsche", "name alt")
+      .populate("voiture", "nom_model type_voiture description")
+      .populate("couleur_exterieur", "nom_couleur photo_couleur prix")
+      .populate("couleur_interieur", "nom_couleur photo_couleur prix")
+      .populate("taille_jante", "taille_jante couleur_jante prix")
+      .populate("package", "nom_package prix")
+      .populate("siege", "nom_siege prix")
+      .sort({ createdAt: -1 })
+      .lean();
+    
+    console.log(`✅ Trouvé ${model_porsches.length} modèles`);
     
     // Si pas de données, retourner un tableau vide
-    if (!model_porsches_raw || model_porsches_raw.length === 0) {
-      console.log("⚠️ Aucun modèle trouvé - retourne tableau vide");
+    if (!model_porsches || model_porsches.length === 0) {
       return res.status(200).json([]);
     }
     
-    // Populate les références
-    console.log("🔄 Début populate...");
-    const model_porsches = await populateModel(
-      Model_porsche.find()
-    ).sort({ createdAt: -1 });
-    console.log(`✅ Populate terminé: ${model_porsches.length} modèles`);
+    // Calculer le prix pour chaque modèle
+    const model_porschesWithPrix = model_porsches.map((model) => {
+      const prixBase = model.prix_base || 0;
+      const prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
+      const prixCouleursInterieur = Array.isArray(model.couleur_interieur)
+        ? model.couleur_interieur.reduce((total, c) => total + (c?.prix || 0), 0)
+        : 0;
+      const prixJante = model.taille_jante?.prix || 0;
+      const prixPackage = model.package?.prix || 0;
+      const prixSiege = model.siege?.prix || 0;
+      
+      const prixTotal = prixBase + prixCouleurExterieur + prixCouleursInterieur + prixJante + prixPackage + prixSiege;
+      
+      return {
+        ...model,
+        prix_calcule: {
+          prix_base_variante: prixBase,
+          options: {
+            couleur_exterieur: prixCouleurExterieur,
+            couleurs_interieur: prixCouleursInterieur,
+            jante: prixJante,
+            package: prixPackage,
+            siege: prixSiege,
+          },
+          total_options: prixCouleurExterieur + prixCouleursInterieur + prixJante + prixPackage + prixSiege,
+          prix_total: prixTotal,
+          acompte_requis: prixTotal * 0.1,
+          pourcentage_acompte: "10%",
+        },
+      };
+    });
     
-    // Calculer le prix pour chaque modèle et ajouter au résultat final
-    console.log("💰 Calcul des prix...");
-    const model_porschesWithPrix = model_porsches.map((model) => ({
-      ...model.toObject(),
-      prix_calcule: calculatePrix(model),
-    }));
-    console.log(`✅ Prix calculés pour ${model_porschesWithPrix.length} modèles`);
-    
-    // Retourner la liste des modèles avec les prix calculés
+    console.log(`✅ Retourne ${model_porschesWithPrix.length} modèles avec prix`);
     return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
-    console.error("❌ Erreur dans getAllModel_porsches:", error);
+    console.error("❌ Erreur getAllModel_porsches:", error.message);
     console.error("Stack:", error.stack);
-    return res
-      .status(500)
-      .json({ message: "Erreur serveur", error: error.message });
+    return res.status(500).json({ 
+      message: "Erreur serveur", 
+      error: error.message 
+    });
   }
 };
 

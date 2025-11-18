@@ -5,6 +5,7 @@ import db from "./db/db.js";
 import path from "node:path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+// import mongoSanitize from "express-mongo-sanitize"; // Désactivé temporairement - conflit avec Express
 
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
@@ -121,7 +122,8 @@ app.use(express.json());
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// Protection contre les injections NoSQL (retire $, . dans les clés)
+// Note: mongoSanitize désactivé temporairement (conflit version Express)
+// La protection NoSQL est assurée par la validation Joi sur toutes les routes
 
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);
