@@ -71,29 +71,50 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      {/* Hero Section */}
+      {/* Hero Section avec choix Neuf/Occasion */}
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">Bienvenue chez Porsche</h1>
           <p className="hero-subtitle">
-            Découvrez l'excellence automobile. Configurez votre Porsche ou explorez notre sélection d'accessoires premium.
+            Découvrez l'excellence automobile. Choisissez votre expérience Porsche.
           </p>
-          <div className="hero-cta">
-            <Link to="/choix-voiture" className="cta-button cta-primary">
-              Nos Voitures
+          
+          {/* Choix Neuf/Occasion */}
+          <div className="hero-choice">
+            <Link to="/catalogue/neuve" className="choice-card choice-card-new">
+              <div className="choice-icon">✨</div>
+              <h2 className="choice-title">Voitures Neuves</h2>
+              <p className="choice-description">
+                Configurez votre Porsche sur mesure avec toutes les options disponibles
+              </p>
+              <span className="choice-cta">Configurer →</span>
             </Link>
-            <Link to="/accessoires" className="cta-button cta-secondary">
-              Accessoires
+
+            <Link to="/catalogue/occasion" className="choice-card choice-card-used">
+              <div className="choice-icon">🏎️</div>
+              <h2 className="choice-title">Voitures d'Occasion</h2>
+              <p className="choice-description">
+                Découvrez notre sélection de Porsche d'occasion certifiées
+              </p>
+              <span className="choice-cta">Découvrir →</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Models */}
-      <section className="featured-section">
-        <h2 className="section-title">Modèles Vedettes</h2>
+      {/* Modèles à choisir: 911, Cayman, Cayenne */}
+      <section className="models-section">
+        <div className="models-header">
+          <h2 className="section-title">Choisissez Votre Modèle</h2>
+          <p className="section-subtitle">911 • Cayman • Cayenne</p>
+        </div>
+        
         {loading ? (
           <div className="models-loading">Chargement des modèles...</div>
+        ) : modeles.length === 0 ? (
+          <div className="models-empty">
+            <p>Aucun modèle disponible pour le moment</p>
+          </div>
         ) : (
           <div className="models-grid">
             {modeles.map((modele) => (
@@ -127,7 +148,7 @@ const Home = () => {
                     {modele.description || getModelDescription(modele.nom_model)}
                   </p>
                   <span className="model-link">
-                    Découvrir →
+                    Voir les variantes →
                   </span>
                 </div>
               </button>
@@ -136,49 +157,29 @@ const Home = () => {
         )}
       </section>
 
-      {/* Services Section */}
-      <section className="services-section">
-        <div className="services-grid">
-          <Link to="/catalogue/neuve" className="service-card service-card-link">
-            <div className="service-icon">🚗</div>
-            <h3 className="service-title">Voitures Neuves</h3>
-            <p className="service-description">
-              Créez votre Porsche sur mesure avec notre configurateur en ligne
+      {/* Section Accessoires */}
+      <section className="accessoires-section">
+        <div className="accessoires-content">
+          <div className="accessoires-text">
+            <h2 className="accessoires-title">Accessoires Porsche</h2>
+            <p className="accessoires-description">
+              Personnalisez votre expérience avec notre collection exclusive d'accessoires premium. 
+              Du lifestyle aux pièces de performance, découvrez tout ce qui fait l'excellence Porsche.
             </p>
-          </Link>
-
-          <Link to="/accessoires" className="service-card service-card-link">
-            <div className="service-icon">🛍️</div>
-            <h3 className="service-title">Accessoires</h3>
-            <p className="service-description">
-              Découvrez notre gamme d'accessoires Porsche authentiques
-            </p>
-          </Link>
-
-          <Link to="/catalogue/occasion" className="service-card service-card-link">
-            <div className="service-icon">💼</div>
-            <h3 className="service-title">Voitures d'Occasion</h3>
-            <p className="service-description">
-              Explorez notre sélection de Porsche d'occasion certifiées
-            </p>
-          </Link>
-        </div>
-      </section>
-
-      {/* Call to Action Final */}
-      <section className="cta-section">
-        <div className="cta-content">
-          <h2 className="cta-title">Prêt à commencer votre aventure Porsche ?</h2>
-          <p className="cta-text">
-            Configurez votre véhicule de rêve ou découvrez notre sélection d'occasions certifiées
-          </p>
-          <div className="cta-buttons">
-            <Link to="/choix-voiture" className="cta-button cta-primary">
-              Commencer la configuration
+            <Link to="/accessoires" className="accessoires-button">
+              Découvrir les Accessoires →
             </Link>
-            <Link to="/accessoires" className="cta-button cta-secondary">
-              Voir les accessoires
-            </Link>
+          </div>
+          <div className="accessoires-visual">
+            <div className="accessoires-icon">🛍️</div>
+            <div className="accessoires-categories">
+              <span className="accessoires-tag">Porte-clés</span>
+              <span className="accessoires-tag">Casquettes</span>
+              <span className="accessoires-tag">Décoration</span>
+              <span className="accessoires-tag">Vêtements</span>
+              <span className="accessoires-tag">Bagages</span>
+              <span className="accessoires-tag">Miniatures</span>
+            </div>
           </div>
         </div>
       </section>
