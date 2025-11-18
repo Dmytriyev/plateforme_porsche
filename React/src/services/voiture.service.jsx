@@ -35,13 +35,12 @@ const voitureService = {
   },
 
   /**
-   * Créer une nouvelle voiture (ADMIN)
-   * @param {Object} data - Données de la voiture
-   * @returns {Promise} Voiture créée
+   * Récupérer les voitures NEUVES uniquement
+   * @returns {Promise} Liste des voitures neuves
    */
-  createVoiture: async (data) => {
+  getVoituresNeuves: async () => {
     try {
-      const response = await apiClient.post('/voiture', data);
+      const response = await apiClient.get('/voiture/neuve');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -49,14 +48,55 @@ const voitureService = {
   },
 
   /**
-   * Mettre à jour une voiture (ADMIN)
+   * Récupérer les voitures OCCASION uniquement
+   * @returns {Promise} Liste des voitures occasion
+   */
+  getVoituresOccasion: async () => {
+    try {
+      const response = await apiClient.get('/voiture/occasion');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Récupérer les modèles Porsche d'une voiture
+   * @param {string} voitureId - ID de la voiture
+   * @returns {Promise} Liste des modèles Porsche
+   */
+  getModelsPorscheByVoiture: async (voitureId) => {
+    try {
+      const response = await apiClient.get(`/voiture/modelsPorsche/${voitureId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Créer une nouvelle voiture (STAFF)
+   * @param {Object} data - Données de la voiture
+   * @returns {Promise} Voiture créée
+   */
+  createVoiture: async (data) => {
+    try {
+      const response = await apiClient.post('/voiture/new', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Mettre à jour une voiture (STAFF)
    * @param {string} id - ID de la voiture
    * @param {Object} data - Nouvelles données
    * @returns {Promise} Voiture mise à jour
    */
   updateVoiture: async (id, data) => {
     try {
-      const response = await apiClient.put(`/voiture/${id}`, data);
+      const response = await apiClient.put(`/voiture/update/${id}`, data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -70,98 +110,13 @@ const voitureService = {
    */
   deleteVoiture: async (id) => {
     try {
-      const response = await apiClient.delete(`/voiture/${id}`);
+      const response = await apiClient.delete(`/voiture/delete/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  // ==================== MODÈLES PORSCHE (Variantes) ====================
-
-  /**
-   * Récupérer tous les modèles Porsche
-   * @returns {Promise} Liste des modèles
-   */
-  getAllModels: async () => {
-    try {
-      const response = await apiClient.get('/model_porsche');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  /**
-   * Récupérer un modèle par ID
-   * @param {string} id - ID du modèle
-   * @returns {Promise} Détails du modèle
-   */
-  getModelById: async (id) => {
-    try {
-      const response = await apiClient.get(`/model_porsche/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  /**
-   * Filtrer les modèles par type (neuve/occasion)
-   * @param {boolean} isNew - true pour neuve, false pour occasion
-   * @returns {Promise} Liste filtrée
-   */
-  getModelsByType: async (isNew) => {
-    try {
-      const response = await apiClient.get(`/model_porsche?type_voiture=${isNew}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  /**
-   * Créer un nouveau modèle (ADMIN)
-   * @param {Object} data - Données du modèle
-   * @returns {Promise} Modèle créé
-   */
-  createModel: async (data) => {
-    try {
-      const response = await apiClient.post('/model_porsche', data);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  /**
-   * Mettre à jour un modèle (ADMIN)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - Nouvelles données
-   * @returns {Promise} Modèle mis à jour
-   */
-  updateModel: async (id, data) => {
-    try {
-      const response = await apiClient.put(`/model_porsche/${id}`, data);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  /**
-   * Supprimer un modèle (ADMIN)
-   * @param {string} id - ID du modèle
-   * @returns {Promise} Confirmation
-   */
-  deleteModel: async (id) => {
-    try {
-      const response = await apiClient.delete(`/model_porsche/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
 
   // ==================== PHOTOS ====================
 
