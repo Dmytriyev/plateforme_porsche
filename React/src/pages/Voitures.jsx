@@ -234,7 +234,7 @@ const Voitures = () => {
                       {voiture.photo_porsche && voiture.photo_porsche.length > 0 ? (
                         <img
                           src={`http://localhost:3000${voiture.photo_porsche[0].name}`}
-                          alt={voiture.photo_porsche[0].alt || voiture.nom_model}
+                          alt={voiture.photo_porsche[0].alt || `${voiture.voiture?.nom_model || ''} ${voiture.nom_model}`.trim()}
                           className="voiture-image"
                           onError={(e) => {
                             e.target.style.display = 'none';
@@ -244,18 +244,28 @@ const Voitures = () => {
                       ) : null}
                       <div className="voiture-image-placeholder" style={{ display: voiture.photo_porsche && voiture.photo_porsche.length > 0 ? 'none' : 'flex' }}>
                         <span className="voiture-image-letter">
-                          {voiture.nom_model?.charAt(0) || '?'}
+                          {voiture.voiture?.nom_model?.charAt(0) || voiture.nom_model?.charAt(0) || '?'}
                         </span>
                       </div>
                     </div>
 
                     {/* Informations */}
                     <div className="voiture-details">
-                      <h3 className="voiture-name">{voiture.nom_model}</h3>
+                      {/* Modèle parent + Variante */}
+                      <h3 className="voiture-name">
+                        {voiture.voiture?.nom_model && (
+                          <span className="voiture-model-parent">{voiture.voiture.nom_model} </span>
+                        )}
+                        {voiture.nom_model}
+                      </h3>
                       
-                      {voiture.description && (
+                      {/* Description du modèle parent */}
+                      {voiture.voiture?.description && (
                         <p className="voiture-description">
-                          {voiture.description.substring(0, 100)}...
+                          {voiture.voiture.description.length > 100 
+                            ? voiture.voiture.description.substring(0, 100) + '...'
+                            : voiture.voiture.description
+                          }
                         </p>
                       )}
 
@@ -273,18 +283,28 @@ const Voitures = () => {
 
                       {/* Badge type */}
                       <div className="voiture-badge-container">
-                        {voiture.voiture?.type_voiture ? (
+                        {/* Badge Neuf/Occasion basé sur le modèle parent */}
+                        {voiture.voiture?.type_voiture === true ? (
                           <span className="voiture-badge voiture-badge-new">
                             ✨ Neuve
                           </span>
-                        ) : (
+                        ) : voiture.voiture?.type_voiture === false ? (
                           <span className="voiture-badge voiture-badge-used">
                             🔄 Occasion
                           </span>
-                        )}
-                        {voiture.disponible && (
+                        ) : null}
+                        
+                        {/* Badge Disponible (si défini et true) */}
+                        {voiture.disponible === true && (
                           <span className="voiture-badge voiture-badge-available">
                             Disponible
+                          </span>
+                        )}
+                        
+                        {/* Badge carrosserie si disponible */}
+                        {voiture.type_carrosserie && (
+                          <span className="voiture-badge voiture-badge-carrosserie">
+                            {voiture.type_carrosserie}
                           </span>
                         )}
                       </div>
