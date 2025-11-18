@@ -13,7 +13,7 @@ const voitureService = {
    */
   getAllVoitures: async () => {
     try {
-      const response = await apiClient.get('/voiture');
+      const response = await apiClient.get('/voiture/all');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
