@@ -33,7 +33,7 @@ const Voitures = () => {
     const fetchVoitures = async () => {
       try {
         setLoading(true);
-        const data = await voitureService.getAllModels();
+        const data = await voitureService.getAllVoitures();
         setVoitures(data);
       } catch (err) {
         setError('Erreur lors du chargement des voitures');

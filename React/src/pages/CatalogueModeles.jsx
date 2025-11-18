@@ -27,7 +27,7 @@ const CatalogueModeles = () => {
       setError('');
       
       // Récupérer tous les modèles de voitures
-      const data = await voitureService.getAll();
+      const data = await voitureService.getAllVoitures();
       
       // Filtrer selon le type (neuf/occasion)
       const filteredModeles = data.filter(voiture => 

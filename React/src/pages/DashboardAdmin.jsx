@@ -32,7 +32,7 @@ const DashboardAdmin = () => {
     try {
       setLoading(true);
       // Charger les statistiques
-      const voitures = await voitureService.getAllModels();
+      const voitures = await voitureService.getAllVoitures();
       const commandes = await commandeService.getMyCommandes();
       
       setStats({
