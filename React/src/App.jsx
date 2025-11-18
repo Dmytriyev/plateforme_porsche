@@ -19,6 +19,9 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ChoixVoiture from './pages/ChoixVoiture.jsx';
+import CatalogueModeles from './pages/CatalogueModeles.jsx';
+import ListeVariantes from './pages/ListeVariantes.jsx';
 import Voitures from './pages/Voitures.jsx';
 import VoitureDetail from './pages/VoitureDetail.jsx';
 import Configurateur from './pages/Configurateur.jsx';
@@ -53,6 +56,13 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  
+                  {/* Parcours hiérarchique voitures */}
+                  <Route path="/choix-voiture" element={<ChoixVoiture />} />
+                  <Route path="/catalogue/:type" element={<CatalogueModeles />} />
+                  <Route path="/variantes/:type/:modeleId" element={<ListeVariantes />} />
+                  
+                  {/* Ancien parcours (compatibilité) */}
             <Route path="/voitures" element={<Voitures />} />
             <Route path="/voitures/:id" element={<VoitureDetail />} />
           <Route path="/configurateur/:voitureId" element={<Configurateur />} />

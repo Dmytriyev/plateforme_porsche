@@ -29,7 +29,7 @@ const Navbar = () => {
             <Link to="/" className="hover:text-gray-300 transition-colors font-medium">
               Accueil
             </Link>
-            <Link to="/voitures" className="hover:text-gray-300 transition-colors font-medium">
+            <Link to="/choix-voiture" className="hover:text-gray-300 transition-colors font-medium">
               Voitures
             </Link>
             <Link to="/accessoires" className="hover:text-gray-300 transition-colors font-medium">

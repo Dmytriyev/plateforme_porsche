@@ -1,0 +1,260 @@
+/* Page Liste Variantes */
+.variantes-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 2rem 0;
+}
+
+.variantes-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* En-tête */
+.variantes-header {
+  margin-bottom: 3rem;
+}
+
+.variantes-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2rem;
+}
+
+.variantes-back-btn:hover {
+  border-color: #000;
+  color: #000;
+}
+
+.variantes-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.variantes-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Grille variantes */
+.variantes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+}
+
+/* Carte variante */
+.variante-card {
+  background-color: #fff;
+  border: 3px solid #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.variante-card:hover {
+  border-color: #000;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Image */
+.variante-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+.variante-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.variante-card:hover .variante-image {
+  transform: scale(1.05);
+}
+
+.variante-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variante-letter {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0.5;
+}
+
+/* Informations */
+.variante-info {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Badges */
+.variante-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.variante-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.variante-badge-new {
+  background-color: #dcfce7;
+  color: #059669;
+}
+
+.variante-badge-used {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.variante-badge-disponible {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.variante-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.variante-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Spécifications */
+.variante-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.variante-spec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.variante-spec-label {
+  font-size: 1rem;
+}
+
+.variante-spec-value {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Prix */
+.variante-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.variante-price-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.variante-price-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #000;
+}
+
+/* CTA */
+.variante-cta {
+  padding: 1rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.variante-card:hover .variante-cta {
+  background-color: #1f2937;
+}
+
+/* Message vide */
+.variantes-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.variantes-empty p {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .variantes-title {
+    font-size: 2rem;
+  }
+
+  .variantes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

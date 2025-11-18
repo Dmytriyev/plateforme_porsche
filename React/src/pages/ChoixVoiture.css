@@ -1,0 +1,177 @@
+/* Page Choix Voiture */
+.choix-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+  padding: 4rem 1rem;
+}
+
+.choix-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* En-tête */
+.choix-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.choix-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.choix-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Grille de choix */
+.choix-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+/* Cartes de choix */
+.choix-card {
+  background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+  border: 3px solid #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.choix-card:hover,
+.choix-card-hover {
+  border-color: #000;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #fff 0%, #fff 100%);
+}
+
+.choix-card-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.choix-card-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.choix-card-description {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.choix-card-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.choix-card-features li {
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.choix-card-features li:last-child {
+  border-bottom: none;
+}
+
+.choix-card-cta {
+  margin-top: 1rem;
+  padding: 1rem 2rem;
+  background-color: #000;
+  color: #fff;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.choix-card:hover .choix-card-cta,
+.choix-card-hover .choix-card-cta {
+  background-color: #1f2937;
+  transform: scale(1.05);
+}
+
+/* Information complémentaire */
+.choix-info {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.choix-info-card {
+  background-color: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.choix-info-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.choix-info-card p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .choix-title {
+    font-size: 2rem;
+  }
+
+  .choix-subtitle {
+    font-size: 1rem;
+  }
+
+  .choix-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .choix-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .choix-card-title {
+    font-size: 1.5rem;
+  }
+
+  .choix-card-icon {
+    font-size: 3rem;
+  }
+}
+
