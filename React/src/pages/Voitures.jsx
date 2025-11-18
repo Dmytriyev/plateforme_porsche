@@ -16,9 +16,11 @@ const Voitures = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Onglet actif (tous, neuves, occasions)
+  const [activeTab, setActiveTab] = useState(searchParams.get('type') || 'tous');
+
   // Filtres
   const [filters, setFilters] = useState({
-    type: searchParams.get('type') || '', // neuf ou occasion
     modele: searchParams.get('modele') || '',
     prixMin: '',
     prixMax: '',
@@ -44,11 +46,11 @@ const Voitures = () => {
     fetchVoitures();
   }, []);
 
-  // Filtrer les voitures selon les critères
+  // Filtrer les voitures selon l'onglet actif et les critères
   const voituresFiltrees = voitures.filter((voiture) => {
-    // Filtre par type
-    if (filters.type === 'neuf' && !voiture.type_voiture) return false;
-    if (filters.type === 'occasion' && voiture.type_voiture) return false;
+    // Filtre par onglet (neuf/occasion/tous)
+    if (activeTab === 'neuves' && !voiture.voiture?.type_voiture) return false;
+    if (activeTab === 'occasions' && voiture.voiture?.type_voiture) return false;
 
     // Filtre par modèle
     if (filters.modele && !voiture.nom_model?.toLowerCase().includes(filters.modele.toLowerCase())) {
@@ -56,8 +58,9 @@ const Voitures = () => {
     }
 
     // Filtre par prix
-    if (filters.prixMin && voiture.prix < parseFloat(filters.prixMin)) return false;
-    if (filters.prixMax && voiture.prix > parseFloat(filters.prixMax)) return false;
+    const prixTotal = voiture.prix_calcule?.prix_total || voiture.prix_base || 0;
+    if (filters.prixMin && prixTotal < parseFloat(filters.prixMin)) return false;
+    if (filters.prixMax && prixTotal > parseFloat(filters.prixMax)) return false;
 
     // Filtre par transmission
     if (filters.transmissionType && voiture.specifications?.transmission !== filters.transmissionType) {
@@ -67,18 +70,37 @@ const Voitures = () => {
     return true;
   });
 
+  // Statistiques pour les onglets
+  const stats = {
+    tous: voitures.length,
+    neuves: voitures.filter(v => v.voiture?.type_voiture === true).length,
+    occasions: voitures.filter(v => v.voiture?.type_voiture === false).length,
+  };
+
   const handleFilterChange = (name, value) => {
     setFilters({ ...filters, [name]: value });
   };
 
   const handleResetFilters = () => {
     setFilters({
-      type: '',
       modele: '',
       prixMin: '',
       prixMax: '',
       transmissionType: '',
     });
+    setActiveTab('tous');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // Mettre à jour l'URL
+    const newParams = new URLSearchParams(searchParams);
+    if (tab === 'tous') {
+      newParams.delete('type');
+    } else {
+      newParams.set('type', tab);
+    }
+    navigate(`?${newParams.toString()}`, { replace: true });
   };
 
   const handleViewDetails = (id) => {
@@ -119,6 +141,31 @@ const Voitures = () => {
           </button>
         </div>
 
+        {/* Onglets Tous / Neuves / Occasions */}
+        <div className="voitures-tabs">
+          <button
+            className={`voitures-tab ${activeTab === 'tous' ? 'voitures-tab-active' : ''}`}
+            onClick={() => handleTabChange('tous')}
+          >
+            Toutes
+            <span className="voitures-tab-count">{stats.tous}</span>
+          </button>
+          <button
+            className={`voitures-tab ${activeTab === 'neuves' ? 'voitures-tab-active' : ''}`}
+            onClick={() => handleTabChange('neuves')}
+          >
+            Neuves
+            <span className="voitures-tab-count">{stats.neuves}</span>
+          </button>
+          <button
+            className={`voitures-tab ${activeTab === 'occasions' ? 'voitures-tab-active' : ''}`}
+            onClick={() => handleTabChange('occasions')}
+          >
+            Occasions
+            <span className="voitures-tab-count">{stats.occasions}</span>
+          </button>
+        </div>
+
         <div className="voitures-layout">
           {/* Sidebar filtres */}
           <aside className={`voitures-sidebar ${showFilters ? 'voitures-sidebar-open' : ''}`}>
@@ -128,43 +175,6 @@ const Voitures = () => {
                 <button onClick={handleResetFilters} className="voitures-filters-reset">
                   Réinitialiser
                 </button>
-              </div>
-
-              {/* Type */}
-              <div className="voitures-filter-group">
-                <h3 className="voitures-filter-label">Type</h3>
-                <div className="voitures-filter-options">
-                  <label className="voitures-filter-option">
-                    <input
-                      type="radio"
-                      name="type"
-                      value=""
-                      checked={filters.type === ''}
-                      onChange={(e) => handleFilterChange('type', e.target.value)}
-                    />
-                    <span>Tous</span>
-                  </label>
-                  <label className="voitures-filter-option">
-                    <input
-                      type="radio"
-                      name="type"
-                      value="neuf"
-                      checked={filters.type === 'neuf'}
-                      onChange={(e) => handleFilterChange('type', e.target.value)}
-                    />
-                    <span>Neuves</span>
-                  </label>
-                  <label className="voitures-filter-option">
-                    <input
-                      type="radio"
-                      name="type"
-                      value="occasion"
-                      checked={filters.type === 'occasion'}
-                      onChange={(e) => handleFilterChange('type', e.target.value)}
-                    />
-                    <span>Occasion</span>
-                  </label>
-                </div>
               </div>
 
               {/* Modèle */}
@@ -262,22 +272,27 @@ const Voitures = () => {
                       )}
 
                       {/* Badge type */}
-                      <div>
-                        {voiture.type_voiture ? (
+                      <div className="voiture-badge-container">
+                        {voiture.voiture?.type_voiture ? (
                           <span className="voiture-badge voiture-badge-new">
-                            Neuve
+                            ✨ Neuve
                           </span>
                         ) : (
                           <span className="voiture-badge voiture-badge-used">
-                            Occasion
+                            🔄 Occasion
+                          </span>
+                        )}
+                        {voiture.disponible && (
+                          <span className="voiture-badge voiture-badge-available">
+                            Disponible
                           </span>
                         )}
                       </div>
 
                       {/* Prix */}
-                      {voiture.prix && (
+                      {(voiture.prix_calcule?.prix_total || voiture.prix_base) && (
                         <p className="voiture-price">
-                          {formatPrice(voiture.prix)}
+                          {formatPrice(voiture.prix_calcule?.prix_total || voiture.prix_base)}
                         </p>
                       )}
 
