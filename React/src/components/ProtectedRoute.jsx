@@ -11,7 +11,7 @@ import './ProtectedRoute.css';
  * - requireRole: Rôle requis (optionnel)
  */
 const ProtectedRoute = ({ children, requireRole }) => {
-  const { user, loading, isAuthenticated, hasRole } = useAuth();
+  const { loading, isAuthenticated, hasRole } = useAuth();
 
   if (loading) {
     return <Loading fullScreen message="Vérification..." />;

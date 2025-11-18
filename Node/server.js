@@ -5,6 +5,7 @@ import db from "./db/db.js";
 import path from "node:path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
@@ -120,6 +121,9 @@ app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 app.use(express.json());
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+// Protection contre les injections NoSQL (retire $, . dans les clés)
+app.use(mongoSanitize());
 
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);

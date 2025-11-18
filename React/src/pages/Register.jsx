@@ -102,7 +102,8 @@ const Register = () => {
       } else {
         setErrorMessage(result.error || 'Erreur d\'inscription');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Erreur inscription:', err);
       setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);

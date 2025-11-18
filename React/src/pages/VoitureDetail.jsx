@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { voitureService, modelPorscheService } from '../services';
+import { useParams, useNavigate } from 'react-router-dom';
+import { voitureService } from '../services';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Button, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';

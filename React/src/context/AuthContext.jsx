@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
       try {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
-      } catch (error) {
-        console.error('Erreur chargement utilisateur:', error);
+      } catch (err) {
+        console.error('Erreur chargement utilisateur:', err);
       } finally {
         setLoading(false);
       }
@@ -35,8 +35,8 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.login(email, password);
       setUser(data.user);
       return { success: true, data };
-    } catch (error) {
-      return { success: false, error: error.message || 'Erreur de connexion' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Erreur de connexion' };
     }
   };
 
@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.register(userData);
       setUser(data.user);
       return { success: true, data };
-    } catch (error) {
-      return { success: false, error: error.message || 'Erreur d\'inscription' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Erreur d\'inscription' };
     }
   };
 
@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.updateProfile(userData);
       setUser(data);
       return { success: true, data };
-    } catch (error) {
-      return { success: false, error: error.message || 'Erreur de mise à jour' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Erreur de mise à jour' };
     }
   };
 

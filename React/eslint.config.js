@@ -10,6 +10,18 @@ import { defineConfig, globalIgnores } from "eslint/config"; // utilitaires pour
 export default defineConfig([
   // Ignorer le dossiers
   globalIgnores(["dist", "node_modules", "build"]),
+  // Configuration pour les fichiers de config (tailwind, vite)
+  {
+    files: ["*.config.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      "no-undef": "off",
+    },
+  },
   {
     // Cible les fichiers JS et JSX du projet
     files: ["**/*.{js,jsx}"],
@@ -36,9 +48,13 @@ export default defineConfig([
     // Règles personnalisées ou surcharges
     rules: {
       // Erreur si une variable n'est jamais utilisée, sauf si elle commence
-      // par une majuscule ou un underscore. Utile pour ignorer certains
-      // composants React (majuscules) ou variables privées commençant par `_`.
-      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      // par une majuscule, underscore, ou est "err/error" dans un catch
+      "no-unused-vars": ["error", { 
+        varsIgnorePattern: "^[A-Z_]",
+        caughtErrors: "none"  // Ignore les variables dans catch
+      }],
+      // Désactiver react-refresh pour les contextes
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
   },
 ]);

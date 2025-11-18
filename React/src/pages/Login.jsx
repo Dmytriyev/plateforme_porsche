@@ -70,7 +70,8 @@ const Login = () => {
       } else {
         setErrorMessage(result.error || 'Erreur de connexion');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Erreur connexion:', err);
       setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
