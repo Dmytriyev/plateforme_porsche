@@ -219,11 +219,24 @@ const Voitures = () => {
               <div className="voitures-grid">
                 {voituresFiltrees.map((voiture) => (
                   <Card key={voiture._id} hover padding="md">
-                    {/* Image placeholder */}
-                    <div className="voiture-image-placeholder">
-                      <span className="voiture-image-letter">
-                        {voiture.nom_model?.charAt(0) || '?'}
-                      </span>
+                    {/* Image voiture */}
+                    <div className="voiture-image-container">
+                      {voiture.photo_porsche && voiture.photo_porsche.length > 0 ? (
+                        <img
+                          src={`http://localhost:3000${voiture.photo_porsche[0].name}`}
+                          alt={voiture.photo_porsche[0].alt || voiture.nom_model}
+                          className="voiture-image"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className="voiture-image-placeholder" style={{ display: voiture.photo_porsche && voiture.photo_porsche.length > 0 ? 'none' : 'flex' }}>
+                        <span className="voiture-image-letter">
+                          {voiture.nom_model?.charAt(0) || '?'}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Informations */}
