@@ -117,11 +117,11 @@ const VoitureDetail = () => {
           
           {/* Badge type */}
           <div>
-            {voiture.type_voiture ? (
-              <span className="voiture-badge voiture-badge-new">Neuve</span>
-            ) : (
-              <span className="voiture-badge voiture-badge-used">Occasion certifiée</span>
-            )}
+            {voiture.voiture?.type_voiture === true ? (
+              <span className="voiture-badge voiture-badge-new">✨ Neuve</span>
+            ) : voiture.voiture?.type_voiture === false ? (
+              <span className="voiture-badge voiture-badge-used">🔄 Occasion certifiée</span>
+            ) : null}
           </div>
         </div>
 
@@ -213,7 +213,7 @@ const VoitureDetail = () => {
             )}
 
             {/* Configuration (si voiture neuve) */}
-            {voiture.type_voiture && (
+            {voiture.voiture?.type_voiture === true && (
               <div className="voiture-config">
                 <h2 className="voiture-config-title">Configuration</h2>
                 <div className="voiture-config-grid">
@@ -249,7 +249,7 @@ const VoitureDetail = () => {
 
             {/* Boutons d'action */}
             <div className="voiture-actions">
-              {voiture.type_voiture ? (
+              {voiture.voiture?.type_voiture === true ? (
                 <>
                   <Button fullWidth size="lg" onClick={handleConfigurer}>
                     Configurer votre Porsche
@@ -260,7 +260,7 @@ const VoitureDetail = () => {
                 </>
               ) : (
                 <Button fullWidth size="lg" onClick={handleReservation}>
-                  Réserver cette voiture
+                  Réserver cette voiture d'occasion
                 </Button>
               )}
             </div>
