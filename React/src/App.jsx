@@ -27,6 +27,9 @@ import VoitureDetail from './pages/VoitureDetail.jsx';
 import Configurateur from './pages/Configurateur.jsx';
 import ConfigurationComplete from './pages/ConfigurationComplete.jsx';
 import Accessoires from './pages/Accessoires.jsx';
+import CategoriesAccessoires from './pages/CategoriesAccessoires.jsx';
+import AccessoiresParCategorie from './pages/AccessoiresParCategorie.jsx';
+import AccessoireDetail from './pages/AccessoireDetail.jsx';
 import Panier from './pages/Panier.jsx';
 
 // Pages protégées
@@ -67,7 +70,13 @@ function App() {
             <Route path="/voitures/:id" element={<VoitureDetail />} />
           <Route path="/configurateur/:voitureId" element={<Configurateur />} />
           <Route path="/configuration/:varianteId" element={<ConfigurationComplete />} />
-          <Route path="/accessoires" element={<Accessoires />} />
+          
+          {/* Parcours accessoires */}
+          <Route path="/accessoires-old" element={<Accessoires />} />
+          <Route path="/accessoires" element={<CategoriesAccessoires />} />
+          <Route path="/accessoires/categorie/:categorie" element={<AccessoiresParCategorie />} />
+          <Route path="/accessoires/detail/:id" element={<AccessoireDetail />} />
+          
             <Route path="/panier" element={<Panier />} />
 
                   {/* Routes protégées - Nécessitent authentification */}
