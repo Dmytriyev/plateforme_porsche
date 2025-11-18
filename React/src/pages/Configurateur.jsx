@@ -114,7 +114,8 @@ const Configurateur = () => {
   }, [config]);
 
   const handleVarianteChange = (variante) => {
-    setConfig({ ...config, variante });
+    // Rediriger vers la page de configuration complète
+    navigate(`/configuration/${variante._id}`);
   };
 
   const handleCouleurExtChange = (couleur) => {

@@ -21,6 +21,14 @@ const modelPorscheService = {
   },
 
   /**
+   * Alias pour getById (pour compatibilité)
+   */
+  getModelById: async (id) => {
+    const response = await apiClient.get(`/model_porsche/${id}`);
+    return response.data;
+  },
+
+  /**
    * Récupérer les variantes disponibles pour un modèle de voiture
    * @param {string} voitureId - ID du modèle de base (911, Cayenne, etc.)
    */

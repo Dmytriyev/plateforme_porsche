@@ -22,6 +22,7 @@ import Register from './pages/Register.jsx';
 import Voitures from './pages/Voitures.jsx';
 import VoitureDetail from './pages/VoitureDetail.jsx';
 import Configurateur from './pages/Configurateur.jsx';
+import ConfigurationComplete from './pages/ConfigurationComplete.jsx';
 import Accessoires from './pages/Accessoires.jsx';
 import Panier from './pages/Panier.jsx';
 
@@ -54,8 +55,9 @@ function App() {
                   <Route path="/register" element={<Register />} />
             <Route path="/voitures" element={<Voitures />} />
             <Route path="/voitures/:id" element={<VoitureDetail />} />
-            <Route path="/configurateur/:voitureId" element={<Configurateur />} />
-            <Route path="/accessoires" element={<Accessoires />} />
+          <Route path="/configurateur/:voitureId" element={<Configurateur />} />
+          <Route path="/configuration/:varianteId" element={<ConfigurationComplete />} />
+          <Route path="/accessoires" element={<Accessoires />} />
             <Route path="/panier" element={<Panier />} />
 
                   {/* Routes protégées - Nécessitent authentification */}
