@@ -1,0 +1,5 @@
+# USERS.csv
+email,password,isAdmin,role,nom,prenom,telephone,adresse,code_postal
+admin@porsche.com,Admin123!,true,admin,Dupont,Jean,+33612345678,"15 Avenue des Champs-Élysées",75008
+conseiller@porsche.com,Conseiller123!,false,conseillere,Martin,Sophie,+33612345679,22 Rue de Rivoli,75001
+user@example.com,User123!,false,user,Bernard,Pierre,+33612345680,10 Boulevard Saint-Germain,75005

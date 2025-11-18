@@ -1,0 +1,219 @@
+/* Panier Page Styles */
+
+.panier-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 3rem 0;
+}
+
+.panier-content {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.panier-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.panier-empty {
+  text-align: center;
+}
+
+.panier-empty-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.panier-empty-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.panier-empty-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.panier-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.panier-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panier-article {
+  display: flex;
+  gap: 1rem;
+}
+
+.panier-article-image {
+  width: 8rem;
+  height: 8rem;
+  background-color: #e5e7eb;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+}
+
+.panier-article-details {
+  flex: 1;
+}
+
+.panier-article-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.panier-article-config {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.panier-article-config p {
+  margin: 0.25rem 0;
+}
+
+.panier-quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.panier-quantity-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.panier-quantity-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panier-quantity-btn {
+  width: 2rem;
+  height: 2rem;
+  background-color: #e5e7eb;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.panier-quantity-btn:hover {
+  background-color: #d1d5db;
+}
+
+.panier-quantity-value {
+  width: 3rem;
+  text-align: center;
+}
+
+.panier-article-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panier-article-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.panier-remove-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.panier-remove-btn:hover {
+  color: #991b1b;
+}
+
+.panier-clear-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: color 0.2s;
+}
+
+.panier-clear-btn:hover {
+  color: #991b1b;
+}
+
+.panier-summary {
+  position: sticky;
+  top: 6rem;
+}
+
+.panier-summary-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.panier-summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.panier-summary-row {
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+}
+
+.panier-summary-total {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.panier-summary-info {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .panier-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .panier-content {
+    padding: 0 2rem;
+  }
+  
+  .panier-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+

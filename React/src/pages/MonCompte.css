@@ -1,0 +1,89 @@
+/* MonCompte Page Styles */
+
+.compte-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 3rem 0;
+}
+
+.compte-content {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.compte-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.compte-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.compte-section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.compte-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.compte-info-item label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.compte-info-item p {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.compte-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.compte-action-card h3 {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.compte-action-card p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.compte-role {
+  text-transform: capitalize;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .compte-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .compte-content {
+    padding: 0 2rem;
+  }
+  
+  .compte-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+

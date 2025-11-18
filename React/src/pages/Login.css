@@ -1,0 +1,73 @@
+/* Login Page Styles */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 3rem 1rem;
+}
+
+.login-form-wrapper {
+  max-width: 28rem;
+  width: 100%;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: #6b7280;
+}
+
+.login-error {
+  margin-bottom: 1.5rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.login-links p {
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.login-link {
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+.login-forgot {
+  display: block;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.login-forgot:hover {
+  color: #000;
+}
+
