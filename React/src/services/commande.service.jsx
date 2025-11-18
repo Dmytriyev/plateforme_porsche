@@ -104,6 +104,35 @@ const commandeService = {
     }
   },
 
+  // ==================== PROPOSITIONS DE VENTE ====================
+
+  /**
+   * Proposer ma voiture en vente
+   * @param {Object} data - Données de la proposition
+   * @returns {Promise} Proposition créée
+   */
+  proposerVente: async (data) => {
+    try {
+      const response = await apiClient.post('/proposition-vente', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  /**
+   * Récupérer mes propositions de vente
+   * @returns {Promise} Liste des propositions
+   */
+  getMesPropositions: async () => {
+    try {
+      const response = await apiClient.get('/proposition-vente');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   // ==================== PAIEMENT ====================
 
   /**

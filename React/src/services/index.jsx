@@ -12,4 +12,5 @@ export { default as accesoireService } from './accesoire.service.jsx';
 export { default as personnalisationService } from './personnalisation.service.jsx';
 export { default as commandeService } from './commande.service.jsx';
 export { default as modelPorscheService } from './model_porsche.service.jsx';
+export { default as maVoitureService } from './ma_voiture.service.jsx';
 

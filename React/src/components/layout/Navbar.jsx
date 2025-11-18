@@ -67,6 +67,15 @@ const Navbar = () => {
             {isAuthenticated() ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm">Bonjour, {user?.prenom}</span>
+                <Link to="/mes-voitures" className="hover:text-gray-300 transition-colors font-medium">
+                  Mes Voitures
+                </Link>
+                <Link to="/mes-reservations" className="hover:text-gray-300 transition-colors font-medium">
+                  Mes Réservations
+                </Link>
+                <Link to="/mon-compte" className="hover:text-gray-300 transition-colors font-medium">
+                  Mon Compte
+                </Link>
                 <button
                   onClick={logout}
                   className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors font-medium"
@@ -126,6 +135,12 @@ const Navbar = () => {
 
               {isAuthenticated() ? (
                 <>
+                  <Link to="/mes-voitures" className="hover:text-gray-300 transition-colors font-medium">
+                    Mes Voitures
+                  </Link>
+                  <Link to="/mes-reservations" className="hover:text-gray-300 transition-colors font-medium">
+                    Mes Réservations
+                  </Link>
                   <Link to="/mon-compte" className="hover:text-gray-300 transition-colors font-medium">
                     Mon Compte
                   </Link>

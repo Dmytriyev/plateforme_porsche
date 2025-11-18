@@ -27,6 +27,8 @@ import Panier from './pages/Panier.jsx';
 
 // Pages protégées
 import MonCompte from './pages/MonCompte.jsx';
+import MesVoitures from './pages/MesVoitures.jsx';
+import MesReservations from './pages/MesReservations.jsx';
 
 import './App.css';
 
@@ -59,6 +61,24 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <MonCompte />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/mes-voitures"
+                    element={
+                      <ProtectedRoute>
+                        <MesVoitures />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/mes-reservations"
+                    element={
+                      <ProtectedRoute>
+                        <MesReservations />
                       </ProtectedRoute>
                     }
                   />

@@ -1,0 +1,160 @@
+/* Page Mes Voitures */
+.mes-voitures-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 2rem 0;
+}
+
+.mes-voitures-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* En-tête */
+.mes-voitures-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+
+.mes-voitures-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.mes-voitures-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .mes-voitures-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Message vide */
+.mes-voitures-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.mes-voitures-empty-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.5rem;
+  color: #9ca3af;
+}
+
+.mes-voitures-empty-text {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Grille voitures */
+.mes-voitures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Image */
+.mes-voitures-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.mes-voitures-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mes-voitures-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0.5;
+}
+
+/* Détails */
+.mes-voitures-details {
+  padding: 0;
+}
+
+.mes-voitures-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.mes-voitures-year {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem 0;
+}
+
+/* Configuration */
+.mes-voitures-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mes-voitures-config-item {
+  padding: 0.25rem 0.75rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+/* Actions */
+.mes-voitures-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mes-voitures-btn-delete {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.mes-voitures-btn-delete:hover {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .mes-voitures-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
