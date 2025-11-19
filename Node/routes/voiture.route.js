@@ -10,6 +10,7 @@ import {
   getModelsPorscheByVoiture,
   getVoituresNeuves,
   getVoituresOccasionFinder,
+  getVoiturePage,
 } from "../controllers/voiture.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -41,12 +42,13 @@ const optionalUpload = (req, res, next) => {
 router.get("/all", getAllVoitures);
 router.get("/neuve", getVoituresNeuves);
 router.get("/occasion", getVoituresOccasionFinder);
-router.get("/:id", validateObjectId("id"), getVoitureById); // Récupérer une voiture par son ID
+router.get("/page/:id", validateObjectId("id"), getVoiturePage); // Page explicative complète d'une voiture
 router.get(
   "/modelsPorsche/:id",
   validateObjectId("id"), //id voiture
   getModelsPorscheByVoiture
 ); // Récupérer les modèles Porsche associés à une voiture
+router.get("/:id", validateObjectId("id"), getVoitureById); // Récupérer une voiture par son ID
 
 // Routes réservées au personnel
 router.post("/new", auth, isStaff, optionalUpload, createVoiture);

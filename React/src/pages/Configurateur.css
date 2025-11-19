@@ -1,102 +1,161 @@
-/* Page Configurateur */
+/* Page Configurateur - Design inspiré du configurateur officiel Porsche */
+
 .configurateur-container {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
 }
 
-.configurateur-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-/* En-tête */
-.configurateur-header {
+/* Header en haut */
+.configurateur-top-header {
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 2rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.configurateur-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 0.5rem 0;
-}
-
-.configurateur-subtitle {
-  font-size: 1.125rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* Résumé prix en en-tête */
-.configurateur-price-summary {
-  background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 300px;
-  text-align: center;
   position: sticky;
-  top: 90px;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 1024px) {
-  .configurateur-price-summary {
-    position: relative;
-    top: 0;
-    width: 100%;
-  }
+.configurateur-header-left {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
 }
 
-.configurateur-price-label {
+.configurateur-header-link {
+  background: none;
+  border: none;
+  color: #fff;
   font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 0.5rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: opacity 0.2s;
 }
 
-.configurateur-price-amount {
-  font-size: 2rem;
+.configurateur-header-link:hover {
+  opacity: 0.7;
+}
+
+.configurateur-header-center {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.configurateur-header-price-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.configurateur-header-price-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.configurateur-header-price-amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.configurateur-header-price-total {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #000;
-  margin: 0 0 1rem 0;
+  color: #fff;
 }
 
-/* Visualisation */
-.configurateur-visual {
-  width: 100%;
-  margin-bottom: 2rem;
-  text-align: center;
+.configurateur-header-info-icon {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
-.configurateur-visual-image {
+.configurateur-header-info-icon:hover {
+  opacity: 1;
+}
+
+.configurateur-header-link-small {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.configurateur-header-link-small:hover {
+  opacity: 1;
+}
+
+.configurateur-header-price-label {
+  font-size: 0.75rem;
+  color: #ccc;
+}
+
+.configurateur-header-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Contenu principal - Layout en deux colonnes */
+.configurateur-main-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Zone de visualisation (gauche) */
+.configurateur-visual-area {
+  background-color: #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.configurateur-visual-main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.configurateur-main-image {
   width: 100%;
-  max-width: 900px;
-  height: auto;
-  margin: 0 auto 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  height: 100%;
+  object-fit: contain;
   display: block;
-  object-fit: cover;
 }
 
 .configurateur-visual-placeholder {
   width: 100%;
-  max-width: 900px;
-  aspect-ratio: 21/9;
+  height: 100%;
   background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 .configurateur-visual-letter {
@@ -106,226 +165,518 @@
   opacity: 0.3;
 }
 
-.configurateur-visual-caption {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
-  margin-top: 0.5rem;
-}
-
-/* Options */
-.configurateur-options {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  margin-bottom: 3rem;
-}
-
-.configurateur-section {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.configurateur-section-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 0.5rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.configurateur-section-hint {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 1rem;
-  font-style: italic;
-}
-
-/* Grille options */
-.configurateur-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-@media (max-width: 768px) {
-  .configurateur-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.configurateur-option-card {
-  position: relative;
+/* Bouton plein écran */
+.configurateur-fullscreen-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
   cursor: pointer;
-  border: 3px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.configurateur-option-card:hover {
-  border-color: #9ca3af;
-}
-
-.configurateur-option-selected {
-  border-color: #000 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.configurateur-option-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #000;
-  margin: 0 0 0.5rem 0;
-}
-
-.configurateur-option-desc {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.5;
-}
-
-.configurateur-option-specs {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #374151;
-  margin-bottom: 0.75rem;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
 }
 
-.configurateur-option-price {
-  font-size: 1.125rem;
+.configurateur-fullscreen-btn:hover {
+  background: #fff;
+}
+
+/* Bouton vue 360° */
+.configurateur-360-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.configurateur-360-btn:hover {
+  background: #fff;
+}
+
+/* Contrôles au-dessus des miniatures */
+.configurateur-visual-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.configurateur-control-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  color: #333;
+}
+
+.configurateur-control-btn:hover {
+  background: #fff;
+}
+
+/* Miniatures */
+.configurateur-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.05);
+  scrollbar-width: thin;
+}
+
+.configurateur-thumbnail {
+  flex-shrink: 0;
+  width: 120px;
+  height: 80px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+  padding: 0;
+  transition: border-color 0.2s;
+}
+
+.configurateur-thumbnail:hover {
+  border-color: #999;
+}
+
+.configurateur-thumbnail-active {
+  border-color: #0066cc;
+}
+
+.configurateur-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Panneau de configuration (droite) */
+.configurateur-options-panel {
+  background-color: #fff;
+  overflow-y: auto;
+  padding: 2rem;
+  height: 100%;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.configurateur-panel-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.configurateur-panel-title {
+  font-size: 1.5rem;
   font-weight: 700;
   color: #000;
   margin: 0;
 }
 
-/* Couleurs */
-.configurateur-colors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
+.configurateur-panel-year {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 400;
 }
 
-@media (max-width: 640px) {
-  .configurateur-colors-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.configurateur-color-option {
-  background: #fff;
-  border: 3px solid #e5e7eb;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.configurateur-color-option:hover {
-  border-color: #9ca3af;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.configurateur-color-selected {
-  border-color: #000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.configurateur-color-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 0.5rem;
-  object-fit: cover;
-  border: 2px solid #e5e7eb;
-}
-
-.configurateur-color-swatch {
-  width: 80px;
-  height: 80px;
-  border-radius: 0.5rem;
-  border: 2px solid #e5e7eb;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.configurateur-color-name {
+.configurateur-panel-link {
+  display: block;
+  color: #0066cc;
+  text-decoration: none;
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.configurateur-color-price {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #059669;
-}
-
-/* Résumé final */
-.configurateur-summary {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 2px solid #e5e7eb;
-}
-
-.configurateur-summary-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 1.5rem 0;
-}
-
-.configurateur-summary-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   margin-bottom: 1.5rem;
+  transition: opacity 0.2s;
 }
 
-.configurateur-summary-item {
+.configurateur-panel-link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+/* Barre de recherche */
+.configurateur-search {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.configurateur-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.configurateur-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.configurateur-search-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  background-color: #fff;
+}
+
+/* Sections d'options */
+.configurateur-option-section {
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 0.5rem;
+}
+
+.configurateur-option-section-header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
-.configurateur-summary-item:last-of-type {
-  border-bottom: none;
+.configurateur-option-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
 }
 
-.configurateur-summary-item span:first-child {
+.configurateur-option-count {
+  color: #666;
+  font-weight: 400;
+}
+
+.configurateur-option-section-icon {
+  transition: transform 0.3s;
+  color: #666;
+}
+
+.configurateur-option-section-icon.open {
+  transform: rotate(180deg);
+}
+
+.configurateur-option-section-content {
+  padding-bottom: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Couleurs extérieures */
+.configurateur-colors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.configurateur-color-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.configurateur-color-item:hover {
+  background: #f0f0f0;
+  border-color: #ddd;
+}
+
+.configurateur-color-item.selected {
+  border-color: #0066cc;
+  background: #fff;
+}
+
+.configurateur-color-item-image,
+.configurateur-color-item-swatch {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.configurateur-color-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.configurateur-color-item-name {
   font-size: 0.875rem;
-  color: #6b7280;
   font-weight: 500;
+  color: #000;
 }
 
-.configurateur-summary-item span:last-child {
+.configurateur-color-item-price {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Jantes */
+.configurateur-jantes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.configurateur-jante-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.configurateur-jante-item:hover {
+  background: #f0f0f0;
+  border-color: #ddd;
+}
+
+.configurateur-jante-item.selected {
+  border-color: #0066cc;
+  background: #fff;
+}
+
+.configurateur-jante-size {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.configurateur-jante-price {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Couleurs intérieures */
+.configurateur-interior-standard {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.configurateur-interior-standard-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.configurateur-interior-standard-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.configurateur-interior-standard-price {
   font-size: 0.875rem;
   color: #000;
-  font-weight: 600;
-  text-align: right;
+  margin-left: auto;
 }
 
-.configurateur-summary-total {
-  padding-top: 1rem;
-  border-top: 2px solid #000;
-  border-bottom: none;
+.configurateur-interior-standard-desc {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.configurateur-interior-standard-swatch {
+  margin-top: 0.5rem;
+}
+
+.configurateur-interior-leather {
   margin-top: 1rem;
 }
 
-.configurateur-summary-total span {
-  font-size: 1.125rem;
-  font-weight: 700;
+.configurateur-interior-category {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.75rem;
+}
+
+.configurateur-interior-swatches {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.configurateur-interior-swatch-item {
+  width: 60px;
+  height: 60px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  background: #f9f9f9;
+  transition: all 0.2s;
+}
+
+.configurateur-interior-swatch-item:hover {
+  border-color: #ddd;
+}
+
+.configurateur-interior-swatch-item.selected {
+  border-color: #0066cc;
+}
+
+.configurateur-interior-swatch-item img,
+.configurateur-interior-swatch-item div {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Sièges */
+.configurateur-sieges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.configurateur-siege-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.configurateur-siege-item:hover {
+  background: #f0f0f0;
+  border-color: #ddd;
+}
+
+.configurateur-siege-item.selected {
+  border-color: #0066cc;
+  background: #fff;
+}
+
+.configurateur-siege-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.configurateur-siege-price {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .configurateur-main-content {
+    grid-template-columns: 1fr 350px;
+  }
+}
+
+@media (max-width: 968px) {
+  .configurateur-main-content {
+    grid-template-columns: 1fr;
+  }
+
+  .configurateur-options-panel {
+    max-height: 50vh;
+  }
+
+  .configurateur-top-header {
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .configurateur-header-center {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .configurateur-top-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .configurateur-header-left {
+    flex-wrap: wrap;
+  }
+
+  .configurateur-header-center {
+    order: 2;
+    width: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 0;
+  }
+
+  .configurateur-header-right {
+    order: 3;
+    width: 100%;
+    flex-direction: column;
+  }
 }
 
 /* Error container */
@@ -338,4 +689,3 @@
   gap: 1.5rem;
   padding: 2rem;
 }
-

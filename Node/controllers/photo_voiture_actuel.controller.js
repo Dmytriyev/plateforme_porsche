@@ -66,7 +66,7 @@ const createPhoto_voiture_actuel = async (req, res) => {
       try {
         removeUploadedFile(req.file.filename);
       } catch (cleanErr) {
-        logger.error("Failed to clean uploaded file", { err: cleanErr });
+        console.error("Failed to clean uploaded file", { err: cleanErr });
       }
     }
     return res.status(500).json({ message: "Erreur serveur" });

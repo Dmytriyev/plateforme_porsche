@@ -425,7 +425,7 @@ User:
 | ---------- | ---------------------- | -------------- |
 | Admin      | admin@porsche.com      | Admin123!      |
 | Conseiller | conseiller@porsche.com | Conseiller123! |
-| User       | user@example.com       | User123!       |
+| User       | user@gmail.com       | User123!       |
 
 ---
 

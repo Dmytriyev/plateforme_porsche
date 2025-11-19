@@ -1,16 +1,6 @@
 import apiClient from '../config/api.jsx';
 
-/**
- * Service de gestion des commandes et réservations
- */
 const commandeService = {
-  // ==================== RÉSERVATIONS ====================
-
-  /**
-   * Créer une réservation pour une voiture d'occasion
-   * @param {Object} data - Données de réservation
-   * @returns {Promise} Réservation créée
-   */
   createReservation: async (data) => {
     try {
       const response = await apiClient.post('/reservation', data);
@@ -20,24 +10,15 @@ const commandeService = {
     }
   },
 
-  /**
-   * Récupérer mes réservations
-   * @returns {Promise} Liste des réservations
-   */
-  getMyReservations: async () => {
+  getMyReservations: async (userId) => {
     try {
-      const response = await apiClient.get('/reservation');
+      const response = await apiClient.get(`/reservation/user/${userId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Annuler une réservation
-   * @param {string} id - ID de la réservation
-   * @returns {Promise} Confirmation
-   */
   cancelReservation: async (id) => {
     try {
       const response = await apiClient.delete(`/reservation/${id}`);
@@ -47,13 +28,6 @@ const commandeService = {
     }
   },
 
-  // ==================== COMMANDES ====================
-
-  /**
-   * Créer une commande
-   * @param {Object} data - Données de commande
-   * @returns {Promise} Commande créée
-   */
   createCommande: async (data) => {
     try {
       const response = await apiClient.post('/commande', data);
@@ -63,24 +37,15 @@ const commandeService = {
     }
   },
 
-  /**
-   * Récupérer mes commandes
-   * @returns {Promise} Liste des commandes
-   */
   getMyCommandes: async () => {
     try {
-      const response = await apiClient.get('/commande');
+      const response = await apiClient.get('/commande/historique');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer une commande par ID
-   * @param {string} id - ID de la commande
-   * @returns {Promise} Détails de la commande
-   */
   getCommandeById: async (id) => {
     try {
       const response = await apiClient.get(`/commande/${id}`);
@@ -90,11 +55,6 @@ const commandeService = {
     }
   },
 
-  /**
-   * Annuler une commande (avant paiement uniquement)
-   * @param {string} id - ID de la commande
-   * @returns {Promise} Confirmation
-   */
   cancelCommande: async (id) => {
     try {
       const response = await apiClient.delete(`/commande/${id}`);
@@ -104,13 +64,6 @@ const commandeService = {
     }
   },
 
-  // ==================== PROPOSITIONS DE VENTE ====================
-
-  /**
-   * Proposer ma voiture en vente
-   * @param {Object} data - Données de la proposition
-   * @returns {Promise} Proposition créée
-   */
   proposerVente: async (data) => {
     try {
       const response = await apiClient.post('/proposition-vente', data);
@@ -120,10 +73,6 @@ const commandeService = {
     }
   },
 
-  /**
-   * Récupérer mes propositions de vente
-   * @returns {Promise} Liste des propositions
-   */
   getMesPropositions: async () => {
     try {
       const response = await apiClient.get('/proposition-vente');
@@ -133,13 +82,6 @@ const commandeService = {
     }
   },
 
-  // ==================== PAIEMENT ====================
-
-  /**
-   * Créer une session de paiement Stripe
-   * @param {string} commandeId - ID de la commande
-   * @returns {Promise} URL de paiement Stripe
-   */
   createPaymentSession: async (commandeId) => {
     try {
       const response = await apiClient.post('/api/payment/create-checkout-session', {
@@ -151,11 +93,6 @@ const commandeService = {
     }
   },
 
-  /**
-   * Vérifier le statut d'un paiement
-   * @param {string} sessionId - ID de session Stripe
-   * @returns {Promise} Statut du paiement
-   */
   verifyPayment: async (sessionId) => {
     try {
       const response = await apiClient.get(`/api/payment/verify/${sessionId}`);
@@ -164,7 +101,44 @@ const commandeService = {
       throw error.response?.data || error;
     }
   },
+
+  getPanier: async () => {
+    try {
+      const response = await apiClient.get('/commande/panier');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  updateQuantiteLigne: async (ligneId, quantite) => {
+    try {
+      const response = await apiClient.patch(`/commande/updateQuantite/ligne/${ligneId}`, {
+        quantite,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  supprimerLignePanier: async (ligneId) => {
+    try {
+      const response = await apiClient.delete(`/commande/delete/ligne/${ligneId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  viderPanier: async () => {
+    try {
+      const response = await apiClient.delete('/ligneCommande/panier/vider');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default commandeService;
-

@@ -20,6 +20,7 @@ import {
   getCarrosseriesByModel,
   VARIANTES_PAR_MODELE,
 } from "../utils/model_porsche.constants.js";
+const logger = console;
 
 // Champs pour les références dans Model_porsche
 const POPULATE_FIELDS = {
@@ -189,8 +190,8 @@ const createModel_porsche = async (req, res) => {
 // Récupérer toutes les configurations de modèles Porsche
 const getAllModel_porsches = async (req, res) => {
   try {
-    console.log("📍 getAllModel_porsches - START");
-    
+    logger.info("getAllModel_porsches - start");
+
     // Récupérer sans populate d'abord pour debug
     const model_porsches = await Model_porsche.find()
       .populate("photo_porsche", "name alt")
@@ -202,27 +203,36 @@ const getAllModel_porsches = async (req, res) => {
       .populate("siege", "nom_siege prix")
       .sort({ createdAt: -1 })
       .lean();
-    
-    console.log(`✅ Trouvé ${model_porsches.length} modèles`);
-    
+
+    logger.info("Found models", { count: model_porsches.length });
+
     // Si pas de données, retourner un tableau vide
     if (!model_porsches || model_porsches.length === 0) {
       return res.status(200).json([]);
     }
-    
+
     // Calculer le prix pour chaque modèle
     const model_porschesWithPrix = model_porsches.map((model) => {
       const prixBase = model.prix_base || 0;
       const prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
       const prixCouleursInterieur = Array.isArray(model.couleur_interieur)
-        ? model.couleur_interieur.reduce((total, c) => total + (c?.prix || 0), 0)
+        ? model.couleur_interieur.reduce(
+            (total, c) => total + (c?.prix || 0),
+            0
+          )
         : 0;
       const prixJante = model.taille_jante?.prix || 0;
       const prixPackage = model.package?.prix || 0;
       const prixSiege = model.siege?.prix || 0;
-      
-      const prixTotal = prixBase + prixCouleurExterieur + prixCouleursInterieur + prixJante + prixPackage + prixSiege;
-      
+
+      const prixTotal =
+        prixBase +
+        prixCouleurExterieur +
+        prixCouleursInterieur +
+        prixJante +
+        prixPackage +
+        prixSiege;
+
       return {
         ...model,
         prix_calcule: {
@@ -234,22 +244,31 @@ const getAllModel_porsches = async (req, res) => {
             package: prixPackage,
             siege: prixSiege,
           },
-          total_options: prixCouleurExterieur + prixCouleursInterieur + prixJante + prixPackage + prixSiege,
+          total_options:
+            prixCouleurExterieur +
+            prixCouleursInterieur +
+            prixJante +
+            prixPackage +
+            prixSiege,
           prix_total: prixTotal,
           acompte_requis: prixTotal * 0.1,
           pourcentage_acompte: "10%",
         },
       };
     });
-    
-    console.log(`✅ Retourne ${model_porschesWithPrix.length} modèles avec prix`);
+
+    logger.info("Returning models with calculated prices", {
+      count: model_porschesWithPrix.length,
+    });
     return res.status(200).json(model_porschesWithPrix);
   } catch (error) {
-    console.error("❌ Erreur getAllModel_porsches:", error.message);
-    console.error("Stack:", error.stack);
-    return res.status(500).json({ 
-      message: "Erreur serveur", 
-      error: error.message 
+    logger.error("Erreur getAllModel_porsches", {
+      message: error.message,
+      stack: error.stack,
+    });
+    return res.status(500).json({
+      message: "Erreur serveur",
+      error: error.message,
     });
   }
 };
@@ -842,6 +861,245 @@ const getModelPorscheNeuves = async (req, res) => {
   }
 };
 
+// Page explicative complète d'une variante model_porsche (GTS, GT3, GT4RS, etc.)
+// Retourne toutes les informations nécessaires pour afficher une page détaillée de la variante
+const getModelPorschePage = async (req, res) => {
+  try {
+    const modelId = req.params.id;
+
+    // Récupérer la variante avec toutes ses relations
+    const model_porsche = await populateModel(Model_porsche.findById(modelId));
+
+    if (!model_porsche) {
+      return res.status(404).json({
+        success: false,
+        message: "Variante Porsche introuvable",
+      });
+    }
+
+    // Calculer le prix total avec options
+    const prixCalcule = calculatePrix(model_porsche);
+
+    // Vérifier si c'est une voiture neuve ou d'occasion
+    const isNeuve = model_porsche.voiture?.type_voiture === true;
+
+    // Formater les options sélectionnées
+    const options = {
+      couleur_exterieur: model_porsche.couleur_exterieur
+        ? {
+            _id: model_porsche.couleur_exterieur._id,
+            nom: model_porsche.couleur_exterieur.nom_couleur,
+            photo: model_porsche.couleur_exterieur.photo_couleur,
+            prix: model_porsche.couleur_exterieur.prix || 0,
+          }
+        : null,
+      couleurs_interieur:
+        model_porsche.couleur_interieur &&
+        Array.isArray(model_porsche.couleur_interieur)
+          ? model_porsche.couleur_interieur.map((c) => ({
+              _id: c._id,
+              nom: c.nom_couleur,
+              photo: c.photo_couleur,
+              prix: c.prix || 0,
+            }))
+          : [],
+      taille_jante: model_porsche.taille_jante
+        ? {
+            _id: model_porsche.taille_jante._id,
+            taille: model_porsche.taille_jante.taille_jante,
+            couleur: model_porsche.taille_jante.couleur_jante,
+            prix: model_porsche.taille_jante.prix || 0,
+          }
+        : null,
+      package: model_porsche.package
+        ? {
+            _id: model_porsche.package._id,
+            nom: model_porsche.package.nom_package,
+            prix: model_porsche.package.prix || 0,
+          }
+        : null,
+      siege: model_porsche.siege
+        ? {
+            _id: model_porsche.siege._id,
+            nom: model_porsche.siege.nom_siege,
+            prix: model_porsche.siege.prix || 0,
+          }
+        : null,
+    };
+
+    // Formater la réponse pour la page explicative
+    const pageData = {
+      variante: {
+        _id: model_porsche._id,
+        nom_model: model_porsche.nom_model,
+        type_carrosserie: model_porsche.type_carrosserie,
+        annee_production: model_porsche.annee_production,
+        description: model_porsche.description,
+        statut: model_porsche.statut,
+        disponible: model_porsche.disponible,
+        numero_vin: model_porsche.numero_vin,
+        concessionnaire: model_porsche.concessionnaire,
+        createdAt: model_porsche.createdAt,
+        updatedAt: model_porsche.updatedAt,
+      },
+      voiture_base: {
+        _id: model_porsche.voiture?._id,
+        nom_model: model_porsche.voiture?.nom_model,
+        type_voiture: model_porsche.voiture?.type_voiture,
+        description: model_porsche.voiture?.description,
+      },
+      specifications: {
+        moteur: model_porsche.specifications?.moteur || "N/A",
+        puissance: model_porsche.specifications?.puissance || 0,
+        couple: model_porsche.specifications?.couple || 0,
+        transmission: model_porsche.specifications?.transmission || "N/A",
+        acceleration_0_100:
+          model_porsche.specifications?.acceleration_0_100 || 0,
+        vitesse_max: model_porsche.specifications?.vitesse_max || 0,
+        consommation: model_porsche.specifications?.consommation || 0,
+      },
+      options: options,
+      photos:
+        model_porsche.photo_porsche &&
+        Array.isArray(model_porsche.photo_porsche)
+          ? model_porsche.photo_porsche.map((p) => ({
+              _id: p._id,
+              name: p.name,
+              alt: p.alt,
+            }))
+          : [],
+      prix: prixCalcule,
+      type: isNeuve ? "neuf" : "occasion",
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: pageData,
+      message: `Page explicative de la ${model_porsche.nom_model} récupérée avec succès`,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+      error: error.message,
+    });
+  }
+};
+
+// Page explicative complète d'une voiture d'occasion
+// Retourne toutes les informations nécessaires pour afficher une page détaillée de la voiture d'occasion
+const getOccasionPage = async (req, res) => {
+  try {
+    const modelId = req.params.id;
+
+    // Récupérer la variante avec toutes ses relations
+    const model_porsche = await populateModel(Model_porsche.findById(modelId));
+
+    if (!model_porsche) {
+      return res.status(404).json({
+        success: false,
+        message: "Voiture d'occasion introuvable",
+      });
+    }
+
+    // Vérifier que c'est bien une voiture d'occasion
+    if (model_porsche.voiture?.type_voiture === true) {
+      return res.status(400).json({
+        success: false,
+        message: "Cette voiture n'est pas une voiture d'occasion",
+      });
+    }
+
+    // Calculer le prix fixe (pour les occasions, le prix est fixe)
+    const prixFixe = model_porsche.prix_base || 0;
+
+    // Formater les options de la voiture d'occasion
+    const options = {
+      couleur_exterieur: model_porsche.couleur_exterieur
+        ? {
+            _id: model_porsche.couleur_exterieur._id,
+            nom: model_porsche.couleur_exterieur.nom_couleur,
+            photo: model_porsche.couleur_exterieur.photo_couleur,
+          }
+        : null,
+      couleurs_interieur:
+        model_porsche.couleur_interieur &&
+        Array.isArray(model_porsche.couleur_interieur)
+          ? model_porsche.couleur_interieur.map((c) => ({
+              _id: c._id,
+              nom: c.nom_couleur,
+              photo: c.photo_couleur,
+            }))
+          : [],
+      taille_jante: model_porsche.taille_jante
+        ? {
+            _id: model_porsche.taille_jante._id,
+            taille: model_porsche.taille_jante.taille_jante,
+            couleur: model_porsche.taille_jante.couleur_jante,
+          }
+        : null,
+    };
+
+    // Formater la réponse pour la page explicative de l'occasion
+    const pageData = {
+      occasion: {
+        _id: model_porsche._id,
+        nom_model: model_porsche.nom_model,
+        type_carrosserie: model_porsche.type_carrosserie,
+        annee_production: model_porsche.annee_production,
+        description: model_porsche.description,
+        statut: model_porsche.statut,
+        disponible: model_porsche.disponible,
+        numero_vin: model_porsche.numero_vin,
+        concessionnaire: model_porsche.concessionnaire || "Centre Porsche",
+        createdAt: model_porsche.createdAt,
+        updatedAt: model_porsche.updatedAt,
+      },
+      voiture_base: {
+        _id: model_porsche.voiture?._id,
+        nom_model: model_porsche.voiture?.nom_model,
+        description: model_porsche.voiture?.description,
+      },
+      specifications: {
+        moteur: model_porsche.specifications?.moteur || "N/A",
+        puissance: model_porsche.specifications?.puissance || 0,
+        couple: model_porsche.specifications?.couple || 0,
+        transmission: model_porsche.specifications?.transmission || "N/A",
+        acceleration_0_100:
+          model_porsche.specifications?.acceleration_0_100 || 0,
+        vitesse_max: model_porsche.specifications?.vitesse_max || 0,
+        consommation: model_porsche.specifications?.consommation || 0,
+      },
+      options: options,
+      photos:
+        model_porsche.photo_porsche &&
+        Array.isArray(model_porsche.photo_porsche)
+          ? model_porsche.photo_porsche.map((p) => ({
+              _id: p._id,
+              name: p.name,
+              alt: p.alt,
+            }))
+          : [],
+      prix: {
+        prix_fixe: prixFixe,
+        type: "occasion",
+      },
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: pageData,
+      message: `Page explicative de la ${model_porsche.nom_model} d'occasion récupérée avec succès`,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+      error: error.message,
+    });
+  }
+};
+
 export {
   createModel_porsche,
   getAllModel_porsches,
@@ -863,4 +1121,6 @@ export {
   getAllVariantes,
   getModelPorscheOccasions,
   getModelPorscheNeuves,
+  getModelPorschePage,
+  getOccasionPage,
 };

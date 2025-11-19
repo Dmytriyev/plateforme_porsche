@@ -3,14 +3,29 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { accesoireService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
+import { API_URL } from '../config/api.jsx';
 import './AccessoiresParCategorie.css';
 
 /**
  * Page Liste Accessoires par Catégorie
- * Deuxième étape: Afficher les accessoires d'une catégorie
+ * 
+ * EXPLICATION POUR ÉTUDIANT:
+ * ==========================
+ * Cette page affiche tous les accessoires d'une catégorie spécifique.
+ * 
+ * Exemples d'URL:
+ * - /accessoires/categorie/vetement → Affiche tous les vêtements
+ * - /accessoires/categorie/porte-cl%C3%A9s → Affiche tous les porte-clés
+ * - /accessoires/categorie/decoration → Affiche tous les objets de décoration
+ * 
+ * Concepts utilisés:
+ * 1. useParams: Récupère le paramètre 'categorie' de l'URL
+ * 2. decodeURIComponent: Décode les caractères spéciaux dans l'URL (%C3%A9 → é)
+ * 3. Normalisation: Convertit différents formats en un format unique pour le backend
+ * 4. useEffect: Charge les données quand la catégorie change
  */
 const AccessoiresParCategorie = () => {
-  const { categorie } = useParams();
+  const { categorie } = useParams(); // Récupère 'porte-cl%C3%A9s' depuis l'URL
   const navigate = useNavigate();
   const [accessoires, setAccessoires] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,17 +40,38 @@ const AccessoiresParCategorie = () => {
       setLoading(true);
       setError('');
       
-      // OPTIMISÉ: Utiliser l'endpoint de recherche directement au lieu de filtrer côté client
-      // Backend: GET /accesoire/search?type=categorie
-      const response = await accesoireService.getAccessoiresByType(decodeURIComponent(categorie));
+      let categorieDecodee = decodeURIComponent(categorie).toLowerCase();
       
-      // Vérifier que la réponse est bien un tableau
+      const normalisations = {
+        'décoration': 'decoration',
+        'decoration': 'decoration',
+        'vetement': 'vetement',
+        'vêtement': 'vetement',
+        'vetements': 'vetement',
+        'vêtements': 'vetement',
+        'porte-clés': 'porte-clés',
+        'porte clés': 'porte-clés',
+        'porte cles': 'porte-clés',
+        'porte-cles': 'porte-clés',
+        'portecles': 'porte-clés',
+      };
+      
+      const categorieNormalisee = normalisations[categorieDecodee] || categorieDecodee;
+      
+      const response = await accesoireService.getAccessoiresByType(categorieNormalisee);
+      
       const filteredAccessoires = Array.isArray(response) ? response : [];
+      
       
       setAccessoires(filteredAccessoires);
     } catch (err) {
-      setError(err.message || 'Erreur lors du chargement des accessoires');
-      console.error(err);
+      const errorMessage = err.message || 'Erreur lors du chargement des accessoires';
+      setError(errorMessage);
+      console.error('Erreur fetchAccessoires:', {
+        categorie,
+        erreur: err.message,
+        details: err
+      });
     } finally {
       setLoading(false);
     }
@@ -69,7 +105,20 @@ const AccessoiresParCategorie = () => {
             ← Retour aux catégories
           </button>
           <h1 className="accessoires-categorie-title">
-            {decodeURIComponent(categorie).charAt(0).toUpperCase() + decodeURIComponent(categorie).slice(1)}
+            {(() => {
+              // Formater le titre de manière élégante
+              const categorieDecodee = decodeURIComponent(categorie);
+              const labels = {
+                'porte-clés': 'Porte-clés',
+                'porte-cles': 'Porte-clés',
+                'vetement': 'Vêtements',
+                'vêtement': 'Vêtements',
+                'decoration': 'Décoration',
+                'décoration': 'Décoration',
+              };
+              return labels[categorieDecodee.toLowerCase()] 
+                || categorieDecodee.charAt(0).toUpperCase() + categorieDecodee.slice(1);
+            })()}
           </h1>
           <p className="accessoires-categorie-subtitle">
             {accessoires.length} article{accessoires.length > 1 ? 's' : ''} disponible{accessoires.length > 1 ? 's' : ''}
@@ -91,20 +140,58 @@ const AccessoiresParCategorie = () => {
               >
                 {/* Image */}
                 <div className="accessoire-image-container">
-                  {accessoire.photo_accesoire && accessoire.photo_accesoire.length > 0 ? (
-                    <img
-                      src={`http://localhost:3000${accessoire.photo_accesoire[0].name}`}
-                      alt={accessoire.nom_accesoire}
-                      className="accessoire-image"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
+                  {(() => {
+                    // Récupérer la première photo disponible
+                    const photoPrincipale = accessoire.photo_accesoire && 
+                      Array.isArray(accessoire.photo_accesoire) && 
+                      accessoire.photo_accesoire.length > 0 
+                      ? accessoire.photo_accesoire[0] 
+                      : null;
+                    
+                    if (photoPrincipale && photoPrincipale.name) {
+                      // Construire l'URL complète de l'image
+                      let photoUrl = photoPrincipale.name;
+                      if (!photoUrl.startsWith('http')) {
+                        // Si le chemin commence par /, utiliser directement, sinon ajouter /
+                        photoUrl = photoUrl.startsWith('/')
+                          ? `${API_URL}${photoUrl}`
+                          : `${API_URL}/${photoUrl}`;
+                      }
+                      
+                      return (
+                        <img
+                          src={photoUrl}
+                          alt={photoPrincipale.alt || accessoire.nom_accesoire}
+                          className="accessoire-image"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            if (e.target.nextSibling) {
+                              e.target.nextSibling.style.display = 'flex';
+                            }
+                          }}
+                          onLoad={(e) => {
+                            // Cacher le placeholder si l'image charge correctement
+                            const placeholder = e.target.nextSibling;
+                            if (placeholder && placeholder.classList.contains('accessoire-placeholder')) {
+                              placeholder.style.display = 'none';
+                            }
+                          }}
+                        />
+                      );
+                    }
+                    return null;
+                  })()}
                   <div 
                     className="accessoire-placeholder"
-                    style={{ display: accessoire.photo_accesoire && accessoire.photo_accesoire.length > 0 ? 'none' : 'flex' }}
+                    style={{ 
+                      display: (() => {
+                        const hasPhoto = accessoire.photo_accesoire && 
+                          Array.isArray(accessoire.photo_accesoire) && 
+                          accessoire.photo_accesoire.length > 0 &&
+                          accessoire.photo_accesoire[0]?.name;
+                        return hasPhoto ? 'none' : 'flex';
+                      })()
+                    }}
                   >
                     <span className="accessoire-letter">
                       {accessoire.nom_accesoire?.charAt(0) || '?'}

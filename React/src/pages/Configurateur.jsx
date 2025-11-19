@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { modelPorscheService, personnalisationService } from '../services';
 import { usePanier } from '../hooks/usePanier.jsx';
-import { Loading, Button, Alert, Card } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import { Loading, Button, Alert } from '../components/common';
+import { formatPrice, formatPriceMonthly } from '../utils/format.js';
 import './Configurateur.css';
 
 /**
  * Page Configurateur - Personnalisation d'une Porsche neuve
+ * Design inspiré du configurateur officiel Porsche
  */
 const Configurateur = () => {
   const { voitureId } = useParams();
@@ -30,13 +31,25 @@ const Configurateur = () => {
   const [config, setConfig] = useState({
     variante: null,
     couleur_exterieur: null,
-    couleur_interieur: [],
+    couleur_interieur: null, // Changé en simple sélection
     taille_jante: null,
     siege: null,
     package: null,
   });
 
   const [prixTotal, setPrixTotal] = useState(0);
+  const [prixMensuel, setPrixMensuel] = useState(0);
+  
+  // États pour l'interface
+  const [photoActive, setPhotoActive] = useState(0);
+  const [sectionsOuvertes, setSectionsOuvertes] = useState({
+    couleursExt: false,
+    jantes: false,
+    couleursInt: true, // Ouvert par défaut
+    sieges: false,
+    packages: false,
+  });
+  const [recherche, setRecherche] = useState('');
 
   // Charger les options disponibles
   useEffect(() => {
@@ -46,8 +59,10 @@ const Configurateur = () => {
         setError('');
 
         // Charger les variantes disponibles pour ce modèle
-        const variantesData = await modelPorscheService.getVariantesByModel(voitureId);
-        setVariantes(variantesData);
+        // CORRECTION: Utiliser getConfigurationsByVoiture qui accepte un ID de voiture
+        // au lieu de getVariantesByModel qui attend un nom de modèle (ex: "911")
+        const variantesData = await modelPorscheService.getConfigurationsByVoiture(voitureId);
+        setVariantes(Array.isArray(variantesData) ? variantesData : []);
 
         // Charger les options de personnalisation
         const [couleursExtData, couleursIntData, jantesData, siegesData, packagesData] =
@@ -94,8 +109,8 @@ const Configurateur = () => {
       total += config.couleur_exterieur.prix || 0;
     }
 
-    if (config.couleur_interieur && config.couleur_interieur.length > 0) {
-      total += config.couleur_interieur.reduce((sum, c) => sum + (c.prix || 0), 0);
+    if (config.couleur_interieur) {
+      total += config.couleur_interieur.prix || 0;
     }
 
     if (config.taille_jante) {
@@ -111,6 +126,9 @@ const Configurateur = () => {
     }
 
     setPrixTotal(total);
+    // Calcul du prix mensuel (exemple : 80 mois à 0%)
+    // Éviter la division par zéro
+    setPrixMensuel(total > 0 ? total / 80 : 0);
   }, [config]);
 
   const handleVarianteChange = (variante) => {
@@ -123,19 +141,21 @@ const Configurateur = () => {
   };
 
   const handleCouleurIntChange = (couleur) => {
-    // Gérer sélection multiple
-    const isSelected = config.couleur_interieur.some((c) => c._id === couleur._id);
-    if (isSelected) {
-      setConfig({
-        ...config,
-        couleur_interieur: config.couleur_interieur.filter((c) => c._id !== couleur._id),
-      });
-    } else {
-      setConfig({
-        ...config,
-        couleur_interieur: [...config.couleur_interieur, couleur],
-      });
-    }
+    setConfig({ ...config, couleur_interieur: couleur });
+  };
+
+  const toggleSection = (section) => {
+    setSectionsOuvertes((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const getPhotosVariante = () => {
+    if (!config.variante?.photo_porsche) return [];
+    return Array.isArray(config.variante.photo_porsche) 
+      ? config.variante.photo_porsche 
+      : [];
   };
 
   const handleJanteChange = (jante) => {
@@ -185,299 +205,404 @@ const Configurateur = () => {
     );
   }
 
+  const photos = getPhotosVariante();
+  const nomModel = config.variante?.nom_model || config.variante?.voiture?.nom_model || '911 GT3';
+  const annee = new Date().getFullYear() + 1; // Année du modèle
+
   return (
     <div className="configurateur-container">
       {success && <Alert type="success">{success}</Alert>}
       {error && !success && <Alert type="error">{error}</Alert>}
 
-      <div className="configurateur-content">
-        {/* En-tête */}
-        <div className="configurateur-header">
-          <div>
-            <h1 className="configurateur-title">
-              {config.variante?.voiture?.nom_model || 'Configurateur Porsche'}
-            </h1>
-            <p className="configurateur-subtitle">
-              Personnalisez votre Porsche selon vos préférences
-            </p>
+      {/* Header avec navigation et prix */}
+      <header className="configurateur-top-header">
+        <div className="configurateur-header-left">
+          <button className="configurateur-header-link" onClick={() => navigate('/voitures')}>
+            Changer de modèle
+          </button>
+          <button className="configurateur-header-link" onClick={() => {/* TODO: Sauvegarder */}}>
+            Sauvegarder
+          </button>
+          <button className="configurateur-header-link" onClick={() => {/* TODO: Créer code */}}>
+            Créer un code Porsche
+          </button>
+        </div>
+
+        <div className="configurateur-header-center">
+          <div className="configurateur-header-price-group">
+            <div className="configurateur-header-price-item">
+              <span className="configurateur-header-price-amount">
+                {formatPriceMonthly(prixMensuel)} /mois
+              </span>
+              <button className="configurateur-header-info-icon" title="Informations">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <button className="configurateur-header-link-small">Calculer la mensualité</button>
           </div>
 
-          {/* Prix total */}
-          <div className="configurateur-price-summary">
-            <p className="configurateur-price-label">Prix total T.T.C.</p>
-            <p className="configurateur-price-amount">{formatPrice(prixTotal)}</p>
-            <Button size="lg" onClick={handleAddToCart} fullWidth>
-              Ajouter au panier
-            </Button>
+          <div className="configurateur-header-price-group">
+            <div className="configurateur-header-price-item">
+              <span className="configurateur-header-price-total">{formatPrice(prixTotal)}</span>
+              <button className="configurateur-header-info-icon" title="Informations">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <span className="configurateur-header-price-label">incluant TVA</span>
           </div>
         </div>
 
-        {/* Visualisation */}
-        <div className="configurateur-visual">
-          {config.variante?.photo_porsche && config.variante.photo_porsche.length > 0 ? (
-            <img
-              src={`http://localhost:3000${config.variante.photo_porsche[0].name}`}
-              alt={config.variante.nom_model}
-              className="configurateur-visual-image"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <div 
-            className="configurateur-visual-placeholder"
-            style={{ display: config.variante?.photo_porsche && config.variante.photo_porsche.length > 0 ? 'none' : 'flex' }}
-          >
-            <span className="configurateur-visual-letter">
-              {config.variante?.nom_model?.charAt(0) || '?'}
-            </span>
-          </div>
-          <p className="configurateur-visual-caption">
-            {config.variante?.nom_model ? `${config.variante.voiture?.nom_model || ''} ${config.variante.nom_model}` : 'Sélectionnez une variante'}
-          </p>
+        <div className="configurateur-header-right">
+          <Button variant="outline" onClick={() => {/* TODO: Aperçu */}}>
+            Aperçu
+          </Button>
+          <Button variant="primary" onClick={handleAddToCart}>
+            Contactez un Centre Porsche
+          </Button>
         </div>
+      </header>
 
-        {/* Options de configuration */}
-        <div className="configurateur-options">
-          {/* Variante */}
-          {variantes.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">1. Choisissez votre variante</h2>
-              <div className="configurateur-grid">
-                {variantes.map((variante) => (
-                  <Card
-                    key={variante._id}
-                    hover
-                    onClick={() => handleVarianteChange(variante)}
-                    className={`configurateur-option-card ${
-                      config.variante?._id === variante._id ? 'configurateur-option-selected' : ''
-                    }`}
-                  >
-                    <h3 className="configurateur-option-name">{variante.nom_model}</h3>
-                    <p className="configurateur-option-desc">{variante.description}</p>
-                    {variante.specifications && (
-                      <div className="configurateur-option-specs">
-                        <span>{variante.specifications.puissance} ch</span>
-                        <span>•</span>
-                        <span>0-100: {variante.specifications.acceleration_0_100}s</span>
-                      </div>
-                    )}
-                    <p className="configurateur-option-price">{formatPrice(variante.prix_base)}</p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Contenu principal */}
+      <div className="configurateur-main-content">
 
-          {/* Couleur extérieure */}
-          {couleursExt.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">2. Couleur extérieure</h2>
-              <div className="configurateur-colors-grid">
-                {couleursExt.map((couleur) => (
-                  <button
-                    key={couleur._id}
-                    onClick={() => handleCouleurExtChange(couleur)}
-                    className={`configurateur-color-option ${
-                      config.couleur_exterieur?._id === couleur._id
-                        ? 'configurateur-color-selected'
-                        : ''
-                    }`}
-                    title={couleur.nom_couleur}
-                  >
-                    {couleur.photo_couleur ? (
-                      <img
-                        src={`http://localhost:3000${couleur.photo_couleur}`}
-                        alt={couleur.nom_couleur}
-                        className="configurateur-color-image"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="configurateur-color-swatch"
-                      style={{ 
-                        backgroundColor: couleur.code_hex || '#ccc',
-                        display: couleur.photo_couleur ? 'none' : 'block'
-                      }}
-                    />
-                    <span className="configurateur-color-name">{couleur.nom_couleur}</span>
-                    {couleur.prix > 0 && (
-                      <span className="configurateur-color-price">+{formatPrice(couleur.prix)}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* Zone de visualisation (gauche) */}
+        <div className="configurateur-visual-area">
+          <div className="configurateur-visual-main">
+            {/* Bouton plein écran */}
+            <button className="configurateur-fullscreen-btn" title="Plein écran">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+            </button>
 
-          {/* Couleur intérieure */}
-          {couleursInt.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">3. Couleur intérieure</h2>
-              <p className="configurateur-section-hint">Sélection multiple possible</p>
-              <div className="configurateur-colors-grid">
-                {couleursInt.map((couleur) => (
-                  <button
-                    key={couleur._id}
-                    onClick={() => handleCouleurIntChange(couleur)}
-                    className={`configurateur-color-option ${
-                      config.couleur_interieur.some((c) => c._id === couleur._id)
-                        ? 'configurateur-color-selected'
-                        : ''
-                    }`}
-                    title={couleur.nom_couleur}
-                  >
-                    {couleur.photo_couleur ? (
-                      <img
-                        src={`http://localhost:3000${couleur.photo_couleur}`}
-                        alt={couleur.nom_couleur}
-                        className="configurateur-color-image"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'block';
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="configurateur-color-swatch"
-                      style={{ 
-                        backgroundColor: couleur.code_hex || '#ccc',
-                        display: couleur.photo_couleur ? 'none' : 'block'
-                      }}
-                    />
-                    <span className="configurateur-color-name">{couleur.nom_couleur}</span>
-                    {couleur.prix > 0 && (
-                      <span className="configurateur-color-price">+{formatPrice(couleur.prix)}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Jantes */}
-          {jantes.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">4. Jantes</h2>
-              <div className="configurateur-grid">
-                {jantes.map((jante) => (
-                  <Card
-                    key={jante._id}
-                    hover
-                    onClick={() => handleJanteChange(jante)}
-                    className={`configurateur-option-card ${
-                      config.taille_jante?._id === jante._id ? 'configurateur-option-selected' : ''
-                    }`}
-                  >
-                    <h3 className="configurateur-option-name">{jante.taille_jante}"</h3>
-                    {jante.couleur_jante && (
-                      <p className="configurateur-option-desc">{jante.couleur_jante}</p>
-                    )}
-                    {jante.prix > 0 && (
-                      <p className="configurateur-option-price">+{formatPrice(jante.prix)}</p>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Sièges */}
-          {sieges.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">5. Sièges</h2>
-              <div className="configurateur-grid">
-                {sieges.map((siege) => (
-                  <Card
-                    key={siege._id}
-                    hover
-                    onClick={() => handleSiegeChange(siege)}
-                    className={`configurateur-option-card ${
-                      config.siege?._id === siege._id ? 'configurateur-option-selected' : ''
-                    }`}
-                  >
-                    <h3 className="configurateur-option-name">{siege.nom_siege}</h3>
-                    {siege.prix > 0 && (
-                      <p className="configurateur-option-price">+{formatPrice(siege.prix)}</p>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Packages */}
-          {packages.length > 0 && (
-            <div className="configurateur-section">
-              <h2 className="configurateur-section-title">6. Packages</h2>
-              <div className="configurateur-grid">
-                {packages.map((pkg) => (
-                  <Card
-                    key={pkg._id}
-                    hover
-                    onClick={() => handlePackageChange(pkg)}
-                    className={`configurateur-option-card ${
-                      config.package?._id === pkg._id ? 'configurateur-option-selected' : ''
-                    }`}
-                  >
-                    <h3 className="configurateur-option-name">{pkg.nom_package}</h3>
-                    {pkg.description && (
-                      <p className="configurateur-option-desc">{pkg.description}</p>
-                    )}
-                    {pkg.prix > 0 && (
-                      <p className="configurateur-option-price">+{formatPrice(pkg.prix)}</p>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Résumé final */}
-        <div className="configurateur-summary">
-          <h2 className="configurateur-summary-title">Votre configuration</h2>
-          <div className="configurateur-summary-content">
-            <div className="configurateur-summary-item">
-              <span>Variante</span>
-              <span>{config.variante?.nom_model || 'Non sélectionné'}</span>
-            </div>
-            <div className="configurateur-summary-item">
-              <span>Couleur extérieure</span>
-              <span>{config.couleur_exterieur?.nom_couleur || 'Non sélectionné'}</span>
-            </div>
-            <div className="configurateur-summary-item">
-              <span>Couleur intérieure</span>
-              <span>
-                {config.couleur_interieur.length > 0
-                  ? config.couleur_interieur.map((c) => c.nom_couleur).join(', ')
-                  : 'Non sélectionné'}
+            {/* Image principale */}
+            {photos.length > 0 ? (
+              <img
+                src={`http://localhost:3000${photos[photoActive]?.name}`}
+                alt={nomModel}
+                className="configurateur-main-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div 
+              className="configurateur-visual-placeholder"
+              style={{ display: photos.length > 0 ? 'none' : 'flex' }}
+            >
+              <span className="configurateur-visual-letter">
+                {nomModel?.charAt(0) || '?'}
               </span>
             </div>
-            <div className="configurateur-summary-item">
-              <span>Jantes</span>
-              <span>{config.taille_jante?.taille_jante ? `${config.taille_jante.taille_jante}"` : 'Non sélectionné'}</span>
-            </div>
-            <div className="configurateur-summary-item">
-              <span>Sièges</span>
-              <span>{config.siege?.nom_siege || 'Non sélectionné'}</span>
-            </div>
-            <div className="configurateur-summary-item">
-              <span>Package</span>
-              <span>{config.package?.nom_package || 'Non sélectionné'}</span>
-            </div>
-            <div className="configurateur-summary-item configurateur-summary-total">
-              <span>Prix total T.T.C.</span>
-              <span>{formatPrice(prixTotal)}</span>
-            </div>
+
+            {/* Bouton vue 360° */}
+            <button className="configurateur-360-btn">
+              Ouvrir la vue à 360
+            </button>
           </div>
-          <Button size="lg" onClick={handleAddToCart} fullWidth>
-            Ajouter au panier
-          </Button>
+
+          {/* Contrôles au-dessus des miniatures */}
+          <div className="configurateur-visual-controls">
+            <button className="configurateur-control-btn" title="Photos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </button>
+            <button className="configurateur-control-btn" title="Vue nuit">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            </button>
+            <button className="configurateur-control-btn" title="Caméra">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Miniatures */}
+          {photos.length > 1 && (
+            <div className="configurateur-thumbnails">
+              {photos.map((photo, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPhotoActive(index)}
+                  className={`configurateur-thumbnail ${photoActive === index ? 'configurateur-thumbnail-active' : ''}`}
+                >
+                  <img
+                    src={`http://localhost:3000${photo.name}`}
+                    alt={`Vue ${index + 1}`}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Panneau de configuration (droite) */}
+        <div className="configurateur-options-panel">
+          {/* En-tête du panneau */}
+          <div className="configurateur-panel-header">
+            <h2 className="configurateur-panel-title">{nomModel}</h2>
+            <span className="configurateur-panel-year">{annee}</span>
+          </div>
+
+          <a href="#" className="configurateur-panel-link">
+            Données techniques et équipement de série
+          </a>
+
+          {/* Barre de recherche */}
+          <div className="configurateur-search">
+            <svg className="configurateur-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Recherche d'options d'équipement"
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+              className="configurateur-search-input"
+            />
+          </div>
+
+          {/* Section Couleurs Extérieures */}
+          {couleursExt.length > 0 && (
+            <div className="configurateur-option-section">
+              <button
+                className="configurateur-option-section-header"
+                onClick={() => toggleSection('couleursExt')}
+              >
+                <span className="configurateur-option-section-title">
+                  Couleurs Extérieures <span className="configurateur-option-count">1</span>
+                </span>
+                <svg
+                  className={`configurateur-option-section-icon ${sectionsOuvertes.couleursExt ? 'open' : ''}`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+              {sectionsOuvertes.couleursExt && (
+                <div className="configurateur-option-section-content">
+                  <div className="configurateur-colors-list">
+                    {couleursExt.map((couleur) => (
+                      <button
+                        key={couleur._id}
+                        onClick={() => handleCouleurExtChange(couleur)}
+                        className={`configurateur-color-item ${
+                          config.couleur_exterieur?._id === couleur._id ? 'selected' : ''
+                        }`}
+                      >
+                        {couleur.photo_couleur ? (
+                          <img
+                            src={`http://localhost:3000${couleur.photo_couleur}`}
+                            alt={couleur.nom_couleur}
+                            className="configurateur-color-item-image"
+                          />
+                        ) : (
+                          <div
+                            className="configurateur-color-item-swatch"
+                            style={{ backgroundColor: couleur.code_hex || '#ccc' }}
+                          />
+                        )}
+                        <div className="configurateur-color-item-info">
+                          <span className="configurateur-color-item-name">{couleur.nom_couleur}</span>
+                          {couleur.prix > 0 && (
+                            <span className="configurateur-color-item-price">+{formatPrice(couleur.prix)}</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Section Jantes */}
+          {jantes.length > 0 && (
+            <div className="configurateur-option-section">
+              <button
+                className="configurateur-option-section-header"
+                onClick={() => toggleSection('jantes')}
+              >
+                <span className="configurateur-option-section-title">
+                  Jantes <span className="configurateur-option-count">1</span>
+                </span>
+                <svg
+                  className={`configurateur-option-section-icon ${sectionsOuvertes.jantes ? 'open' : ''}`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+              {sectionsOuvertes.jantes && (
+                <div className="configurateur-option-section-content">
+                  <div className="configurateur-jantes-list">
+                    {jantes.map((jante) => (
+                      <button
+                        key={jante._id}
+                        onClick={() => handleJanteChange(jante)}
+                        className={`configurateur-jante-item ${
+                          config.taille_jante?._id === jante._id ? 'selected' : ''
+                        }`}
+                      >
+                        <span className="configurateur-jante-size">{jante.taille_jante}"</span>
+                        {jante.prix > 0 && (
+                          <span className="configurateur-jante-price">+{formatPrice(jante.prix)}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Section Couleurs Intérieures */}
+          {couleursInt.length > 0 && (
+            <div className="configurateur-option-section">
+              <button
+                className="configurateur-option-section-header"
+                onClick={() => toggleSection('couleursInt')}
+              >
+                <span className="configurateur-option-section-title">
+                  Couleurs Intérieures
+                </span>
+                <svg
+                  className={`configurateur-option-section-icon ${sectionsOuvertes.couleursInt ? 'open' : ''}`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+              {sectionsOuvertes.couleursInt && (
+                <div className="configurateur-option-section-content">
+                  {/* Standard */}
+                  <div className="configurateur-interior-standard">
+                    <div className="configurateur-interior-standard-header">
+                      <span className="configurateur-interior-standard-label">Standard</span>
+                      <span className="configurateur-interior-standard-price">0,00 €</span>
+                      <button className="configurateur-header-info-icon" title="Informations">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p className="configurateur-interior-standard-desc">
+                      Intérieur en cuir / Race-Tex Noir et en couleur contrastante Argent GT
+                    </p>
+                    <div className="configurateur-interior-standard-swatch">
+                      <div className="configurateur-interior-swatch-item"></div>
+                    </div>
+                  </div>
+
+                  {/* Cuir */}
+                  <div className="configurateur-interior-leather">
+                    <span className="configurateur-interior-category">Cuir</span>
+                    <div className="configurateur-interior-swatches">
+                      {couleursInt.map((couleur) => (
+                        <button
+                          key={couleur._id}
+                          onClick={() => handleCouleurIntChange(couleur)}
+                          className={`configurateur-interior-swatch-item ${
+                            config.couleur_interieur?._id === couleur._id ? 'selected' : ''
+                          }`}
+                          title={couleur.nom_couleur}
+                        >
+                          {couleur.photo_couleur ? (
+                            <img
+                              src={`http://localhost:3000${couleur.photo_couleur}`}
+                              alt={couleur.nom_couleur}
+                            />
+                          ) : (
+                            <div
+                              style={{ backgroundColor: couleur.code_hex || '#ccc' }}
+                            />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Section Sièges */}
+          {sieges.length > 0 && (
+            <div className="configurateur-option-section">
+              <button
+                className="configurateur-option-section-header"
+                onClick={() => toggleSection('sieges')}
+              >
+                <span className="configurateur-option-section-title">
+                  Sièges
+                </span>
+                <svg
+                  className={`configurateur-option-section-icon ${sectionsOuvertes.sieges ? 'open' : ''}`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+              {sectionsOuvertes.sieges && (
+                <div className="configurateur-option-section-content">
+                  <div className="configurateur-sieges-list">
+                    {sieges.map((siege) => (
+                      <button
+                        key={siege._id}
+                        onClick={() => handleSiegeChange(siege)}
+                        className={`configurateur-siege-item ${
+                          config.siege?._id === siege._id ? 'selected' : ''
+                        }`}
+                      >
+                        <span className="configurateur-siege-name">{siege.nom_siege}</span>
+                        {siege.prix > 0 && (
+                          <span className="configurateur-siege-price">+{formatPrice(siege.prix)}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

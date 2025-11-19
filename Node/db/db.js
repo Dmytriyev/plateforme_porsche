@@ -6,11 +6,15 @@ export default function db() {
     socketTimeoutMS: 45000,
     bufferCommands: false,
   };
-  
+
   connect(process.env.DB_URI, options)
-    .then(() => console.log("✅ Connexion à mongoDB réussie"))
+    .then(() => console.log("Connexion à mongoDB réussie"))
     .catch((error) => {
-      console.error("❌ Erreur connexion MongoDB:", error.message);
-      console.log(error.reason);
+      console.error(
+        "Erreur connexion MongoDB",
+        error && (error.message || error.reason)
+          ? { message: error.message, reason: error.reason }
+          : error
+      );
     });
 }

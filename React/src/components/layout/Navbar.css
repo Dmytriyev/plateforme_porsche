@@ -5,12 +5,13 @@
 
 /* Container principal */
 .navbar {
-  background-color: var(--color-black);
-  color: var(--color-white);
-  box-shadow: var(--shadow-md);
+  background-color: var(--color-white);
+  color: var(--color-black);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 40;
+  border-bottom: 1px solid var(--color-grey-light);
 }
 
 .navbar-container {
@@ -23,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80px;
+  height: 60px;
 }
 
 /* Logo */
@@ -38,11 +39,17 @@
   opacity: 0.8;
 }
 
+.navbar-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+}
+
 .navbar-logo-text {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 3px;
-  color: var(--color-white);
+  color: var(--color-black);
 }
 
 /* Navigation Desktop */
@@ -59,7 +66,7 @@
 }
 
 .navbar-link {
-  color: var(--color-white);
+  color: var(--color-black);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-body-small);
   text-decoration: none;
@@ -91,8 +98,11 @@
 /* Panier */
 .navbar-cart {
   position: relative;
-  color: var(--color-white);
+  color: var(--color-black);
   transition: color var(--transition-duration) var(--transition-easing);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .navbar-cart:hover {
@@ -120,6 +130,25 @@
   justify-content: center;
 }
 
+/* Logo buste (Mon compte) */
+.navbar-account {
+  color: var(--color-black);
+  transition: color var(--transition-duration) var(--transition-easing);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.navbar-account:hover {
+  color: var(--color-red-porsche);
+}
+
+.navbar-account-icon {
+  width: 24px;
+  height: 24px;
+}
+
 /* Authentification */
 .navbar-auth {
   display: flex;
@@ -129,14 +158,13 @@
 
 .navbar-user-name {
   font-size: var(--font-size-secondary);
-  color: var(--color-white);
+  color: var(--color-black);
 }
 
-.navbar-btn-logout,
-.navbar-btn-register {
+.navbar-btn-logout {
   padding: var(--spacing-xs) var(--spacing-md);
-  background-color: var(--color-white);
-  color: var(--color-black);
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
   border-radius: var(--border-radius-sm);
   font-weight: var(--font-weight-medium);
@@ -145,15 +173,31 @@
   transition: all var(--transition-duration) var(--transition-easing);
 }
 
-.navbar-btn-logout:hover,
+.navbar-btn-logout:hover {
+  background-color: var(--color-anthracite);
+}
+
+.navbar-btn-register {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: var(--color-red-porsche);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-secondary);
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
+  text-decoration: none;
+}
+
 .navbar-btn-register:hover {
-  background-color: var(--color-grey-light);
+  background-color: var(--color-red-porsche-dark);
 }
 
 .navbar-btn-login {
   padding: var(--spacing-xs) var(--spacing-md);
   background-color: transparent;
-  color: var(--color-white);
+  color: var(--color-black);
   border: none;
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-secondary);
@@ -179,13 +223,13 @@
 }
 
 .navbar-menu-btn:hover {
-  background-color: var(--color-anthracite);
+  background-color: var(--color-grey-light);
 }
 
 .navbar-menu-icon {
   width: 24px;
   height: 24px;
-  color: var(--color-white);
+  color: var(--color-black);
 }
 
 @media (min-width: 768px) {
@@ -200,7 +244,7 @@
   flex-direction: column;
   gap: var(--spacing-md);
   padding: var(--spacing-md) 0;
-  border-top: 1px solid var(--color-anthracite);
+  border-top: 1px solid var(--color-grey-light);
 }
 
 @media (min-width: 768px) {
@@ -210,7 +254,7 @@
 }
 
 .navbar-mobile-link {
-  color: var(--color-white);
+  color: var(--color-black);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-body-small);
   text-decoration: none;
@@ -224,7 +268,7 @@
 .navbar-mobile-btn {
   text-align: left;
   background-color: transparent;
-  color: var(--color-white);
+  color: var(--color-black);
   border: none;
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-body-small);
@@ -244,7 +288,7 @@
   }
   
   .navbar-content {
-    height: 64px;
+    height: 56px;
   }
   
   .navbar-logo-text {

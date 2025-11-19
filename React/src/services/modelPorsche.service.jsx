@@ -1,30 +1,20 @@
 import apiClient from '../config/api.jsx';
 
-/**
- * Service de gestion des modèles Porsche (variantes)
- * Correspond à l'endpoint /model_porsche du backend
- */
 const modelPorscheService = {
-  // ==================== MODÈLES PORSCHE (Variantes) ====================
-
-  /**
-   * Récupérer tous les modèles Porsche
-   * @returns {Promise} Liste des modèles
-   */
   getAllModels: async () => {
     try {
       const response = await apiClient.get('/model_porsche/all');
-      return response.data;
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      }
+      return [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer un modèle par ID
-   * @param {string} id - ID du modèle
-   * @returns {Promise} Détails du modèle
-   */
   getModelById: async (id) => {
     try {
       const response = await apiClient.get(`/model_porsche/${id}`);
@@ -34,36 +24,38 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Récupérer les modèles NEUFS uniquement
-   * @returns {Promise} Liste des modèles neufs
-   */
   getModelesNeufs: async () => {
     try {
       const response = await apiClient.get('/model_porsche/neuves');
-      return response.data;
+      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer les modèles OCCASION uniquement
-   * @returns {Promise} Liste des modèles occasion
-   */
   getModelesOccasion: async () => {
     try {
       const response = await apiClient.get('/model_porsche/occasions');
-      return response.data;
+      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer toutes les variantes disponibles
-   * @returns {Promise} Liste des variantes
-   */
   getAllVariantes: async () => {
     try {
       const response = await apiClient.get('/model_porsche/variantes');
@@ -73,11 +65,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Récupérer les variantes d'un modèle spécifique (ex: '911')
-   * @param {string} nomModel - Nom du modèle (911, Cayenne, Cayman)
-   * @returns {Promise} Liste des variantes du modèle
-   */
   getVariantesByModel: async (nomModel) => {
     try {
       const response = await apiClient.get(`/model_porsche/variantes/${nomModel}`);
@@ -87,10 +74,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Récupérer toutes les carrosseries disponibles
-   * @returns {Promise} Liste des types de carrosserie
-   */
   getAllCarrosseries: async () => {
     try {
       const response = await apiClient.get('/model_porsche/carrosseries');
@@ -100,41 +83,92 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Récupérer les configurations d'une voiture spécifique
-   * @param {string} voitureId - ID de la voiture
-   * @returns {Promise} Configurations de la voiture
-   */
   getConfigurationsByVoiture: async (voitureId) => {
     try {
       const response = await apiClient.get(`/model_porsche/voiture/${voitureId}`);
-      return response.data;
+      if (response.data && response.data.configurations && Array.isArray(response.data.configurations)) {
+        return response.data.configurations;
+      } else if (response.data && Array.isArray(response.data)) {
+        return response.data;
+      } else if (Array.isArray(response.data?.data)) {
+        return response.data.data;
+      }
+      return [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Calculer le prix total d'un modèle avec options
-   * @param {string} modelId - ID du modèle
-   * @returns {Promise} Prix total calculé
-   */
   calculatePrixTotal: async (modelId) => {
     try {
       const response = await apiClient.get(`/model_porsche/prixTotal/${modelId}`);
-      return response.data;
+      if (response.data && response.data.details_prix) {
+        return response.data;
+      }
+      return response.data || response;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  // ==================== ROUTES PROTÉGÉES ====================
+  getVariantePage: async (id) => {
+    try {
+      const response = await apiClient.get(`/model_porsche/page/${id}`);
+      return response.data?.data || response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 
-  /**
-   * Créer un nouveau modèle (STAFF)
-   * @param {Object} data - Données du modèle
-   * @returns {Promise} Modèle créé
-   */
+  getOccasionPage: async (id) => {
+    try {
+      const response = await apiClient.get(`/model_porsche/occasion/page/${id}`, {
+        validateStatus: (status) => status < 500
+      });
+      
+      if (response.status === 404 || response.status === 400) {
+        const silentError = new Error("Voiture d'occasion introuvable");
+        silentError.status = response.status;
+        silentError.response = { status: response.status };
+        silentError.isExpected = true;
+        silentError.silent = true;
+        silentError.config = { url: `/model_porsche/occasion/page/${id}` };
+        throw silentError;
+      }
+      
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data;
+      }
+      return response.data || response;
+    } catch (error) {
+      const status = error.response?.status || error.status;
+      
+      if (error.silent || error.isExpected || status === 404 || status === 400) {
+        const silentError = new Error("Voiture d'occasion introuvable");
+        silentError.status = status || 404;
+        silentError.response = { status: status || 404 };
+        silentError.isExpected = true;
+        silentError.silent = true;
+        silentError.config = error.config || { url: `/model_porsche/occasion/page/${id}` };
+        Object.defineProperty(silentError, 'message', {
+          value: "Voiture d'occasion introuvable",
+          writable: false,
+          enumerable: false,
+          configurable: false
+        });
+        throw silentError;
+      }
+      
+      console.error('Erreur getOccasionPage:', {
+        id,
+        status,
+        message: error.response?.data?.message || error.message
+      });
+      
+      throw error.response?.data || error;
+    }
+  },
+
   createModel: async (data) => {
     try {
       const response = await apiClient.post('/model_porsche/new', data);
@@ -144,12 +178,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Mettre à jour un modèle (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - Nouvelles données
-   * @returns {Promise} Modèle mis à jour
-   */
   updateModel: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/update/${id}`, data);
@@ -159,11 +187,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Supprimer un modèle (ADMIN)
-   * @param {string} id - ID du modèle
-   * @returns {Promise} Confirmation
-   */
   deleteModel: async (id) => {
     try {
       const response = await apiClient.delete(`/model_porsche/delete/${id}`);
@@ -173,12 +196,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Ajouter des images à un modèle (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {FormData} formData - Images à ajouter
-   * @returns {Promise} Modèle mis à jour
-   */
   addImages: async (id, formData) => {
     try {
       const response = await apiClient.patch(`/model_porsche/addImages/${id}`, formData, {
@@ -190,12 +207,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Supprimer des images d'un modèle (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - IDs des images à supprimer
-   * @returns {Promise} Modèle mis à jour
-   */
   removeImages: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/removeImages/${id}`, data);
@@ -205,12 +216,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Ajouter une couleur extérieure (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - Données de la couleur
-   * @returns {Promise} Modèle mis à jour
-   */
   addCouleurExterieur: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/addCouleurExterieur/${id}`, data);
@@ -220,12 +225,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Supprimer une couleur extérieure (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - ID de la couleur à supprimer
-   * @returns {Promise} Modèle mis à jour
-   */
   removeCouleurExterieur: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/removeCouleurExterieur/${id}`, data);
@@ -235,12 +234,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Ajouter une couleur intérieure (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - Données de la couleur
-   * @returns {Promise} Modèle mis à jour
-   */
   addCouleurInterieur: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/addCouleursInterieur/${id}`, data);
@@ -250,12 +243,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Supprimer une couleur intérieure (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - ID de la couleur à supprimer
-   * @returns {Promise} Modèle mis à jour
-   */
   removeCouleurInterieur: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/removeCouleursInterieur/${id}`, data);
@@ -265,12 +252,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Ajouter une taille de jante (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - Données de la jante
-   * @returns {Promise} Modèle mis à jour
-   */
   addTailleJante: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/addTailleJante/${id}`, data);
@@ -280,12 +261,6 @@ const modelPorscheService = {
     }
   },
 
-  /**
-   * Supprimer une taille de jante (STAFF)
-   * @param {string} id - ID du modèle
-   * @param {Object} data - ID de la jante à supprimer
-   * @returns {Promise} Modèle mis à jour
-   */
   removeTailleJante: async (id, data) => {
     try {
       const response = await apiClient.patch(`/model_porsche/removeTailleJante/${id}`, data);

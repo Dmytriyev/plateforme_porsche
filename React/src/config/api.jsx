@@ -27,15 +27,31 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Intercepteur pour gérer les erreurs de réponse
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expiré ou invalide
       localStorage.removeItem("token");
       window.location.href = "/login";
+      return Promise.reject(error);
     }
+    
+    if (error.response?.status === 404 || error.response?.status === 400) {
+      const url = error.config?.url || '';
+      
+      const silentRoutes = [
+        '/model_porsche/occasion/page/',
+      ];
+      
+      const shouldBeSilent = silentRoutes.some(route => url.includes(route));
+      
+      if (shouldBeSilent) {
+        error.silent = true;
+        error.isExpected = true;
+        error.message = error.message || "Voiture d'occasion introuvable";
+      }
+    }
+    
     return Promise.reject(error);
   }
 );

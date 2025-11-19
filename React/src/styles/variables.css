@@ -22,7 +22,14 @@
   --color-grey-disabled: #9E9E9E;
   
   /* ========== TYPOGRAPHIE ========== */
-  --font-family-primary: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  /* 
+   * EXPLICATION POUR ÉTUDIANT:
+   * ==========================
+   * La police 'Porsche Next' est déclarée en premier.
+   * Si elle n'est pas disponible, le navigateur utilisera les polices suivantes (fallback).
+   * C'est ce qu'on appelle une "font stack" (pile de polices).
+   */
+  --font-family-primary: 'Porsche Next', 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   
   /* Tailles de police */
   --font-size-h1: 56px;

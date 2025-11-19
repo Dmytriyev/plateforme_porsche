@@ -5,7 +5,7 @@ import authService from '../services/auth.service.jsx';
  * Contexte d'authentification
  * Gère l'état global de l'utilisateur connecté
  */
-export const AuthContext = createContext();
+export const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -61,13 +61,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  /**
-   * Mettre à jour le profil
-   */
-  const updateProfile = async (userData) => {
+  const updateProfile = async (userId, userData) => {
     try {
-      const data = await authService.updateProfile(userData);
-      setUser(data);
+      const data = await authService.updateProfile(userId, userData);
+      if (data) {
+        setUser(data);
+      }
       return { success: true, data };
     } catch (err) {
       return { success: false, error: err.message || 'Erreur de mise à jour' };

@@ -1,35 +1,35 @@
-/* Page Choix Voiture */
+/* Page Choix Voiture - Style harmonisé avec le reste de l'application */
 .choix-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
-  padding: 4rem 1rem;
+  background-color: #fff;
+  padding: 4rem 2rem;
 }
 
 .choix-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
 /* En-tête */
 .choix-header {
-  text-align: center;
-  margin-bottom: 4rem;
+  text-align: left;
+  margin-bottom: 3rem;
 }
 
 .choix-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #000;
   margin: 0 0 1rem 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .choix-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: #6b7280;
   margin: 0;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  line-height: 1.6;
 }
 
 /* Grille de choix */
@@ -38,30 +38,103 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 3rem;
   margin-bottom: 4rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Cartes de choix */
+/* Cartes de choix - Style harmonisé avec CatalogueModeles et Home */
 .choix-card {
-  background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
-  border: 3px solid #e5e7eb;
-  border-radius: 1.5rem;
-  padding: 3rem 2rem;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 0;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-align: center;
+  text-align: left;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Image générale de la carte - Style harmonisé */
+.choix-card-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #f3f4f6;
+  position: relative;
+  overflow: hidden;
+  display: flex;
   align-items: center;
-  gap: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  justify-content: center;
+  min-height: 300px;
+}
+
+.choix-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+.choix-card-image-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #9ca3af;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.choix-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Contenu de la carte (après l'image) - Style harmonisé */
+.choix-card > *:not(.choix-card-image) {
+  padding: 0 1.5rem;
+}
+
+.choix-card > .choix-card-title {
+  padding-top: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.choix-card > .choix-card-description {
+  padding-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.choix-card > .choix-card-cta {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 100%;
+  text-align: center;
 }
 
 .choix-card:hover,
 .choix-card-hover {
   border-color: #000;
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(135deg, #fff 0%, #fff 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+}
+
+.choix-card:hover .choix-card-image img,
+.choix-card-hover .choix-card-image img {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
 }
 
 .choix-card-icon {
@@ -70,14 +143,15 @@
 }
 
 .choix-card-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #000;
   margin: 0;
+  line-height: 1.2;
 }
 
 .choix-card-description {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #6b7280;
   margin: 0;
   line-height: 1.6;
@@ -103,20 +177,26 @@
 }
 
 .choix-card-cta {
-  margin-top: 1rem;
-  padding: 1rem 2rem;
+  margin-top: 0;
+  padding: 0.875rem 1.5rem;
   background-color: #000;
   color: #fff;
-  border-radius: 0.75rem;
-  font-size: 1.125rem;
+  border-radius: 4px;
+  font-size: 1rem;
   font-weight: 600;
   transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 
 .choix-card:hover .choix-card-cta,
 .choix-card-hover .choix-card-cta {
   background-color: #1f2937;
-  transform: scale(1.05);
 }
 
 /* Information complémentaire */

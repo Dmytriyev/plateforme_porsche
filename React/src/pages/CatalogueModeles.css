@@ -57,6 +57,13 @@
   gap: 2rem;
 }
 
+/* Grille pour les neuves - 2 colonnes égales */
+.catalogue-modeles-grid-neuf {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 /* Carte modèle */
 .catalogue-modele-card {
   background-color: #fff;
@@ -75,6 +82,53 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
+/* Carte modèle neuf - Design spécifique */
+.catalogue-modele-card-neuf {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.catalogue-modele-card-neuf:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Carte modèle occasion - Design style Finder Porsche */
+.catalogue-modele-card-occasion {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.catalogue-modele-card-occasion:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: #000;
+}
+
+/* Header avec nom et badge */
+.catalogue-modele-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+}
+
+.catalogue-modele-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.catalogue-modele-fuel-badge {
+  background-color: #e5e7eb;
+  color: #000;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 /* Image */
 .catalogue-modele-image-container {
   position: relative;
@@ -82,6 +136,15 @@
   aspect-ratio: 16/9;
   background-color: #f3f4f6;
   overflow: hidden;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.catalogue-modele-card-neuf .catalogue-modele-image-container {
+  padding: 1rem 1.5rem;
+  min-height: 300px;
 }
 
 .catalogue-modele-image {
@@ -94,6 +157,11 @@
 
 .catalogue-modele-card:hover .catalogue-modele-image {
   transform: scale(1.05);
+}
+
+.catalogue-modele-card-neuf .catalogue-modele-image {
+  object-fit: contain;
+  max-height: 100%;
 }
 
 .catalogue-modele-placeholder {
@@ -121,6 +189,11 @@
   gap: 1rem;
 }
 
+.catalogue-modele-card-neuf .catalogue-modele-info {
+  padding: 0 1.5rem 1rem 1.5rem;
+  gap: 1rem;
+}
+
 .catalogue-modele-name {
   font-size: 1.75rem;
   font-weight: 700;
@@ -135,6 +208,84 @@
   line-height: 1.5;
 }
 
+.catalogue-modele-card-neuf .catalogue-modele-description {
+  font-size: 0.9375rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* Spécifications pour les neuves */
+.catalogue-modele-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.catalogue-modele-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.catalogue-modele-spec-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.catalogue-modele-spec-value {
+  color: #000;
+  font-weight: 600;
+}
+
+.catalogue-modele-annee {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  font-weight: 500;
+}
+
+.catalogue-modele-annee-inline {
+  font-size: 1.25rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.catalogue-modele-prix {
+  font-size: 1rem;
+  color: #000;
+  margin: 0;
+  font-weight: 700;
+}
+
+.catalogue-modele-carrosseries {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  font-weight: 500;
+}
+
+.catalogue-modele-carrosserie {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.catalogue-modele-puissance {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.catalogue-modele-variantes {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
 .catalogue-modele-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -144,6 +295,12 @@
   font-weight: 600;
   color: #374151;
   width: fit-content;
+}
+
+.catalogue-modele-badge-disponible {
+  background-color: #10b981;
+  color: #fff;
+  margin-top: 0.5rem;
 }
 
 /* CTA */
@@ -159,6 +316,25 @@
 
 .catalogue-modele-card:hover .catalogue-modele-cta {
   background-color: #1f2937;
+}
+
+/* Styles spécifiques pour les occasions */
+.catalogue-modele-prix-occasion {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0.5rem 0;
+}
+
+.catalogue-modele-count-occasion {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.catalogue-modele-card-neuf .catalogue-modele-cta {
+  margin-top: auto;
+  border-radius: 0;
 }
 
 /* Message vide */
@@ -177,13 +353,37 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .catalogue-modeles-grid-neuf {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogue-modeles-grid-occasion {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .catalogue-modeles-grid-occasion {
+    grid-template-columns: 1fr;
+  }
+
   .catalogue-modeles-title {
     font-size: 2rem;
   }
 
   .catalogue-modeles-grid {
     grid-template-columns: 1fr;
+  }
+
+  .catalogue-modele-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .catalogue-modele-card-neuf .catalogue-modele-image-container {
+    min-height: 250px;
   }
 }
 

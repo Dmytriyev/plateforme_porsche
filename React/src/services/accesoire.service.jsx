@@ -1,28 +1,22 @@
 import apiClient from '../config/api.jsx';
 
-/**
- * Service de gestion des accessoires
- * Correspond à l'endpoint /accesoire du backend
- */
 const accesoireService = {
-  /**
-   * Récupérer tous les accessoires avec photos et couleurs
-   * @returns {Promise} Liste des accessoires
-   */
   getAllAccessoires: async () => {
     try {
       const response = await apiClient.get('/accesoire/all');
-      return response.data;
+      if (response.data && response.data.success && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      }
+      return response.data || [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer un accessoire par ID
-   * @param {string} id - ID de l'accessoire
-   * @returns {Promise} Détails de l'accessoire
-   */
   getAccessoireById: async (id) => {
     try {
       const response = await apiClient.get(`/accesoire/${id}`);
@@ -32,24 +26,22 @@ const accesoireService = {
     }
   },
 
-  /**
-   * Filtrer les accessoires par type
-   * @param {string} type - Type d'accessoire
-   * @returns {Promise} Liste filtrée
-   */
   getAccessoiresByType: async (type) => {
     try {
-      const response = await apiClient.get(`/accesoire/search?type=${type}`);
-      return response.data;
+      const response = await apiClient.get(`/accesoire/search?type_accesoire=${encodeURIComponent(type)}`);
+      if (response.data && Array.isArray(response.data.accesoires)) {
+        return response.data.accesoires;
+      } else if (response.data && response.data.success && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  /**
-   * Récupérer les types d'accessoires disponibles
-   * @returns {Promise} Liste des types
-   */
   getAvailableTypes: async () => {
     try {
       const response = await apiClient.get('/accesoire/types');
@@ -59,11 +51,6 @@ const accesoireService = {
     }
   },
 
-  /**
-   * Recherche d'accessoires avec critères multiples
-   * @param {Object} params - Paramètres de recherche (type, prix_min, prix_max, etc.)
-   * @returns {Promise} Liste filtrée
-   */
   searchAccessoires: async (params) => {
     try {
       const queryString = new URLSearchParams(params).toString();
@@ -74,10 +61,6 @@ const accesoireService = {
     }
   },
 
-  /**
-   * Récupérer toutes les couleurs d'accessoires
-   * @returns {Promise} Liste des couleurs
-   */
   getCouleurs: async () => {
     try {
       const response = await apiClient.get('/couleur_accesoire');
@@ -87,13 +70,6 @@ const accesoireService = {
     }
   },
 
-  // ==================== ROUTES PROTÉGÉES ====================
-
-  /**
-   * Créer un nouvel accessoire (ADMIN)
-   * @param {Object} data - Données de l'accessoire
-   * @returns {Promise} Accessoire créé
-   */
   createAccessoire: async (data) => {
     try {
       const response = await apiClient.post('/accesoire/new', data);
@@ -103,12 +79,6 @@ const accesoireService = {
     }
   },
 
-  /**
-   * Mettre à jour un accessoire (ADMIN)
-   * @param {string} id - ID de l'accessoire
-   * @param {Object} data - Nouvelles données
-   * @returns {Promise} Accessoire mis à jour
-   */
   updateAccessoire: async (id, data) => {
     try {
       const response = await apiClient.put(`/accesoire/update/${id}`, data);
@@ -118,11 +88,6 @@ const accesoireService = {
     }
   },
 
-  /**
-   * Supprimer un accessoire (ADMIN)
-   * @param {string} id - ID de l'accessoire
-   * @returns {Promise} Confirmation
-   */
   deleteAccessoire: async (id) => {
     try {
       const response = await apiClient.delete(`/accesoire/delete/${id}`);

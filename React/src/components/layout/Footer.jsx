@@ -72,9 +72,9 @@ const Footer = () => {
           <div>
             <h4 className="footer-section-title">Contact</h4>
             <ul className="footer-contact">
-              <li>📞 01 23 45 67 89</li>
-              <li>📧 contact@porsche.fr</li>
-              <li>📍 Paris, France</li>
+              <li>01 23 45 67 89</li>
+              <li>contact@porsche.fr</li>
+              <li>Paris, France</li>
             </ul>
 
             {/* Réseaux sociaux */}

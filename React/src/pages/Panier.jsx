@@ -1,145 +1,392 @@
-import { Link } from 'react-router-dom';
-import { usePanier } from '../hooks/usePanier.jsx';
-import { Button, Card } from '../components/common';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.jsx';
+import { commandeService } from '../services';
+import { Loading, Alert } from '../components/common';
+import { API_URL } from '../config/api.jsx';
 import { formatPrice } from '../utils/format.js';
 import './Panier.css';
 
 /**
- * Page du panier
+ * Page Panier - Design style Porsche Shop
+ * Inspiré de: https://shop.porsche.com/
+ * 
+ * EXPLICATION POUR ÉTUDIANT:
+ * ==========================
+ * Cette page affiche le panier de l'utilisateur connecté.
+ * Le panier peut contenir :
+ * - Des accessoires (quantité modifiable, prix total)
+ * - Des voitures neuves configurées (quantité = 1, acompte uniquement)
+ * 
+ * Toutes les données proviennent de la base de données.
  */
 const Panier = () => {
-  const { articles, retirerArticle, modifierQuantite, total, viderPanier } = usePanier();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+  // Données du panier
+  const [panierData, setPanierData] = useState(null);
+  const [lignes, setLignes] = useState([]);
+  const [total, setTotal] = useState(0);
 
-  if (articles.length === 0) {
+  useEffect(() => {
+    if (user) {
+      fetchPanier();
+    }
+  }, [user]);
+
+  const fetchPanier = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const data = await commandeService.getPanier();
+      
+      // Le backend retourne { panier, lignes, nombreArticles, total, note }
+      setPanierData(data.panier || null);
+      setLignes(Array.isArray(data.lignes) ? data.lignes : []);
+      setTotal(data.total || 0);
+    } catch (err) {
+      // Si pas de panier, c'est normal (panier vide)
+      if (err.message?.includes('Panier') || err.message?.includes('Aucun panier')) {
+        setLignes([]);
+        setTotal(0);
+      } else {
+        setError(err.message || 'Erreur lors du chargement du panier');
+        console.error(err);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateQuantite = async (ligneId, nouvelleQuantite) => {
+    if (nouvelleQuantite < 1) {
+      return;
+    }
+
+    try {
+      setError('');
+      await commandeService.updateQuantiteLigne(ligneId, nouvelleQuantite);
+      setSuccess('Quantité mise à jour');
+      setTimeout(() => setSuccess(''), 2000);
+      fetchPanier();
+    } catch (err) {
+      setError(err.message || 'Erreur lors de la mise à jour de la quantité');
+      console.error(err);
+    }
+  };
+
+  const handleSupprimerLigne = async (ligneId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir retirer cet article du panier ?')) {
+      return;
+    }
+
+    try {
+      setError('');
+      await commandeService.supprimerLignePanier(ligneId);
+      setSuccess('Article retiré du panier');
+      setTimeout(() => setSuccess(''), 2000);
+      fetchPanier();
+    } catch (err) {
+      setError(err.message || 'Erreur lors de la suppression');
+      console.error(err);
+    }
+  };
+
+  const handlePasserCommande = () => {
+    navigate('/commande/checkout');
+  };
+
+  if (!user) {
     return (
-      <div className="panier-container">
-        <div className="panier-content panier-empty">
-          <h1 className="panier-empty-title">Votre panier est vide</h1>
-          <p className="panier-empty-subtitle">
-            Découvrez nos voitures et accessoires
-          </p>
-          <div className="panier-empty-buttons">
-            <Link to="/voitures">
-              <Button>Explorer les voitures</Button>
-            </Link>
-            <Link to="/accessoires">
-              <Button variant="secondary">Voir les accessoires</Button>
-            </Link>
-          </div>
-        </div>
+      <div className="panier-error">
+        <p>Vous devez être connecté pour accéder à votre panier</p>
+        <button onClick={() => navigate('/login')}>Se connecter</button>
       </div>
     );
   }
 
-  return (
-    <div className="panier-container">
-      <div className="panier-content">
-        <h1 className="panier-title">Mon panier</h1>
+  if (loading) {
+    return <Loading fullScreen message="Chargement de votre panier..." />;
+  }
 
-        <div className="panier-grid">
+  // Calculer le nombre total d'articles
+  const nombreArticles = lignes.reduce((sum, ligne) => sum + (ligne.quantite || 1), 0);
+
+  return (
+    <div className="panier-container-porsche">
+      {/* Lien retour */}
+      <div className="panier-back-link">
+        <Link to="/" className="panier-back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Continuer les achats
+        </Link>
+      </div>
+
+      {/* Titre */}
+      <h1 className="panier-title-porsche">Mon panier</h1>
+
+      {/* Messages */}
+      {error && (
+        <div className="panier-messages">
+          <Alert variant="error">{error}</Alert>
+        </div>
+      )}
+      {success && (
+        <div className="panier-messages">
+          <Alert variant="success">{success}</Alert>
+        </div>
+      )}
+
+      {lignes.length === 0 ? (
+        <div className="panier-empty-porsche">
+          <p className="panier-empty-text">Votre panier est vide</p>
+          <div className="panier-empty-buttons">
+            <Link to="/catalogue/neuve" className="panier-empty-btn">
+              Parcourir les voitures
+            </Link>
+            <Link to="/accessoires" className="panier-empty-btn">
+              Voir les accessoires
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="panier-layout-porsche">
           {/* Liste des articles */}
-          <div className="panier-articles">
-            {articles.map((article) => (
-              <Card key={article.id} padding="md">
-                <div className="panier-article">
-                  {/* Image placeholder */}
-                  <div className="panier-article-image" />
+          <div className="panier-articles-porsche">
+            {lignes.map((ligne) => {
+              const isVoiture = ligne.type_produit === true;
+              const produit = isVoiture ? ligne.model_porsche_id : ligne.accesoire;
+              
+              if (!produit) return null;
+
+              // Récupérer les photos
+              let photos = [];
+              if (isVoiture && ligne.model_porsche_id?.photo_porsche) {
+                photos = Array.isArray(ligne.model_porsche_id.photo_porsche)
+                  ? ligne.model_porsche_id.photo_porsche.filter(p => p && (p.name || p._id))
+                  : [];
+              } else if (!isVoiture && ligne.accesoire?.photo_accesoire) {
+                photos = Array.isArray(ligne.accesoire.photo_accesoire)
+                  ? ligne.accesoire.photo_accesoire.filter(p => p && (p.name || p._id))
+                  : [];
+              }
+
+              const photoPrincipale = photos.length > 0 ? photos[0] : null;
+
+              // Prix à afficher : acompte pour voiture, prix total pour accessoire
+              const prixAAfficher = isVoiture ? (ligne.acompte || 0) : (ligne.prix || 0);
+              const prixTotalLigne = prixAAfficher * (ligne.quantite || 1);
+
+              return (
+                <article key={ligne._id} className="panier-article-card-porsche">
+                  {/* Bouton supprimer */}
+                  <button
+                    className="panier-article-remove-porsche"
+                    onClick={() => handleSupprimerLigne(ligne._id)}
+                    aria-label="Retirer du panier"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+
+                  {/* Image */}
+                  <div className="panier-article-image-porsche">
+                    {photoPrincipale && photoPrincipale.name ? (
+                      <img
+                        src={photoPrincipale.name?.startsWith('http')
+                          ? photoPrincipale.name
+                          : photoPrincipale.name?.startsWith('/')
+                            ? `${API_URL}${photoPrincipale.name}`
+                            : `${API_URL}/${photoPrincipale.name}`}
+                        alt={isVoiture ? produit.nom_model : produit.nom_accesoire}
+                        className="panier-article-img-porsche"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          if (e.target.nextSibling) {
+                            e.target.nextSibling.style.display = 'flex';
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="panier-article-placeholder-porsche"
+                      style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
+                    >
+                      <span className="panier-article-letter-porsche">
+                        {isVoiture 
+                          ? produit.nom_model?.charAt(0) || 'P'
+                          : produit.nom_accesoire?.charAt(0) || 'A'
+                        }
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Détails */}
-                  <div className="panier-article-details">
-                    <h3 className="panier-article-title">
-                      {article.type === 'voiture'
-                        ? article.voiture?.nom_model
-                        : article.accessoire?.nom}
+                  <div className="panier-article-details-porsche">
+                    <h3 className="panier-article-name-porsche">
+                      {isVoiture ? produit.nom_model : produit.nom_accesoire}
                     </h3>
 
-                    {article.type === 'voiture' && article.configuration && (
-                      <div className="panier-article-config">
-                        {article.configuration.couleurExterieur && (
-                          <p>Couleur: {article.configuration.couleurExterieur.nom}</p>
+                    {/* Attributs pour accessoire */}
+                    {!isVoiture && ligne.accesoire && (
+                      <div className="panier-article-attributes-porsche">
+                        {ligne.accesoire.couleur_accesoire && (
+                          <div className="panier-attribute-item-porsche">
+                            <span className="panier-attribute-label-porsche">Couleur:</span>
+                            <div className="panier-attribute-value-porsche">
+                              <span 
+                                className="panier-color-swatch-porsche"
+                                style={{ backgroundColor: ligne.accesoire.couleur_accesoire.nom_couleur === 'Rouge' ? '#dc2626' : '#9ca3af' }}
+                              />
+                              {ligne.accesoire.couleur_accesoire.nom_couleur}
+                            </div>
+                          </div>
                         )}
-                        {article.configuration.jantes && (
-                          <p>Jantes: {article.configuration.jantes.taille}</p>
+                        {ligne.accesoire.type_accesoire && (
+                          <div className="panier-attribute-item-porsche">
+                            <span className="panier-attribute-label-porsche">Matériau:</span>
+                            <span className="panier-attribute-value-porsche">
+                              {ligne.accesoire.description || 'N/A'}
+                            </span>
+                          </div>
                         )}
-                      </div>
-                    )}
-
-                    {article.type === 'accessoire' && (
-                      <div className="panier-quantity-control">
-                        <label className="panier-quantity-label">Quantité:</label>
-                        <div className="panier-quantity-buttons">
-                          <button
-                            onClick={() => modifierQuantite(article.id, article.quantite - 1)}
-                            className="panier-quantity-btn"
-                          >
-                            -
-                          </button>
-                          <span className="panier-quantity-value">{article.quantite}</span>
-                          <button
-                            onClick={() => modifierQuantite(article.id, article.quantite + 1)}
-                            className="panier-quantity-btn"
-                          >
-                            +
-                          </button>
+                        <div className="panier-attribute-item-porsche">
+                          <span className="panier-attribute-label-porsche">Taille:</span>
+                          <span className="panier-attribute-value-porsche">Taille unique</span>
                         </div>
                       </div>
                     )}
 
-                    <div className="panier-article-footer">
-                      <p className="panier-article-price">
-                        {formatPrice(article.prix * (article.quantite || 1))}
-                      </p>
-                      <button
-                        onClick={() => retirerArticle(article.id)}
-                        className="panier-remove-btn"
-                      >
-                        Retirer
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                    {/* Configuration pour voiture */}
+                    {isVoiture && ligne.model_porsche_id && (
+                      <div className="panier-article-attributes-porsche">
+                        {ligne.model_porsche_id.couleur_exterieur && (
+                          <div className="panier-attribute-item-porsche">
+                            <span className="panier-attribute-label-porsche">Couleur extérieure:</span>
+                            <span className="panier-attribute-value-porsche">
+                              {ligne.model_porsche_id.couleur_exterieur.nom_couleur}
+                            </span>
+                          </div>
+                        )}
+                        {ligne.model_porsche_id.type_carrosserie && (
+                          <div className="panier-attribute-item-porsche">
+                            <span className="panier-attribute-label-porsche">Carrosserie:</span>
+                            <span className="panier-attribute-value-porsche">
+                              {ligne.model_porsche_id.type_carrosserie}
+                            </span>
+                          </div>
+                        )}
+                        {isVoiture && (
+                          <div className="panier-attribute-item-porsche">
+                            <span className="panier-attribute-label-porsche">Acompte:</span>
+                            <span className="panier-attribute-value-porsche">
+                              {formatPrice(ligne.acompte || 0)} (10% du prix total)
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-            <button
-              onClick={viderPanier}
-              className="panier-clear-btn"
-            >
-              Vider le panier
-            </button>
+                    {/* Sélecteur de quantité (uniquement pour accessoires) */}
+                    {!isVoiture && (
+                      <div className="panier-quantity-porsche">
+                        <button
+                          className="panier-quantity-btn-porsche"
+                          onClick={() => handleUpdateQuantite(ligne._id, (ligne.quantite || 1) - 1)}
+                          disabled={ligne.quantite <= 1}
+                        >
+                          -
+                        </button>
+                        <span className="panier-quantity-value-porsche">{ligne.quantite || 1}</span>
+                        <button
+                          className="panier-quantity-btn-porsche"
+                          onClick={() => handleUpdateQuantite(ligne._id, (ligne.quantite || 1) + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Prix */}
+                  <div className="panier-article-price-porsche">
+                    {formatPrice(prixTotalLigne)}
+                  </div>
+                </article>
+              );
+            })}
+
+            {/* Message d'information */}
+            <div className="panier-info-porsche">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-info-icon-porsche">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+              <span>Les produits dans votre panier ne sont pas réservés.</span>
+            </div>
           </div>
 
-          {/* Résumé */}
-          <div>
-            <Card padding="lg" className="panier-summary">
-              <h2 className="panier-summary-title">Résumé</h2>
+          {/* Résumé de commande */}
+          <aside className="panier-summary-porsche">
+            <div className="panier-summary-card-porsche">
+              <h2 className="panier-summary-title-porsche">Montant total</h2>
+              <div className="panier-summary-total-porsche">
+                {formatPrice(total)}
+                <span className="panier-summary-ttc-porsche">T.T.C.</span>
+              </div>
 
-              <div className="panier-summary-details">
-                <div className="panier-summary-row">
-                  <span>Sous-total</span>
+              {/* Utiliser un bon d'achat */}
+              <button className="panier-voucher-link-porsche">
+                Utiliser un bon d'achat
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+
+              {/* Bouton passer commande */}
+              <button
+                className="panier-checkout-btn-porsche"
+                onClick={handlePasserCommande}
+              >
+                Passer la commande
+              </button>
+
+              {/* Détails */}
+              <div className="panier-summary-details-porsche">
+                <div className="panier-summary-detail-item-porsche">
+                  <span>{nombreArticles} produit{nombreArticles > 1 ? 's' : ''}</span>
                   <span>{formatPrice(total)}</span>
                 </div>
-                <div className="panier-summary-row">
-                  <span>Livraison</span>
-                  <span>Gratuite</span>
-                </div>
-                <div className="panier-summary-total">
-                  <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                <div className="panier-summary-detail-item-porsche">
+                  <span>Emballage et expédition</span>
+                  <span className="panier-shipping-free-porsche">gratuit</span>
                 </div>
               </div>
 
-              <Button fullWidth size="lg">
-                Passer la commande
-              </Button>
-
-              <p className="panier-summary-info">
-                Paiement sécurisé avec Stripe
-              </p>
-            </Card>
-          </div>
+              {/* Sécurité */}
+              <div className="panier-security-porsche">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-security-icon-porsche">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <div className="panier-security-text-porsche">
+                  <span className="panier-security-title-porsche">Cryptage SSL</span>
+                  <span className="panier-security-subtitle-porsche">Vos données sont sécurisées</span>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      )}
     </div>
   );
 };

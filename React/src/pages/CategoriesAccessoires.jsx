@@ -47,9 +47,15 @@ const CategoriesAccessoires = () => {
       } else {
         // Fallback: charger tous les accessoires (ancien comportement)
         const allAccessoires = await accesoireService.getAllAccessoires();
+        
+        if (!Array.isArray(allAccessoires)) {
+          setCategories([]);
+          return;
+        }
+        
         const categoriesMap = {};
         allAccessoires.forEach(acc => {
-          if (acc.type_accesoire) {
+          if (acc && acc.type_accesoire) {
             if (!categoriesMap[acc.type_accesoire]) {
               categoriesMap[acc.type_accesoire] = {
                 type: acc.type_accesoire,

@@ -17,6 +17,20 @@ export const formatPrice = (prix) => {
 };
 
 /**
+ * Formater un prix mensuel en euros avec décimales
+ * @param {number} prix - Prix mensuel à formater
+ * @returns {string} Prix formaté avec 2 décimales
+ */
+export const formatPriceMonthly = (prix) => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(prix);
+};
+
+/**
  * Formater une date
  * @param {string|Date} date - Date à formater
  * @returns {string} Date formatée

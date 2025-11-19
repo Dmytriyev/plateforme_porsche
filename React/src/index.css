@@ -1,6 +1,25 @@
 @import "tailwindcss";
 @import "flowbite";
 
+/* ========== POLICES PERSONNALISÉES ========== */
+/**
+ * EXPLICATION POUR ÉTUDIANT:
+ * ==========================
+ * @font-face permet de déclarer une police personnalisée.
+ * - font-family: nom de la police (à utiliser dans CSS)
+ * - src: chemin vers le fichier de police
+ * - format: format du fichier (opentype pour .otf)
+ * - font-weight: graisse de la police (400 = normal, 700 = bold)
+ * - font-style: style (normal, italic)
+ */
+@font-face {
+  font-family: 'Porsche Next';
+  src: url('./fonts/porsche-next.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Affiche le texte immédiatement avec une police de secours, puis remplace par la police personnalisée */
+}
+
 /* Reset et base selon charte Porsche */
 * {
   margin: 0;
@@ -13,8 +32,8 @@ body {
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-relaxed);
-  color: var(--color-anthracite);
-  background-color: var(--color-white);
+  color: var(--color-black);
+  background-color: #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -69,11 +88,6 @@ a:hover {
   }
 }
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 #root {
   min-height: 100vh;

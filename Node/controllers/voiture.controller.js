@@ -524,6 +524,94 @@ const getVoituresOccasionFinder = async (req, res) => {
   }
 };
 
+// Page explicative complète d'une voiture model-start (911, Cayman, Cayenne)
+// Retourne toutes les informations nécessaires pour afficher une page détaillée
+const getVoiturePage = async (req, res) => {
+  try {
+    const voitureId = req.params.id;
+    
+    // Récupérer la voiture avec ses photos
+    const voiture = await Voiture.findById(voitureId)
+      .populate("photo_voiture", "name alt")
+      .lean();
+    
+    if (!voiture) {
+      return sendNotFound(res, "Gamme de voiture introuvable");
+    }
+
+    // Import dynamique pour éviter les dépendances circulaires
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+
+    // Récupérer toutes les variantes disponibles pour cette voiture
+    const variantes = await Model_porsche.find({ 
+      voiture: voitureId,
+      disponible: true 
+    })
+      .select("nom_model type_carrosserie description specifications prix_base photo_porsche")
+      .populate("photo_porsche", "name alt")
+      .sort({ prix_base: 1 })
+      .lean();
+
+    // Calculer les statistiques agrégées
+    const prixMin = variantes.length > 0 
+      ? Math.min(...variantes.map(v => v.prix_base || 0).filter(p => p > 0))
+      : 0;
+    
+    const carrosseries = [...new Set(variantes.map(v => v.type_carrosserie).filter(Boolean))];
+    
+    const transmissions = new Set();
+    variantes.forEach(v => {
+      const trans = v.specifications?.transmission || "";
+      if (trans.includes("PDK") || trans.includes("Automatique")) transmissions.add("Automatique");
+      if (trans.includes("Manuelle")) transmissions.add("Manuelle");
+    });
+
+    // Formater la réponse pour la page explicative
+    const pageData = {
+      voiture: {
+        _id: voiture._id,
+        nom_model: voiture.nom_model,
+        type_voiture: voiture.type_voiture,
+        description: voiture.description,
+        photos: voiture.photo_voiture || [],
+        createdAt: voiture.createdAt,
+        updatedAt: voiture.updatedAt,
+      },
+      statistiques: {
+        nombre_variantes: variantes.length,
+        prix_depuis: prixMin,
+        carrosseries_disponibles: carrosseries,
+        transmissions_disponibles: Array.from(transmissions),
+      },
+      variantes: variantes.map(v => ({
+        _id: v._id,
+        nom_model: v.nom_model,
+        type_carrosserie: v.type_carrosserie,
+        prix_base: v.prix_base,
+        description: v.description || "",
+        specifications: {
+          puissance: v.specifications?.puissance || 0,
+          transmission: v.specifications?.transmission || "N/A",
+          acceleration_0_100: v.specifications?.acceleration_0_100 || 0,
+        },
+        photo_principale: v.photo_porsche && v.photo_porsche.length > 0 
+          ? v.photo_porsche[0] 
+          : null,
+        nombre_photos: v.photo_porsche ? v.photo_porsche.length : 0,
+      })),
+    };
+
+    return sendSuccess(
+      res,
+      pageData,
+      `Page explicative de la ${voiture.nom_model} récupérée avec succès`
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
 export {
   createVoiture,
   getAllVoitures,
@@ -535,4 +623,5 @@ export {
   getModelsPorscheByVoiture,
   getVoituresNeuves,
   getVoituresOccasionFinder,
+  getVoiturePage,
 };

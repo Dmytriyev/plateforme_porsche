@@ -1,0 +1,455 @@
+/* Page Occasion - Design style Finder Porsche */
+
+/* Container principal pour la liste */
+.occasion-page-container {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: #f5f5f5;
+}
+
+.occasion-page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.occasion-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+/* ========== MODE DÉTAILS - Design Finder Porsche ========== */
+.occasion-detail-container {
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* Navigation Header */
+.occasion-detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.occasion-detail-nav-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s;
+}
+
+.occasion-detail-nav-back:hover {
+  color: #666;
+}
+
+.occasion-detail-nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.occasion-detail-nav-btn {
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.occasion-detail-nav-btn:hover {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
+.occasion-detail-nav-center {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Gallery */
+.occasion-detail-gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  padding: 2rem;
+  background: #f9fafb;
+}
+
+.occasion-detail-gallery-main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.occasion-detail-main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.occasion-detail-gallery-btn {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.occasion-detail-gallery-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.occasion-detail-gallery-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.occasion-detail-thumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #e5e7eb;
+  transition: border-color 0.2s;
+  padding: 0;
+}
+
+.occasion-detail-thumbnail:hover {
+  border-color: #000;
+}
+
+.occasion-detail-thumbnail.active {
+  border-color: #000;
+}
+
+.occasion-detail-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Main Content */
+.occasion-detail-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Left Column */
+.occasion-detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.occasion-detail-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.occasion-detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.occasion-detail-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #000;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.occasion-detail-availability {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.occasion-detail-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.occasion-detail-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.occasion-detail-spec-item:last-child {
+  border-bottom: none;
+}
+
+.occasion-detail-spec-label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.occasion-detail-spec-value-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.occasion-detail-spec-value {
+  font-size: 1rem;
+  color: #000;
+  font-weight: 600;
+}
+
+.occasion-detail-color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.occasion-detail-description {
+  margin-top: 2rem;
+}
+
+.occasion-detail-description-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.occasion-detail-description-text {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Right Column */
+.occasion-detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.occasion-detail-price-box {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.occasion-detail-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.occasion-detail-price-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.occasion-detail-price-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.occasion-detail-financing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.occasion-detail-financing-link {
+  color: #000;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.occasion-detail-financing-link:hover {
+  color: #666;
+}
+
+.occasion-detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.occasion-detail-action-btn {
+  width: 100%;
+}
+
+.occasion-detail-save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.occasion-detail-save-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.occasion-detail-dealer {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.occasion-detail-dealer-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.occasion-detail-dealer-link {
+  color: #000;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.occasion-detail-dealer-link:hover {
+  color: #666;
+}
+
+.occasion-detail-vehicle-number {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.occasion-detail-copy-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.occasion-detail-copy-btn:hover {
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .occasion-detail-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .occasion-detail-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+
+  .occasion-detail-nav {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .occasion-detail-nav-center {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .occasion-detail-title {
+    font-size: 1.5rem;
+  }
+
+  .occasion-detail-gallery {
+    padding: 1rem;
+  }
+
+  .occasion-detail-content {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ========== MODE LISTE - Styles existants ========== */
+/* (Conserver les styles existants pour la liste) */

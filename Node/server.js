@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import db from "./db/db.js";
 import path from "node:path";
 import rateLimit from "express-rate-limit";
@@ -9,7 +10,7 @@ import helmet from "helmet";
 
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
-import logger from "./utils/logger.js";
+// logger removed: use console for simple logging
 import errorMiddleware from "./middlewares/error.js";
 
 import userRoutes from "./routes/user.route.js";
@@ -41,18 +42,20 @@ const __dirname = path.dirname(__filename);
 
 // Création de l'application express et port par défaut
 const app = express();
+// Configurer trust proxy si déployé derrière un reverse proxy (ex: Heroku, nginx)
+app.set(
+  "trust proxy",
+  process.env.TRUST_PROXY === "1" || process.env.TRUST_PROXY === "true"
+);
 const port = process.env.PORT || 3000;
 
 // Connexion à la base de données MongoDB
 db();
 
 // Configuration CORS sécurisée
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173',
-].filter(Boolean).map((url) => url.replace(/\/$/, "")); // retirer le slash final
+const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:5173"]
+  .filter(Boolean)
+  .map((url) => url.replace(/\/$/, "")); // retirer le slash final
 
 // Options CORS personnalisées
 const corsOptions = {
@@ -65,7 +68,10 @@ const corsOptions = {
       callback(null, true);
     } else {
       // En développement, autoriser localhost
-      if (normalizedOrigin.startsWith('http://localhost') || normalizedOrigin.startsWith('http://127.0.0.1')) {
+      if (
+        normalizedOrigin.startsWith("http://localhost") ||
+        normalizedOrigin.startsWith("http://127.0.0.1")
+      ) {
         return callback(null, true);
       }
       // Rejeter les origines non autorisées
@@ -83,15 +89,17 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Autorise les requêtes entre origines CORS
 
 // Helmet avec configuration pour permettre le chargement des images
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // Permet le chargement des images depuis d'autres origines
-  crossOriginEmbedderPolicy: false, // Désactive pour compatibilité avec les images
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Permet le chargement des images depuis d'autres origines
+    crossOriginEmbedderPolicy: false, // Désactive pour compatibilité avec les images
+  })
+);
 
 // Limiteur global pour éviter le DDoS attaques
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // fenêtre de 15 minutes
-  max: 100, // max 100 requêtes par IP
+  max: 1000, // max 100 requêtes par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -100,7 +108,7 @@ const globalLimiter = rateLimit({
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // max 10 tentatives par IP
+  max: 100, // max 10 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -109,31 +117,34 @@ const loginLimiter = rateLimit({
 // Limiteur pour les inscriptions utilisateurs
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 5, // max 5 inscriptions par IP
+  max: 50, // max 5 inscriptions par IP
   message: "Trop d'inscriptions, réessayez plus tard",
 });
 
 // Limiteur pour les endpoints de paiement
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 20, // max 20 tentatives de paiement par IP
+  max: 200, // max 20 tentatives de paiement par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 // Limiteur pour uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50, // max 50 uploads par IP
+  max: 500, // max 50 uploads par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
-// Stripe webhook : on parser le body
+// Activer compression pour réduire la taille des réponses
+app.use(compression());
+
+// Stripe webhook : on parser le body (raw required by Stripe)
 app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 
-// Parser JSON pour le reste des endpoints
-app.use(express.json());
+// Parser JSON pour le reste des endpoints (limiter la taille des bodies)
+app.use(express.json({ limit: "100kb" }));
 // Parser des bodies encodés en application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 // Note: mongoSanitize désactivé temporairement (conflit version Express)
 // La protection NoSQL est assurée par la validation Joi sur toutes les routes
@@ -141,8 +152,11 @@ app.use(express.urlencoded({ extended: true }));
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);
 
-// Dossier statique les fichiers uploadés
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Dossier statique pour les fichiers uploadés avec cache côté client
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), { maxAge: "7d", etag: false })
+);
 
 // Route racine
 app.get("/", (req, res) => {
@@ -182,33 +196,40 @@ app.use(errorMiddleware);
 
 // Démarrage du serveur
 const server = app.listen(port, () => {
-  logger.info(`Le serveur est démarré sur le port ${port}`);
+  console.log(`Le serveur est démarré sur le port ${port}`);
 });
 // Gestion de l'arrêt du serveur
 const gracefulShutdown = (signal, err) => {
-  logger.warn(`Received ${signal}. Shutting down gracefully...`);
+  console.warn(`Received ${signal}. Shutting down gracefully...`);
   if (err)
-    logger.error("Shutdown reason", { stack: err.stack || err.message || err });
+    console.error(
+      "Shutdown reason",
+      err && (err.stack || err.message) ? err.stack || err.message : err
+    );
   server.close(() => {
-    logger.info("Closed out remaining connections");
+    console.log("Closed out remaining connections");
     process.exit(err ? 1 : 0);
   });
   // si après 20s toujours pas fermé, forcer la sortie
   setTimeout(() => {
-    logger.error("Forcing shutdown");
+    console.error("Forcing shutdown");
     process.exit(1);
   }, 20000).unref();
 };
 
 // Capturer les erreurs non gérées
 process.on("unhandledRejection", (reason) => {
-  logger.error("Unhandled Rejection", {
-    reason: (reason && (reason.stack || reason.message)) || String(reason),
-  });
+  console.error(
+    "Unhandled Rejection",
+    (reason && (reason.stack || reason.message)) || String(reason)
+  );
   gracefulShutdown("unhandledRejection", reason);
 });
 // Capturer les exceptions non gérées
 process.on("uncaughtException", (err) => {
-  logger.error("Uncaught Exception", { stack: err.stack || err.message });
+  console.error(
+    "Uncaught Exception",
+    err && (err.stack || err.message) ? err.stack || err.message : err
+  );
   gracefulShutdown("uncaughtException", err);
 });

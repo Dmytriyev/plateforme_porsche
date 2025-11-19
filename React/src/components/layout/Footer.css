@@ -1,8 +1,8 @@
-/* Footer Component Styles */
+/* Footer Component Styles - Charte Graphique Porsche */
 
 .footer {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
 }
 
 .footer-container {
@@ -28,8 +28,8 @@
 }
 
 .footer-description {
-  color: #9ca3af;
-  line-height: 1.6;
+  color: var(--color-grey-medium);
+  line-height: var(--line-height-relaxed);
 }
 
 .footer-section-title {
@@ -48,13 +48,13 @@
 }
 
 .footer-link {
-  color: #9ca3af;
+  color: var(--color-grey-medium);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--transition-duration) var(--transition-easing);
 }
 
 .footer-link:hover {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .footer-contact {
@@ -64,7 +64,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  color: #9ca3af;
+  color: var(--color-grey-medium);
 }
 
 .footer-social {
@@ -74,12 +74,12 @@
 }
 
 .footer-social-link {
-  color: #fff;
-  transition: color 0.2s;
+  color: var(--color-white);
+  transition: color var(--transition-duration) var(--transition-easing);
 }
 
 .footer-social-link:hover {
-  color: #9ca3af;
+  color: var(--color-red-porsche);
 }
 
 .footer-social-icon {
@@ -88,11 +88,11 @@
 }
 
 .footer-copyright {
-  border-top: 1px solid #1f2937;
-  margin-top: 2rem;
-  padding-top: 2rem;
+  border-top: 1px solid var(--color-anthracite);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-grey-medium);
 }
 
 .footer-copyright p {

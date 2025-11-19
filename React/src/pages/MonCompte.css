@@ -1,89 +1,895 @@
-/* MonCompte Page Styles */
+/* Page Mon Compte - Design style Tesla/Connect Store */
+/* Inspiré de: https://connect-store.porsche.com/offer/fr/fr-FR/911_2026/products */
 
-.compte-container {
+.mon-compte-container {
   min-height: 100vh;
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 0;
+}
+
+/* Sidebar Navigation */
+.mon-compte-sidebar {
   background-color: #f9fafb;
-  padding: 3rem 0;
+  border-right: 1px solid #e5e7eb;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.compte-content {
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Message de bienvenue */
+.mon-compte-welcome {
+  padding: 2rem 1rem 1rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #fff;
 }
 
-.compte-title {
-  font-size: 2.25rem;
-  font-weight: bold;
+.mon-compte-welcome-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1rem 2rem 1rem;
+  flex: 1;
+}
+
+.mon-compte-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.mon-compte-nav-item:hover {
+  background-color: #f3f4f6;
+  color: #000;
+}
+
+.mon-compte-nav-item.active {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+}
+
+.mon-compte-nav-item svg {
+  flex-shrink: 0;
+}
+
+.mon-compte-nav-logout {
+  margin-top: 1rem;
+  color: #dc2626;
+}
+
+.mon-compte-nav-logout:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Main Content */
+.mon-compte-main {
+  padding: 3rem 4rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.mon-compte-messages {
   margin-bottom: 2rem;
 }
 
-.compte-grid {
+/* Section Title */
+.mon-compte-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 2rem 0;
+  line-height: 1.2;
+}
+
+/* Section: Mes produits */
+.mon-compte-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Bloc générique */
+.mon-compte-block {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mon-compte-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mon-compte-block-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-block-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mon-compte-block-btn {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.mon-compte-block-btn-primary {
+  background-color: #000;
+  color: #fff;
+}
+
+.mon-compte-block-btn-primary:hover {
+  background-color: #1f2937;
+}
+
+.mon-compte-block-btn-secondary {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.mon-compte-block-btn-secondary:hover {
+  background-color: #f9fafb;
+}
+
+.mon-compte-block-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.mon-compte-block-empty-text {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+.mon-compte-block-empty-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-block-empty-btn:hover {
+  background-color: #1f2937;
+}
+
+/* Liste des réservations */
+.mon-compte-reservations-list {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.mon-compte-reservation-card {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mon-compte-reservation-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mon-compte-reservation-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mon-compte-reservation-placeholder span {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.mon-compte-reservation-info {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mon-compte-reservation-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-reservation-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mon-compte-reservation-price {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-reservation-actions {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mon-compte-reservation-btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-reservation-btn-modify {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.mon-compte-reservation-btn-modify:hover {
+  background-color: #f9fafb;
+}
+
+.mon-compte-reservation-btn-delete {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+.mon-compte-reservation-btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+/* Liste des commandes */
+.mon-compte-commandes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mon-compte-commande-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mon-compte-commande-btn-modify {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.mon-compte-commande-btn-modify:hover {
+  background-color: #f9fafb;
+}
+
+/* Liste des voitures */
+.mon-compte-voitures-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.mon-compte-voiture-card {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mon-compte-voiture-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mon-compte-voiture-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mon-compte-voiture-placeholder span {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #9ca3af;
+}
+
+.mon-compte-voiture-info {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mon-compte-voiture-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-voiture-year {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mon-compte-voiture-color {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mon-compte-voiture-actions {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mon-compte-voiture-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-voiture-btn-view {
+  background-color: #000;
+  color: #fff;
+}
+
+.mon-compte-voiture-btn-view:hover {
+  background-color: #1f2937;
+}
+
+.mon-compte-voiture-btn-modify {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.mon-compte-voiture-btn-modify:hover {
+  background-color: #f9fafb;
+}
+
+.mon-compte-voiture-btn-delete {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+.mon-compte-voiture-btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+/* Ancien style pour compatibilité */
+.mon-compte-cards {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
-.compte-section-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+.mon-compte-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.compte-info-list {
+.mon-compte-card-image {
+  width: 100%;
+  height: 300px;
+  background-color: #f3f4f6;
+  position: relative;
+  overflow: hidden;
+}
+
+.mon-compte-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mon-compte-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+.mon-compte-card-placeholder-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #9ca3af;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
+
+.mon-compte-card-image-faded {
+  opacity: 0.3;
+}
+
+.mon-compte-card-placeholder-faded {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.mon-compte-card-content {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.compte-info-item label {
-  font-size: 0.875rem;
-  color: #6b7280;
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.compte-info-item p {
-  font-size: 1.125rem;
-  font-weight: 500;
+.mon-compte-card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
   margin: 0;
 }
 
-.compte-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.mon-compte-card-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
 }
 
-.compte-action-card h3 {
-  font-weight: bold;
+.mon-compte-card-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  margin-top: 0.5rem;
+}
+
+.mon-compte-card-btn:hover {
+  background-color: #1f2937;
+}
+
+.mon-compte-card-btn-add {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.mon-compte-card-btn-add:hover {
+  background-color: #f9fafb;
+}
+
+.mon-compte-card-question {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #374151;
   margin-bottom: 0.5rem;
 }
 
-.compte-action-card p {
+.mon-compte-info-icon {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* Section: Paramètres */
+.mon-compte-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.mon-compte-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mon-compte-settings-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-settings-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mon-compte-settings-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mon-compte-settings-value {
+  font-size: 1rem;
+  color: #000;
+  margin: 0;
+}
+
+.mon-compte-settings-actions {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mon-compte-settings-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-settings-btn:hover {
+  background-color: #1f2937;
+}
+
+/* Section: Mode de paiement */
+.mon-compte-payment {
+  display: flex;
+  flex-direction: column;
+}
+
+.mon-compte-payment-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.mon-compte-payment-icon {
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.mon-compte-payment-text {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+.mon-compte-payment-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-payment-btn:hover {
+  background-color: #1f2937;
+}
+
+/* Section: Historique des commandes */
+.mon-compte-commandes {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mon-compte-commande-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mon-compte-commande-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.mon-compte-commande-id {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.25rem 0;
+}
+
+.mon-compte-commande-date {
   font-size: 0.875rem;
   color: #6b7280;
   margin: 0;
 }
 
-.compte-role {
-  text-transform: capitalize;
+.mon-compte-commande-status {
+  display: flex;
+  align-items: center;
+}
+
+.mon-compte-commande-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mon-compte-commande-badge.validated {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.mon-compte-commande-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.mon-compte-commande-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mon-compte-commande-total-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.mon-compte-commande-total-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.mon-compte-commande-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  align-self: flex-start;
+}
+
+.mon-compte-commande-btn:hover {
+  background-color: #f9fafb;
+}
+
+/* Empty State */
+.mon-compte-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.mon-compte-empty-text {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+}
+
+.mon-compte-empty-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mon-compte-empty-btn:hover {
+  background-color: #1f2937;
+}
+
+/* Error State */
+.mon-compte-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.mon-compte-error p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.mon-compte-error button {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* Responsive */
-@media (min-width: 640px) {
-  .compte-content {
-    padding: 0 1.5rem;
+@media (max-width: 968px) {
+  .mon-compte-container {
+    grid-template-columns: 1fr;
+  }
+
+  .mon-compte-sidebar {
+    position: relative;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .mon-compte-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  .mon-compte-nav-item {
+    white-space: nowrap;
+  }
+
+  .mon-compte-main {
+    padding: 2rem 1.5rem;
+  }
+
+  .mon-compte-title {
+    font-size: 1.5rem;
   }
 }
 
-@media (min-width: 1024px) {
-  .compte-content {
-    padding: 0 2rem;
+@media (max-width: 768px) {
+  .mon-compte-card-image {
+    height: 200px;
   }
-  
-  .compte-grid {
-    grid-template-columns: 2fr 1fr;
+
+  .mon-compte-commande-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mon-compte-block-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mon-compte-block-actions {
+    width: 100%;
+  }
+
+  .mon-compte-block-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mon-compte-reservations-list,
+  .mon-compte-voitures-list {
+    grid-template-columns: 1fr;
+  }
+
+  .mon-compte-reservation-actions,
+  .mon-compte-voiture-actions {
+    flex-direction: column;
+  }
+
+  .mon-compte-reservation-btn,
+  .mon-compte-voiture-btn {
+    width: 100%;
   }
 }
-

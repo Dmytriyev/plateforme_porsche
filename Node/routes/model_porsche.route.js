@@ -20,6 +20,8 @@ import {
   getAllVariantes,
   getModelPorscheOccasions,
   getModelPorscheNeuves,
+  getModelPorschePage,
+  getOccasionPage,
 } from "../controllers/model_porsche.controller.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
@@ -61,6 +63,8 @@ router.get(
   validateObjectId("voiture_id"), // id de la voiture
   getConfigurationsByVoiture
 ); // récupérer configurations d'une voiture spécifique (avec couleurs, jantes, accessoires)
+router.get("/page/:id", validateObjectId("id"), getModelPorschePage); // Page explicative complète d'une variante
+router.get("/occasion/page/:id", validateObjectId("id"), getOccasionPage); // Page explicative complète d'une voiture d'occasion
 // Route paramétrée id (doit être après les routes plus spécifiques)
 router.get("/:id", validateObjectId("id"), getModel_porscheById);
 
