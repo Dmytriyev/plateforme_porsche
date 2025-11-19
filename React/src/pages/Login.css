@@ -1,73 +1,163 @@
-/* Login Page Styles */
+/* Login Page Styles - Style Porsche */
 
-.login-container {
+.login-container-porsche {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: #fff;
   padding: 3rem 1rem;
 }
 
-.login-form-wrapper {
+.login-form-wrapper-porsche {
   max-width: 28rem;
   width: 100%;
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.login-form-card-porsche {
+  background-color: #fff;
+  padding: 0;
+  width: 100%;
 }
 
-.login-title {
-  font-size: 1.875rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+/* Titre */
+.login-title-porsche {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 2rem 0;
+  text-align: left;
 }
 
-.login-subtitle {
-  color: #6b7280;
-}
-
-.login-error {
+/* Message d'erreur */
+.login-error-porsche {
   margin-bottom: 1.5rem;
 }
 
-.login-form {
+/* Formulaire */
+.login-form-porsche {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.login-links {
-  margin-top: 1.5rem;
-  text-align: center;
+/* Champs de saisie */
+.login-field-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.login-links p {
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-}
-
-.login-link {
-  color: #000;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.login-link:hover {
-  text-decoration: underline;
-}
-
-.login-forgot {
-  display: block;
+.login-label-porsche {
   font-size: 0.875rem;
+  font-weight: 500;
+  color: #000;
+  margin: 0;
+}
+
+.login-input-porsche {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  font-size: 1rem;
+  color: #000;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.login-input-porsche::placeholder {
   color: #9ca3af;
-  text-decoration: none;
+}
+
+.login-input-porsche:focus {
+  outline: none;
+  border-color: #000;
+  background-color: #fff;
+}
+
+.login-input-porsche.error {
+  border-color: #dc2626;
+}
+
+.login-field-error-porsche {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.25rem;
+}
+
+/* Bouton principal */
+.login-btn-primary-porsche {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
   margin-top: 0.5rem;
 }
 
-.login-forgot:hover {
+.login-btn-primary-porsche:hover:not(:disabled) {
+  background-color: #1f2937;
+}
+
+.login-btn-primary-porsche:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Séparateur */
+.login-separator-porsche {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.login-separator-porsche::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.login-separator-text-porsche {
+  position: relative;
+  background-color: #fff;
+  padding: 0 1rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Bouton secondaire */
+.login-btn-secondary-porsche {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #fff;
   color: #000;
+  border: 2px solid #000;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.login-btn-secondary-porsche:hover {
+  background-color: #000;
+  color: #fff;
 }
 

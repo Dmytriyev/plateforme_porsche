@@ -1,3 +1,36 @@
+// sanitize.js
+// Utility to sanitize HTML input before rendering. Prefer using DOMPurify
+// Install with: `npm install dompurify` and the code will use it.
+
+export async function sanitizeHTML(html) {
+  if (!html) return '';
+  try {
+    // dynamic import so project builds even if DOMPurify not installed
+    const DOMPurify = (await import('dompurify')).default;
+    return DOMPurify.sanitize(html);
+  } catch (e) {
+    // Fallback: escape basic characters to avoid trivial XSS
+    return String(html)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  }
+}
+
+export function sanitizeText(text) {
+  if (text === null || text === undefined) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+export default { sanitizeHTML, sanitizeText };
 /**
  * Utilitaires de sanitization pour la protection XSS
  */

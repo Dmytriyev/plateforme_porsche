@@ -7,27 +7,15 @@ import { API_URL } from '../config/api.jsx';
 import { formatPrice } from '../utils/format.js';
 import './Panier.css';
 
-/**
- * Page Panier - Design style Porsche Shop
- * Inspiré de: https://shop.porsche.com/
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page affiche le panier de l'utilisateur connecté.
- * Le panier peut contenir :
- * - Des accessoires (quantité modifiable, prix total)
- * - Des voitures neuves configurées (quantité = 1, acompte uniquement)
- * 
- * Toutes les données proviennent de la base de données.
- */
+
 const Panier = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Données du panier
   const [panierData, setPanierData] = useState(null);
   const [lignes, setLignes] = useState([]);
@@ -44,7 +32,7 @@ const Panier = () => {
       setLoading(true);
       setError('');
       const data = await commandeService.getPanier();
-      
+
       // Le backend retourne { panier, lignes, nombreArticles, total, note }
       setPanierData(data.panier || null);
       setLignes(Array.isArray(data.lignes) ? data.lignes : []);
@@ -56,7 +44,6 @@ const Panier = () => {
         setTotal(0);
       } else {
         setError(err.message || 'Erreur lors du chargement du panier');
-        console.error(err);
       }
     } finally {
       setLoading(false);
@@ -76,7 +63,6 @@ const Panier = () => {
       fetchPanier();
     } catch (err) {
       setError(err.message || 'Erreur lors de la mise à jour de la quantité');
-      console.error(err);
     }
   };
 
@@ -93,7 +79,6 @@ const Panier = () => {
       fetchPanier();
     } catch (err) {
       setError(err.message || 'Erreur lors de la suppression');
-      console.error(err);
     }
   };
 
@@ -123,7 +108,7 @@ const Panier = () => {
       <div className="panier-back-link">
         <Link to="/" className="panier-back-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
           Continuer les achats
         </Link>
@@ -163,7 +148,7 @@ const Panier = () => {
             {lignes.map((ligne) => {
               const isVoiture = ligne.type_produit === true;
               const produit = isVoiture ? ligne.model_porsche_id : ligne.accesoire;
-              
+
               if (!produit) return null;
 
               // Récupérer les photos
@@ -193,8 +178,8 @@ const Panier = () => {
                     aria-label="Retirer du panier"
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
 
@@ -222,7 +207,7 @@ const Panier = () => {
                       style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
                     >
                       <span className="panier-article-letter-porsche">
-                        {isVoiture 
+                        {isVoiture
                           ? produit.nom_model?.charAt(0) || 'P'
                           : produit.nom_accesoire?.charAt(0) || 'A'
                         }
@@ -243,7 +228,7 @@ const Panier = () => {
                           <div className="panier-attribute-item-porsche">
                             <span className="panier-attribute-label-porsche">Couleur:</span>
                             <div className="panier-attribute-value-porsche">
-                              <span 
+                              <span
                                 className="panier-color-swatch-porsche"
                                 style={{ backgroundColor: ligne.accesoire.couleur_accesoire.nom_couleur === 'Rouge' ? '#dc2626' : '#9ca3af' }}
                               />
@@ -328,8 +313,8 @@ const Panier = () => {
             {/* Message d'information */}
             <div className="panier-info-porsche">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-info-icon-porsche">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
               </svg>
               <span>Les produits dans votre panier ne sont pas réservés.</span>
             </div>
@@ -348,7 +333,7 @@ const Panier = () => {
               <button className="panier-voucher-link-porsche">
                 Utiliser un bon d'achat
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6 9 12 15 18 9"/>
+                  <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
 
@@ -375,8 +360,8 @@ const Panier = () => {
               {/* Sécurité */}
               <div className="panier-security-porsche">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-security-icon-porsche">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <div className="panier-security-text-porsche">
                   <span className="panier-security-title-porsche">Cryptage SSL</span>

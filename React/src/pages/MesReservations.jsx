@@ -12,7 +12,7 @@ import './MesReservations.css';
 const MesReservations = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,11 +26,20 @@ const MesReservations = () => {
     try {
       setLoading(true);
       setError('');
-      const data = await commandeService.getMyReservations();
-      setReservations(data);
+      
+      // Récupérer l'ID utilisateur (peut être _id ou id)
+      const userId = user?._id || user?.id;
+      
+      if (!userId) {
+        setError('ID utilisateur manquant');
+        setLoading(false);
+        return;
+      }
+      
+      const data = await commandeService.getMyReservations(userId);
+      setReservations(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des réservations');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -48,7 +57,6 @@ const MesReservations = () => {
       fetchReservations();
     } catch (err) {
       setError(err.message || 'Erreur lors de l\'annulation');
-      console.error(err);
     }
   };
 
@@ -164,16 +172,16 @@ const MesReservations = () => {
 
                     {/* Actions */}
                     <div className="reservation-actions">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => navigate(`/voitures/${reservation.model_porsche?._id}`)}
                       >
                         Voir la voiture
                       </Button>
                       {reservation.statut === 'en_attente' && (
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => handleAnnuler(reservation._id)}
                           className="reservation-btn-cancel"

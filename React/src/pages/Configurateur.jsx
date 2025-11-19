@@ -3,13 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { modelPorscheService, personnalisationService } from '../services';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Button, Alert } from '../components/common';
+import ContactButton from '../components/ContactButton.jsx';
 import { formatPrice, formatPriceMonthly } from '../utils/format.js';
 import './Configurateur.css';
 
-/**
- * Page Configurateur - Personnalisation d'une Porsche neuve
- * Design inspiré du configurateur officiel Porsche
- */
 const Configurateur = () => {
   const { voitureId } = useParams();
   const navigate = useNavigate();
@@ -39,7 +36,7 @@ const Configurateur = () => {
 
   const [prixTotal, setPrixTotal] = useState(0);
   const [prixMensuel, setPrixMensuel] = useState(0);
-  
+
   // États pour l'interface
   const [photoActive, setPhotoActive] = useState(0);
   const [sectionsOuvertes, setSectionsOuvertes] = useState({
@@ -58,9 +55,6 @@ const Configurateur = () => {
         setLoading(true);
         setError('');
 
-        // Charger les variantes disponibles pour ce modèle
-        // CORRECTION: Utiliser getConfigurationsByVoiture qui accepte un ID de voiture
-        // au lieu de getVariantesByModel qui attend un nom de modèle (ex: "911")
         const variantesData = await modelPorscheService.getConfigurationsByVoiture(voitureId);
         setVariantes(Array.isArray(variantesData) ? variantesData : []);
 
@@ -86,7 +80,6 @@ const Configurateur = () => {
         }
       } catch (err) {
         setError('Erreur lors du chargement des options');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -97,7 +90,6 @@ const Configurateur = () => {
     }
   }, [voitureId]);
 
-  // Calculer le prix total quand la configuration change
   useEffect(() => {
     let total = 0;
 
@@ -131,10 +123,7 @@ const Configurateur = () => {
     setPrixMensuel(total > 0 ? total / 80 : 0);
   }, [config]);
 
-  const handleVarianteChange = (variante) => {
-    // Rediriger vers la page de configuration complète
-    navigate(`/configuration/${variante._id}`);
-  };
+  const handleVarianteChange = (variante) => navigate(`/configuration/${variante._id}`);
 
   const handleCouleurExtChange = (couleur) => {
     setConfig({ ...config, couleur_exterieur: couleur });
@@ -144,19 +133,9 @@ const Configurateur = () => {
     setConfig({ ...config, couleur_interieur: couleur });
   };
 
-  const toggleSection = (section) => {
-    setSectionsOuvertes((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
+  const toggleSection = (section) => setSectionsOuvertes((prev) => ({ ...prev, [section]: !prev[section] }));
 
-  const getPhotosVariante = () => {
-    if (!config.variante?.photo_porsche) return [];
-    return Array.isArray(config.variante.photo_porsche) 
-      ? config.variante.photo_porsche 
-      : [];
-  };
+  const getPhotosVariante = () => (Array.isArray(config.variante?.photo_porsche) ? config.variante.photo_porsche : []);
 
   const handleJanteChange = (jante) => {
     setConfig({ ...config, taille_jante: jante });
@@ -220,10 +199,10 @@ const Configurateur = () => {
           <button className="configurateur-header-link" onClick={() => navigate('/voitures')}>
             Changer de modèle
           </button>
-          <button className="configurateur-header-link" onClick={() => {/* TODO: Sauvegarder */}}>
+          <button className="configurateur-header-link" onClick={() => { }}>
             Sauvegarder
           </button>
-          <button className="configurateur-header-link" onClick={() => {/* TODO: Créer code */}}>
+          <button className="configurateur-header-link" onClick={() => { }}>
             Créer un code Porsche
           </button>
         </div>
@@ -236,8 +215,8 @@ const Configurateur = () => {
               </span>
               <button className="configurateur-header-info-icon" title="Informations">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
@@ -249,8 +228,8 @@ const Configurateur = () => {
               <span className="configurateur-header-price-total">{formatPrice(prixTotal)}</span>
               <button className="configurateur-header-info-icon" title="Informations">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
@@ -259,12 +238,14 @@ const Configurateur = () => {
         </div>
 
         <div className="configurateur-header-right">
-          <Button variant="outline" onClick={() => {/* TODO: Aperçu */}}>
+          <Button variant="outline" onClick={() => { }}>
             Aperçu
           </Button>
-          <Button variant="primary" onClick={handleAddToCart}>
-            Contactez un Centre Porsche
-          </Button>
+          <ContactButton
+            vehiculeId={config.variante?._id}
+            typeVehicule="neuf"
+            variant="primary"
+          />
         </div>
       </header>
 
@@ -277,7 +258,7 @@ const Configurateur = () => {
             {/* Bouton plein écran */}
             <button className="configurateur-fullscreen-btn" title="Plein écran">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
               </svg>
             </button>
 
@@ -293,7 +274,7 @@ const Configurateur = () => {
                 }}
               />
             ) : null}
-            <div 
+            <div
               className="configurateur-visual-placeholder"
               style={{ display: photos.length > 0 ? 'none' : 'flex' }}
             >
@@ -312,20 +293,20 @@ const Configurateur = () => {
           <div className="configurateur-visual-controls">
             <button className="configurateur-control-btn" title="Photos">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <path d="M21 15l-5-5L5 21"/>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="M21 15l-5-5L5 21" />
               </svg>
             </button>
             <button className="configurateur-control-btn" title="Vue nuit">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             </button>
             <button className="configurateur-control-btn" title="Caméra">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
               </svg>
             </button>
           </div>
@@ -367,8 +348,8 @@ const Configurateur = () => {
           {/* Barre de recherche */}
           <div className="configurateur-search">
             <svg className="configurateur-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.35-4.35"/>
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
             </svg>
             <input
               type="text"
@@ -398,7 +379,7 @@ const Configurateur = () => {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M6 9l6 6 6-6"/>
+                  <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {sectionsOuvertes.couleursExt && (
@@ -408,9 +389,8 @@ const Configurateur = () => {
                       <button
                         key={couleur._id}
                         onClick={() => handleCouleurExtChange(couleur)}
-                        className={`configurateur-color-item ${
-                          config.couleur_exterieur?._id === couleur._id ? 'selected' : ''
-                        }`}
+                        className={`configurateur-color-item ${config.couleur_exterieur?._id === couleur._id ? 'selected' : ''
+                          }`}
                       >
                         {couleur.photo_couleur ? (
                           <img
@@ -457,7 +437,7 @@ const Configurateur = () => {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M6 9l6 6 6-6"/>
+                  <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {sectionsOuvertes.jantes && (
@@ -467,9 +447,8 @@ const Configurateur = () => {
                       <button
                         key={jante._id}
                         onClick={() => handleJanteChange(jante)}
-                        className={`configurateur-jante-item ${
-                          config.taille_jante?._id === jante._id ? 'selected' : ''
-                        }`}
+                        className={`configurateur-jante-item ${config.taille_jante?._id === jante._id ? 'selected' : ''
+                          }`}
                       >
                         <span className="configurateur-jante-size">{jante.taille_jante}"</span>
                         {jante.prix > 0 && (
@@ -502,7 +481,7 @@ const Configurateur = () => {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M6 9l6 6 6-6"/>
+                  <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {sectionsOuvertes.couleursInt && (
@@ -514,8 +493,8 @@ const Configurateur = () => {
                       <span className="configurateur-interior-standard-price">0,00 €</span>
                       <button className="configurateur-header-info-icon" title="Informations">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
-                          <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+                          <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
                       </button>
                     </div>
@@ -535,9 +514,8 @@ const Configurateur = () => {
                         <button
                           key={couleur._id}
                           onClick={() => handleCouleurIntChange(couleur)}
-                          className={`configurateur-interior-swatch-item ${
-                            config.couleur_interieur?._id === couleur._id ? 'selected' : ''
-                          }`}
+                          className={`configurateur-interior-swatch-item ${config.couleur_interieur?._id === couleur._id ? 'selected' : ''
+                            }`}
                           title={couleur.nom_couleur}
                         >
                           {couleur.photo_couleur ? (
@@ -578,7 +556,7 @@ const Configurateur = () => {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M6 9l6 6 6-6"/>
+                  <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {sectionsOuvertes.sieges && (
@@ -588,9 +566,8 @@ const Configurateur = () => {
                       <button
                         key={siege._id}
                         onClick={() => handleSiegeChange(siege)}
-                        className={`configurateur-siege-item ${
-                          config.siege?._id === siege._id ? 'selected' : ''
-                        }`}
+                        className={`configurateur-siege-item ${config.siege?._id === siege._id ? 'selected' : ''
+                          }`}
                       >
                         <span className="configurateur-siege-name">{siege.nom_siege}</span>
                         {siege.prix > 0 && (

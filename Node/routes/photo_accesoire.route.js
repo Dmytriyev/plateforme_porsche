@@ -37,12 +37,12 @@ router.put(
 
 // Routes publiques
 router.get("/all", getAllPhoto_accesoires);
-router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
 router.get(
-  "/all/accesoire/:accesoireId",
-  getAllPhoto_accesoires,
-  validateObjectId("accesoireId")
+  "/accesoire/:accesoireId",
+  validateObjectId("accesoireId"),
+  getAllPhoto_accesoires
 );
+router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
 
 // Routes admin
 router.delete(

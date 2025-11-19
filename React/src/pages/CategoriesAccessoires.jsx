@@ -22,11 +22,11 @@ const CategoriesAccessoires = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       // OPTIMISÉ: Utiliser endpoint dédié pour récupérer types + compteurs
       // Backend: GET /accesoire/types
       const typesData = await accesoireService.getAvailableTypes();
-      
+
       // Si le backend retourne déjà le format correct avec types et compteurs
       if (Array.isArray(typesData) && typesData.length > 0 && typeof typesData[0] === 'object') {
         // Format: [{ type: "porte-cles", count: 5 }]
@@ -47,12 +47,12 @@ const CategoriesAccessoires = () => {
       } else {
         // Fallback: charger tous les accessoires (ancien comportement)
         const allAccessoires = await accesoireService.getAllAccessoires();
-        
+
         if (!Array.isArray(allAccessoires)) {
           setCategories([]);
           return;
         }
-        
+
         const categoriesMap = {};
         allAccessoires.forEach(acc => {
           if (acc && acc.type_accesoire) {
@@ -70,7 +70,6 @@ const CategoriesAccessoires = () => {
       }
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des catégories');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -82,6 +81,11 @@ const CategoriesAccessoires = () => {
 
   const getCategorieLabel = (type) => {
     // Retourne le label propre pour la catégorie (conforme charte graphique Porsche)
+    // Vérification de sécurité pour éviter les erreurs si type est undefined/null
+    if (!type || typeof type !== 'string') {
+      return 'Catégorie';
+    }
+    
     const labels = {
       'porte-clés': 'Porte-clés',
       'porte-cles': 'Porte-clés',
@@ -96,8 +100,18 @@ const CategoriesAccessoires = () => {
       'livres': 'Livres',
       'technologie': 'Technologie'
     };
-    const formatted = type.charAt(0).toUpperCase() + type.slice(1);
-    return labels[type.toLowerCase()] || formatted;
+    
+    const typeLower = type.toLowerCase();
+    if (labels[typeLower]) {
+      return labels[typeLower];
+    }
+    
+    // Formatage sécurisé avec vérification de la longueur
+    if (type.length > 0) {
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+    
+    return 'Catégorie';
   };
 
   if (loading) {
@@ -130,7 +144,9 @@ const CategoriesAccessoires = () => {
           </div>
         ) : (
           <div className="categories-grid">
-            {categories.map((cat) => (
+            {categories
+              .filter((cat) => cat && cat.type) // Filtrer les catégories sans type valide
+              .map((cat) => (
               <button
                 key={cat.type}
                 onClick={() => handleCategorieClick(cat.type)}
@@ -174,7 +190,7 @@ const CategoriesAccessoires = () => {
           <div className="categories-info-card">
             <h3>Collection Premium</h3>
             <p>
-              Tous nos accessoires Porsche sont authentiques et conçus pour offrir 
+              Tous nos accessoires Porsche sont authentiques et conçus pour offrir
               la même qualité et le même design que nos véhicules.
             </p>
           </div>

@@ -53,6 +53,63 @@ Authorization: Bearer TOKEN
 - Commandes : `/api/commande`
 - Paiement : `/api/payment`
 
+## Paiement — Checkout Stripe (multi-étapes)
+
+Cette API utilise Stripe Checkout pour les paiements. Le flux est en deux parties :
+
+- Création d'une session Checkout (route protégée) : le serveur construit les `line_items` à partir des `LigneCommande` et retourne l'URL de Stripe Checkout.
+- Webhook Stripe : Stripe notifie votre serveur via `/webhook` lorsque la session est complétée ; le serveur marque la `Commande` comme payée, enregistre la `factureUrl` et crée un nouveau panier vide pour l'utilisateur.
+
+Endpoints et exemples
+
+- POST `/api/payment/checkout/:id`
+  - Description : Crée une session Stripe Checkout pour la commande `:id` (doit être un panier actif `status: false`).
+  - Auth : requis (JWT)
+  - Réponse (succès) : `{ id, url, status, customer }` — ouvrez `url` dans un navigateur pour finaliser le paiement.
+  - Exemple (curl) :
+
+```
+curl -X POST "http://localhost:3000/api/payment/checkout/<COMMANDE_ID>" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json"
+```
+
+- POST `/webhook`
+  - Description : Endpoint public pour recevoir les webhooks Stripe. Doit utiliser `express.raw({type: 'application/json'})` pour valider la signature.
+  - Sécurité : Stripe signe chaque webhook ; la validation requiert `STRIPE_WEBHOOK_SECRET`.
+  - Comportement : gère `checkout.session.completed` et met à jour la commande (status, prix, factureUrl).
+
+Variables d'environnement requises
+
+- `STRIPE_SECRET_KEY` : clé secrète Stripe (ex: `sk_test_...`).
+- `STRIPE_WEBHOOK_SECRET` : secret pour vérifier la signature des webhooks (fourni par Stripe lors de la configuration du webhook).
+- `FRONTEND_URL` : URL du front (utilisée pour `success_url` et `cancel_url`).
+
+Configuration locale pour tester les webhooks
+
+1. Installer la CLI Stripe (recommandé) : https://stripe.com/docs/stripe-cli
+2. Dans une console, lancer l'écoute et forward vers votre serveur local :
+
+```bash
+stripe login
+stripe listen --forward-to localhost:3000/webhook
+```
+
+3. Ouvrir la session Checkout renvoyée par l'endpoint de création ; effectuer un paiement en mode test.
+
+Notes et bonnes pratiques
+
+- Idempotence : le service enregistre `stripeSessionId` sur la `Commande` et ignore les webhooks si la commande est déjà marquée payée.
+- Sécurité : gardez `STRIPE_SECRET_KEY` et `STRIPE_WEBHOOK_SECRET` hors du repo (fichier `.env` non commité).
+- Logs : surveillez les logs pour les erreurs de webhooks et les signatures invalides.
+- Production : configurez l'URL `/webhook` dans le dashboard Stripe (endpoint HTTPS) et utilisez `STRIPE_WEBHOOK_SECRET` correspondant.
+
+Étapes recommandées après intégration
+
+- Envoyer un email de confirmation après paiement (utiliser `utils/logger.js` ou un service mail).
+- Émettre un événement socket pour mettre à jour l'interface client en temps réel.
+- Ajouter des tests unitaires/mocks pour `payment.service.js`.
+
 ## Workflows.
 
 - **Voiture neuve** : créer options → `voiture` → `model-porsche` → photos
@@ -425,7 +482,7 @@ User:
 | ---------- | ---------------------- | -------------- |
 | Admin      | admin@porsche.com      | Admin123!      |
 | Conseiller | conseiller@porsche.com | Conseiller123! |
-| User       | user@gmail.com       | User123!       |
+| User       | user@gmail.com         | User123!       |
 
 ---
 

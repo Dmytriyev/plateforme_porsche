@@ -20,31 +20,29 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      
+
       // OPTIMISÉ: Utiliser l'endpoint dédié pour voitures neuves
       // Backend: GET /voiture/neuve
       const response = await voitureService.getVoituresNeuves();
-      
+
       const data = Array.isArray(response) ? response : [];
-      
-      const modelesAffiches = data.filter(v => 
+
+      const modelesAffiches = data.filter(v =>
         ['911', 'Cayman', 'Cayenne'].includes(v.nom_model)
       );
-      
+
       const uniqueModeles = [];
       const nomsVus = new Set();
-      
+
       modelesAffiches.forEach(voiture => {
         if (!nomsVus.has(voiture.nom_model)) {
           nomsVus.add(voiture.nom_model);
           uniqueModeles.push(voiture);
         }
       });
-      
+
       setModeles(uniqueModeles);
     } catch (error) {
-      console.error('Erreur chargement modèles:', error);
-      // Afficher un message d'erreur à l'utilisateur
       setModeles([]);
     } finally {
       setLoading(false);
@@ -134,7 +132,7 @@ const Home = () => {
         <div className="models-header-porsche">
           <h2 className="section-title-porsche">Sélectionner une gamme</h2>
         </div>
-        
+
         {loading ? (
           <div className="models-loading">Chargement des modèles...</div>
         ) : modeles.length === 0 ? (
@@ -145,7 +143,7 @@ const Home = () => {
           <div className="models-grid-porsche">
             {modeles.map((modele) => {
               const modeleInfo = getModeleInfo(modele);
-              
+
               // Récupérer la photo principale (une seule image)
               let photoPrincipale = null;
               if (modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0) {
@@ -154,7 +152,7 @@ const Home = () => {
                   photoPrincipale = validPhotos[0];
                 }
               }
-              
+
               return (
                 <article
                   key={modele._id}
@@ -164,8 +162,8 @@ const Home = () => {
                   <div className="model-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name?.startsWith('http') 
-                          ? photoPrincipale.name 
+                        src={photoPrincipale.name?.startsWith('http')
+                          ? photoPrincipale.name
                           : photoPrincipale.name?.startsWith('/')
                             ? `${API_URL}${photoPrincipale.name}`
                             : `${API_URL}/${photoPrincipale.name}`}
@@ -179,7 +177,7 @@ const Home = () => {
                         }}
                       />
                     ) : null}
-                    <div 
+                    <div
                       className="model-placeholder-porsche"
                       style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
                     >
@@ -260,7 +258,7 @@ const Home = () => {
           <div className="home-accessoires-text">
             <h2 className="home-accessoires-title">Découvrez la boutique Porsche Lifestyle</h2>
             <p className="home-accessoires-description">
-              Personnalisez votre expérience avec notre collection exclusive d'accessoires premium. 
+              Personnalisez votre expérience avec notre collection exclusive d'accessoires premium.
               Du lifestyle aux pièces de performance, découvrez tout ce qui fait l'excellence Porsche.
             </p>
             <div className="home-accessoires-buttons">
@@ -281,7 +279,7 @@ const Home = () => {
               <span className="home-approved-image-text">Porsche Approved</span>
             </div>
           </div>
-          
+
           {/* Contenu à droite */}
           <div className="home-approved-content">
             <h2 className="home-approved-title">

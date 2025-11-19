@@ -24,12 +24,12 @@ import './MonCompte.css';
 const MonCompte = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  
+
   const [activeSection, setActiveSection] = useState('mes-produits');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Données
   const [reservations, setReservations] = useState([]);
   const [commandes, setCommandes] = useState([]);
@@ -46,21 +46,26 @@ const MonCompte = () => {
     try {
       setLoading(true);
       setError('');
-      
+
+      // Récupérer l'ID utilisateur (peut être _id ou id)
+      const userId = user?._id || user?.id;
+
       // Récupérer toutes les données en parallèle
-      const [reservationsData, commandesData, voituresData] = await Promise.all([
-        commandeService.getMyReservations().catch(() => []),
+      // getMesVoitures et getMyCommandes récupèrent l'ID depuis le token JWT
+      const promises = [
+        userId ? commandeService.getMyReservations(userId).catch(() => []) : Promise.resolve([]),
         commandeService.getMyCommandes().catch(() => []),
         maVoitureService.getMesVoitures().catch(() => []),
-      ]);
-      
+      ];
+
+      const [reservationsData, commandesData, voituresData] = await Promise.all(promises);
+
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       setCommandes(Array.isArray(commandesData) ? commandesData : []);
       setVoitures(Array.isArray(voituresData) ? voituresData : []);
       setUserData(user);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des données');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -85,7 +90,6 @@ const MonCompte = () => {
       fetchAllData();
     } catch (err) {
       setError(err.message || 'Erreur lors de l\'annulation');
-      console.error(err);
     }
   };
 
@@ -125,8 +129,8 @@ const MonCompte = () => {
             onClick={() => setActiveSection('mes-produits')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             <span>Mes produits</span>
           </button>
@@ -136,8 +140,8 @@ const MonCompte = () => {
             onClick={() => setActiveSection('parametres')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
             <span>Paramètres de votre compte</span>
           </button>
@@ -147,8 +151,8 @@ const MonCompte = () => {
             onClick={() => setActiveSection('paiement')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
             </svg>
             <span>Mode de paiement</span>
           </button>
@@ -158,8 +162,8 @@ const MonCompte = () => {
             onClick={() => navigate('/mes-commandes')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
             </svg>
             <span>Mes commandes</span>
           </button>
@@ -169,9 +173,9 @@ const MonCompte = () => {
             onClick={handleLogout}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
             <span>Déconnexion</span>
           </button>
@@ -229,11 +233,11 @@ const MonCompte = () => {
                     const voitureBase = modelPorsche?.voiture; // Voiture de base
                     const typeModel = modelPorsche?.type_model || voitureBase?.nom_model || 'Porsche';
                     const prix = modelPorsche?.prix_base_variante || modelPorsche?.prix_base || 0;
-                    const photoPrincipale = modelPorsche?.photo_voiture_actuel?.[0] || 
-                                           modelPorsche?.photo_voiture?.[0] ||
-                                           voitureBase?.photo_voiture?.[0];
+                    const photoPrincipale = modelPorsche?.photo_voiture_actuel?.[0] ||
+                      modelPorsche?.photo_voiture?.[0] ||
+                      voitureBase?.photo_voiture?.[0];
                     const modelPorscheId = modelPorsche?._id;
-                    
+
                     return (
                       <div key={reservation._id} className="mon-compte-reservation-card">
                         {photoPrincipale && photoPrincipale.name ? (
@@ -399,7 +403,7 @@ const MonCompte = () => {
                 <div className="mon-compte-voitures-list">
                   {voitures.slice(0, 3).map((voiture) => {
                     const photoPrincipale = voiture.photo_voiture_actuel?.[0];
-                    
+
                     return (
                       <div key={voiture._id} className="mon-compte-voiture-card">
                         {photoPrincipale && photoPrincipale.name ? (
@@ -482,7 +486,7 @@ const MonCompte = () => {
               {userData && (
                 <div className="mon-compte-settings-group">
                   <h2 className="mon-compte-settings-title">Informations personnelles</h2>
-                  
+
                   <div className="mon-compte-settings-item">
                     <label className="mon-compte-settings-label">Nom complet</label>
                     <p className="mon-compte-settings-value">
@@ -539,8 +543,8 @@ const MonCompte = () => {
             <div className="mon-compte-payment">
               <div className="mon-compte-payment-empty">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mon-compte-payment-icon">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                  <line x1="1" y1="10" x2="23" y2="10"/>
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
                 </svg>
                 <p className="mon-compte-payment-text">
                   Aucun mode de paiement enregistré

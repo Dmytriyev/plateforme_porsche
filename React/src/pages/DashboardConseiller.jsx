@@ -12,7 +12,7 @@ import './DashboardConseiller.css';
 const DashboardConseiller = () => {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
-  
+
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,10 +27,22 @@ const DashboardConseiller = () => {
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      const data = await commandeService.getMyReservations();
-      setReservations(data);
+      // Les conseillers et admins voient toutes les réservations
+      const data = await commandeService.getAllReservations();
+      setReservations(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Erreur chargement réservations:', err);
+      // En cas d'erreur (pas admin), essayer de récupérer les réservations de l'utilisateur
+      const userId = user?._id || user?.id;
+      if (userId) {
+        try {
+          const userData = await commandeService.getMyReservations(userId);
+          setReservations(Array.isArray(userData) ? userData : []);
+        } catch (userErr) {
+          setReservations([]);
+        }
+      } else {
+        setReservations([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -94,7 +106,7 @@ const DashboardConseiller = () => {
         {/* Réservations récentes */}
         <div className="dashboard-reservations">
           <h2 className="dashboard-reservations-title">Réservations Récentes</h2>
-          
+
           {reservations.length === 0 ? (
             <Card padding="lg">
               <p className="dashboard-empty-text">Aucune réservation pour le moment</p>
@@ -117,8 +129,8 @@ const DashboardConseiller = () => {
                     </div>
                     <div className="dashboard-reservation-actions">
                       {getStatusBadge(reservation)}
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => navigate(`/reservations/${reservation._id}`)}
                       >

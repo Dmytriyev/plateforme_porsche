@@ -1,176 +1,77 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
-/**
- * Contexte du panier
- * Gère les articles (voitures configurées et accessoires)
- */
 export const PanierContext = createContext();
 
 export const PanierProvider = ({ children }) => {
   const [articles, setArticles] = useState([]);
+  const saveTimer = useRef(null);
 
   // Charger le panier depuis localStorage au démarrage
   useEffect(() => {
     try {
       const savedPanier = localStorage.getItem('panier');
-      if (savedPanier) {
-        setArticles(JSON.parse(savedPanier));
-      }
-    } catch (error) {
-      console.error('Erreur chargement panier:', error);
-    }
+      if (savedPanier) setArticles(JSON.parse(savedPanier));
+    } catch (error) { }
   }, []);
 
-  // Sauvegarder le panier dans localStorage à chaque modification
+  // Sauvegarder le panier avec debounce pour réduire les écritures
   useEffect(() => {
-    try {
-      localStorage.setItem('panier', JSON.stringify(articles));
-    } catch (error) {
-      console.error('Erreur sauvegarde panier:', error);
-    }
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      try {
+        localStorage.setItem('panier', JSON.stringify(articles));
+      } catch (e) { }
+    }, 250);
+    return () => clearTimeout(saveTimer.current);
   }, [articles]);
 
-  /**
-   * Ajouter un article au panier
-   * @param {Object} article - Article à ajouter
-   */
-  const ajouterArticle = (article) => {
-    const nouvelArticle = {
-      ...article,
-      id: Date.now() + Math.random(), // ID unique
-      dateAjout: new Date().toISOString(),
-    };
+  const ajouterArticle = useCallback((article) => {
+    const nouvelArticle = { ...article, id: Date.now() + Math.random(), dateAjout: new Date().toISOString() };
     setArticles((prev) => [...prev, nouvelArticle]);
-  };
+  }, []);
 
-  /**
-   * Ajouter une voiture configurée au panier
-   * @param {Object} voiture - Voiture sélectionnée
-   * @param {Object} configuration - Configuration choisie
-   */
-  const ajouterVoiture = (voiture, configuration) => {
-    const prixTotal = calculerPrixConfiguration(configuration);
-    const article = {
-      type: 'voiture',
-      voiture,
-      configuration,
-      prix: prixTotal,
-      quantite: 1,
-    };
-    ajouterArticle(article);
-  };
-
-  /**
-   * Ajouter un accessoire au panier
-   * @param {Object} accessoire - Accessoire sélectionné
-   * @param {number} quantite - Quantité
-   */
-  const ajouterAccessoire = (accessoire, quantite = 1) => {
-    // Vérifier si l'accessoire existe déjà
-    const existant = articles.find(
-      (a) => a.type === 'accessoire' && a.accessoire._id === accessoire._id
-    );
-
-    if (existant) {
-      modifierQuantite(existant.id, existant.quantite + quantite);
-    } else {
-      const article = {
-        type: 'accessoire',
-        accessoire,
-        prix: accessoire.prix,
-        quantite,
-      };
-      ajouterArticle(article);
-    }
-  };
-
-  /**
-   * Retirer un article du panier
-   * @param {string} id - ID de l'article
-   */
-  const retirerArticle = (id) => {
-    setArticles((prev) => prev.filter((article) => article.id !== id));
-  };
-
-  /**
-   * Modifier la quantité d'un article
-   * @param {string} id - ID de l'article
-   * @param {number} nouvelleQuantite - Nouvelle quantité
-   */
-  const modifierQuantite = (id, nouvelleQuantite) => {
-    if (nouvelleQuantite <= 0) {
-      retirerArticle(id);
-      return;
-    }
-
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === id ? { ...article, quantite: nouvelleQuantite } : article
-      )
-    );
-  };
-
-  /**
-   * Vider le panier
-   */
-  const viderPanier = () => {
-    setArticles([]);
-    localStorage.removeItem('panier');
-  };
-
-  /**
-   * Calculer le prix total de la configuration
-   * @param {Object} configuration - Configuration de la voiture
-   * @returns {number} Prix total
-   */
-  const calculerPrixConfiguration = (configuration) => {
+  const calculerPrixConfiguration = useCallback((configuration) => {
     let total = configuration.prixBase || 0;
-
-    if (configuration.couleurExterieur?.prix) {
-      total += configuration.couleurExterieur.prix;
-    }
-
-    if (configuration.couleurInterieur?.prix) {
-      total += configuration.couleurInterieur.prix;
-    }
-
-    if (configuration.jantes?.prix) {
-      total += configuration.jantes.prix;
-    }
-
-    if (configuration.sieges?.prix) {
-      total += configuration.sieges.prix;
-    }
-
-    if (configuration.package?.prix) {
-      total += configuration.package.prix;
-    }
-
+    if (configuration.couleurExterieur?.prix) total += configuration.couleurExterieur.prix;
+    if (configuration.couleurInterieur?.prix) total += configuration.couleurInterieur.prix;
+    if (configuration.jantes?.prix) total += configuration.jantes.prix;
+    if (configuration.sieges?.prix) total += configuration.sieges.prix;
+    if (configuration.package?.prix) total += configuration.package.prix;
     return total;
-  };
+  }, []);
 
-  /**
-   * Calculer le total du panier
-   * @returns {number} Total
-   */
-  const calculerTotal = () => {
-    return articles.reduce((total, article) => {
-      const prix = article.prix * (article.quantite || 1);
-      return total + prix;
-    }, 0);
-  };
+  const ajouterVoiture = useCallback((voiture, configuration) => {
+    const prixTotal = calculerPrixConfiguration(configuration);
+    const article = { type: 'voiture', voiture, configuration, prix: prixTotal, quantite: 1 };
+    ajouterArticle(article);
+  }, [ajouterArticle, calculerPrixConfiguration]);
 
-  /**
-   * Obtenir le nombre d'articles
-   * @returns {number} Nombre d'articles
-   */
-  const getNombreArticles = () => {
-    return articles.reduce((total, article) => {
-      return total + (article.quantite || 1);
-    }, 0);
-  };
+  const ajouterAccessoire = useCallback((accessoire, quantite = 1) => {
+    setArticles((prev) => {
+      const existant = prev.find((a) => a.type === 'accessoire' && a.accessoire._id === accessoire._id);
+      if (existant) return prev.map((a) => (a.id === existant.id ? { ...a, quantite: a.quantite + quantite } : a));
+      const article = { type: 'accessoire', accessoire, prix: accessoire.prix, quantite };
+      return [...prev, article];
+    });
+  }, []);
 
-  const value = {
+  const retirerArticle = useCallback((id) => setArticles((prev) => prev.filter((article) => article.id !== id)), []);
+
+  const modifierQuantite = useCallback((id, nouvelleQuantite) => {
+    if (nouvelleQuantite <= 0) return retirerArticle(id);
+    setArticles((prev) => prev.map((article) => (article.id === id ? { ...article, quantite: nouvelleQuantite } : article)));
+  }, [retirerArticle]);
+
+  const viderPanier = useCallback(() => {
+    setArticles([]);
+    try { localStorage.removeItem('panier'); } catch (e) { }
+  }, []);
+
+  const calculerTotal = useCallback(() => articles.reduce((total, article) => total + (article.prix * (article.quantite || 1)), 0), [articles]);
+
+  const getNombreArticles = useCallback(() => articles.reduce((total, article) => total + (article.quantite || 1), 0), [articles]);
+
+  const value = useMemo(() => ({
     articles,
     ajouterArticle,
     ajouterVoiture,
@@ -182,7 +83,7 @@ export const PanierProvider = ({ children }) => {
     getNombreArticles,
     total: calculerTotal(),
     nombreArticles: getNombreArticles(),
-  };
+  }), [articles, ajouterArticle, ajouterVoiture, ajouterAccessoire, retirerArticle, modifierQuantite, viderPanier, calculerTotal, getNombreArticles]);
 
   return <PanierContext.Provider value={value}>{children}</PanierContext.Provider>;
 };

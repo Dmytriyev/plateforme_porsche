@@ -1,86 +1,118 @@
-/* Register Page Styles */
+/* Register Page Styles - Style Porsche */
 
-.register-container {
+.register-container-porsche {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: #fff;
   padding: 3rem 1rem;
 }
 
-.register-form-wrapper {
-  max-width: 42rem;
+.register-form-wrapper-porsche {
+  max-width: 28rem;
   width: 100%;
 }
 
-.register-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.register-form-card-porsche {
+  background-color: #fff;
+  padding: 0;
+  width: 100%;
 }
 
-.register-title {
-  font-size: 1.875rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+/* Titre */
+.register-title-porsche {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 2rem 0;
+  text-align: left;
 }
 
-.register-subtitle {
-  color: #6b7280;
-  margin-top: 0.5rem;
-}
-
-.register-error {
+/* Message d'erreur */
+.register-error-porsche {
   margin-bottom: 1.5rem;
 }
 
-.register-form {
+/* Formulaire */
+.register-form-porsche {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.register-form-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+/* Champs de saisie */
+.register-field-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.register-links {
-  margin-top: 1.5rem;
-  text-align: center;
-}
-
-.register-links p {
-  color: #6b7280;
-}
-
-.register-link {
+.register-label-porsche {
+  font-size: 0.875rem;
+  font-weight: 500;
   color: #000;
+  margin: 0;
+}
+
+.register-required-porsche {
+  color: #dc2626;
+}
+
+.register-input-porsche {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  font-size: 1rem;
+  color: #000;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.register-input-porsche::placeholder {
+  color: #9ca3af;
+}
+
+.register-input-porsche:focus {
+  outline: none;
+  border-color: #000;
+  background-color: #fff;
+}
+
+.register-input-porsche.error {
+  border-color: #dc2626;
+}
+
+.register-field-error-porsche {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.25rem;
+}
+
+/* Bouton principal */
+.register-btn-primary-porsche {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
 }
 
-.register-link:hover {
-  text-decoration: underline;
+.register-btn-primary-porsche:hover:not(:disabled) {
+  background-color: #1f2937;
 }
 
-/* Responsive */
-@media (min-width: 768px) {
-  .register-form-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.register-btn-primary-porsche:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-@media (min-width: 640px) {
-  .register-container {
-    padding: 3rem 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .register-container {
-    padding: 3rem 2rem;
-  }
-}
 

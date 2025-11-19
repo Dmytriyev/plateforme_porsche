@@ -1,0 +1,110 @@
+import { useState, useCallback, useEffect, useRef } from 'react';
+
+// Hook simple pour gérer la création et le suivi d'une réservation côté client.
+// Attention: le backend doit exposer les endpoints suivants :
+// POST /api/reservations  -> { reservationToken, clientSecret, amount, expiresAt }
+// GET  /api/reservations/:token
+// POST /api/reservations/:token/cancel
+
+export default function useReservation() {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [reservation, setReservation] = useState(null);
+    const pollRef = useRef(null);
+
+    const createReservation = useCallback(async (payload) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('/api/reservations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(`Reservation API error ${res.status}`);
+            const data = await res.json();
+            setReservation(data);
+            return data;
+        } catch (err) {
+            setError(err.message || String(err));
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const getReservation = useCallback(async (token) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(`/api/reservations/${encodeURIComponent(token)}`);
+            if (!res.ok) throw new Error(`Get reservation failed ${res.status}`);
+            const data = await res.json();
+            setReservation(data);
+            return data;
+        } catch (err) {
+            setError(err.message || String(err));
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const cancelReservation = useCallback(async (token) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(`/api/reservations/${encodeURIComponent(token)}/cancel`, {
+                method: 'POST',
+            });
+            if (!res.ok) throw new Error(`Cancel failed ${res.status}`);
+            const data = await res.json();
+            setReservation(data);
+            return data;
+        } catch (err) {
+            setError(err.message || String(err));
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Poll the reservation status until it is completed/failed/expired.
+    const pollReservationStatus = useCallback((token, { interval = 3000, stopWhen } = {}) => {
+        if (!token) return;
+        if (pollRef.current) clearInterval(pollRef.current);
+        pollRef.current = setInterval(async () => {
+            try {
+                const data = await getReservation(token);
+                const status = data?.status;
+                if (stopWhen ? stopWhen(status) : ['completed', 'failed', 'expired', 'cancelled'].includes(status)) {
+                    clearInterval(pollRef.current);
+                    pollRef.current = null;
+                }
+            } catch (e) {
+                // ignore transient errors during polling
+            }
+        }, interval);
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+            pollRef.current = null;
+        };
+    }, [getReservation]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current);
+        };
+    }, []);
+
+    return {
+        loading,
+        error,
+        reservation,
+        createReservation,
+        getReservation,
+        cancelReservation,
+        pollReservationStatus,
+    };
+}

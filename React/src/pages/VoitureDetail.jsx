@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { voitureService } from '../services';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Button, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import './VoitureDetail.css';
 
-/**
- * Page de détail d'une voiture
- */
 const VoitureDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { ajouterArticle } = usePanier();
-  
+
   const [voiture, setVoiture] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,12 +22,10 @@ const VoitureDetail = () => {
       try {
         setLoading(true);
         setError('');
-        // CORRIGÉ: Utiliser getVoitureById au lieu de getById
         const data = await voitureService.getVoitureById(id);
         setVoiture(data);
       } catch (err) {
         setError('Erreur lors du chargement de la voiture');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -115,7 +110,7 @@ const VoitureDetail = () => {
               <p className="voiture-detail-subtitle">{voiture.description}</p>
             )}
           </div>
-          
+
           {/* Badge type */}
           <div>
             {voiture.voiture?.type_voiture === true ? (
@@ -145,9 +140,8 @@ const VoitureDetail = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`voiture-thumbnail ${
-                      selectedImage === index ? 'voiture-thumbnail-active' : ''
-                    }`}
+                    className={`voiture-thumbnail ${selectedImage === index ? 'voiture-thumbnail-active' : ''
+                      }`}
                   >
                     <div className="voiture-image-placeholder-small">
                       <span>{index + 1}</span>

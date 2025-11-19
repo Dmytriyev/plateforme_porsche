@@ -25,7 +25,6 @@ const ListeVariantes = () => {
   });
 
   const [recherche, setRecherche] = useState('');
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [variantesComparees, setVariantesComparees] = useState([]);
 
   const isNeuf = type === 'neuve';
@@ -75,7 +74,6 @@ const ListeVariantes = () => {
         const allOccasions = await voitureService.getVoituresOccasion();
 
         if (!Array.isArray(allOccasions)) {
-          console.error('Les occasions ne sont pas un tableau:', allOccasions);
           setVariantes([]);
           return;
         }
@@ -83,11 +81,6 @@ const ListeVariantes = () => {
         const modeleNom = modeleData.nom_model;
 
         if (!modeleNom) {
-          console.error('Nom du modèle non trouvé:', {
-            modeleId,
-            modeleData,
-            message: 'Le modèle récupéré ne contient pas de nom_model. Vérifiez la structure des données.'
-          });
           setVariantes([]);
           return;
         }
@@ -113,7 +106,6 @@ const ListeVariantes = () => {
     } catch (err) {
       const errorMessage = err.message || 'Erreur lors du chargement des variantes';
       setError(errorMessage);
-      console.error('Erreur dans fetchData:', err);
     } finally {
       setLoading(false);
     }
@@ -148,14 +140,6 @@ const ListeVariantes = () => {
     });
   };
 
-  /**
-   * Filtrer les variantes selon les critères sélectionnés
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * Cette fonction filtre les variantes en utilisant UNIQUEMENT les données
-   * disponibles dans la base de données (carrosserie, transmission, puissance, prix, recherche)
-   */
   useEffect(() => {
     if (variantes.length === 0) {
       setVariantesFiltrees([]);
@@ -276,26 +260,6 @@ const ListeVariantes = () => {
     });
   };
 
-  /**
-   * Convertir la puissance en kW et PS
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * 1 PS (Pferdestärke) = 0.7355 kW
-   * Donc pour convertir ch (chevaux) en kW et PS:
-   * - kW = ch * 0.7355
-   * - PS = ch (car 1 ch ≈ 1 PS)
-   */
-  const formatPower = (puissance) => {
-    if (!puissance) return 'N/A';
-    const kw = Math.round(puissance * 0.7355);
-    return `${kw} kW / ${puissance} PS`;
-  };
-
-  /**
-   * Formater la consommation et les émissions CO2
-   */
-
 
   if (loading) {
     return <Loading fullScreen message="Chargement des variantes..." />;
@@ -309,14 +273,6 @@ const ListeVariantes = () => {
     );
   }
 
-  /**
-   * Calculer les informations de consommation et CO2
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * Cette fonction calcule la consommation et les émissions CO2
-   * en utilisant UNIQUEMENT les données disponibles dans la base
-   */
   const getConsumptionInfo = (variante) => {
     const consommation = variante.specifications?.consommation || 0;
     if (consommation === 0) return null;
@@ -335,9 +291,6 @@ const ListeVariantes = () => {
     };
   };
 
-  /**
-   * Déterminer le type de transmission depuis les spécifications
-   */
   const getTransmissionType = (variante) => {
     const trans = variante.specifications?.transmission || '';
     if (trans.includes('PDK') || trans.includes('Automatique')) {

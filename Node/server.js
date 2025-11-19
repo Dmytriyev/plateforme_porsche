@@ -35,6 +35,7 @@ import packageRoutes from "./routes/package.route.js";
 import accesoireRoutes from "./routes/accesoire.route.js";
 import photo_accesoireRoutes from "./routes/photo_accesoire.route.js";
 import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
+import demandeContactRoutes from "./routes/demande_contact.route.js";
 
 // __dirname pour retrouver le dossier courant
 const __filename = fileURLToPath(import.meta.url);
@@ -96,10 +97,10 @@ app.use(
   })
 );
 
-// Limiteur global pour éviter le DDoS attaques
+// Limiteur global pour éviter les attaques DDoS
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // fenêtre de 15 minutes
-  max: 1000, // max 100 requêtes par IP
+  max: 1000, // max 1000 requêtes par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -108,7 +109,7 @@ const globalLimiter = rateLimit({
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // max 10 tentatives par IP
+  max: 100, // max 100 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -117,21 +118,21 @@ const loginLimiter = rateLimit({
 // Limiteur pour les inscriptions utilisateurs
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50, // max 5 inscriptions par IP
+  max: 50, // max 50 inscriptions par IP
   message: "Trop d'inscriptions, réessayez plus tard",
 });
 
 // Limiteur pour les endpoints de paiement
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 200, // max 20 tentatives de paiement par IP
+  max: 200, // max 200 tentatives de paiement par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
 });
 
 // Limiteur pour uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 500, // max 50 uploads par IP
+  max: 500, // max 500 uploads par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
@@ -160,7 +161,11 @@ app.use(
 
 // Route racine
 app.get("/", (req, res) => {
-  res.send("This is Porsche API");
+  res.json({ 
+    message: "API Porsche - Plateforme de vente de voitures et accessoires",
+    version: "1.0.0",
+    status: "running"
+  });
 });
 // routes avec les limiteur upload
 app.use("/photo_voiture", uploadLimiter, photo_voitureRoutes);
@@ -190,6 +195,7 @@ app.use("/model_porsche_actuel", model_porsche_actuelRoutes);
 app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);
 app.use("/accesoire", accesoireRoutes);
+app.use("/contact", demandeContactRoutes);
 
 // Error handler (doit être après les routes)
 app.use(errorMiddleware);

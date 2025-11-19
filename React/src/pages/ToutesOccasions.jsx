@@ -6,69 +6,47 @@ import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
 import './ToutesOccasions.css';
 
-/**
- * Page Liste de Toutes les Voitures d'Occasion
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page affiche TOUTES les voitures d'occasion disponibles dans la base de données.
- * 
- * Différence avec ListeVariantes:
- * - ListeVariantes: Affiche les occasions d'UN modèle spécifique (ex: toutes les 911)
- * - ToutesOccasions: Affiche TOUTES les occasions (911, Cayenne, Cayman, etc.)
- * 
- * Concepts utilisés:
- * 1. useState: Pour gérer l'état (liste des occasions, chargement, erreurs)
- * 2. useEffect: Pour charger les données au montage du composant
- * 3. map(): Pour transformer chaque occasion en élément JSX
- * 4. filter(): Pour filtrer les occasions si nécessaire
- */
 const ToutesOccasions = () => {
-  // ========== ÉTAPE 1: DÉCLARATION DES ÉTATS ==========
-  // EXPLICATION: useState permet de stocker des données qui peuvent changer
-  // Quand on appelle setOccasions([...]), React re-rend automatiquement le composant
-  const [occasions, setOccasions] = useState([]);  // Liste de toutes les occasions
-  const [loading, setLoading] = useState(true);    // true = en cours de chargement
-  const [error, setError] = useState('');          // Message d'erreur si problème
-  const [filtreModele, setFiltreModele] = useState(''); // Filtre optionnel par modèle
-  
+  const [occasions, setOccasions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filtreModele, setFiltreModele] = useState('');
+
   const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const chargerOccasions = async () => {
       try {
         setLoading(true);
         setError('');
-        
+
         const toutesLesOccasions = await voitureService.getVoituresOccasion();
-        
+
         if (!isMounted) return;
-        
+
         if (!Array.isArray(toutesLesOccasions)) {
-          console.error('Les occasions ne sont pas un tableau:', toutesLesOccasions);
           setOccasions([]);
           return;
         }
-        
+
         setOccasions(toutesLesOccasions);
-        
+
       } catch (err) {
         if (!isMounted) return;
-        
+
         const errorMessage = err.message || 'Erreur lors du chargement des occasions';
         setError(errorMessage);
-        console.error('Erreur lors du chargement:', err);
       } finally {
         if (isMounted) {
           setLoading(false);
         }
       }
     };
-    
+
     chargerOccasions();
-    
+
     return () => {
       isMounted = false;
     };
@@ -83,10 +61,10 @@ const ToutesOccasions = () => {
     if (!filtreModele) {
       return true;
     }
-    
+
     // Récupérer le nom du modèle de l'occasion
     const nomModel = occasion.nom_model || occasion.voiture_base?.nom_model || '';
-    
+
     // Comparer avec le filtre (insensible à la casse)
     return nomModel.toLowerCase().includes(filtreModele.toLowerCase());
   });
@@ -127,8 +105,8 @@ const ToutesOccasions = () => {
       <div className="toutes-occasions-content">
         {/* En-tête */}
         <div className="toutes-occasions-header">
-          <button 
-            onClick={() => navigate('/choix-voiture')} 
+          <button
+            onClick={() => navigate('/choix-voiture')}
             className="toutes-occasions-back-btn"
           >
             ← Retour au choix
@@ -155,7 +133,7 @@ const ToutesOccasions = () => {
             className="filtre-input"
           />
           {filtreModele && (
-            <button 
+            <button
               onClick={() => setFiltreModele('')}
               className="filtre-reset"
             >
@@ -167,7 +145,7 @@ const ToutesOccasions = () => {
         {/* Résultats du filtre */}
         {filtreModele && (
           <div className="toutes-occasions-filtre-info">
-            {occasionsFiltrees.length} {occasionsFiltrees.length > 1 ? 'occasions trouvées' : 'occasion trouvée'} 
+            {occasionsFiltrees.length} {occasionsFiltrees.length > 1 ? 'occasions trouvées' : 'occasion trouvée'}
             pour "{filtreModele}"
           </div>
         )}
@@ -176,13 +154,13 @@ const ToutesOccasions = () => {
         {occasionsFiltrees.length === 0 ? (
           <div className="toutes-occasions-empty">
             <p>
-              {filtreModele 
+              {filtreModele
                 ? `Aucune occasion trouvée pour "${filtreModele}"`
                 : 'Aucune occasion disponible pour le moment.'
               }
             </p>
             {filtreModele && (
-              <button 
+              <button
                 onClick={() => setFiltreModele('')}
                 className="btn-reset-filtre"
               >
@@ -197,7 +175,7 @@ const ToutesOccasions = () => {
               const nomModel = occasion.nom_model || occasion.voiture_base?.nom_model || 'Modèle';
               const description = occasion.description || occasion.voiture_base?.description || '';
               const prix = occasion.prix_base || occasion.prix_base_variante || 0;
-              
+
               // Récupérer la photo principale
               let photoPrincipale = null;
               if (occasion.photo_voiture && Array.isArray(occasion.photo_voiture) && occasion.photo_voiture.length > 0) {
@@ -220,8 +198,8 @@ const ToutesOccasions = () => {
                   <div className="occasion-card-image-container">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name.startsWith('http') 
-                          ? photoPrincipale.name 
+                        src={photoPrincipale.name.startsWith('http')
+                          ? photoPrincipale.name
                           : photoPrincipale.name.startsWith('/')
                             ? `${API_URL}${photoPrincipale.name}`
                             : `${API_URL}/${photoPrincipale.name}`
@@ -236,7 +214,7 @@ const ToutesOccasions = () => {
                         }}
                       />
                     ) : null}
-                    <div 
+                    <div
                       className="occasion-card-placeholder"
                       style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
                     >
@@ -262,8 +240,8 @@ const ToutesOccasions = () => {
 
                     {description && (
                       <p className="occasion-card-description">
-                        {description.length > 100 
-                          ? description.substring(0, 100) + '...' 
+                        {description.length > 100
+                          ? description.substring(0, 100) + '...'
                           : description
                         }
                       </p>

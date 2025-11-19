@@ -57,9 +57,10 @@ const createCouleur_accesoire = async (req, res) => {
 // Récupérer toutes les couleurs d'accesoires
 const getAllCouleur_accesoires = async (req, res) => {
   try {
-    const couleur_accesoires = await Couleur_accesoire.find().sort({
-      nom_couleur: 1,
-    });
+    const couleur_accesoires = await Couleur_accesoire.find()
+      .sort({ nom_couleur: 1 })
+      .lean();
+    // Retourner le tableau directement pour compatibilité avec extractArray
     return res.status(200).json(couleur_accesoires);
   } catch (error) {
     return handleError(res, error, "getAllCouleur_accesoires");

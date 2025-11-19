@@ -5,17 +5,7 @@ import { Loading, Alert, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import './VariantePage.css';
 
-/**
- * Page explicative complète d'une variante model_porsche (GTS, GT3, GT4RS, etc.)
- * Design inspiré de la page officielle Porsche: https://www.porsche.com/france/models/911/911-gt3-models/911-gt3/
- * Affiche toutes les informations, photos, options et prix
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page s'affiche APRÈS la sélection d'une variante dans ListeVariantes
- * et AVANT la configuration. Elle présente la variante avec ses performances,
- * ses caractéristiques et permet de naviguer vers la configuration.
- */
+
 const VariantePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,7 +22,7 @@ const VariantePage = () => {
         setError('');
         const data = await modelPorscheService.getVariantePage(id);
         setPageData(data);
-        
+
         // Récupérer les carrosseries disponibles pour ce modèle de base
         if (data.voiture_base?._id) {
           try {
@@ -51,7 +41,6 @@ const VariantePage = () => {
         }
       } catch (err) {
         setError(err.message || 'Erreur lors du chargement de la page');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -147,7 +136,7 @@ const VariantePage = () => {
       <nav className="variante-nav-top-porsche">
         <div className="variante-nav-top-left">
           <span className="variante-nav-model-name">{variante.nom_model}</span>
-          <button 
+          <button
             className="variante-nav-change-model"
             onClick={handleChangerModele}
           >
@@ -155,13 +144,13 @@ const VariantePage = () => {
           </button>
         </div>
         <div className="variante-nav-top-right">
-          <button 
+          <button
             className="variante-nav-link"
             onClick={handleConfigurer}
           >
             Configurer
           </button>
-          <button 
+          <button
             className="variante-nav-link"
             onClick={handleAcheter}
           >
@@ -189,16 +178,15 @@ const VariantePage = () => {
             />
           </div>
         )}
-        
+
         {/* Navigation Carrosserie */}
         {carrosseriesNav.length > 0 && (
           <nav className="variante-carrosserie-nav-porsche">
             {carrosseriesNav.map((carrosserie) => (
               <button
                 key={carrosserie}
-                className={`variante-carrosserie-nav-item-porsche ${
-                  selectedCarrosserie === carrosserie ? 'active' : ''
-                }`}
+                className={`variante-carrosserie-nav-item-porsche ${selectedCarrosserie === carrosserie ? 'active' : ''
+                  }`}
                 onClick={() => setSelectedCarrosserie(carrosserie)}
               >
                 {carrosserie}
@@ -257,7 +245,7 @@ const VariantePage = () => {
               )}
             </div>
           )}
-          
+
           <button className="variante-technical-details-btn-porsche">
             Tous les détails techniques
           </button>
@@ -296,19 +284,19 @@ const VariantePage = () => {
 
       {/* Boutons d'action en bas */}
       <div className="variante-actions-bottom-porsche">
-        <button 
+        <button
           className="variante-action-btn-porsche variante-action-btn-black"
           onClick={handleChangerModele}
         >
           Changer de modèle
         </button>
-        <button 
+        <button
           className="variante-action-btn-porsche variante-action-btn-white"
           onClick={handleConfigurer}
         >
           Configurer
         </button>
-        <button 
+        <button
           className="variante-action-btn-porsche variante-action-btn-white"
           onClick={handleAcheter}
         >

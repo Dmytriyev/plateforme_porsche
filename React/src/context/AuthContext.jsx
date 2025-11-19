@@ -1,11 +1,11 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import authService from '../services/auth.service.jsx';
 
 /**
  * Contexte d'authentification
  * Gère l'état global de l'utilisateur connecté
  */
-export const AuthContext = createContext(undefined);
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
       } catch (err) {
-        console.error('Erreur chargement utilisateur:', err);
       } finally {
         setLoading(false);
       }
@@ -30,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   /**
    * Connexion
    */
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     try {
       const data = await authService.login(email, password);
       setUser(data.user);
@@ -38,81 +37,72 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       return { success: false, error: err.message || 'Erreur de connexion' };
     }
-  };
+  }, []);
 
   /**
    * Inscription
    */
-  const register = async (userData) => {
+  const register = useCallback(async (userData) => {
     try {
       const data = await authService.register(userData);
       setUser(data.user);
       return { success: true, data };
     } catch (err) {
-      return { success: false, error: err.message || 'Erreur d\'inscription' };
+      return { success: false, error: err.message || "Erreur d'inscription" };
     }
-  };
+  }, []);
 
   /**
    * Déconnexion
    */
-  const logout = () => {
+  const logout = useCallback(() => {
     authService.logout();
     setUser(null);
-  };
+  }, []);
 
-  const updateProfile = async (userId, userData) => {
+  const updateProfile = useCallback(async (userId, userData) => {
     try {
       const data = await authService.updateProfile(userId, userData);
-      if (data) {
-        setUser(data);
-      }
+      if (data) setUser(data);
       return { success: true, data };
     } catch (err) {
       return { success: false, error: err.message || 'Erreur de mise à jour' };
     }
-  };
+  }, []);
 
   /**
    * Vérifier si l'utilisateur est connecté
    */
-  const isAuthenticated = () => {
+  const isAuthenticated = useCallback(() => {
     return !!user && authService.isAuthenticated();
-  };
+  }, [user]);
 
   /**
    * Vérifier le rôle de l'utilisateur
    */
-  const hasRole = (role) => {
-    return user?.role === role;
-  };
+  const hasRole = useCallback((role) => user?.role === role, [user]);
 
   /**
    * Vérifier si l'utilisateur est admin
    */
-  const isAdmin = () => {
-    return hasRole('admin');
-  };
+  const isAdmin = useCallback(() => hasRole('admin'), [hasRole]);
+  const isConseiller = useCallback(() => hasRole('conseiller') || hasRole('responsable'), [hasRole]);
 
-  /**
-   * Vérifier si l'utilisateur est conseiller
-   */
-  const isConseiller = () => {
-    return hasRole('conseiller') || hasRole('responsable');
-  };
-
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    updateProfile,
-    isAuthenticated,
-    hasRole,
-    isAdmin,
-    isConseiller,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      updateProfile,
+      isAuthenticated,
+      hasRole,
+      isAdmin,
+      isConseiller,
+    }),
+    [user, loading, login, register, logout, updateProfile, isAuthenticated, hasRole, isAdmin, isConseiller]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

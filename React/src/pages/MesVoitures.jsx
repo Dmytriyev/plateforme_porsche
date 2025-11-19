@@ -6,24 +6,11 @@ import { Loading, Alert } from '../components/common';
 import { API_URL } from '../config/api.jsx';
 import './MesVoitures.css';
 
-/**
- * Page Mes Porsche - Design style Finder Porsche
- * Inspiré de: https://connect-store.porsche.com/offer/fr/fr-FR/911_2026/products
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page affiche les Porsche (model_porsche_actuel) de l'utilisateur connecté.
- * Elle utilise UNIQUEMENT les données disponibles dans la base de données.
- * 
- * Structure:
- * 1. Image générale en haut
- * 2. Boutons de gestion de voiture
- * 3. Liste des voitures avec cartes détaillées (style Finder)
- */
+
 const MesVoitures = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [voitures, setVoitures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,7 +31,6 @@ const MesVoitures = () => {
       setVoitures(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement de vos voitures');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -98,7 +84,6 @@ const MesVoitures = () => {
       fetchMesVoitures();
     } catch (err) {
       setError(err.message || 'Erreur lors de la suppression');
-      console.error(err);
     }
   };
 
@@ -201,10 +186,10 @@ const MesVoitures = () => {
             const photos = voiture.photo_voiture_actuel && Array.isArray(voiture.photo_voiture_actuel)
               ? voiture.photo_voiture_actuel.filter(p => p && (p.name || p._id))
               : [];
-            
+
             const photoPrincipale = photos.length > 0 ? photos[0] : null;
             const thumbnails = photos.slice(1, 4); // Maximum 3 thumbnails
-            
+
             const isEnregistree = voituresEnregistrees.includes(voiture._id);
             const dateImmat = formatDateImmat(voiture.annee_production);
 
@@ -315,8 +300,8 @@ const MesVoitures = () => {
                           {voiture.info_transmission.includes('PDK') || voiture.info_transmission.includes('Automatique')
                             ? 'Transmission intégrale • PDK (automatique)'
                             : voiture.info_transmission.includes('Manuelle')
-                            ? 'Transmission intégrale • Manuelle'
-                            : voiture.info_transmission}
+                              ? 'Transmission intégrale • Manuelle'
+                              : voiture.info_transmission}
                         </span>
                       </div>
                     )}
@@ -345,14 +330,14 @@ const MesVoitures = () => {
                       {isEnregistree ? (
                         <>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
                           </svg>
                           Enregistré
                         </>
                       ) : (
                         <>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
                           </svg>
                           → Comparer
                         </>

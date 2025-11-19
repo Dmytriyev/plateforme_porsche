@@ -72,38 +72,61 @@
   margin: 0;
 }
 
-/* Grille accessoires */
-.accessoires-grid {
+/* Grille accessoires - Style Porsche Design */
+.accessoires-grid-porsche {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: start;
 }
 
-/* Image container */
-.accessoire-image-container {
+/* Carte accessoire - Style Porsche Design */
+.accessoire-card-porsche {
+  background-color: #fff;
+  border-radius: 0;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+.accessoire-card-porsche:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Container - Style Porsche Design */
+.accessoire-card-image-container {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  margin-bottom: 1rem;
-  border-radius: 0.5rem;
+  min-height: 280px;
+  max-height: 280px;
+  background-color: #f9fafb;
   overflow: hidden;
-  background-color: #f3f4f6;
+  flex-shrink: 0;
 }
 
-.accessoire-image {
+.accessoire-card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.3s ease;
+  display: block;
 }
 
-.accessoire-image:hover {
+.accessoire-card-porsche:hover .accessoire-card-image {
   transform: scale(1.05);
 }
 
-/* Image placeholder */
-.accessoire-image-placeholder {
+.accessoire-card-image-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
@@ -112,73 +135,195 @@
   justify-content: center;
 }
 
-.accessoire-image-letter {
+.accessoire-card-image-letter {
   font-size: 3rem;
   font-weight: 700;
   color: #fff;
   opacity: 0.5;
 }
 
-/* Détails */
-.accessoire-details {
-  padding: 0;
-}
-
-/* Type badge */
-.accessoire-type-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #f3f4f6;
-  border-radius: 9999px;
+/* Badge "En rupture de stock" */
+.accessoire-card-out-of-stock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
+  z-index: 10;
 }
 
-.accessoire-name {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 0.5rem 0;
-}
-
-.accessoire-description {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 0.75rem 0;
-  line-height: 1.5;
-}
-
-/* Couleur */
-.accessoire-couleur {
+/* Wishlist Icon */
+.accessoire-card-wishlist {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  color: #000;
 }
 
-.accessoire-couleur-label {
+.accessoire-card-wishlist:hover {
+  background-color: #fff;
+  transform: scale(1.1);
+}
+
+.accessoire-card-wishlist.active {
+  color: #dc2626;
+}
+
+.accessoire-card-wishlist svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Content - Style Porsche Design */
+.accessoire-card-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
+/* Brand */
+.accessoire-card-brand {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+/* Name */
+.accessoire-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+  min-height: 2.8rem;
+  max-height: 4.2rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Price */
+.accessoire-card-price {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.accessoire-card-price-current {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.accessoire-card-price-old {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.accessoire-card-price-new {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+/* Color Swatches */
+.accessoire-card-colors {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.accessoire-card-color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  background: none;
+}
+
+.accessoire-card-color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.accessoire-card-color-swatch.active {
+  border-color: #000;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #000;
+}
+
+/* Actions */
+.accessoire-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.accessoire-card-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.accessoire-couleur-value {
-  font-size: 0.875rem;
-  color: #6b7280;
-  padding: 0.125rem 0.5rem;
-  background-color: #f3f4f6;
-  border-radius: 0.25rem;
+.accessoire-card-btn-primary {
+  background-color: #000;
+  color: #fff;
 }
 
-.accessoire-price {
-  font-size: 1.5rem;
-  font-weight: 700;
+.accessoire-card-btn-primary:hover:not(:disabled) {
+  background-color: #1f2937;
+}
+
+.accessoire-card-btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.accessoire-card-btn-secondary {
+  background-color: transparent;
   color: #000;
-  margin: 1rem 0;
+  border: 2px solid #000;
+}
+
+.accessoire-card-btn-secondary:hover {
+  background-color: #000;
+  color: #fff;
 }
 
 /* Message vide */
@@ -204,12 +349,27 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .accessoires-grid-porsche {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 640px) {
-  .accessoires-grid {
+  .accessoires-grid-porsche {
     grid-template-columns: 1fr;
   }
   
   .accessoires-header {
     text-align: center;
+  }
+
+  .accessoire-card-content {
+    padding: 1rem;
+  }
+
+  .accessoire-card-name {
+    min-height: auto;
   }
 }

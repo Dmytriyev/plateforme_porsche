@@ -2,14 +2,6 @@ import { Component } from 'react';
 import { Button } from './common';
 import './ErrorBoundary.css';
 
-/**
- * ErrorBoundary - Composant pour capturer les erreurs React
- * 
- * Utilisation:
- * <ErrorBoundary>
- *   <VotreComposant />
- * </ErrorBoundary>
- */
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -31,7 +23,6 @@ class ErrorBoundary extends Component {
     });
 
     if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
 
@@ -49,12 +40,12 @@ class ErrorBoundary extends Component {
         <div className="error-boundary-container">
           <div className="error-boundary-content">
             <div>
-              <div className="error-boundary-icon">⚠️</div>
+              <div className="error-boundary-icon" aria-hidden="true" />
               <h1 className="error-boundary-title">Oups !</h1>
               <p className="error-boundary-message">
                 Une erreur inattendue s'est produite
               </p>
-              
+
               {import.meta.env.DEV && this.state.error && (
                 <details className="error-boundary-details">
                   <summary>

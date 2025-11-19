@@ -11,7 +11,7 @@ import './DashboardAdmin.css';
 const DashboardAdmin = () => {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
-  
+
   const [stats, setStats] = useState({
     voitures: 0,
     commandes: 0,
@@ -34,7 +34,7 @@ const DashboardAdmin = () => {
       // Charger les statistiques
       const voitures = await voitureService.getAllVoitures();
       const commandes = await commandeService.getMyCommandes();
-      
+
       setStats({
         voitures: voitures.length,
         commandes: commandes.length,
@@ -42,7 +42,6 @@ const DashboardAdmin = () => {
         users: 0,
       });
     } catch (err) {
-      console.error('Erreur chargement stats:', err);
     } finally {
       setLoading(false);
     }

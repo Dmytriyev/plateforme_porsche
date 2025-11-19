@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Button, Input, Alert, Card } from '../components/common';
+import { Alert } from '../components/common';
 import { validateEmail } from '../utils/validation.js';
 import './Login.css';
 
-/**
- * Page de connexion
- */
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -66,79 +64,102 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        navigate('/');
+        // Utiliser replace pour éviter les problèmes de cache du navigateur
+        // et un petit délai pour s'assurer que le contexte est mis à jour
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
       } else {
         setErrorMessage(result.error || 'Erreur de connexion');
+        setLoading(false);
       }
     } catch (err) {
-      console.error('Erreur connexion:', err);
       setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-form-wrapper">
-        <Card padding="lg">
-          <div className="login-header">
-            <h2 className="login-title">Connexion</h2>
-            <p className="login-subtitle">
-              Connectez-vous à votre compte Porsche
-            </p>
-          </div>
+    <div className="login-container-porsche">
+      <div className="login-form-wrapper-porsche">
+        <div className="login-form-card-porsche">
+          {/* Titre */}
+          <h1 className="login-title-porsche">Connexion</h1>
 
+          {/* Message d'erreur */}
           {errorMessage && (
-            <div className="login-error">
+            <div className="login-error-porsche">
               <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="login-form">
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="votre@email.com"
-              error={errors.email}
-              required
-            />
+          {/* Formulaire */}
+          <form onSubmit={handleSubmit} className="login-form-porsche">
+            {/* Champ Email */}
+            <div className="login-field-porsche">
+              <label htmlFor="email" className="login-label-porsche">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="email@gmail.com"
+                className={`login-input-porsche ${errors.email ? 'error' : ''}`}
+                autoComplete="email"
+                required
+              />
+              {errors.email && (
+                <span className="login-field-error-porsche">{errors.email}</span>
+              )}
+            </div>
 
-            <Input
-              label="Mot de passe"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              error={errors.password}
-              required
-            />
+            {/* Champ Password */}
+            <div className="login-field-porsche">
+              <label htmlFor="password" className="login-label-porsche">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Mot de passe"
+                className={`login-input-porsche ${errors.password ? 'error' : ''}`}
+                autoComplete="current-password"
+                required
+              />
+              {errors.password && (
+                <span className="login-field-error-porsche">{errors.password}</span>
+              )}
+            </div>
 
-            <Button
+            {/* Bouton Se connecter */}
+            <button
               type="submit"
-              fullWidth
+              className="login-btn-primary-porsche"
               disabled={loading}
             >
               {loading ? 'Connexion...' : 'Se connecter'}
-            </Button>
-          </form>
+            </button>
 
-          <div className="login-links">
-            <p>
-              Pas encore de compte ?{' '}
-              <Link to="/register" className="login-link">
-                S'inscrire
-              </Link>
-            </p>
-            <Link to="/mot-de-passe-oublie" className="login-forgot">
-              Mot de passe oublié ?
+            {/* Séparateur */}
+            <div className="login-separator-porsche">
+              <span className="login-separator-text-porsche">Ou</span>
+            </div>
+
+            {/* Bouton Créer un compte */}
+            <Link
+              to="/register"
+              className="login-btn-secondary-porsche"
+            >
+              Créer un compte
             </Link>
-          </div>
-        </Card>
+          </form>
+        </div>
       </div>
     </div>
   );

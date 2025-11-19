@@ -70,7 +70,6 @@ const ConfigurationComplete = () => {
         setPackages(packagesData);
       } catch (err) {
         setError(err.message || 'Erreur lors du chargement');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -188,7 +187,7 @@ const ConfigurationComplete = () => {
               {variante?.voiture?.nom_model || ''} {variante?.nom_model || ''}
             </h1>
             <p className="config-subtitle">{variante?.description || ''}</p>
-            
+
             {/* Spécifications */}
             {variante?.specifications && (
               <div className="config-specs">
@@ -239,7 +238,7 @@ const ConfigurationComplete = () => {
               }}
             />
           ) : null}
-          <div 
+          <div
             className="config-gallery-placeholder"
             style={{ display: variante?.photo_porsche && variante.photo_porsche.length > 0 ? 'none' : 'flex' }}
           >
@@ -296,9 +295,8 @@ const ConfigurationComplete = () => {
                 <button
                   key={couleur._id}
                   onClick={() => handleCouleurExtChange(couleur)}
-                  className={`config-color-card ${
-                    config.couleur_exterieur?._id === couleur._id ? 'config-color-selected' : ''
-                  }`}
+                  className={`config-color-card ${config.couleur_exterieur?._id === couleur._id ? 'config-color-selected' : ''
+                    }`}
                 >
                   {couleur.photo_couleur ? (
                     <img
@@ -313,7 +311,7 @@ const ConfigurationComplete = () => {
                   ) : null}
                   <div
                     className="config-color-swatch"
-                    style={{ 
+                    style={{
                       backgroundColor: couleur.code_hex || '#ccc',
                       display: couleur.photo_couleur ? 'none' : 'block'
                     }}
@@ -340,9 +338,8 @@ const ConfigurationComplete = () => {
                 <button
                   key={couleur._id}
                   onClick={() => handleCouleurIntChange(couleur)}
-                  className={`config-color-card ${
-                    config.couleur_interieur.some((c) => c._id === couleur._id) ? 'config-color-selected' : ''
-                  }`}
+                  className={`config-color-card ${config.couleur_interieur.some((c) => c._id === couleur._id) ? 'config-color-selected' : ''
+                    }`}
                 >
                   {couleur.photo_couleur ? (
                     <img
@@ -357,7 +354,7 @@ const ConfigurationComplete = () => {
                   ) : null}
                   <div
                     className="config-color-swatch"
-                    style={{ 
+                    style={{
                       backgroundColor: couleur.code_hex || '#ccc',
                       display: couleur.photo_couleur ? 'none' : 'block'
                     }}
@@ -383,9 +380,8 @@ const ConfigurationComplete = () => {
                 <button
                   key={jante._id}
                   onClick={() => setConfig({ ...config, taille_jante: jante })}
-                  className={`config-option-card ${
-                    config.taille_jante?._id === jante._id ? 'config-option-selected' : ''
-                  }`}
+                  className={`config-option-card ${config.taille_jante?._id === jante._id ? 'config-option-selected' : ''
+                    }`}
                 >
                   <h3 className="config-option-name">{jante.taille_jante}"</h3>
                   {jante.couleur_jante && (
@@ -409,9 +405,8 @@ const ConfigurationComplete = () => {
                 <button
                   key={siege._id}
                   onClick={() => setConfig({ ...config, siege })}
-                  className={`config-option-card ${
-                    config.siege?._id === siege._id ? 'config-option-selected' : ''
-                  }`}
+                  className={`config-option-card ${config.siege?._id === siege._id ? 'config-option-selected' : ''
+                    }`}
                 >
                   <h3 className="config-option-name">{siege.nom_siege}</h3>
                   {siege.prix > 0 && (
@@ -432,9 +427,8 @@ const ConfigurationComplete = () => {
                 <button
                   key={pkg._id}
                   onClick={() => setConfig({ ...config, package: pkg })}
-                  className={`config-option-card ${
-                    config.package?._id === pkg._id ? 'config-option-selected' : ''
-                  }`}
+                  className={`config-option-card ${config.package?._id === pkg._id ? 'config-option-selected' : ''
+                    }`}
                 >
                   <h3 className="config-option-name">{pkg.nom_package}</h3>
                   {pkg.description && (

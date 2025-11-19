@@ -26,7 +26,6 @@ const VoiturePage = () => {
         setPageData(data);
       } catch (err) {
         setError(err.message || 'Erreur lors du chargement de la page');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -86,7 +85,7 @@ const VoiturePage = () => {
             Accueil
           </Link>
           <span className="breadcrumb-separator">/</span>
-          <Link 
+          <Link
             to={`/catalogue/${voiture.type_voiture ? 'neuve' : 'occasion'}`}
             className="breadcrumb-link"
           >
@@ -132,9 +131,8 @@ const VoiturePage = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`voiture-page-thumbnail ${
-                      selectedImage === index ? 'voiture-page-thumbnail-active' : ''
-                    }`}
+                    className={`voiture-page-thumbnail ${selectedImage === index ? 'voiture-page-thumbnail-active' : ''
+                      }`}
                   >
                     <img
                       src={`${API_URL}${image.name}`}

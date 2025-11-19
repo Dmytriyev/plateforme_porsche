@@ -70,13 +70,14 @@ const getAllAccesoires = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean(); // Retourne des objets JS purs (30-50% plus rapide)
 
-    return sendSuccess(res, accesoires);
+    // Retourner le tableau directement dans data pour compatibilité avec extractArray
+    return sendSuccess(res, accesoires, "Accesoires récupérés avec succès");
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
-//  Récupérer un accesoire par son ID
+// Récupérer un accesoire par son ID
 const getAccesoireById = async (req, res) => {
   try {
     const accesoire = await Accesoire.findById(req.params.id)
@@ -88,7 +89,7 @@ const getAccesoireById = async (req, res) => {
       return sendNotFound(res, "Accesoire introuvable");
     }
 
-    return sendSuccess(res, accesoire);
+    return sendSuccess(res, accesoire, "Accesoire récupéré avec succès");
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
@@ -248,43 +249,26 @@ const removeImages = async (req, res) => {
 // Définir la couleur d'un accesoire existant dans la base de données
 const setCouleur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
-    // Vérifier que le corps de la requête n'est pas vide
     const { body } = req;
     if (!body || Object.keys(body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return sendValidationError(res, "Pas de données dans la requête");
     }
 
     const { error } = accesoireValidation(body).accesoireSetCouleur;
     if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+      return sendValidationError(res, error.details[0].message);
     }
 
     // Vérifier que l'accesoire existe
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return res.status(404).json({ message: "Accesoire n'existe pas" });
+      return sendNotFound(res, "Accesoire introuvable");
     }
 
     // Vérifier que la couleur existe
     const couleur = await Couleur_accesoire.findById(body.couleur_accesoire);
     if (!couleur) {
-      return res
-        .status(404)
-        .json({ message: "Couleur d'accesoire introuvable" });
+      return sendNotFound(res, "Couleur d'accesoire introuvable");
     }
 
     // Mettre à jour la couleur
@@ -296,34 +280,23 @@ const setCouleur = async (req, res) => {
       .populate("photo_accesoire", "name alt")
       .populate("couleur_accesoire", "nom_couleur photo_couleur description");
 
-    return res.status(200).json({
-      message: "Couleur définie avec succès",
-      accesoire: updatedAccesoire,
-    });
+    return sendSuccess(
+      res,
+      { accesoire: updatedAccesoire },
+      "Couleur définie avec succès"
+    );
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
 // Retirer la couleur d'un accesoire existant dans la base de données
 const removeCouleur = async (req, res) => {
   try {
-    // Vérifier l'authentification
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
-
-    // Vérifier que l'utilisateur est admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Accès réservé aux administrateurs" });
-    }
-
     // Vérifier que l'accesoire existe
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
-      return res.status(404).json({ message: "Accesoire n'existe pas" });
+      return sendNotFound(res, "Accesoire introuvable");
     }
 
     // Retirer la couleur
@@ -334,12 +307,13 @@ const removeCouleur = async (req, res) => {
       { new: true }
     ).populate("photo_accesoire", "name alt");
 
-    return res.status(200).json({
-      message: "Couleur supprimée avec succès",
-      accesoire: updatedAccesoire,
-    });
+    return sendSuccess(
+      res,
+      { accesoire: updatedAccesoire },
+      "Couleur supprimée avec succès"
+    );
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -365,15 +339,20 @@ const getAccesoiresByCriteria = async (req, res) => {
     const accesoires = await Accesoire.find(query)
       .populate("photo_accesoire", "name alt")
       .populate("couleur_accesoire", "nom_couleur photo_couleur")
-      .sort({ createdAt: -1 }); // Trier par date de création décroissante
+      .sort({ createdAt: -1 }) // Trier par date de création décroissante
+      .lean();
 
-    return res.status(200).json({
-      count: accesoires.length,
-      filters: query,
-      accesoires,
-    });
+    return sendSuccess(
+      res,
+      {
+        count: accesoires.length,
+        filters: query,
+        accesoires,
+      },
+      "Accesoires récupérés avec succès"
+    );
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 
@@ -381,13 +360,13 @@ const getAccesoiresByCriteria = async (req, res) => {
 const getAvailableTypesAccesoireOptions = async (req, res) => {
   try {
     const types = getAvailableTypesAccesoire();
-    return res.json({
-      success: true,
-      data: types,
-      message: "Types d'accesoires récupérés avec succès",
-    });
+    return sendSuccess(
+      res,
+      types,
+      "Types d'accesoires récupérés avec succès"
+    );
   } catch (error) {
-    return sendError(res, "getAvailableTypesAccesoireOptions", error);
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 

@@ -1,74 +1,76 @@
 import apiClient from '../config/api.jsx';
+import { extractData, handleServiceError } from './httpHelper';
+import TokenService from './token.service.js';
 
 const authService = {
   login: async (email, password) => {
     try {
       const response = await apiClient.post('/user/login', { email, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      const data = extractData(response) || {};
+      if (data.token) {
+        TokenService.setToken(data.token, { persist: false });
+        try { localStorage.setItem('user', JSON.stringify(data.user)); } catch (e) { }
       }
-      return response.data;
+      return data;
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   register: async (userData) => {
     try {
       const response = await apiClient.post('/user/register', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      const data = extractData(response) || {};
+      if (data.token) {
+        TokenService.setToken(data.token, { persist: false });
+        try { localStorage.setItem('user', JSON.stringify(data.user)); } catch (e) { }
       }
-      return response.data;
+      return data;
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    TokenService.clear();
+    try { localStorage.removeItem('user'); } catch (e) { }
     window.location.href = '/login';
   },
 
   getProfile: async (userId) => {
     try {
       const response = await apiClient.get(`/user/profile/${userId}`);
-      if (response.data && response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      return response.data;
+      const data = extractData(response) || {};
+      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+      return data;
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   updateProfile: async (userId, userData) => {
     try {
       const response = await apiClient.put(`/user/update/${userId}`, userData);
-      if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-      }
-      return response.data;
+      const data = extractData(response);
+      if (data) localStorage.setItem('user', JSON.stringify(data));
+      return data;
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    try {
+      const userStr = localStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (e) {
+      return null;
+    }
   },
 
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
-  },
+  isAuthenticated: () => !!TokenService.getToken(),
 
-  getToken: () => {
-    return localStorage.getItem('token');
-  },
+  getToken: () => TokenService.getToken(),
 
   hasRole: (role) => {
     const user = authService.getCurrentUser();

@@ -65,7 +65,8 @@ const getAllVoitures = async (req, res) => {
       .populate("photo_voiture", "name alt")
       .sort({ createdAt: -1 }) // Trier par date de création
       .lean(); // Retourne des plain JS objects (plus léger)
-    return sendSuccess(res, voitures);
+    // Retourner le tableau directement dans data pour compatibilité avec extractArray
+    return sendSuccess(res, voitures, "Voitures récupérées avec succès");
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }

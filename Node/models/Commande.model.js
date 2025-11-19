@@ -31,6 +31,11 @@ const CommandeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // ID de session Stripe pour idempotence et debug
+    stripeSessionId: {
+      type: String,
+      trim: true,
+    },
     // Relation Many-to-One: Utilisateur propriétaire
     user: {
       type: mongoose.Schema.Types.ObjectId,

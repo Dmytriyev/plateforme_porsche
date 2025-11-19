@@ -12,7 +12,7 @@ import './MesCommandes.css';
 const MesCommandes = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [commandes, setCommandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,7 +29,6 @@ const MesCommandes = () => {
       setCommandes(data);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des commandes');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -142,13 +141,13 @@ const MesCommandes = () => {
 
                     {commande.factureUrl && (
                       <div className="commande-detail-item">
-                        <a 
-                          href={commande.factureUrl} 
-                          target="_blank" 
+                        <a
+                          href={commande.factureUrl}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="commande-facture-link"
                         >
-                          📄 Télécharger la facture
+                          Télécharger la facture
                         </a>
                       </div>
                     )}
@@ -156,8 +155,8 @@ const MesCommandes = () => {
 
                   {/* Actions */}
                   <div className="commande-actions">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => navigate(`/commandes/${commande._id}`)}
                     >

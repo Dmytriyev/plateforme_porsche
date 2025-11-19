@@ -6,24 +6,7 @@ import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
 import './AccessoiresParCategorie.css';
 
-/**
- * Page Liste Accessoires par Catégorie
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page affiche tous les accessoires d'une catégorie spécifique.
- * 
- * Exemples d'URL:
- * - /accessoires/categorie/vetement → Affiche tous les vêtements
- * - /accessoires/categorie/porte-cl%C3%A9s → Affiche tous les porte-clés
- * - /accessoires/categorie/decoration → Affiche tous les objets de décoration
- * 
- * Concepts utilisés:
- * 1. useParams: Récupère le paramètre 'categorie' de l'URL
- * 2. decodeURIComponent: Décode les caractères spéciaux dans l'URL (%C3%A9 → é)
- * 3. Normalisation: Convertit différents formats en un format unique pour le backend
- * 4. useEffect: Charge les données quand la catégorie change
- */
+
 const AccessoiresParCategorie = () => {
   const { categorie } = useParams(); // Récupère 'porte-cl%C3%A9s' depuis l'URL
   const navigate = useNavigate();
@@ -39,9 +22,9 @@ const AccessoiresParCategorie = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       let categorieDecodee = decodeURIComponent(categorie).toLowerCase();
-      
+
       const normalisations = {
         'décoration': 'decoration',
         'decoration': 'decoration',
@@ -55,23 +38,18 @@ const AccessoiresParCategorie = () => {
         'porte-cles': 'porte-clés',
         'portecles': 'porte-clés',
       };
-      
+
       const categorieNormalisee = normalisations[categorieDecodee] || categorieDecodee;
-      
+
       const response = await accesoireService.getAccessoiresByType(categorieNormalisee);
-      
+
       const filteredAccessoires = Array.isArray(response) ? response : [];
-      
-      
+
+
       setAccessoires(filteredAccessoires);
     } catch (err) {
       const errorMessage = err.message || 'Erreur lors du chargement des accessoires';
       setError(errorMessage);
-      console.error('Erreur fetchAccessoires:', {
-        categorie,
-        erreur: err.message,
-        details: err
-      });
     } finally {
       setLoading(false);
     }
@@ -98,8 +76,8 @@ const AccessoiresParCategorie = () => {
       <div className="accessoires-categorie-content">
         {/* En-tête */}
         <div className="accessoires-categorie-header">
-          <button 
-            onClick={() => navigate('/accessoires')} 
+          <button
+            onClick={() => navigate('/accessoires')}
             className="accessoires-back-btn"
           >
             ← Retour aux catégories
@@ -116,7 +94,7 @@ const AccessoiresParCategorie = () => {
                 'decoration': 'Décoration',
                 'décoration': 'Décoration',
               };
-              return labels[categorieDecodee.toLowerCase()] 
+              return labels[categorieDecodee.toLowerCase()]
                 || categorieDecodee.charAt(0).toUpperCase() + categorieDecodee.slice(1);
             })()}
           </h1>
@@ -142,12 +120,12 @@ const AccessoiresParCategorie = () => {
                 <div className="accessoire-image-container">
                   {(() => {
                     // Récupérer la première photo disponible
-                    const photoPrincipale = accessoire.photo_accesoire && 
-                      Array.isArray(accessoire.photo_accesoire) && 
-                      accessoire.photo_accesoire.length > 0 
-                      ? accessoire.photo_accesoire[0] 
+                    const photoPrincipale = accessoire.photo_accesoire &&
+                      Array.isArray(accessoire.photo_accesoire) &&
+                      accessoire.photo_accesoire.length > 0
+                      ? accessoire.photo_accesoire[0]
                       : null;
-                    
+
                     if (photoPrincipale && photoPrincipale.name) {
                       // Construire l'URL complète de l'image
                       let photoUrl = photoPrincipale.name;
@@ -157,7 +135,7 @@ const AccessoiresParCategorie = () => {
                           ? `${API_URL}${photoUrl}`
                           : `${API_URL}/${photoUrl}`;
                       }
-                      
+
                       return (
                         <img
                           src={photoUrl}
@@ -181,12 +159,12 @@ const AccessoiresParCategorie = () => {
                     }
                     return null;
                   })()}
-                  <div 
+                  <div
                     className="accessoire-placeholder"
-                    style={{ 
+                    style={{
                       display: (() => {
-                        const hasPhoto = accessoire.photo_accesoire && 
-                          Array.isArray(accessoire.photo_accesoire) && 
+                        const hasPhoto = accessoire.photo_accesoire &&
+                          Array.isArray(accessoire.photo_accesoire) &&
                           accessoire.photo_accesoire.length > 0 &&
                           accessoire.photo_accesoire[0]?.name;
                         return hasPhoto ? 'none' : 'flex';
@@ -202,7 +180,7 @@ const AccessoiresParCategorie = () => {
                 {/* Informations */}
                 <div className="accessoire-info">
                   <h2 className="accessoire-name">{accessoire.nom_accesoire}</h2>
-                  
+
                   {accessoire.description && (
                     <p className="accessoire-description">
                       {accessoire.description.length > 100

@@ -11,7 +11,7 @@ import './Voitures.css';
 const Voitures = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [voitures, setVoitures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,7 +37,6 @@ const Voitures = () => {
         setVoitures(data);
       } catch (err) {
         setError('Erreur lors du chargement des voitures');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -128,9 +127,9 @@ const Voitures = () => {
               Découvrez notre collection de voitures neuves et d'occasion
             </p>
           </div>
-          
+
           {/* Bouton filtres mobile */}
-          <button 
+          <button
             className="voitures-filter-toggle"
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -258,11 +257,11 @@ const Voitures = () => {
                         )}
                         {voiture.nom_model}
                       </h3>
-                      
+
                       {/* Description du modèle parent */}
                       {voiture.voiture?.description && (
                         <p className="voiture-description">
-                          {voiture.voiture.description.length > 100 
+                          {voiture.voiture.description.length > 100
                             ? voiture.voiture.description.substring(0, 100) + '...'
                             : voiture.voiture.description
                           }
@@ -293,14 +292,14 @@ const Voitures = () => {
                             Occasion
                           </span>
                         ) : null}
-                        
+
                         {/* Badge Disponible (si défini et true) */}
                         {voiture.disponible === true && (
                           <span className="voiture-badge voiture-badge-available">
                             Disponible
                           </span>
                         )}
-                        
+
                         {/* Badge carrosserie si disponible */}
                         {voiture.type_carrosserie && (
                           <span className="voiture-badge voiture-badge-carrosserie">

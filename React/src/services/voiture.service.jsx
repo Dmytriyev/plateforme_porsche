@@ -1,130 +1,105 @@
 import apiClient from '../config/api.jsx';
+import { extractData, extractArray, handleServiceError } from './httpHelper';
 
 const voitureService = {
   getAllVoitures: async () => {
     try {
       const response = await apiClient.get('/voiture/all');
-      return response.data;
+      return extractArray(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getVoitureById: async (id) => {
     try {
       const response = await apiClient.get(`/voiture/${id}`);
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
-      } else if (response.data && response.data.data) {
-        return response.data.data;
-      }
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getVoituresNeuves: async () => {
     try {
       const response = await apiClient.get('/voiture/neuve');
-      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data.voitures)) {
-        return response.data.data.voitures;
-      } else if (response.data && response.data.data && Array.isArray(response.data.data.voitures)) {
-        return response.data.data.voitures;
-      } else if (response.data && Array.isArray(response.data.voitures)) {
-        return response.data.voitures;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
+      return extractArray(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getVoituresOccasion: async (modele = null) => {
     try {
       let url = '/voiture/occasion';
-      if (modele) {
-        url += `?modele=${encodeURIComponent(modele)}`;
-      }
-      
+      if (modele) url += `?modele=${encodeURIComponent(modele)}`;
       const response = await apiClient.get(url);
-      if (response.data && response.data.success && response.data.data && Array.isArray(response.data.data.voitures)) {
-        return response.data.data.voitures;
-      } else if (response.data && response.data.data && Array.isArray(response.data.data.voitures)) {
-        return response.data.data.voitures;
-      } else if (response.data && Array.isArray(response.data.voitures)) {
-        return response.data.voitures;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
+      return extractArray(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return [];
     }
   },
 
   getModelsPorscheByVoiture: async (voitureId) => {
     try {
       const response = await apiClient.get(`/voiture/modelsPorsche/${voitureId}`);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getVoiturePage: async (id) => {
     try {
       const response = await apiClient.get(`/voiture/page/${id}`);
-      return response.data?.data || response.data;
+      return extractData(response) || extractData(response)?.data || null;
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   createVoiture: async (data) => {
     try {
       const response = await apiClient.post('/voiture/new', data);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   updateVoiture: async (id, data) => {
     try {
       const response = await apiClient.put(`/voiture/update/${id}`, data);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   deleteVoiture: async (id) => {
     try {
       const response = await apiClient.delete(`/voiture/delete/${id}`);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getPhotosByVoiture: async (voitureId) => {
     try {
       const response = await apiClient.get(`/photo_voiture?voiture=${voitureId}`);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 
   getPhotosByModel: async (modelId) => {
     try {
       const response = await apiClient.get(`/photo_porsche?model_porsche=${modelId}`);
-      return response.data;
+      return extractData(response);
     } catch (error) {
-      throw error.response?.data || error;
+      return handleServiceError(error);
     }
   },
 };

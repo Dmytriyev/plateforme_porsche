@@ -32,48 +32,71 @@
   line-height: 1.6;
 }
 
-/* Grille de choix */
-.choix-grid {
+/* Grille de choix - Style Porsche */
+.choix-grid-porsche {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 3rem;
-  margin-bottom: 4rem;
+  gap: 2rem;
+  margin-top: 2rem;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* Cartes de choix - Style harmonisé avec CatalogueModeles et Home */
-.choix-card {
+/* Carte de choix - Style Porsche (comme sur l'image) */
+.choix-card-porsche {
   background-color: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem;
-  padding: 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: left;
+  border-radius: 0;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0;
+  height: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
-/* Image générale de la carte - Style harmonisé */
-.choix-card-image {
+.choix-card-porsche:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Titre en haut */
+.choix-card-title-porsche {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Image */
+.choix-card-image-porsche {
   width: 100%;
-  aspect-ratio: 16/9;
-  background-color: #f3f4f6;
+  aspect-ratio: 4/3;
+  background-color: #f9fafb;
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  padding: 1rem;
 }
 
-.choix-card-image-placeholder {
+.choix-card-img-porsche {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.choix-card-porsche:hover .choix-card-img-porsche {
+  transform: scale(1.05);
+}
+
+.choix-card-image-placeholder-porsche {
   width: 100%;
   height: 100%;
   display: flex;
@@ -82,150 +105,34 @@
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
 }
 
-.choix-card-image-text {
-  font-size: 2rem;
+.choix-card-image-letter-porsche {
+  font-size: 4rem;
   font-weight: 700;
   color: #9ca3af;
   opacity: 0.5;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
-.choix-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-/* Contenu de la carte (après l'image) - Style harmonisé */
-.choix-card > *:not(.choix-card-image) {
-  padding: 0 1.5rem;
-}
-
-.choix-card > .choix-card-title {
-  padding-top: 1.5rem;
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-}
-
-.choix-card > .choix-card-description {
-  padding-top: 0;
-  margin-bottom: 1.5rem;
-}
-
-.choix-card > .choix-card-cta {
-  padding: 0 1.5rem 1.5rem 1.5rem;
-  margin-top: 0;
-  margin-bottom: 0;
-  width: 100%;
-  text-align: center;
-}
-
-.choix-card:hover,
-.choix-card-hover {
-  border-color: #000;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  background-color: #fff;
-}
-
-.choix-card:hover .choix-card-image img,
-.choix-card-hover .choix-card-image img {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
-}
-
-.choix-card-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.choix-card-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.choix-card-description {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.6;
-}
-
-.choix-card-features {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  text-align: left;
-}
-
-.choix-card-features li {
-  padding: 0.75rem 0;
-  font-size: 1rem;
-  color: #374151;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.choix-card-features li:last-child {
-  border-bottom: none;
-}
-
-.choix-card-cta {
-  margin-top: 0;
-  padding: 0.875rem 1.5rem;
+/* Bouton */
+.choix-card-btn-porsche {
+  padding: 1rem 2rem;
   background-color: #000;
   color: #fff;
-  border-radius: 4px;
+  border: none;
+  border-radius: 0;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
-  border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
+  transition: all 0.2s ease;
+  text-transform: none;
+  margin: 1.5rem;
+  margin-top: auto;
+  width: calc(100% - 3rem);
 }
 
-.choix-card:hover .choix-card-cta,
-.choix-card-hover .choix-card-cta {
+.choix-card-btn-porsche:hover {
   background-color: #1f2937;
 }
 
-/* Information complémentaire */
-.choix-info {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.choix-info-card {
-  background-color: #fff;
-  border: 2px solid #e5e7eb;
-  border-radius: 1rem;
-  padding: 2rem;
-  text-align: center;
-}
-
-.choix-info-card h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
-  margin: 0 0 1rem 0;
-}
-
-.choix-info-card p {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.6;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -233,25 +140,19 @@
     font-size: 2rem;
   }
 
-  .choix-subtitle {
-    font-size: 1rem;
-  }
-
-  .choix-grid {
+  .choix-grid-porsche {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
-  .choix-card {
-    padding: 2rem 1.5rem;
+  .choix-card-title-porsche {
+    font-size: 2rem;
+    padding: 1.25rem 1.25rem 0.75rem 1.25rem;
   }
 
-  .choix-card-title {
-    font-size: 1.5rem;
-  }
-
-  .choix-card-icon {
-    font-size: 3rem;
+  .choix-card-btn-porsche {
+    margin: 1.25rem;
+    width: calc(100% - 2.5rem);
   }
 }
 

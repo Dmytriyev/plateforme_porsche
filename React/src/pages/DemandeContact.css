@@ -1,0 +1,177 @@
+/* Demande Contact Page Styles - Style Porsche */
+
+.demande-contact-container {
+  min-height: 100vh;
+  background-color: #fff;
+  padding: 2rem 1rem;
+}
+
+.demande-contact-content {
+  max-width: 42rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Bouton Retour */
+.demande-contact-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  transition: opacity 0.2s ease;
+}
+
+.demande-contact-back:hover {
+  opacity: 0.7;
+}
+
+/* Titre */
+.demande-contact-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 2rem 0;
+}
+
+/* Messages d'erreur et de succès */
+.demande-contact-error {
+  margin-bottom: 1.5rem;
+}
+
+.demande-contact-success {
+  margin-bottom: 1.5rem;
+}
+
+/* Formulaire */
+.demande-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 2rem;
+}
+
+/* Ligne pour Prénom et Nom */
+.demande-contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Champs de saisie */
+.demande-contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.demande-contact-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.demande-contact-required {
+  color: #dc2626;
+}
+
+.demande-contact-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  color: #000;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.demande-contact-input::placeholder {
+  color: #9ca3af;
+}
+
+.demande-contact-input:focus {
+  outline: none;
+  border-color: #000;
+  background-color: #fff;
+}
+
+.demande-contact-input.error {
+  border-color: #dc2626;
+}
+
+/* Textarea */
+.demande-contact-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.demande-contact-field-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.25rem;
+}
+
+/* Bouton Soumettre */
+.demande-contact-submit {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.demande-contact-submit:hover:not(:disabled) {
+  background-color: #1f2937;
+}
+
+.demande-contact-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Texte de confidentialité */
+.demande-contact-privacy {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .demande-contact-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 640px) {
+  .demande-contact-container {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .demande-contact-container {
+    padding: 3rem 2rem;
+  }
+}
+

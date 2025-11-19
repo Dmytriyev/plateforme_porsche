@@ -7,15 +7,11 @@ import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
 import './AccessoireDetail.css';
 
-/**
- * Page Détail d'un Accessoire
- * Affiche toutes les photos et informations complètes
- */
 const AccessoireDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { ajouterAccessoire } = usePanier();
-  
+
   const [accessoire, setAccessoire] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -35,7 +31,6 @@ const AccessoireDetail = () => {
       setAccessoire(data);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement de l\'accessoire');
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -51,14 +46,11 @@ const AccessoireDetail = () => {
     }
   };
 
-  const handleToggleWishlist = () => {
-    setIsWishlist(!isWishlist);
-    // TODO: Implémenter la fonctionnalité de liste de souhaits
-  };
+  const handleToggleWishlist = () => setIsWishlist((s) => !s);
 
   const handlePrevPhoto = () => {
     if (accessoire?.photo_accesoire && accessoire.photo_accesoire.length > 0) {
-      setPhotoActive((prev) => 
+      setPhotoActive((prev) =>
         prev === 0 ? accessoire.photo_accesoire.length - 1 : prev - 1
       );
     }
@@ -66,7 +58,7 @@ const AccessoireDetail = () => {
 
   const handleNextPhoto = () => {
     if (accessoire?.photo_accesoire && accessoire.photo_accesoire.length > 0) {
-      setPhotoActive((prev) => 
+      setPhotoActive((prev) =>
         prev === accessoire.photo_accesoire.length - 1 ? 0 : prev + 1
       );
     }
@@ -125,13 +117,13 @@ const AccessoireDetail = () => {
               {photos.length > 0 ? (
                 <>
                   {hasMultiplePhotos && (
-                    <button 
+                    <button
                       className="gallery-nav-btn gallery-nav-prev"
                       onClick={handlePrevPhoto}
                       aria-label="Photo précédente"
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
                       </svg>
                     </button>
                   )}
@@ -151,13 +143,13 @@ const AccessoireDetail = () => {
                     }}
                   />
                   {hasMultiplePhotos && (
-                    <button 
+                    <button
                       className="gallery-nav-btn gallery-nav-next"
                       onClick={handleNextPhoto}
                       aria-label="Photo suivante"
                     >
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                        <path d="M5 12h14M12 5l7 7-7 7" />
                       </svg>
                     </button>
                   )}
@@ -205,7 +197,25 @@ const AccessoireDetail = () => {
 
           {/* Informations */}
           <div className="accessoire-info-porsche">
-            {/* Nom */}
+            {/* Wishlist icon en haut à droite */}
+            <div className="accessoire-wishlist-header">
+              <button
+                className={`accessoire-wishlist-icon-btn ${isWishlist ? 'active' : ''}`}
+                onClick={handleToggleWishlist}
+                aria-label={isWishlist ? 'Retirer de la liste de souhaits' : 'Ajouter à la liste de souhaits'}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Catégorie */}
+            <div className="accessoire-category-porsche">
+              Accessoires {accessoire?.type_accesoire && `/${accessoire.type_accesoire.charAt(0).toUpperCase() + accessoire.type_accesoire.slice(1)}`}
+            </div>
+
+            {/* Nom du produit */}
             <h1 className="accessoire-title-porsche">
               {accessoire.nom_accesoire}
             </h1>
@@ -215,44 +225,41 @@ const AccessoireDetail = () => {
               {formatPrice(accessoire.prix)} T.T.C.
             </div>
 
-            {/* Actions */}
+            {/* Description courte */}
+            {accessoire.description && (
+              <div className="accessoire-short-description-porsche">
+                {accessoire.description.length > 150 
+                  ? accessoire.description.substring(0, 150) + '...' 
+                  : accessoire.description}
+              </div>
+            )}
+
+            {/* Bouton Ajouter au panier */}
             <div className="accessoire-actions-porsche">
-              <Button 
-                size="lg" 
-                fullWidth 
-                onClick={handleAddToCart}
-                className="accessoire-add-cart-btn"
-              >
-                Ajouter au panier
-              </Button>
               <button
-                className={`accessoire-wishlist-btn ${isWishlist ? 'active' : ''}`}
-                onClick={handleToggleWishlist}
-                aria-label={isWishlist ? 'Retirer de la liste de souhaits' : 'Ajouter à la liste de souhaits'}
+                onClick={handleAddToCart}
+                className="accessoire-add-cart-btn-porsche"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
-                Ajouter à la liste de souhaits
+                Ajouter au panier
               </button>
             </div>
 
-            {/* Sections d'informations */}
-            <div className="accessoire-sections-porsche">
-              {/* Détails du produit */}
-              <section className="accessoire-section-porsche">
-                <h2 className="accessoire-section-title-porsche">Détails du produit</h2>
-                <div className="accessoire-section-content-porsche">
-                  {accessoire.description && (
-                    <div className="accessoire-detail-item">
-                      <h3 className="accessoire-detail-item-title">Description</h3>
-                      <p className="accessoire-detail-item-text">{accessoire.description}</p>
-                    </div>
-                  )}
-                </div>
-              </section>
+            {/* Informations de livraison */}
+            <div className="accessoire-delivery-info-porsche">
+              <div className="accessoire-delivery-line"></div>
+              <span className="accessoire-delivery-text">
+                Livraison gratuite en 3–5 jours ouvrables via DHL
+              </span>
+            </div>
 
-              {/* Description */}
+            {/* Sections d'informations supplémentaires */}
+            <div className="accessoire-sections-porsche">
+              {/* Description complète */}
               {accessoire.description && (
                 <section className="accessoire-section-porsche">
                   <h2 className="accessoire-section-title-porsche">Description</h2>
@@ -266,7 +273,7 @@ const AccessoireDetail = () => {
 
               {/* Caractéristiques générales */}
               <section className="accessoire-section-porsche">
-                <h2 className="accessoire-section-title-porsche">Caractéristiques générales</h2>
+                <h2 className="accessoire-section-title-porsche">Caractéristiques</h2>
                 <div className="accessoire-section-content-porsche">
                   {accessoire.type_accesoire && (
                     <div className="accessoire-characteristic-item">

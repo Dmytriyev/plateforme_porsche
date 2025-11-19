@@ -1,0 +1,189 @@
+/* Ajouter Porsche Page Styles - Style Porsche */
+
+.ajouter-porsche-container {
+  min-height: 100vh;
+  background-color: #fff;
+  padding: 2rem 1rem;
+}
+
+.ajouter-porsche-content {
+  max-width: 42rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Bouton Retour */
+.ajouter-porsche-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  transition: opacity 0.2s ease;
+}
+
+.ajouter-porsche-back:hover {
+  opacity: 0.7;
+}
+
+/* Titre */
+.ajouter-porsche-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 2rem 0;
+}
+
+/* Message d'erreur */
+.ajouter-porsche-error {
+  margin-bottom: 1.5rem;
+}
+
+/* Formulaire */
+.ajouter-porsche-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 2rem;
+}
+
+/* Champs de saisie */
+.ajouter-porsche-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ajouter-porsche-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.ajouter-porsche-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  font-size: 1rem;
+  color: #000;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.ajouter-porsche-input::placeholder {
+  color: #9ca3af;
+}
+
+.ajouter-porsche-input:focus {
+  outline: none;
+  border-color: #000;
+  background-color: #fff;
+}
+
+.ajouter-porsche-input.error {
+  border-color: #dc2626;
+}
+
+.ajouter-porsche-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Select */
+.ajouter-porsche-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.ajouter-porsche-field-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.25rem;
+}
+
+/* Bouton Photos */
+.ajouter-porsche-photo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.ajouter-porsche-photo-btn:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.ajouter-porsche-photo-input {
+  display: none;
+}
+
+.ajouter-porsche-photo-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Bouton Soumettre */
+.ajouter-porsche-submit {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.ajouter-porsche-submit:hover:not(:disabled) {
+  background-color: #1f2937;
+}
+
+.ajouter-porsche-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .ajouter-porsche-container {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ajouter-porsche-container {
+    padding: 3rem 2rem;
+  }
+}
+

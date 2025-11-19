@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Button, Input, Alert, Card } from '../components/common';
+import { Alert } from '../components/common';
 import { validateEmail, validatePassword, validateTelephone, getPasswordErrors } from '../utils/validation.js';
 import './Register.css';
 
@@ -13,14 +13,13 @@ const Register = () => {
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    nom: '',
     prenom: '',
+    nom: '',
     email: '',
+    telephone: '',
     password: '',
     confirmPassword: '',
-    telephone: '',
     adresse: '',
-    ville: '',
     codePostal: '',
   });
 
@@ -45,13 +44,17 @@ const Register = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.nom.trim()) newErrors.nom = 'Le nom est requis';
     if (!formData.prenom.trim()) newErrors.prenom = 'Le prénom est requis';
+    if (!formData.nom.trim()) newErrors.nom = 'Le nom est requis';
 
     if (!formData.email) {
       newErrors.email = 'L\'email est requis';
     } else if (!validateEmail(formData.email)) {
       newErrors.email = 'Email invalide';
+    }
+
+    if (formData.telephone && !validateTelephone(formData.telephone)) {
+      newErrors.telephone = 'Numéro de téléphone invalide';
     }
 
     if (!formData.password) {
@@ -61,12 +64,17 @@ const Register = () => {
       newErrors.password = passwordErrors[0];
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'La confirmation du mot de passe est requise';
+    } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
     }
 
-    if (formData.telephone && !validateTelephone(formData.telephone)) {
-      newErrors.telephone = 'Numéro de téléphone invalide';
+    if (!formData.adresse.trim()) newErrors.adresse = 'L\'adresse postale est requise';
+    if (!formData.codePostal.trim()) {
+      newErrors.codePostal = 'Le code postal est requis';
+    } else if (!/^[0-9]{5}$/.test(formData.codePostal)) {
+      newErrors.codePostal = 'Le code postal doit contenir 5 chiffres';
     }
 
     setErrors(newErrors);
@@ -89,153 +97,222 @@ const Register = () => {
         prenom: formData.prenom,
         email: formData.email,
         password: formData.password,
-        telephone: formData.telephone,
+        telephone: formData.telephone || '0000000000',
         adresse: formData.adresse,
-        ville: formData.ville,
         code_postal: formData.codePostal,
       };
 
       const result = await register(userData);
 
       if (result.success) {
-        navigate('/');
+        // Utiliser replace pour éviter les problèmes de cache du navigateur
+        // et un petit délai pour s'assurer que le contexte est mis à jour
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 100);
       } else {
         setErrorMessage(result.error || 'Erreur d\'inscription');
+        setLoading(false);
       }
     } catch (err) {
-      console.error('Erreur inscription:', err);
       setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="register-container">
-      <div className="register-form-wrapper">
-        <Card padding="lg">
-          <div className="register-header">
-            <h2 className="register-title">Inscription</h2>
-            <p className="register-subtitle">
-              Créez votre compte Porsche
-            </p>
-          </div>
+    <div className="register-container-porsche">
+      <div className="register-form-wrapper-porsche">
+        <div className="register-form-card-porsche">
+          {/* Titre */}
+          <h1 className="register-title-porsche">Création de compte</h1>
 
+          {/* Message d'erreur */}
           {errorMessage && (
-            <div className="register-error">
+            <div className="register-error-porsche">
               <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="register-form">
-            {/* Nom et Prénom */}
-            <div className="register-form-row">
-              <Input
-                label="Nom"
-                name="nom"
-                value={formData.nom}
-                onChange={handleChange}
-                error={errors.nom}
-                required
-              />
-              <Input
-                label="Prénom"
+          {/* Formulaire */}
+          <form onSubmit={handleSubmit} className="register-form-porsche">
+            {/* Prénom */}
+            <div className="register-field-porsche">
+              <label htmlFor="prenom" className="register-label-porsche">
+                Prénom <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="prenom"
+                type="text"
                 name="prenom"
                 value={formData.prenom}
                 onChange={handleChange}
-                error={errors.prenom}
+                placeholder="Votre prénom"
+                className={`register-input-porsche ${errors.prenom ? 'error' : ''}`}
+                autoComplete="given-name"
                 required
               />
+              {errors.prenom && (
+                <span className="register-field-error-porsche">{errors.prenom}</span>
+              )}
+            </div>
+
+            {/* Nom */}
+            <div className="register-field-porsche">
+              <label htmlFor="nom" className="register-label-porsche">
+                Nom <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="nom"
+                type="text"
+                name="nom"
+                value={formData.nom}
+                onChange={handleChange}
+                placeholder="Votre nom"
+                className={`register-input-porsche ${errors.nom ? 'error' : ''}`}
+                autoComplete="family-name"
+                required
+              />
+              {errors.nom && (
+                <span className="register-field-error-porsche">{errors.nom}</span>
+              )}
             </div>
 
             {/* Email */}
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="votre@email.com"
-              error={errors.email}
-              required
-            />
-
-            {/* Mot de passe */}
-            <Input
-              label="Mot de passe"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              error={errors.password}
-              required
-            />
-
-            <Input
-              label="Confirmer le mot de passe"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              error={errors.confirmPassword}
-              required
-            />
+            <div className="register-field-porsche">
+              <label htmlFor="email" className="register-label-porsche">
+                Email <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="votre.email@exemple.com"
+                className={`register-input-porsche ${errors.email ? 'error' : ''}`}
+                autoComplete="email"
+                required
+              />
+              {errors.email && (
+                <span className="register-field-error-porsche">{errors.email}</span>
+              )}
+            </div>
 
             {/* Téléphone */}
-            <Input
-              label="Téléphone"
-              type="tel"
-              name="telephone"
-              value={formData.telephone}
-              onChange={handleChange}
-              placeholder="06 12 34 56 78"
-              error={errors.telephone}
-            />
-
-            {/* Adresse */}
-            <Input
-              label="Adresse"
-              name="adresse"
-              value={formData.adresse}
-              onChange={handleChange}
-              error={errors.adresse}
-            />
-
-            {/* Ville et Code postal */}
-            <div className="register-form-row">
-              <Input
-                label="Ville"
-                name="ville"
-                value={formData.ville}
+            <div className="register-field-porsche">
+              <label htmlFor="telephone" className="register-label-porsche">
+                Téléphone
+              </label>
+              <input
+                id="telephone"
+                type="tel"
+                name="telephone"
+                value={formData.telephone}
                 onChange={handleChange}
-                error={errors.ville}
+                placeholder="06 01 23 45 56"
+                className={`register-input-porsche ${errors.telephone ? 'error' : ''}`}
+                autoComplete="tel"
               />
-              <Input
-                label="Code postal"
+              {errors.telephone && (
+                <span className="register-field-error-porsche">{errors.telephone}</span>
+              )}
+            </div>
+
+            {/* Mot de passe */}
+            <div className="register-field-porsche">
+              <label htmlFor="password" className="register-label-porsche">
+                Mot de passe <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className={`register-input-porsche ${errors.password ? 'error' : ''}`}
+                autoComplete="new-password"
+                required
+              />
+              {errors.password && (
+                <span className="register-field-error-porsche">{errors.password}</span>
+              )}
+            </div>
+
+            {/* Répétez mot de passe */}
+            <div className="register-field-porsche">
+              <label htmlFor="confirmPassword" className="register-label-porsche">
+                Répétez mot de passe <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className={`register-input-porsche ${errors.confirmPassword ? 'error' : ''}`}
+                autoComplete="new-password"
+                required
+              />
+              {errors.confirmPassword && (
+                <span className="register-field-error-porsche">{errors.confirmPassword}</span>
+              )}
+            </div>
+
+            {/* Adresse postale */}
+            <div className="register-field-porsche">
+              <label htmlFor="adresse" className="register-label-porsche">
+                Adresse postale <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="adresse"
+                type="text"
+                name="adresse"
+                value={formData.adresse}
+                onChange={handleChange}
+                placeholder="Votre adresse"
+                className={`register-input-porsche ${errors.adresse ? 'error' : ''}`}
+                autoComplete="street-address"
+                required
+              />
+              {errors.adresse && (
+                <span className="register-field-error-porsche">{errors.adresse}</span>
+              )}
+            </div>
+
+            {/* Code postal */}
+            <div className="register-field-porsche">
+              <label htmlFor="codePostal" className="register-label-porsche">
+                Code postale <span className="register-required-porsche">*</span>
+              </label>
+              <input
+                id="codePostal"
+                type="text"
                 name="codePostal"
                 value={formData.codePostal}
                 onChange={handleChange}
                 placeholder="75000"
-                error={errors.codePostal}
+                className={`register-input-porsche ${errors.codePostal ? 'error' : ''}`}
+                autoComplete="postal-code"
+                required
               />
+              {errors.codePostal && (
+                <span className="register-field-error-porsche">{errors.codePostal}</span>
+              )}
             </div>
 
-            <Button type="submit" fullWidth disabled={loading}>
-              {loading ? 'Inscription...' : 'S\'inscrire'}
-            </Button>
+            {/* Bouton Créer mon compte */}
+            <button
+              type="submit"
+              className="register-btn-primary-porsche"
+              disabled={loading}
+            >
+              {loading ? 'Création...' : 'Créer mon compte'}
+            </button>
           </form>
-
-          <div className="register-links">
-            <p>
-              Vous avez déjà un compte ?{' '}
-              <Link to="/login" className="register-link">
-                Se connecter
-              </Link>
-            </p>
-          </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

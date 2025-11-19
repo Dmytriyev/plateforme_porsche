@@ -62,6 +62,107 @@
   grid-template-columns: repeat(2, 1fr);
   max-width: 1200px;
   margin: 0 auto;
+  gap: 2rem;
+}
+
+/* Carte modèle neuf - Style Porsche simplifié */
+.catalogue-modele-card-neuf-porsche {
+  background-color: #fff;
+  border-radius: 0;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.catalogue-modele-card-neuf-porsche:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Titre */
+.catalogue-modele-title-porsche {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Image */
+.catalogue-modele-image-porsche {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background-color: #f9fafb;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.catalogue-modele-img-porsche {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.catalogue-modele-card-neuf-porsche:hover .catalogue-modele-img-porsche {
+  transform: scale(1.05);
+}
+
+.catalogue-modele-placeholder-porsche {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+.catalogue-modele-letter-porsche {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #9ca3af;
+  opacity: 0.5;
+}
+
+/* Prix */
+.catalogue-modele-prix-porsche {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #000;
+  padding: 0 1.5rem;
+  margin: 1rem 0;
+}
+
+/* Bouton */
+.catalogue-modele-btn-porsche {
+  padding: 1rem 2rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: calc(100% - 3rem);
+}
+
+.catalogue-modele-btn-porsche:hover {
+  background-color: #1f2937;
 }
 
 /* Carte modèle */

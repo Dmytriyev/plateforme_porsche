@@ -4,30 +4,8 @@ import { voitureService } from '../services';
 import { API_URL } from '../config/api.jsx';
 import './ChoixVoiture.css';
 
-/**
- * Page de Choix Initial: Neuf ou Occasion
- * Première étape du parcours client
- * 
- * EXPLICATION POUR ÉTUDIANT:
- * ==========================
- * Cette page permet à l'utilisateur de choisir entre :
- * - Voiture Neuve : Configuration personnalisée
- * - Voiture d'Occasion : Modèles certifiés disponibles
- * 
- * Chaque carte contient :
- * - Une image générale en haut (récupérée depuis l'API si disponible)
- * - Le titre ("Voiture Neuve" ou "Voiture d'Occasion")
- * - Une petite description
- * - Un bouton d'action (CTA)
- * 
- * Concepts utilisés:
- * - useState: Gère l'état des images récupérées
- * - useEffect: Charge les images au montage du composant
- * - API: Récupère les photos depuis la base de données
- */
 const ChoixVoiture = () => {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
   const [imageNeuve, setImageNeuve] = useState(null);
   const [imageOccasion, setImageOccasion] = useState(null);
 
@@ -35,17 +13,6 @@ const ChoixVoiture = () => {
     fetchImages();
   }, []);
 
-  /**
-   * Récupérer les images depuis l'API
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * Cette fonction charge les images depuis la base de données :
-   * - Pour "Neuve" : Récupère la première voiture neuve avec photo
-   * - Pour "Occasion" : Récupère la première occasion avec photo
-   * 
-   * Si aucune image n'est disponible, on utilise un placeholder.
-   */
   const fetchImages = async () => {
     try {
       // Récupérer une image pour "Neuve"
@@ -78,9 +45,23 @@ const ChoixVoiture = () => {
     }
   };
 
-  const handleChoix = (type) => {
-    navigate(`/catalogue/${type}`);
+  const handleConfigurer = () => {
+    navigate('/catalogue/neuve');
   };
+
+  const handleReserver = () => {
+    navigate('/catalogue/occasion');
+  };
+
+  const getImageUrl = (photo) => {
+    if (!photo || !photo.name) return null;
+    if (photo.name.startsWith('http')) return photo.name;
+    if (photo.name.startsWith('/')) return `${API_URL}${photo.name}`;
+    return `${API_URL}/${photo.name}`;
+  };
+
+  const imageNeuveUrl = getImageUrl(imageNeuve);
+  const imageOccasionUrl = getImageUrl(imageOccasion);
 
   return (
     <div className="choix-container">
@@ -88,31 +69,24 @@ const ChoixVoiture = () => {
         {/* En-tête */}
         <div className="choix-header">
           <h1 className="choix-title">Choisissez votre Porsche</h1>
-          <p className="choix-subtitle">
-            Configurez votre Porsche neuve ou découvrez nos modèles d'occasion certifiés
-          </p>
         </div>
 
-        {/* Cartes de choix */}
-        <div className="choix-grid">
-          {/* Voiture Neuve */}
-          <button
-            className={`choix-card ${hoveredCard === 'neuve' ? 'choix-card-hover' : ''}`}
-            onClick={() => handleChoix('neuve')}
-            onMouseEnter={() => setHoveredCard('neuve')}
-            onMouseLeave={() => setHoveredCard(null)}
-          >
-            {/* Image générale */}
-            <div className="choix-card-image">
-              {imageNeuve && imageNeuve.name ? (
+        {/* Cartes */}
+        <div className="choix-grid-porsche">
+          {/* Carte Voiture Neuve */}
+          <div className="choix-card-porsche">
+            {/* Titre */}
+            <h2 className="choix-card-title-porsche">
+              Voiture Neuve
+            </h2>
+
+            {/* Image */}
+            <div className="choix-card-image-porsche">
+              {imageNeuveUrl ? (
                 <img
-                  src={imageNeuve.name?.startsWith('http')
-                    ? imageNeuve.name
-                    : imageNeuve.name?.startsWith('/')
-                      ? `${API_URL}${imageNeuve.name}`
-                      : `${API_URL}/${imageNeuve.name}`}
+                  src={imageNeuveUrl}
                   alt="Porsche Neuve"
-                  className="choix-card-img"
+                  className="choix-card-img-porsche"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     if (e.target.nextSibling) {
@@ -122,40 +96,36 @@ const ChoixVoiture = () => {
                 />
               ) : null}
               <div
-                className="choix-card-image-placeholder"
-                style={{ display: imageNeuve && imageNeuve.name ? 'none' : 'flex' }}
+                className="choix-card-image-placeholder-porsche"
+                style={{ display: imageNeuveUrl ? 'none' : 'flex' }}
               >
-                <span className="choix-card-image-text">Porsche Neuve</span>
+                <span className="choix-card-image-letter-porsche">N</span>
               </div>
             </div>
 
-            <h2 className="choix-card-title">Voiture Neuve</h2>
-            <p className="choix-card-description">
-              Configurez votre Porsche selon vos envies
-            </p>
-            <div className="choix-card-cta">
-              Configurer ma Porsche →
-            </div>
-          </button>
+            {/* Bouton */}
+            <button
+              className="choix-card-btn-porsche"
+              onClick={handleConfigurer}
+            >
+              Configurer
+            </button>
+          </div>
 
-          {/* Voiture d'Occasion */}
-          <button
-            className={`choix-card ${hoveredCard === 'occasion' ? 'choix-card-hover' : ''}`}
-            onClick={() => handleChoix('occasion')}
-            onMouseEnter={() => setHoveredCard('occasion')}
-            onMouseLeave={() => setHoveredCard(null)}
-          >
-            {/* Image générale */}
-            <div className="choix-card-image">
-              {imageOccasion && imageOccasion.name ? (
+          {/* Carte Voiture Occasion */}
+          <div className="choix-card-porsche">
+            {/* Titre */}
+            <h2 className="choix-card-title-porsche">
+              Voiture Occasion
+            </h2>
+
+            {/* Image */}
+            <div className="choix-card-image-porsche">
+              {imageOccasionUrl ? (
                 <img
-                  src={imageOccasion.name?.startsWith('http')
-                    ? imageOccasion.name
-                    : imageOccasion.name?.startsWith('/')
-                      ? `${API_URL}${imageOccasion.name}`
-                      : `${API_URL}/${imageOccasion.name}`}
-                  alt="Porsche Approved"
-                  className="choix-card-img"
+                  src={imageOccasionUrl}
+                  alt="Porsche Occasion"
+                  className="choix-card-img-porsche"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     if (e.target.nextSibling) {
@@ -165,28 +135,20 @@ const ChoixVoiture = () => {
                 />
               ) : null}
               <div
-                className="choix-card-image-placeholder"
-                style={{ display: imageOccasion && imageOccasion.name ? 'none' : 'flex' }}
+                className="choix-card-image-placeholder-porsche"
+                style={{ display: imageOccasionUrl ? 'none' : 'flex' }}
               >
-                <span className="choix-card-image-text">Porsche Approved</span>
+                <span className="choix-card-image-letter-porsche">O</span>
               </div>
             </div>
 
-            <h2 className="choix-card-title">Voiture d'Occasion</h2>
-            <p className="choix-card-description">
-              Découvrez nos Porsche certifiées disponibles immédiatement
-            </p>
-            <div className="choix-card-cta">
-              Voir les occasions →
-            </div>
-          </button>
-        </div>
-
-        {/* Information complémentaire */}
-        <div className="choix-info">
-          <div className="choix-info-card">
-            <h3>Notre engagement</h3>
-            <p>Que vous choisissiez une Porsche neuve ou d'occasion, nous vous garantissons une expérience d'achat exceptionnelle et un service après-vente de qualité.</p>
+            {/* Bouton */}
+            <button
+              className="choix-card-btn-porsche"
+              onClick={handleReserver}
+            >
+              Réserver
+            </button>
           </div>
         </div>
       </div>
