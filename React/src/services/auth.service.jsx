@@ -1,6 +1,8 @@
 import apiClient from '../config/api.jsx';
 import { extractData, handleServiceError } from './httpHelper';
 import TokenService from './token.service.js';
+import { sanitizeObject } from '../utils/sanitize';
+import logger from '../utils/logger';
 
 const authService = {
   login: async (email, password) => {
@@ -9,7 +11,12 @@ const authService = {
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token, { persist: false });
-        try { localStorage.setItem('user', JSON.stringify(data.user)); } catch (e) { }
+        try {
+          const safeUser = data.user ? sanitizeObject(data.user) : data.user;
+          localStorage.setItem('user', JSON.stringify(safeUser));
+        } catch (e) {
+          logger.warn('authService: failed to save user to localStorage', e);
+        }
       }
       return data;
     } catch (error) {
@@ -23,7 +30,12 @@ const authService = {
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token, { persist: false });
-        try { localStorage.setItem('user', JSON.stringify(data.user)); } catch (e) { }
+        try {
+          const safeUser = data.user ? sanitizeObject(data.user) : data.user;
+          localStorage.setItem('user', JSON.stringify(safeUser));
+        } catch (e) {
+          logger.warn('authService: failed to save user to localStorage', e);
+        }
       }
       return data;
     } catch (error) {
@@ -33,7 +45,9 @@ const authService = {
 
   logout: () => {
     TokenService.clear();
-    try { localStorage.removeItem('user'); } catch (e) { }
+    try { localStorage.removeItem('user'); } catch (e) {
+      logger.warn('authService: failed to remove user from localStorage', e);
+    }
     window.location.href = '/login';
   },
 
@@ -41,7 +55,14 @@ const authService = {
     try {
       const response = await apiClient.get(`/user/profile/${userId}`);
       const data = extractData(response) || {};
-      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.user) {
+        try {
+          const safeUser = sanitizeObject(data.user);
+          localStorage.setItem('user', JSON.stringify(safeUser));
+        } catch (e) {
+          logger.warn('authService: failed to save user to localStorage', e);
+        }
+      }
       return data;
     } catch (error) {
       return handleServiceError(error);
@@ -52,7 +73,14 @@ const authService = {
     try {
       const response = await apiClient.put(`/user/update/${userId}`, userData);
       const data = extractData(response);
-      if (data) localStorage.setItem('user', JSON.stringify(data));
+      if (data) {
+        try {
+          const safeData = sanitizeObject(data);
+          localStorage.setItem('user', JSON.stringify(safeData));
+        } catch (e) {
+          logger.warn('authService: failed to save user to localStorage', e);
+        }
+      }
       return data;
     } catch (error) {
       return handleServiceError(error);

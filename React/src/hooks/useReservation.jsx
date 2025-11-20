@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { sanitizeObject } from '../utils/sanitize';
 
 // Hook simple pour gérer la création et le suivi d'une réservation côté client.
 // Attention: le backend doit exposer les endpoints suivants :
@@ -16,10 +17,12 @@ export default function useReservation() {
         setLoading(true);
         setError(null);
         try {
+            const safePayload = sanitizeObject(payload);
             const res = await fetch('/api/reservations', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(safePayload),
             });
             if (!res.ok) throw new Error(`Reservation API error ${res.status}`);
             const data = await res.json();
@@ -37,6 +40,7 @@ export default function useReservation() {
         setLoading(true);
         setError(null);
         try {
+            if (!token) throw new Error('Missing reservation token');
             const res = await fetch(`/api/reservations/${encodeURIComponent(token)}`);
             if (!res.ok) throw new Error(`Get reservation failed ${res.status}`);
             const data = await res.json();
@@ -54,8 +58,11 @@ export default function useReservation() {
         setLoading(true);
         setError(null);
         try {
+            if (!token) throw new Error('Missing reservation token');
             const res = await fetch(`/api/reservations/${encodeURIComponent(token)}/cancel`, {
                 method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'include',
             });
             if (!res.ok) throw new Error(`Cancel failed ${res.status}`);
             const data = await res.json();

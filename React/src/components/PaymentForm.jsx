@@ -4,7 +4,7 @@ import Button from './common/Button.jsx';
 
 // PaymentForm confirme le paiement avec le clientSecret fourni par le backend.
 // Utilise le composant `Button` commun pour le style.
-export default function PaymentForm({ clientSecret, reservationToken, onSuccess, onError }) {
+export default function PaymentForm({ clientSecret, onSuccess, onError }) {
     const stripe = useStripe();
     const elements = useElements();
     const [busy, setBusy] = useState(false);

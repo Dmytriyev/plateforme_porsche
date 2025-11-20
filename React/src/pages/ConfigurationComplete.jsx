@@ -5,6 +5,8 @@ import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Button, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import './ConfigurationComplete.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 /**
  * Page de Configuration Complète pour Voitures Neuves
@@ -229,7 +231,7 @@ const ConfigurationComplete = () => {
         <div className="config-gallery-main">
           {variante?.photo_porsche && variante.photo_porsche.length > 0 ? (
             <img
-              src={`http://localhost:3000${variante.photo_porsche[photoActive].name}`}
+              src={buildUrl(variante.photo_porsche[photoActive].name)}
               alt={variante.photo_porsche[photoActive].alt || variante.nom_model}
               className="config-gallery-image"
               onError={(e) => {
@@ -258,7 +260,7 @@ const ConfigurationComplete = () => {
                 className={`config-gallery-thumb ${photoActive === index ? 'config-gallery-thumb-active' : ''}`}
               >
                 <img
-                  src={`http://localhost:3000${photo.name}`}
+                  src={buildUrl(photo.name)}
                   alt={photo.alt || `Photo ${index + 1}`}
                   onError={(e) => {
                     e.target.style.display = 'none';
@@ -300,7 +302,7 @@ const ConfigurationComplete = () => {
                 >
                   {couleur.photo_couleur ? (
                     <img
-                      src={`http://localhost:3000${couleur.photo_couleur}`}
+                      src={buildUrl(couleur.photo_couleur)}
                       alt={couleur.nom_couleur}
                       className="config-color-image"
                       onError={(e) => {
@@ -343,7 +345,7 @@ const ConfigurationComplete = () => {
                 >
                   {couleur.photo_couleur ? (
                     <img
-                      src={`http://localhost:3000${couleur.photo_couleur}`}
+                      src={buildUrl(couleur.photo_couleur)}
                       alt={couleur.nom_couleur}
                       className="config-color-image"
                       onError={(e) => {

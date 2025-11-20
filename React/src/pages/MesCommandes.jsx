@@ -34,7 +34,7 @@ const MesCommandes = () => {
     }
   };
 
-  const getStatusBadge = (status, acompte, prix) => {
+  const getStatusBadge = (status, acompte) => {
     if (status) {
       return <span className="commande-status status-success">Validée</span>;
     }

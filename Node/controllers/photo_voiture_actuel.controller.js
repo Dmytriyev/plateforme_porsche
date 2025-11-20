@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
+import logger from "../utils/logger.js";
 
 // Obtenir le répertoire courant
 const __filename = fileURLToPath(import.meta.url);
@@ -66,7 +67,7 @@ const createPhoto_voiture_actuel = async (req, res) => {
       try {
         removeUploadedFile(req.file.filename);
       } catch (cleanErr) {
-        console.error("Failed to clean uploaded file", { err: cleanErr });
+        logger.error("Failed to clean uploaded file", { err: cleanErr });
       }
     }
     return res.status(500).json({ message: "Erreur serveur" });
@@ -191,7 +192,7 @@ function removeUploadedFile(FilenameOrPath) {
       fs.unlinkSync(filePath);
     }
   } catch (err) {
-    console.error("Erreur lors de la suppression du fichier:", err);
+    logger.error("Erreur lors de la suppression du fichier:", err);
   }
 }
 

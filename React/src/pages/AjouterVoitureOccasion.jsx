@@ -4,7 +4,8 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import modelPorscheService from '../services/modelPorsche.service.jsx';
 import voitureService from '../services/voiture.service.jsx';
 import apiClient from '../config/api.jsx';
-import { extractData, extractArray } from '../services/httpHelper';
+import logger from '../utils/logger';
+import { /* extractData, */ extractArray } from '../services/httpHelper';
 import { Alert } from '../components/common';
 import './AjouterVoitureOccasion.css';
 
@@ -50,7 +51,7 @@ const AjouterVoitureOccasion = () => {
         setCouleursExterieur(extractArray(extResponse) || []);
         setCouleursInterieur(extractArray(intResponse) || []);
       } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        logger.error('Erreur lors du chargement des données:', error);
       } finally {
         setLoadingData(false);
       }
@@ -183,7 +184,7 @@ const AjouterVoitureOccasion = () => {
               await modelPorscheService.addImages(result._id, formDataPhoto);
             }
           } catch (photoError) {
-            console.error('Erreur lors de l\'upload des photos:', photoError);
+            logger.error('Erreur lors de l\'upload des photos:', photoError);
           }
         }
 

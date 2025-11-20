@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { accesoireService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './AccessoiresParCategorie.css';
 
 
@@ -14,11 +15,7 @@ const AccessoiresParCategorie = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchAccessoires();
-  }, [categorie]);
-
-  const fetchAccessoires = async () => {
+  const fetchAccessoires = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -53,7 +50,11 @@ const AccessoiresParCategorie = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categorie]);
+
+  useEffect(() => {
+    fetchAccessoires();
+  }, [fetchAccessoires]);
 
   const handleAccessoireClick = (accessoire) => {
     navigate(`/accessoires/detail/${accessoire._id}`);
@@ -132,8 +133,8 @@ const AccessoiresParCategorie = () => {
                       if (!photoUrl.startsWith('http')) {
                         // Si le chemin commence par /, utiliser directement, sinon ajouter /
                         photoUrl = photoUrl.startsWith('/')
-                          ? `${API_URL}${photoUrl}`
-                          : `${API_URL}/${photoUrl}`;
+                          ? buildUrl(photoUrl)
+                          : buildUrl(photoUrl);
                       }
 
                       return (

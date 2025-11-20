@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
 import { Loading, Alert, Button } from '../components/common';
+import logger from '../utils/logger';
 import { formatPrice } from '../utils/format.js';
 import './VariantePage.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 
 const VariantePage = () => {
@@ -36,7 +39,7 @@ const VariantePage = () => {
               }
             }
           } catch (err) {
-            // Erreur silencieuse pour les carrosseries
+            logger.warn('VariantePage: failed to fetch voiture page', err);
           }
         }
       } catch (err) {
@@ -77,8 +80,7 @@ const VariantePage = () => {
     );
   }
 
-  const { variante, voiture_base, specifications, options, photos, prix, type } = pageData;
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const { variante, voiture_base, specifications, options: _options, photos, prix, type } = pageData;
 
   /**
    * Convertir la puissance en kW
@@ -165,11 +167,7 @@ const VariantePage = () => {
         {photoPrincipale && (
           <div className="variante-hero-image-porsche">
             <img
-              src={photoPrincipale.name?.startsWith('http')
-                ? photoPrincipale.name
-                : photoPrincipale.name?.startsWith('/')
-                  ? `${API_URL}${photoPrincipale.name}`
-                  : `${API_URL}/${photoPrincipale.name}`}
+              src={buildUrl(photoPrincipale.name)}
               alt={variante.nom_model}
               className="variante-hero-img-porsche"
               onError={(e) => {
@@ -256,11 +254,7 @@ const VariantePage = () => {
           <div className="variante-right-column-porsche">
             <div className="variante-secondary-image-porsche">
               <img
-                src={photoSecondaire.name?.startsWith('http')
-                  ? photoSecondaire.name
-                  : photoSecondaire.name?.startsWith('/')
-                    ? `${API_URL}${photoSecondaire.name}`
-                    : `${API_URL}/${photoSecondaire.name}`}
+                src={buildUrl(photoSecondaire.name)}
                 alt={`${variante.nom_model} - Vue secondaire`}
                 className="variante-secondary-img-porsche"
                 onError={(e) => {

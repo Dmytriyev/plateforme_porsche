@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { commandeService } from '../services';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Loading, Button, Card, Alert } from '../components/common';
 import { formatPrice, formatDate } from '../utils/format.js';
 import './MesReservations.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 /**
  * Page Mes Réservations - Gérer mes réservations de voitures d'occasion
@@ -18,24 +20,20 @@ const MesReservations = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
-
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      
+
       // Récupérer l'ID utilisateur (peut être _id ou id)
       const userId = user?._id || user?.id;
-      
+
       if (!userId) {
         setError('ID utilisateur manquant');
         setLoading(false);
         return;
       }
-      
+
       const data = await commandeService.getMyReservations(userId);
       setReservations(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -43,7 +41,11 @@ const MesReservations = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
 
   const handleAnnuler = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
@@ -127,7 +129,7 @@ const MesReservations = () => {
                   <div className="reservation-image-container">
                     {reservation.model_porsche?.photo_porsche?.[0] ? (
                       <img
-                        src={`http://localhost:3000${reservation.model_porsche.photo_porsche[0].name}`}
+                        src={buildUrl(reservation.model_porsche.photo_porsche[0].name)}
                         alt={reservation.model_porsche.nom_model}
                         className="reservation-image"
                       />

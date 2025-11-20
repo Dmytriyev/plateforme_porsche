@@ -6,6 +6,8 @@ import { Loading, Button, Alert } from '../components/common';
 import ContactButton from '../components/ContactButton.jsx';
 import { formatPrice, formatPriceMonthly } from '../utils/format.js';
 import './Configurateur.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 const Configurateur = () => {
   const { voitureId } = useParams();
@@ -22,7 +24,7 @@ const Configurateur = () => {
   const [couleursInt, setCouleursInt] = useState([]);
   const [jantes, setJantes] = useState([]);
   const [sieges, setSieges] = useState([]);
-  const [packages, setPackages] = useState([]);
+  const [_packages, setPackages] = useState([]);
 
   // Configuration sélectionnée
   const [config, setConfig] = useState({
@@ -123,7 +125,7 @@ const Configurateur = () => {
     setPrixMensuel(total > 0 ? total / 80 : 0);
   }, [config]);
 
-  const handleVarianteChange = (variante) => navigate(`/configuration/${variante._id}`);
+  const _handleVarianteChange = (variante) => navigate(`/configuration/${variante._id}`);
 
   const handleCouleurExtChange = (couleur) => {
     setConfig({ ...config, couleur_exterieur: couleur });
@@ -145,11 +147,11 @@ const Configurateur = () => {
     setConfig({ ...config, siege });
   };
 
-  const handlePackageChange = (pkg) => {
+  const _handlePackageChange = (pkg) => {
     setConfig({ ...config, package: pkg });
   };
 
-  const handleAddToCart = () => {
+  const _handleAddToCart = () => {
     if (!config.variante) {
       setError('Veuillez sélectionner une variante');
       return;
@@ -265,7 +267,7 @@ const Configurateur = () => {
             {/* Image principale */}
             {photos.length > 0 ? (
               <img
-                src={`http://localhost:3000${photos[photoActive]?.name}`}
+                src={buildUrl(photos[photoActive]?.name)}
                 alt={nomModel}
                 className="configurateur-main-image"
                 onError={(e) => {
@@ -321,7 +323,7 @@ const Configurateur = () => {
                   className={`configurateur-thumbnail ${photoActive === index ? 'configurateur-thumbnail-active' : ''}`}
                 >
                   <img
-                    src={`http://localhost:3000${photo.name}`}
+                    src={buildUrl(photo.name)}
                     alt={`Vue ${index + 1}`}
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -352,6 +354,8 @@ const Configurateur = () => {
               <path d="m21 21-4.35-4.35" />
             </svg>
             <input
+              name="config_recherche"
+              id="config-recherche"
               type="text"
               placeholder="Recherche d'options d'équipement"
               value={recherche}
@@ -394,7 +398,7 @@ const Configurateur = () => {
                       >
                         {couleur.photo_couleur ? (
                           <img
-                            src={`http://localhost:3000${couleur.photo_couleur}`}
+                            src={buildUrl(couleur.photo_couleur)}
                             alt={couleur.nom_couleur}
                             className="configurateur-color-item-image"
                           />
@@ -520,7 +524,7 @@ const Configurateur = () => {
                         >
                           {couleur.photo_couleur ? (
                             <img
-                              src={`http://localhost:3000${couleur.photo_couleur}`}
+                              src={buildUrl(couleur.photo_couleur)}
                               alt={couleur.nom_couleur}
                             />
                           ) : (

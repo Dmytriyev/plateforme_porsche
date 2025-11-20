@@ -9,7 +9,7 @@ import Voiture from "../models/voiture.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
 import { getAvailableRoles } from "../utils/roles.constants.js";
-const logger = console;
+import logger from "../utils/logger.js";
 
 // Enregistrer un nouvel utilisateur
 const register = async (req, res) => {

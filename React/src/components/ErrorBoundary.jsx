@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { Button } from './common';
+import logger from '../utils/logger';
 import './ErrorBoundary.css';
 
 class ErrorBoundary extends Component {
@@ -12,7 +13,7 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
@@ -23,6 +24,8 @@ class ErrorBoundary extends Component {
     });
 
     if (import.meta.env.DEV) {
+      // Log error in dev for easier debugging
+      logger.error('ErrorBoundary caught error:', error, errorInfo);
     }
   }
 

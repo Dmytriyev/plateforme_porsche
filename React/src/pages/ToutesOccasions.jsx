@@ -4,6 +4,7 @@ import { voitureService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './ToutesOccasions.css';
 
 const ToutesOccasions = () => {
@@ -126,6 +127,7 @@ const ToutesOccasions = () => {
           </label>
           <input
             id="filtre-modele"
+            name="filtreModele"
             type="text"
             placeholder="Ex: 911, Cayenne, Cayman..."
             value={filtreModele}
@@ -198,12 +200,7 @@ const ToutesOccasions = () => {
                   <div className="occasion-card-image-container">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name.startsWith('http')
-                          ? photoPrincipale.name
-                          : photoPrincipale.name.startsWith('/')
-                            ? `${API_URL}${photoPrincipale.name}`
-                            : `${API_URL}/${photoPrincipale.name}`
-                        }
+                        src={buildUrl(photoPrincipale.name)}
                         alt={nomModel}
                         className="occasion-card-image"
                         onError={(e) => {

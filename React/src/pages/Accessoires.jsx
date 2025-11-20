@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import accesoireService from '../services/accesoire.service.jsx';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Alert } from '../components/common';
-import { formatPrice } from '../utils/format.js';
-import { API_URL } from '../config/api.jsx';
+import { /* formatPrice */ } from '../utils/format.js';
+import buildUrl from '../utils/buildUrl';
 import './Accessoires.css';
 
 /**
@@ -29,7 +29,7 @@ const Accessoires = () => {
       setLoading(true);
       setError('');
       const data = await accesoireService.getAllAccessoires();
-      
+
       if (Array.isArray(data)) {
         setAccessoires(data);
       } else {
@@ -139,15 +139,15 @@ const Accessoires = () => {
         ) : (
           <div className="accessoires-grid-porsche">
             {accessoiresFiltres.map((accessoire) => {
-              const photoPrincipale = accessoire.photo_accesoire && accessoire.photo_accesoire.length > 0 
-                ? accessoire.photo_accesoire[0] 
+              const photoPrincipale = accessoire.photo_accesoire && accessoire.photo_accesoire.length > 0
+                ? accessoire.photo_accesoire[0]
                 : null;
               const photoUrl = photoPrincipale?.name?.startsWith('http')
-                ? photoPrincipale.name
+                ? buildUrl(photoPrincipale.name)
                 : photoPrincipale?.name?.startsWith('/')
-                  ? `${API_URL}${photoPrincipale.name}`
+                  ? buildUrl(photoPrincipale.name)
                   : photoPrincipale?.name
-                    ? `${API_URL}/${photoPrincipale.name}`
+                    ? buildUrl(photoPrincipale.name)
                     : null;
               const isWishlisted = wishlist.has(accessoire._id);
               const isOutOfStock = accessoire.stock === 0 || accessoire.disponible === false;

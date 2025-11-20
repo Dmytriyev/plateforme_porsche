@@ -1,16 +1,34 @@
 import "dotenv/config";
+// Normaliser la variable JWT pour éviter les incohérences entre
+// `SECRET_KEY` et `JWT_SECRET`. On garde les deux keys synchronisées.
+const _jwtSecret =
+  process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.JWT || null;
+if (_jwtSecret) {
+  process.env.JWT_SECRET = _jwtSecret;
+  process.env.SECRET_KEY = _jwtSecret;
+}
 import express from "express";
 import cors from "cors";
 import compression from "compression";
+import zlib from "node:zlib";
 import db from "./db/db.js";
 import path from "node:path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-// import mongoSanitize from "express-mongo-sanitize"; // Désactivé temporairement - conflit avec Express
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import { createRequire } from "module";
+// `xss-clean` fournit une fonction middleware par défaut, mais expose
+// aussi une utilitaire de nettoyage dans `lib/xss`. Pour pouvoir
+// l'utiliser côté ESM, on crée un `require` local.
+const require = createRequire(import.meta.url);
+const { clean: xssClean } = require("xss-clean/lib/xss");
+import hpp from "hpp";
+import cookieParser from "cookie-parser";
 
 import { fileURLToPath } from "node:url";
 import { webhookHandler } from "./controllers/payment.controller.js";
-// logger removed: use console for simple logging
+import logger from "./utils/logger.js";
 import errorMiddleware from "./middlewares/error.js";
 
 import userRoutes from "./routes/user.route.js";
@@ -136,8 +154,14 @@ const uploadLimiter = rateLimit({
   message: "Trop d'uploads d'images, réessayez plus tard",
 });
 
-// Activer compression pour réduire la taille des réponses
-app.use(compression());
+// Activer compression (favoriser la vitesse de compression pour réduire CPU
+// overhead). Threshold à 1kb pour éviter compresser les très petites réponses.
+app.use(
+  compression({
+    level: zlib.constants.Z_BEST_SPEED,
+    threshold: 1024,
+  })
+);
 
 // Stripe webhook : on parser le body (raw required by Stripe)
 app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
@@ -146,9 +170,97 @@ app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 app.use(express.json({ limit: "100kb" }));
 // Parser des bodies encodés en application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+// Protection et sanitation des entrées pour empêcher les injections
+// Cookie parser (utile si vous utilisez des cookies pour auth later)
+app.use(cookieParser());
+// Nettoie les inputs pour supprimer les opérateurs mongo ($ne, $gt, etc.)
+// express-mongo-sanitize middleware réassigne parfois `req.query` qui
+// peut être non-écrasable (getter-only) dans certaines versions
+// d'Express/Node. On utilise la fonction `sanitize` exposée par le
+// package et on applique une stratégie de fallback : tentative
+// d'assignation normale, et si elle échoue on mutile l'objet en place.
+app.use((req, res, next) => {
+  try {
+    const sanitizer =
+      mongoSanitize && mongoSanitize.sanitize ? mongoSanitize.sanitize : null;
+    const keys = ["body", "params", "headers", "query"];
+    keys.forEach((key) => {
+      if (req[key] && typeof req[key] === "object") {
+        try {
+          const sanitized = sanitizer ? sanitizer(req[key]) : req[key];
+          // Essayer l'assignation normale (comportement standard)
+          try {
+            req[key] = sanitized;
+          } catch (assignErr) {
+            // si l'assignation échoue (ex: getter-only), muter l'objet en place
+            Object.keys(req[key]).forEach((k) => delete req[key][k]);
+            Object.keys(sanitized).forEach((k) => (req[key][k] = sanitized[k]));
+          }
+        } catch (innerErr) {
+          // En cas d'erreur pendant la sanitation, on ignore mais on logge
+          logger.warn(
+            `mongoSanitize fallback: erreur de sanitation sur ${key}`,
+            innerErr && innerErr.stack ? innerErr.stack : innerErr
+          );
+        }
+      }
+    });
+  } catch (err) {
+    logger.warn(
+      "Erreur middleware sanitize global:",
+      err && err.stack ? err.stack : err
+    );
+  }
+  next();
+});
+// Protection contre les XSS en nettoyant les champs strings
+// Le middleware officiel de `xss-clean` tente d'assigner `req.query`.
+// Dans certains environnements `req.query` est getter-only et l'assignation
+// provoque une exception. On instancie le middleware puis on le wrappe
+// avec un fallback qui mutera l'objet en place si nécessaire.
+const _xssMiddleware = xss();
+app.use((req, res, next) => {
+  try {
+    return _xssMiddleware(req, res, next);
+  } catch (err) {
+    // Fallback: nettoyer manuellement les propriétés possibles
+    try {
+      const keys = ["body", "params", "query"];
+      keys.forEach((key) => {
+        if (req[key] && typeof req[key] === "object") {
+          const sanitized = xssClean(req[key]);
+          try {
+            req[key] = sanitized;
+          } catch (assignErr) {
+            // getter-only: muter l'objet en place
+            Object.keys(req[key]).forEach((k) => delete req[key][k]);
+            if (sanitized && typeof sanitized === "object") {
+              Object.keys(sanitized).forEach(
+                (k) => (req[key][k] = sanitized[k])
+              );
+            }
+          }
+        } else if (typeof req[key] === "string") {
+          try {
+            req[key] = xssClean(req[key]);
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
+    } catch (inner) {
+      logger.warn(
+        "xss-clean fallback failed:",
+        inner && inner.stack ? inner.stack : inner
+      );
+    }
+    return next();
+  }
+});
+// Protection contre HTTP Parameter Pollution
+app.use(hpp());
 
-// Note: mongoSanitize désactivé temporairement (conflit version Express)
-// La protection NoSQL est assurée par la validation Joi sur toutes les routes
+// Note: La validation NoSQL et métier doit rester via Joi/express-validator
 
 // Appliquer le limiteur global après le parsing JSON
 app.use(globalLimiter);
@@ -161,10 +273,10 @@ app.use(
 
 // Route racine
 app.get("/", (req, res) => {
-  res.json({ 
+  res.json({
     message: "API Porsche - Plateforme de vente de voitures et accessoires",
     version: "1.0.0",
-    status: "running"
+    status: "running",
   });
 });
 // routes avec les limiteur upload
@@ -179,9 +291,8 @@ app.use("/taille_jante", uploadLimiter, taille_janteRoutes);
 app.use("/siege", uploadLimiter, siegeRoutes);
 app.use("/package", uploadLimiter, packageRoutes);
 
-// Routes user avec limiteurs sur login/register
-app.use("/user/login", loginLimiter, userRoutes);
-app.use("/user/register", registerLimiter, userRoutes);
+// Routes user (les limiteurs spécifiques login/register sont appliqués
+// directement dans le routeur utilisateur pour éviter des chemins dupliqués)
 app.use("/user", userRoutes);
 
 // Paiement avec limiteur payment
@@ -202,30 +313,30 @@ app.use(errorMiddleware);
 
 // Démarrage du serveur
 const server = app.listen(port, () => {
-  console.log(`Le serveur est démarré sur le port ${port}`);
+  logger.info(`Le serveur est démarré sur le port ${port}`);
 });
 // Gestion de l'arrêt du serveur
 const gracefulShutdown = (signal, err) => {
-  console.warn(`Received ${signal}. Shutting down gracefully...`);
+  logger.warn(`Received ${signal}. Shutting down gracefully...`);
   if (err)
-    console.error(
+    logger.error(
       "Shutdown reason",
       err && (err.stack || err.message) ? err.stack || err.message : err
     );
   server.close(() => {
-    console.log("Closed out remaining connections");
+    logger.info("Closed out remaining connections");
     process.exit(err ? 1 : 0);
   });
   // si après 20s toujours pas fermé, forcer la sortie
   setTimeout(() => {
-    console.error("Forcing shutdown");
+    logger.error("Forcing shutdown");
     process.exit(1);
   }, 20000).unref();
 };
 
 // Capturer les erreurs non gérées
 process.on("unhandledRejection", (reason) => {
-  console.error(
+  logger.error(
     "Unhandled Rejection",
     (reason && (reason.stack || reason.message)) || String(reason)
   );
@@ -233,7 +344,7 @@ process.on("unhandledRejection", (reason) => {
 });
 // Capturer les exceptions non gérées
 process.on("uncaughtException", (err) => {
-  console.error(
+  logger.error(
     "Uncaught Exception",
     err && (err.stack || err.message) ? err.stack || err.message : err
   );

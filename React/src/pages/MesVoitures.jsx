@@ -4,6 +4,7 @@ import { maVoitureService } from '../services';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Loading, Alert } from '../components/common';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './MesVoitures.css';
 
 
@@ -72,7 +73,7 @@ const MesVoitures = () => {
   /**
    * Supprimer une voiture
    */
-  const handleSupprimer = async (id) => {
+  const _handleSupprimer = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
       return;
     }
@@ -112,11 +113,7 @@ const MesVoitures = () => {
         {photoGenerale ? (
           <div className="mes-voitures-hero-image-finder">
             <img
-              src={photoGenerale.name?.startsWith('http')
-                ? photoGenerale.name
-                : photoGenerale.name?.startsWith('/')
-                  ? `${API_URL}${photoGenerale.name}`
-                  : `${API_URL}/${photoGenerale.name}`}
+              src={buildUrl(photoGenerale.name)}
               alt="Mes Porsche"
               className="mes-voitures-hero-img-finder"
               onError={(e) => {
@@ -201,11 +198,7 @@ const MesVoitures = () => {
                   <div className="mes-voitures-main-image-finder">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name?.startsWith('http')
-                          ? photoPrincipale.name
-                          : photoPrincipale.name?.startsWith('/')
-                            ? `${API_URL}${photoPrincipale.name}`
-                            : `${API_URL}/${photoPrincipale.name}`}
+                        src={buildUrl(photoPrincipale.name)}
                         alt={voiture.type_model || 'Porsche'}
                         className="mes-voitures-main-img-finder"
                         onError={(e) => {
@@ -232,11 +225,7 @@ const MesVoitures = () => {
                       {thumbnails.map((thumb, index) => (
                         <div key={index} className="mes-voitures-thumbnail-finder">
                           <img
-                            src={thumb.name?.startsWith('http')
-                              ? thumb.name
-                              : thumb.name?.startsWith('/')
-                                ? `${API_URL}${thumb.name}`
-                                : `${API_URL}/${thumb.name}`}
+                            src={buildUrl(thumb.name)}
                             alt={`Vue ${index + 2}`}
                             className="mes-voitures-thumbnail-img-finder"
                             onError={(e) => {

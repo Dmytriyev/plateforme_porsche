@@ -1,5 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import authService from '../services/auth.service.jsx';
+import logger from '../utils/logger';
 
 /**
  * Contexte d'authentification
@@ -18,6 +20,8 @@ export const AuthProvider = ({ children }) => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
       } catch (err) {
+        // Log to help debugging during dev or when errors occur
+        logger.warn('AuthContext: loadUser failed', err);
       } finally {
         setLoading(false);
       }

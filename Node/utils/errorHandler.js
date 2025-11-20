@@ -1,6 +1,16 @@
+import logger from "./logger.js";
+
 // Gère les erreurs et envoie une réponse appropriée
 export const handleError = (res, error, context = "") => {
-  console.error(`[${context}]`, error);
+  // Log plus verbeux en dev, log minimal en production
+  if (process.env.NODE_ENV === "production") {
+    logger.error(
+      `[${context}]`,
+      error && error.message ? error.message : String(error)
+    );
+  } else {
+    logger.error(`[${context}]`, error);
+  }
   // ValidationError: données invalides
   if (error && error.name === "ValidationError") {
     return res

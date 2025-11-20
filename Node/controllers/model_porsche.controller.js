@@ -20,7 +20,7 @@ import {
   getCarrosseriesByModel,
   VARIANTES_PAR_MODELE,
 } from "../utils/model_porsche.constants.js";
-const logger = console;
+import logger from "../utils/logger.js";
 
 // Champs pour les références dans Model_porsche
 const POPULATE_FIELDS = {

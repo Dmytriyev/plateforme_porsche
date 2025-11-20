@@ -13,6 +13,11 @@ npm start
 
 Variables d'environnement : `MONGO_URI`, `JWT_SECRET`, `PORT`
 
+Sécurité :
+
+- Installez les dépendances de hardening : `express-mongo-sanitize`, `xss-clean`, `hpp`, `cookie-parser`.
+- Veillez à définir la variable d'environnement `SECRET_KEY` ou `JWT_SECRET` (utiliser la même clé partout).
+
 ## Architecture Générale
 
 L'application utilise une architecture en 2 niveaux pour gérer les voitures :

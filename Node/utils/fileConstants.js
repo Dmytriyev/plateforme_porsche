@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import logger from "./logger.js";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +33,6 @@ export const removeUploadedFile = (FilenameOrPath, subFolder = "") => {
     }
   } catch (err) {
     // On ne remonte pas l'erreur depuis l'effacement de fichier
-    console.warn(`Échec suppression fichier: ${FilenameOrPath}`, err.message);
+    logger.warn(`Échec suppression fichier: ${FilenameOrPath}`, err.message);
   }
 };

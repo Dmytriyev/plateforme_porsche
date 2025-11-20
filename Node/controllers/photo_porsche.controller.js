@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Model_porsche from "../models/model_porsche.model.js";
+import logger from "../utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -239,7 +240,7 @@ const removeUploadedFile = (FilenameOrPath) => {
       fs.unlinkSync(filePath);
     }
   } catch (err) {
-    console.error("Erreur lors de la suppression du fichier:", err);
+    logger.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 

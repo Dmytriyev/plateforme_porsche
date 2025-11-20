@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import maVoitureService from '../services/ma_voiture.service.jsx';
 import apiClient from '../config/api.jsx';
-import { extractData, extractArray } from '../services/httpHelper';
+import logger from '../utils/logger';
+import { /* extractData, */ extractArray } from '../services/httpHelper';
 import { Alert } from '../components/common';
 import './AjouterPorsche.css';
 
@@ -43,7 +44,7 @@ const AjouterPorsche = () => {
         setCouleursExterieur(extractArray(extResponse) || []);
         setCouleursInterieur(extractArray(intResponse) || []);
       } catch (error) {
-        console.error('Erreur lors du chargement des couleurs:', error);
+        logger.error('Erreur lors du chargement des couleurs:', error);
       } finally {
         setLoadingColors(false);
       }
@@ -140,7 +141,7 @@ const AjouterPorsche = () => {
               await maVoitureService.ajouterPhoto(formDataPhoto);
             }
           } catch (photoError) {
-            console.error('Erreur lors de l\'upload des photos:', photoError);
+            logger.error('Erreur lors de l\'upload des photos:', photoError);
           }
         }
 

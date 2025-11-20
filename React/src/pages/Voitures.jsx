@@ -4,6 +4,8 @@ import voitureService from '../services/voiture.service.jsx';
 import { Loading, Card, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import './Voitures.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 /**
  * Page catalogue des voitures
@@ -178,9 +180,11 @@ const Voitures = () => {
 
               {/* Modèle */}
               <div className="voitures-filter-group">
-                <h3 className="voitures-filter-label">Modèle</h3>
+                <label htmlFor="filter-modele" className="voitures-filter-label">Modèle</label>
                 <input
                   type="text"
+                  name="modele"
+                  id="filter-modele"
                   placeholder="Rechercher un modèle..."
                   value={filters.modele}
                   onChange={(e) => handleFilterChange('modele', e.target.value)}
@@ -190,18 +194,26 @@ const Voitures = () => {
 
               {/* Prix */}
               <div className="voitures-filter-group">
-                <h3 className="voitures-filter-label">Prix</h3>
+                <div className="voitures-filter-price-header">
+                  <span className="voitures-filter-label">Prix</span>
+                </div>
                 <div className="voitures-filter-price">
+                  <label htmlFor="filter-prix-min" className="voitures-filter-input-label">Min</label>
                   <input
                     type="number"
+                    name="prixMin"
+                    id="filter-prix-min"
                     placeholder="Min"
                     value={filters.prixMin}
                     onChange={(e) => handleFilterChange('prixMin', e.target.value)}
                     className="voitures-filter-input"
                   />
-                  <span>-</span>
+                  <span aria-hidden="true">-</span>
+                  <label htmlFor="filter-prix-max" className="voitures-filter-input-label">Max</label>
                   <input
                     type="number"
+                    name="prixMax"
+                    id="filter-prix-max"
                     placeholder="Max"
                     value={filters.prixMax}
                     onChange={(e) => handleFilterChange('prixMax', e.target.value)}
@@ -232,7 +244,7 @@ const Voitures = () => {
                     <div className="voiture-image-container">
                       {voiture.photo_porsche && voiture.photo_porsche.length > 0 ? (
                         <img
-                          src={`http://localhost:3000${voiture.photo_porsche[0].name}`}
+                          src={buildUrl(voiture.photo_porsche[0].name)}
                           alt={voiture.photo_porsche[0].alt || `${voiture.voiture?.nom_model || ''} ${voiture.nom_model}`.trim()}
                           className="voiture-image"
                           onError={(e) => {

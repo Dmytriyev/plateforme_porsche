@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { commandeService } from '../services';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -16,15 +16,7 @@ const DashboardConseiller = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!hasRole('conseillere') && !hasRole('admin')) {
-      navigate('/');
-      return;
-    }
-    fetchReservations();
-  }, [hasRole, navigate]);
-
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async () => {
     try {
       setLoading(true);
       // Les conseillers et admins voient toutes les réservations
@@ -46,7 +38,17 @@ const DashboardConseiller = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!hasRole('conseillere') && !hasRole('admin')) {
+      navigate('/');
+      return;
+    }
+    fetchReservations();
+  }, [hasRole, navigate, fetchReservations]);
+
+
 
   const getStatusBadge = (reservation) => {
     if (reservation.status === false) {

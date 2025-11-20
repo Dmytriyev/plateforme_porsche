@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { accesoireService } from '../services';
 import { Loading, Alert } from '../components/common';
 import './CategoriesAccessoires.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 /**
  * Page Catégories d'Accessoires
@@ -85,7 +87,7 @@ const CategoriesAccessoires = () => {
     if (!type || typeof type !== 'string') {
       return 'Catégorie';
     }
-    
+
     const labels = {
       'porte-clés': 'Porte-clés',
       'porte-cles': 'Porte-clés',
@@ -100,17 +102,17 @@ const CategoriesAccessoires = () => {
       'livres': 'Livres',
       'technologie': 'Technologie'
     };
-    
+
     const typeLower = type.toLowerCase();
     if (labels[typeLower]) {
       return labels[typeLower];
     }
-    
+
     // Formatage sécurisé avec vérification de la longueur
     if (type.length > 0) {
       return type.charAt(0).toUpperCase() + type.slice(1);
     }
-    
+
     return 'Catégorie';
   };
 
@@ -147,41 +149,41 @@ const CategoriesAccessoires = () => {
             {categories
               .filter((cat) => cat && cat.type) // Filtrer les catégories sans type valide
               .map((cat) => (
-              <button
-                key={cat.type}
-                onClick={() => handleCategorieClick(cat.type)}
-                className="categorie-card"
-              >
-                {/* Image de fond si disponible */}
-                {cat.photo ? (
-                  <div className="categorie-background">
-                    <img
-                      src={`http://localhost:3000${cat.photo.name}`}
-                      alt={cat.type}
-                      className="categorie-bg-image"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                    <div className="categorie-overlay"></div>
+                <button
+                  key={cat.type}
+                  onClick={() => handleCategorieClick(cat.type)}
+                  className="categorie-card"
+                >
+                  {/* Image de fond si disponible */}
+                  {cat.photo ? (
+                    <div className="categorie-background">
+                      <img
+                        src={buildUrl(cat.photo.name)}
+                        alt={cat.type}
+                        className="categorie-bg-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                      <div className="categorie-overlay"></div>
+                    </div>
+                  ) : (
+                    <div className="categorie-background-default"></div>
+                  )}
+
+                  {/* Contenu */}
+                  <div className="categorie-content">
+                    <h2 className="categorie-name">
+                      {getCategorieLabel(cat.type)}
+                    </h2>
+                    <p className="categorie-count">{cat.count} article{cat.count > 1 ? 's' : ''}</p>
                   </div>
-                ) : (
-                  <div className="categorie-background-default"></div>
-                )}
 
-                {/* Contenu */}
-                <div className="categorie-content">
-                  <h2 className="categorie-name">
-                    {getCategorieLabel(cat.type)}
-                  </h2>
-                  <p className="categorie-count">{cat.count} article{cat.count > 1 ? 's' : ''}</p>
-                </div>
-
-                <div className="categorie-cta">
-                  Découvrir →
-                </div>
-              </button>
-            ))}
+                  <div className="categorie-cta">
+                    Découvrir →
+                  </div>
+                </button>
+              ))}
           </div>
         )}
 

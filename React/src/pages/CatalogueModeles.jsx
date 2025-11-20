@@ -4,6 +4,7 @@ import { voitureService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './CatalogueModeles.css';
 
 
@@ -22,11 +23,6 @@ const CatalogueModeles = () => {
 
     const fetchModeles = async () => {
       try {
-        setLoading(true);
-        setError('');
-
-        // OPTIMISÉ: Utiliser l'endpoint dédié du backend au lieu de filtrer côté client
-        // Backend: GET /voiture/neuve ou GET /voiture/occasion
         const response = isNeuf
           ? await voitureService.getVoituresNeuves()
           : await voitureService.getVoituresOccasion();
@@ -282,13 +278,7 @@ const CatalogueModeles = () => {
                 const photoPrincipale = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0
                   ? modele.photo_voiture[0]
                   : null;
-                const photoUrl = photoPrincipale?.name?.startsWith('http')
-                  ? photoPrincipale.name
-                  : photoPrincipale?.name?.startsWith('/')
-                    ? `${API_URL}${photoPrincipale.name}`
-                    : photoPrincipale?.name
-                      ? `${API_URL}/${photoPrincipale.name}`
-                      : null;
+                const photoUrl = photoPrincipale?.name ? buildUrl(photoPrincipale.name) : null;
 
                 return (
                   <div
@@ -381,12 +371,7 @@ const CatalogueModeles = () => {
                         }
 
                         if (photoPrincipale && photoPrincipale.name) {
-                          let photoUrl = photoPrincipale.name;
-                          if (!photoUrl.startsWith('http')) {
-                            photoUrl = photoUrl.startsWith('/')
-                              ? `${API_URL}${photoUrl}`
-                              : `${API_URL}/${photoUrl}`;
-                          }
+                          const photoUrl = buildUrl(photoPrincipale.name);
 
                           return (
                             <img

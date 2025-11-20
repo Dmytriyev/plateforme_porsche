@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import {
   register,
   login,
@@ -25,9 +26,25 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
+// Limiteurs spécifiques pour /register et /login
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: "Trop de tentatives de connexion, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 50,
+  message: "Trop d'inscriptions, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Routes publiques
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", registerLimiter, register);
+router.post("/login", loginLimiter, login);
 
 // Routes admin
 router.get("/all", auth, isAdmin, getAllUsers);

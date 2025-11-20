@@ -18,7 +18,7 @@ import './Navbar.css';
  * - Bouton connexion/déconnexion
  */
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user: _user, isAuthenticated, logout } = useAuth();
   const { nombreArticles } = usePanier();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -32,9 +32,9 @@ const Navbar = () => {
         <div className="navbar-content">
           {/* Logo Porsche (bouton accueil) */}
           <Link to="/" className="navbar-logo">
-            <img 
-              src="/Logo/Logo_red.svg.png" 
-              alt="Porsche Logo" 
+            <img
+              src="/Logo/Logo_red.svg.png"
+              alt="Porsche Logo"
               className="navbar-logo-img"
               onError={(e) => {
                 e.target.style.display = 'none';

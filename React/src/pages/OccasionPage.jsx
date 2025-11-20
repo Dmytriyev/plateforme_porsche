@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
+import logger from '../utils/logger';
 import { Loading, Alert, Button } from '../components/common';
 import ContactButton from '../components/ContactButton.jsx';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './OccasionPage.css';
 import './ListeVariantes.css';
 
@@ -43,33 +45,37 @@ const OccasionPage = () => {
         setIsListeMode(false);
 
         if (!id) {
-          try {
-            const voiture = await voitureService.getVoitureById(DEFAULT_911_ID);
+          // DEFAULT_911_ID may be configured later; if not set, skip loading a default 911
+          const DEFAULT_911_ID = null;
+          if (DEFAULT_911_ID) {
+            try {
+              const voiture = await voitureService.getVoitureById(DEFAULT_911_ID);
 
-            if (voiture && voiture.type_voiture === false) {
-              if (isMounted) {
-                setIsListeMode(true);
-                setModeleBase(voiture);
-              }
-
-              const occasionsFiltrees = await voitureService.getVoituresOccasion(voiture.nom_model);
-
-              if (!Array.isArray(occasionsFiltrees)) {
+              if (voiture && voiture.type_voiture === false) {
                 if (isMounted) {
-                  setOccasionsListe([]);
-                  setOccasionsFiltrees([]);
+                  setIsListeMode(true);
+                  setModeleBase(voiture);
+                }
+
+                const occasionsFiltrees = await voitureService.getVoituresOccasion(voiture.nom_model);
+
+                if (!Array.isArray(occasionsFiltrees)) {
+                  if (isMounted) {
+                    setOccasionsListe([]);
+                    setOccasionsFiltrees([]);
+                  }
+                  return;
+                }
+
+                if (isMounted) {
+                  setOccasionsListe(occasionsFiltrees);
+                  setOccasionsFiltrees(occasionsFiltrees);
                 }
                 return;
               }
-
-              if (isMounted) {
-                setOccasionsListe(occasionsFiltrees);
-                setOccasionsFiltrees(occasionsFiltrees);
-              }
-              return;
+            } catch (error) {
+              logger.warn('OccasionPage: failed to load default 911', error);
             }
-          } catch (error) {
-            throw new Error("Impossible de charger les 911 d'occasion");
           }
         }
 
@@ -97,12 +103,14 @@ const OccasionPage = () => {
 
             const is404 = status === 404
               || modelPorscheError?.isExpected === true
-              || message.toLowerCase().includes('introuvable');
+              || (typeof message === 'string' && message.toLowerCase().includes('introuvable'));
 
             const is400 = status === 400
-              || message.toLowerCase().includes('invalide');
+              || (typeof message === 'string' && message.toLowerCase().includes('invalide'));
 
             if (!is404 && !is400) {
+              // Log unexpected errors for investigation
+              logger.warn('OccasionPage: modelPorscheError', modelPorscheError);
             }
           }
 
@@ -151,11 +159,11 @@ const OccasionPage = () => {
                   });
 
                   if (occasionsFiltrees2.length > 0) {
-                  if (isMounted) {
-                    setOccasionsListe(occasionsFiltrees2);
-                    setOccasionsFiltrees(occasionsFiltrees2);
-                  }
-                  return;
+                    if (isMounted) {
+                      setOccasionsListe(occasionsFiltrees2);
+                      setOccasionsFiltrees(occasionsFiltrees2);
+                    }
+                    return;
                   }
                 }
 
@@ -176,7 +184,8 @@ const OccasionPage = () => {
           } catch (voitureError) {
             const status = voitureError?.response?.status || voitureError?.status;
             const message = voitureError?.response?.data?.message || voitureError?.message || '';
-            const is400 = status === 400 || message.toLowerCase().includes('invalide');
+            // If needed later, we can inspect 'status' or 'message'
+            logger.warn('OccasionPage: voitureError', { status, message });
           }
         } else {
           const nomModel = id;
@@ -235,11 +244,11 @@ const OccasionPage = () => {
                   });
 
                   if (occasionsFiltrees2.length > 0) {
-                  if (isMounted) {
-                    setOccasionsListe(occasionsFiltrees2);
-                    setOccasionsFiltrees(occasionsFiltrees2);
-                  }
-                  return;
+                    if (isMounted) {
+                      setOccasionsListe(occasionsFiltrees2);
+                      setOccasionsFiltrees(occasionsFiltrees2);
+                    }
+                    return;
                   }
                 }
 
@@ -254,10 +263,12 @@ const OccasionPage = () => {
                   setOccasionsListe([]);
                   setOccasionsFiltrees([]);
                 }
+                logger.warn('OccasionPage: failed to fetch occasions for model', error);
                 return;
               }
             }
           } catch (error) {
+            logger.warn('OccasionPage: general error while resolving by name', error);
           }
         }
 
@@ -476,6 +487,8 @@ const OccasionPage = () => {
                 <label className="variantes-search-label">Recherche</label>
                 <div className="variantes-search-input-wrapper">
                   <input
+                    name="recherche"
+                    id="occasion-recherche"
                     type="text"
                     placeholder="par exemple Carrera S, GTS, Turbo"
                     value={recherche}
@@ -504,6 +517,9 @@ const OccasionPage = () => {
                       <label key={carrosserie} className="variantes-filter-checkbox-finder">
                         <input
                           type="checkbox"
+                          name="carrosserie"
+                          id={`occasion-carrosserie-${carrosserie.replace(/\s+/g, '-').toLowerCase()}`}
+                          value={carrosserie}
                           checked={filtres.carrosserie.includes(carrosserie)}
                           onChange={() => handleFilterChange('carrosserie', carrosserie)}
                         />
@@ -523,6 +539,9 @@ const OccasionPage = () => {
                       <label key={trans} className="variantes-filter-checkbox-finder">
                         <input
                           type="checkbox"
+                          name="boiteVitesse"
+                          id={`occasion-boitevitesse-${trans.replace(/\s+/g, '-').toLowerCase()}`}
+                          value={trans}
                           checked={filtres.boiteVitesse.includes(trans)}
                           onChange={() => handleFilterChange('boiteVitesse', trans)}
                         />
@@ -628,8 +647,8 @@ const OccasionPage = () => {
                             src={photoPrincipale.name?.startsWith('http')
                               ? photoPrincipale.name
                               : photoPrincipale.name?.startsWith('/')
-                                ? `${API_URL}${photoPrincipale.name}`
-                                : `${API_URL}/${photoPrincipale.name}`}
+                                ? buildUrl(photoPrincipale.name)
+                                : buildUrl(photoPrincipale.name)}
                             alt={nomComplet}
                             className="variante-image-photo-finder"
                             onError={(e) => {
@@ -745,7 +764,7 @@ const OccasionPage = () => {
     );
   }
 
-  const { occasion, voiture_base, specifications, options, photos, prix } = pageData;
+  const { occasion, voiture_base: _voiture_base, specifications, options, photos, prix } = pageData;
 
   const formatPower = (puissance) => {
     if (!puissance) return { ch: 0, kw: 0 };
@@ -762,7 +781,7 @@ const OccasionPage = () => {
 
   const dateImmat = formatDateImmat();
   const annee = occasion.annee_production ? new Date(occasion.annee_production).getFullYear() : null;
-  
+
   // Calculer la génération (991 I, 992, etc.) à partir de l'année
   const getGeneration = () => {
     if (!annee) return '';
@@ -771,7 +790,7 @@ const OccasionPage = () => {
     if (annee >= 2020) return '992';
     return '';
   };
-  
+
   const generation = getGeneration();
   const kilometrage = occasion.kilometrage || occasion.kilometrage_actuel || 0;
   const proprietaire = occasion.nombre_proprietaires || 0;
@@ -815,8 +834,8 @@ const OccasionPage = () => {
               src={photos[selectedImage]?.name?.startsWith('http')
                 ? photos[selectedImage].name
                 : photos[selectedImage]?.name?.startsWith('/')
-                  ? `${API_URL}${photos[selectedImage].name}`
-                  : `${API_URL}/${photos[selectedImage].name}`}
+                  ? buildUrl(photos[selectedImage].name)
+                  : buildUrl(photos[selectedImage].name)}
               alt={occasion.nom_model}
               className="occasion-detail-main-image"
               onError={(e) => {
@@ -847,8 +866,8 @@ const OccasionPage = () => {
                     src={photo.name?.startsWith('http')
                       ? photo.name
                       : photo.name?.startsWith('/')
-                        ? `${API_URL}${photo.name}`
-                        : `${API_URL}/${photo.name}`}
+                        ? buildUrl(photo.name)
+                        : buildUrl(photo.name)}
                     alt={`Vue ${index + 1}`}
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -992,7 +1011,7 @@ const OccasionPage = () => {
           {/* Section État et historique */}
           <div className="occasion-detail-state-history">
             <h2 className="occasion-detail-section-title">État et historique</h2>
-            
+
             {/* Cartes de vérification */}
             <div className="occasion-detail-verification-cards">
               <div className="occasion-detail-verification-card">

@@ -3,10 +3,16 @@ import TokenService from '../services/token.service.js';
 
 // Configuration de base de l'API
 // Note: Les variables d'environnement Vite doivent commencer par VITE_
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Par défaut on utilise une base relative (""), ce qui permet d'utiliser
+// le proxy configuré dans Vite durant le développement. Pour pointer
+// explicitement un backend distant, définissez `VITE_API_URL`.
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 // Instance axios configurée
 const apiClient = axios.create({
+  // Si VITE_API_URL est vide, axios utilisera des chemins relatifs
+  // (ex: '/voiture/all') ce qui permet au dev server Vite de proxifier
+  // les requêtes vers l'API backend.
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000, // 10 secondes

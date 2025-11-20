@@ -1,26 +1,49 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { sanitizeObject } from '../utils/sanitize';
+import logger from '../utils/logger';
 
 export const PanierContext = createContext();
 
 export const PanierProvider = ({ children }) => {
-  const [articles, setArticles] = useState([]);
-  const saveTimer = useRef(null);
+  const normalizeArticles = (data) => {
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object') {
+      if (Array.isArray(data.articles)) return data.articles;
 
-  // Charger le panier depuis localStorage au démarrage
-  useEffect(() => {
+      // Migration: handle array-like objects saved as { "0": {...}, "1": {...} }
+      const keys = Object.keys(data);
+      const isNumericKeys = keys.length > 0 && keys.every((k) => String(Number(k)) === k);
+      if (isNumericKeys) return keys.sort((a, b) => Number(a) - Number(b)).map((k) => data[k]);
+    }
+
+    logger.warn('PanierContext: unexpected panier format, normalizing to []', data);
+    return [];
+  };
+  // Lazy init from localStorage to avoid calling setState synchronously inside useEffect
+  const [articles, setArticles] = useState(() => {
     try {
       const savedPanier = localStorage.getItem('panier');
-      if (savedPanier) setArticles(JSON.parse(savedPanier));
-    } catch (error) { }
-  }, []);
+      const parsed = savedPanier ? JSON.parse(savedPanier) : [];
+      return normalizeArticles(parsed);
+    } catch (e) {
+
+      logger.warn('PanierContext: failed to parse saved panier', e);
+      return [];
+    }
+  });
+  const saveTimer = useRef(null);
 
   // Sauvegarder le panier avec debounce pour réduire les écritures
   useEffect(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       try {
-        localStorage.setItem('panier', JSON.stringify(articles));
-      } catch (e) { }
+        const safe = sanitizeObject(Array.isArray(articles) ? articles : []);
+        localStorage.setItem('panier', JSON.stringify(safe));
+      } catch (e) {
+        logger.warn('PanierContext: failed to save panier', e);
+      }
     }, 250);
     return () => clearTimeout(saveTimer.current);
   }, [articles]);
@@ -64,12 +87,22 @@ export const PanierProvider = ({ children }) => {
 
   const viderPanier = useCallback(() => {
     setArticles([]);
-    try { localStorage.removeItem('panier'); } catch (e) { }
+    try {
+      localStorage.removeItem('panier');
+    } catch (e) {
+      logger.warn('PanierContext: failed to remove panier', e);
+    }
   }, []);
 
-  const calculerTotal = useCallback(() => articles.reduce((total, article) => total + (article.prix * (article.quantite || 1)), 0), [articles]);
+  const calculerTotal = useCallback(() => {
+    if (!Array.isArray(articles)) return 0;
+    return articles.reduce((total, article) => total + ((article.prix || 0) * (article.quantite || 1)), 0);
+  }, [articles]);
 
-  const getNombreArticles = useCallback(() => articles.reduce((total, article) => total + (article.quantite || 1), 0), [articles]);
+  const getNombreArticles = useCallback(() => {
+    if (!Array.isArray(articles)) return 0;
+    return articles.reduce((total, article) => total + (article.quantite || 1), 0);
+  }, [articles]);
 
   const value = useMemo(() => ({
     articles,

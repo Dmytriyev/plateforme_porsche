@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { voitureService, modelPorscheService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './ListeVariantes.css';
 
 const ListeVariantes = () => {
@@ -29,23 +30,7 @@ const ListeVariantes = () => {
 
   const isNeuf = type === 'neuve';
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadData = async () => {
-      if (isMounted) {
-        await fetchData();
-      }
-    };
-
-    loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [type, modeleId]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -109,9 +94,27 @@ const ListeVariantes = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [modeleId, isNeuf]);
 
-  const handleVarianteClick = (variante) => {
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchData();
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchData]);
+
+
+
+  const _handleVarianteClick = (variante) => {
     if (isNeuf) {
       navigate(`/configurateur/${variante.voiture?._id || modeleId}`);
     } else {
@@ -119,7 +122,7 @@ const ListeVariantes = () => {
     }
   };
 
-  const handleSelectModel = (variante, e) => {
+  const _handleSelectModel = (variante, e) => {
     e.stopPropagation();
     if (isNeuf) {
       navigate(`/configurateur/${variante.voiture?._id || modeleId}`);
@@ -314,6 +317,8 @@ const ListeVariantes = () => {
               <div className="variantes-search-input-wrapper">
                 <input
                   type="text"
+                  name="recherche"
+                  id="variantes-recherche"
                   placeholder="par exemple Turbo S, 4S, GT"
                   value={recherche}
                   onChange={(e) => setRecherche(e.target.value)}
@@ -341,6 +346,9 @@ const ListeVariantes = () => {
                     <label key={carrosserie} className="variantes-filter-checkbox-finder">
                       <input
                         type="checkbox"
+                        name="carrosserie"
+                        id={`carrosserie-${carrosserie.replace(/\s+/g, '-').toLowerCase()}`}
+                        value={carrosserie}
                         checked={filtres.carrosserie.includes(carrosserie)}
                         onChange={() => handleFilterChange('carrosserie', carrosserie)}
                       />
@@ -366,6 +374,9 @@ const ListeVariantes = () => {
                     <label key={trans} className="variantes-filter-checkbox-finder">
                       <input
                         type="checkbox"
+                        name="boiteVitesse"
+                        id={`boitevitesse-${trans.replace(/\s+/g, '-').toLowerCase()}`}
+                        value={trans}
                         checked={filtres.boiteVitesse.includes(trans)}
                         onChange={() => handleFilterChange('boiteVitesse', trans)}
                       />
@@ -482,8 +493,8 @@ const ListeVariantes = () => {
                           src={photoPrincipale.name?.startsWith('http')
                             ? photoPrincipale.name
                             : photoPrincipale.name?.startsWith('/')
-                              ? `${API_URL}${photoPrincipale.name}`
-                              : `${API_URL}/${photoPrincipale.name}`}
+                              ? buildUrl(photoPrincipale.name)
+                              : buildUrl(photoPrincipale.name)}
                           alt={nomVariante}
                           className="variante-image-photo-finder"
                           onError={(e) => {
@@ -578,6 +589,9 @@ const ListeVariantes = () => {
                         <label className="variante-compare-checkbox-finder">
                           <input
                             type="checkbox"
+                            name="compare"
+                            id={`compare-${variante._id}`}
+                            value={variante._id}
                             checked={isCompareSelected}
                             onChange={(e) => handleCompare(variante, e)}
                           />

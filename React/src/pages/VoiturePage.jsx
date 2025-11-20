@@ -4,6 +4,8 @@ import { voitureService } from '../services';
 import { Loading, Alert, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import './VoiturePage.css';
+import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 
 /**
  * Page explicative complète d'une voiture model-start (911, Cayman, Cayenne)
@@ -74,7 +76,6 @@ const VoiturePage = () => {
 
   const { voiture, statistiques, variantes } = pageData;
   const images = voiture.photos || [];
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   return (
     <div className="voiture-page-container">
@@ -117,7 +118,7 @@ const VoiturePage = () => {
           <div className="voiture-page-gallery">
             <div className="voiture-page-gallery-main">
               <img
-                src={`${API_URL}${images[selectedImage]?.name}`}
+                src={buildUrl(images[selectedImage]?.name)}
                 alt={images[selectedImage]?.alt || voiture.nom_model}
                 className="voiture-page-main-image"
                 onError={(e) => {
@@ -135,7 +136,7 @@ const VoiturePage = () => {
                       }`}
                   >
                     <img
-                      src={`${API_URL}${image.name}`}
+                      src={buildUrl(image.name)}
                       alt={image.alt || `${voiture.nom_model} - Photo ${index + 1}`}
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -194,7 +195,7 @@ const VoiturePage = () => {
                   {variante.photo_principale && (
                     <div className="voiture-page-variante-image">
                       <img
-                        src={`${API_URL}${variante.photo_principale.name}`}
+                        src={buildUrl(variante.photo_principale.name)}
                         alt={variante.nom_model}
                         onError={(e) => {
                           e.target.style.display = 'none';

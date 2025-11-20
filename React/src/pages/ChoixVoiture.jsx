@@ -1,26 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { voitureService } from '../services';
-import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './ChoixVoiture.css';
 
 const ChoixVoiture = () => {
   const navigate = useNavigate();
   const [imageNeuve, setImageNeuve] = useState(null);
   const [imageOccasion, setImageOccasion] = useState(null);
-
-  useEffect(() => {
-    fetchImages();
-  }, []);
-
-  const fetchImages = async () => {
+  // Récupère des images exemples pour les cartes "Neuve" et "Occasion"
+  async function fetchImages() {
     try {
       // Récupérer une image pour "Neuve"
       const voituresNeuves = await voitureService.getVoituresNeuves();
       if (Array.isArray(voituresNeuves) && voituresNeuves.length > 0) {
-        const voitureNeuve = voituresNeuves.find(v => 
-          v.photo_voiture && 
-          Array.isArray(v.photo_voiture) && 
+        const voitureNeuve = voituresNeuves.find(v =>
+          v.photo_voiture &&
+          Array.isArray(v.photo_voiture) &&
           v.photo_voiture.length > 0
         );
         if (voitureNeuve && voitureNeuve.photo_voiture[0]) {
@@ -31,9 +27,9 @@ const ChoixVoiture = () => {
       // Récupérer une image pour "Occasion"
       const voituresOccasions = await voitureService.getVoituresOccasion();
       if (Array.isArray(voituresOccasions) && voituresOccasions.length > 0) {
-        const voitureOccasion = voituresOccasions.find(v => 
-          v.photo_voiture && 
-          Array.isArray(v.photo_voiture) && 
+        const voitureOccasion = voituresOccasions.find(v =>
+          v.photo_voiture &&
+          Array.isArray(v.photo_voiture) &&
           v.photo_voiture.length > 0
         );
         if (voitureOccasion && voitureOccasion.photo_voiture[0]) {
@@ -45,6 +41,14 @@ const ChoixVoiture = () => {
     }
   };
 
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      fetchImages();
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+
   const handleConfigurer = () => {
     navigate('/catalogue/neuve');
   };
@@ -55,9 +59,7 @@ const ChoixVoiture = () => {
 
   const getImageUrl = (photo) => {
     if (!photo || !photo.name) return null;
-    if (photo.name.startsWith('http')) return photo.name;
-    if (photo.name.startsWith('/')) return `${API_URL}${photo.name}`;
-    return `${API_URL}/${photo.name}`;
+    return buildUrl(photo.name);
   };
 
   const imageNeuveUrl = getImageUrl(imageNeuve);

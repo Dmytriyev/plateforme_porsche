@@ -14,7 +14,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 
 
 export default function ReservationForm({ initialConfig = {}, onCompleted, vehiculeId }) {
     const { createReservation, reservation, getReservation, pollReservationStatus } = useReservation();
-    const [config, setConfig] = useState(initialConfig);
+    const [config] = useState(initialConfig);
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState(null);
 

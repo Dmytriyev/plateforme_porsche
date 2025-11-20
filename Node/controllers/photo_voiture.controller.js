@@ -7,6 +7,7 @@ import Voiture from "../models/voiture.model.js";
 import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import Couleur_interieur from "../models/couleur_interieur.model.js";
 import Taille_jante from "../models/taille_jante.model.js";
+import logger from "../utils/logger.js";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);
@@ -316,7 +317,7 @@ const removeUploadedFile = (FilenameOrPath) => {
       fs.unlinkSync(filePath);
     }
   } catch (err) {
-    console.error("Erreur lors de la suppression du fichier:", err);
+    logger.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 

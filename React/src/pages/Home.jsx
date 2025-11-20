@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { voitureService } from '../services';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
 import './Home.css';
 
@@ -162,11 +163,7 @@ const Home = () => {
                   <div className="model-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name?.startsWith('http')
-                          ? photoPrincipale.name
-                          : photoPrincipale.name?.startsWith('/')
-                            ? `${API_URL}${photoPrincipale.name}`
-                            : `${API_URL}/${photoPrincipale.name}`}
+                        src={buildUrl(photoPrincipale.name)}
                         alt={`Porsche ${modele.nom_model}`}
                         className="model-image-photo-porsche"
                         onError={(e) => {
@@ -221,12 +218,7 @@ const Home = () => {
                           </span>
                         </div>
                       )}
-                      <div className="model-spec-item-porsche">
-                        <span className="model-spec-label-porsche">Sièges</span>
-                        <span className="model-spec-value-porsche">
-                          {modeleInfo.seats}
-                        </span>
-                      </div>
+                      {/* Sièges supprimés */}
                       {modeleInfo.transmissions.length > 0 && (
                         <div className="model-spec-item-porsche">
                           <span className="model-spec-label-porsche">Boîte de vitesse</span>

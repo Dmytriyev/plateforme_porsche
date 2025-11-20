@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { authService, commandeService, maVoitureService } from '../services';
+import { commandeService, maVoitureService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import { formatPrice, formatDate } from '../utils/format.js';
 import './MonCompte.css';
 
@@ -36,13 +37,7 @@ const MonCompte = () => {
   const [voitures, setVoitures] = useState([]);
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchAllData();
-    }
-  }, [user]);
-
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -69,7 +64,13 @@ const MonCompte = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchAllData();
+    }
+  }, [user, fetchAllData]);
 
   const handleLogout = () => {
     if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
@@ -107,7 +108,7 @@ const MonCompte = () => {
   }
 
   // Récupérer la première photo disponible pour l'image de la carte "Réserver un véhicule"
-  const photoReservation = voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
+  const _photoReservation = voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
     ? voitures[0].photo_voiture_actuel[0]
     : null;
 
@@ -242,11 +243,7 @@ const MonCompte = () => {
                       <div key={reservation._id} className="mon-compte-reservation-card">
                         {photoPrincipale && photoPrincipale.name ? (
                           <img
-                            src={photoPrincipale.name?.startsWith('http')
-                              ? photoPrincipale.name
-                              : photoPrincipale.name?.startsWith('/')
-                                ? `${API_URL}${photoPrincipale.name}`
-                                : `${API_URL}/${photoPrincipale.name}`}
+                            src={buildUrl(photoPrincipale.name)}
                             alt={typeModel}
                             className="mon-compte-reservation-img"
                             onError={(e) => { e.target.style.display = 'none'; }}
@@ -408,11 +405,7 @@ const MonCompte = () => {
                       <div key={voiture._id} className="mon-compte-voiture-card">
                         {photoPrincipale && photoPrincipale.name ? (
                           <img
-                            src={photoPrincipale.name?.startsWith('http')
-                              ? photoPrincipale.name
-                              : photoPrincipale.name?.startsWith('/')
-                                ? `${API_URL}${photoPrincipale.name}`
-                                : `${API_URL}/${photoPrincipale.name}`}
+                            src={buildUrl(photoPrincipale.name)}
                             alt={voiture.type_model || 'Porsche'}
                             className="mon-compte-voiture-img"
                             onError={(e) => { e.target.style.display = 'none'; }}
@@ -488,27 +481,27 @@ const MonCompte = () => {
                   <h2 className="mon-compte-settings-title">Informations personnelles</h2>
 
                   <div className="mon-compte-settings-item">
-                    <label className="mon-compte-settings-label">Nom complet</label>
+                    <span className="mon-compte-settings-label">Nom complet</span>
                     <p className="mon-compte-settings-value">
                       {userData.prenom} {userData.nom}
                     </p>
                   </div>
 
                   <div className="mon-compte-settings-item">
-                    <label className="mon-compte-settings-label">Email</label>
+                    <span className="mon-compte-settings-label">Email</span>
                     <p className="mon-compte-settings-value">{userData.email}</p>
                   </div>
 
                   {userData.telephone && (
                     <div className="mon-compte-settings-item">
-                      <label className="mon-compte-settings-label">Téléphone</label>
+                      <span className="mon-compte-settings-label">Téléphone</span>
                       <p className="mon-compte-settings-value">{userData.telephone}</p>
                     </div>
                   )}
 
                   {userData.adresse && (
                     <div className="mon-compte-settings-item">
-                      <label className="mon-compte-settings-label">Adresse</label>
+                      <span className="mon-compte-settings-label">Adresse</span>
                       <p className="mon-compte-settings-value">
                         {userData.adresse}
                         {userData.code_postal && `, ${userData.code_postal}`}
@@ -517,7 +510,7 @@ const MonCompte = () => {
                   )}
 
                   <div className="mon-compte-settings-item">
-                    <label className="mon-compte-settings-label">Rôle</label>
+                    <span className="mon-compte-settings-label">Rôle</span>
                     <p className="mon-compte-settings-value">{userData.role || 'Utilisateur'}</p>
                   </div>
                 </div>

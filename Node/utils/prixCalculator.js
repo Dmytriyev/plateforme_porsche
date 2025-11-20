@@ -102,7 +102,13 @@ export const enrichirLigneAvecModelPorsche = async (ligne) => {
         code: "CALCUL_PRIX_ERROR",
       };
 
-      console.error("enrichirLigneAvecModelPorsche - erreur:", error);
+      // Logger l'erreur via le logger centralisé
+      try {
+        const logger = (await import("./logger.js")).default;
+        logger.error("enrichirLigneAvecModelPorsche - erreur:", error);
+      } catch (e) {
+        // si l'import échoue, fallback silencieux
+      }
     }
   }
 

@@ -11,6 +11,17 @@
   padding: 0 1rem;
 }
 
+/* Garanties pour éviter les décalages lors du rendu initial
+   - box-sizing et width assurent que le conteneur ne dépasse pas
+   - position:relative évite certains comportements de placement
+*/
+.accessoires-content {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
 /* En-tête */
 .accessoires-header {
   margin-bottom: 2rem;
@@ -81,6 +92,13 @@
   align-items: start;
 }
 
+/* Forcer l'alignement des éléments de la grille pour éviter
+   qu'ils apparaissent collés à droite lors du premier rendu SPA. */
+.accessoires-grid-porsche {
+  justify-items: start;
+  justify-content: start;
+}
+
 /* Carte accessoire - Style Porsche Design */
 .accessoire-card-porsche {
   background-color: #fff;
@@ -91,6 +109,12 @@
   flex-direction: column;
   min-height: 0;
   width: 100%;
+}
+
+/* Empêcher les cartes de provoquer des débordements horizontaux
+   qui peuvent décaler la grille sur certains rendus initiaux. */
+.accessoire-card-porsche {
+  min-width: 0;
 }
 
 .accessoire-card-porsche:hover {
@@ -360,7 +384,7 @@
   .accessoires-grid-porsche {
     grid-template-columns: 1fr;
   }
-  
+
   .accessoires-header {
     text-align: center;
   }

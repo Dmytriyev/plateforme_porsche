@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import logger from '../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { voitureService, commandeService } from '../services';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -42,6 +43,7 @@ const DashboardAdmin = () => {
         users: 0,
       });
     } catch (err) {
+      logger.warn('DashboardAdmin: fetchStats failed', err);
     } finally {
       setLoading(false);
     }

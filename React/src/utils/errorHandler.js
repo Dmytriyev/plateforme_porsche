@@ -2,7 +2,8 @@
  * Utilitaire de gestion des erreurs
  */
 
-import { ERROR_MESSAGES } from './constants.js';
+import { ERROR_MESSAGES } from "./constants.js";
+import logger from "./logger";
 
 /**
  * Gérer les erreurs API et retourner un message lisible
@@ -21,23 +22,23 @@ export const handleApiError = (error) => {
   switch (status) {
     case 400:
       return data?.message || ERROR_MESSAGES.VALIDATION_ERROR;
-    
+
     case 401:
       return data?.message || ERROR_MESSAGES.UNAUTHORIZED;
-    
+
     case 403:
       return data?.message || ERROR_MESSAGES.FORBIDDEN;
-    
+
     case 404:
       return data?.message || ERROR_MESSAGES.NOT_FOUND;
-    
+
     case 500:
     case 502:
     case 503:
       return ERROR_MESSAGES.SERVER_ERROR;
-    
+
     default:
-      return data?.message || 'Une erreur est survenue';
+      return data?.message || "Une erreur est survenue";
   }
 };
 
@@ -48,10 +49,10 @@ export const handleApiError = (error) => {
  */
 export const logError = (context, error) => {
   if (import.meta.env.DEV) {
-    console.error(`[${context}]`, error);
+    logger.error(`[${context}]`, error);
     if (error.response) {
-      console.error('Response data:', error.response.data);
-      console.error('Response status:', error.response.status);
+      logger.error("Response data:", error.response.data);
+      logger.error("Response status:", error.response.status);
     }
   }
 };
@@ -62,7 +63,7 @@ export const logError = (context, error) => {
  * @returns {string} Message d'erreur
  */
 export const getErrorMessage = (error) => {
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     return error;
   }
 
@@ -78,7 +79,7 @@ export const getErrorMessage = (error) => {
     return error.response.data.error;
   }
 
-  return 'Une erreur est survenue';
+  return "Une erreur est survenue";
 };
 
 /**
@@ -106,10 +107,10 @@ export const isValidationError = (error) => {
  */
 export const getValidationErrors = (error) => {
   const errors = {};
-  
+
   if (error?.response?.data?.errors) {
     const validationErrors = error.response.data.errors;
-    
+
     // Si c'est un tableau d'erreurs
     if (Array.isArray(validationErrors)) {
       validationErrors.forEach((err) => {
@@ -119,13 +120,13 @@ export const getValidationErrors = (error) => {
       });
     }
     // Si c'est un objet d'erreurs
-    else if (typeof validationErrors === 'object') {
+    else if (typeof validationErrors === "object") {
       Object.keys(validationErrors).forEach((key) => {
         errors[key] = validationErrors[key];
       });
     }
   }
-  
+
   return errors;
 };
 
@@ -137,4 +138,3 @@ export default {
   isValidationError,
   getValidationErrors,
 };
-

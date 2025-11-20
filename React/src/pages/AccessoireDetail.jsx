@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { accesoireService } from '../services';
 import { usePanier } from '../hooks/usePanier.jsx';
 import { Loading, Alert, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import './AccessoireDetail.css';
 
 const AccessoireDetail = () => {
@@ -19,11 +20,7 @@ const AccessoireDetail = () => {
   const [photoActive, setPhotoActive] = useState(0);
   const [isWishlist, setIsWishlist] = useState(false);
 
-  useEffect(() => {
-    fetchAccessoire();
-  }, [id]);
-
-  const fetchAccessoire = async () => {
+  const fetchAccessoire = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -34,7 +31,11 @@ const AccessoireDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchAccessoire();
+  }, [fetchAccessoire]);
 
   const handleAddToCart = () => {
     if (accessoire) {
@@ -128,11 +129,7 @@ const AccessoireDetail = () => {
                     </button>
                   )}
                   <img
-                    src={photos[photoActive]?.name?.startsWith('http')
-                      ? photos[photoActive].name
-                      : photos[photoActive]?.name?.startsWith('/')
-                        ? `${API_URL}${photos[photoActive].name}`
-                        : `${API_URL}/${photos[photoActive].name}`}
+                    src={buildUrl(photos[photoActive]?.name)}
                     alt={photos[photoActive]?.alt || accessoire.nom_accesoire}
                     className="gallery-main-image-porsche"
                     onError={(e) => {
@@ -179,11 +176,7 @@ const AccessoireDetail = () => {
                     aria-label={`Voir la photo ${index + 1}`}
                   >
                     <img
-                      src={photo?.name?.startsWith('http')
-                        ? photo.name
-                        : photo?.name?.startsWith('/')
-                          ? `${API_URL}${photo.name}`
-                          : `${API_URL}/${photo.name}`}
+                      src={buildUrl(photo?.name)}
                       alt={photo?.alt || `Photo ${index + 1}`}
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -228,8 +221,8 @@ const AccessoireDetail = () => {
             {/* Description courte */}
             {accessoire.description && (
               <div className="accessoire-short-description-porsche">
-                {accessoire.description.length > 150 
-                  ? accessoire.description.substring(0, 150) + '...' 
+                {accessoire.description.length > 150
+                  ? accessoire.description.substring(0, 150) + '...'
                   : accessoire.description}
               </div>
             )}

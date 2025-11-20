@@ -3,6 +3,7 @@ import photo_accesoireValidation from "../validations/photo_accesoire.validation
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import logger from "../utils/logger.js";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);
@@ -191,7 +192,7 @@ const removeUploadedFile = (FilenameOrPath) => {
       fs.unlinkSync(filePath);
     }
   } catch (err) {
-    console.error("Erreur lors de la suppression du fichier:", err);
+    logger.error("Erreur lors de la suppression du fichier:", err);
   }
 };
 

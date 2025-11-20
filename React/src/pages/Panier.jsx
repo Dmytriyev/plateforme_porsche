@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import { commandeService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { API_URL } from '../config/api.jsx';
+import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
 import './Panier.css';
 
@@ -17,7 +18,7 @@ const Panier = () => {
   const [success, setSuccess] = useState('');
 
   // Données du panier
-  const [panierData, setPanierData] = useState(null);
+  const [_panierData, setPanierData] = useState(null);
   const [lignes, setLignes] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -187,11 +188,7 @@ const Panier = () => {
                   <div className="panier-article-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
-                        src={photoPrincipale.name?.startsWith('http')
-                          ? photoPrincipale.name
-                          : photoPrincipale.name?.startsWith('/')
-                            ? `${API_URL}${photoPrincipale.name}`
-                            : `${API_URL}/${photoPrincipale.name}`}
+                        src={buildUrl(photoPrincipale.name)}
                         alt={isVoiture ? produit.nom_model : produit.nom_accesoire}
                         className="panier-article-img-porsche"
                         onError={(e) => {
