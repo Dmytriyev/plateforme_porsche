@@ -449,6 +449,7 @@ const getVoituresOccasionFinder = async (req, res) => {
       .populate("voiture", "nom_model description")
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
+      .populate("photo_porsche", "name alt _id")
       .sort({ annee_production: -1 })
       .lean();
 
@@ -544,6 +545,7 @@ const getVoituresOccasionFinder = async (req, res) => {
           description: voiture.description || "",
           photo_voiture: voitureAvecPhotos.photo_voiture || [],
         },
+        photo_porsche: occasion.photo_porsche || [],
         type_carrosserie: occasion.type_carrosserie,
         annee_production: occasion.annee_production,
         couleur_exterieur: occasion.couleur_exterieur?.nom_couleur || "N/A",
@@ -559,6 +561,7 @@ const getVoituresOccasionFinder = async (req, res) => {
           consommation: occasion.specifications?.consommation || 0,
         },
         prix_base_variante: occasion.prix_base || 0,
+        prix_base: occasion.prix_base || 0,
         concessionnaire: occasion.concessionnaire || "Centre Porsche",
         numero_vin: occasion.numero_vin || "N/A",
         disponible: occasion.disponible,

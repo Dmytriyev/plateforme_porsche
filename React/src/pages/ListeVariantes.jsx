@@ -6,6 +6,7 @@ import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/ListeVariantes.css';
+import '../css/CatalogueModeles.css';
 
 const ListeVariantes = () => {
   const { type, modeleId } = useParams();
@@ -341,11 +342,11 @@ const ListeVariantes = () => {
 
           {/* Liste des variantes */}
           {variantes.length === 0 ? (
-            <div className="variantes-empty-finder">
+            <div className="catalogue-empty">
               <p>Aucune variante disponible pour ce modèle.</p>
             </div>
           ) : variantesFiltrees.length === 0 ? (
-            <div className="variantes-empty-finder">
+            <div className="catalogue-empty">
               <p>Aucune variante ne correspond aux filtres sélectionnés.</p>
               <button
                 onClick={() => {
@@ -357,7 +358,7 @@ const ListeVariantes = () => {
               </button>
             </div>
           ) : (
-            <div className="variantes-grid-finder">
+            <div className="catalogue-modeles-grid-occasion">
               {variantesFiltrees.map((variante) => {
                 // Récupérer la photo principale (une seule image)
                 let photoPrincipale = null;
@@ -365,8 +366,12 @@ const ListeVariantes = () => {
                 if (isNeuf) {
                   if (variante.photo_porsche && Array.isArray(variante.photo_porsche) && variante.photo_porsche.length > 0) {
                     const validPhotos = variante.photo_porsche.filter(p => p && (p.name || p._id));
-                    if (validPhotos.length > 0) {
-                      photoPrincipale = validPhotos[0];
+                    if (validPhotos.length > 2) {
+                      // Utiliser la photo à l'index 2 (première de la galerie, exclut index 0 et 1)
+                      photoPrincipale = validPhotos[2];
+                    } else if (validPhotos.length > 0) {
+                      // Fallback : dernière photo disponible
+                      photoPrincipale = validPhotos[validPhotos.length - 1];
                     }
                   }
                 } else {
@@ -374,8 +379,12 @@ const ListeVariantes = () => {
                   // 1. Essayer photo_porsche (photos spécifiques à cette occasion)
                   if (variante.photo_porsche && Array.isArray(variante.photo_porsche) && variante.photo_porsche.length > 0) {
                     const validPhotos = variante.photo_porsche.filter(p => p && (p.name || p._id));
-                    if (validPhotos.length > 0) {
-                      photoPrincipale = validPhotos[0];
+                    if (validPhotos.length > 2) {
+                      // Utiliser la photo à l'index 2 (première de la galerie, exclut index 0 et 1)
+                      photoPrincipale = validPhotos[2];
+                    } else if (validPhotos.length > 0) {
+                      // Fallback : dernière photo disponible
+                      photoPrincipale = validPhotos[validPhotos.length - 1];
                     }
                   }
 
@@ -383,8 +392,10 @@ const ListeVariantes = () => {
                   if (!photoPrincipale && variante.photo_voiture) {
                     if (Array.isArray(variante.photo_voiture) && variante.photo_voiture.length > 0) {
                       const validPhotos = variante.photo_voiture.filter(p => p && (p.name || p._id));
-                      if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[0];
+                      if (validPhotos.length > 2) {
+                        photoPrincipale = validPhotos[2];
+                      } else if (validPhotos.length > 0) {
+                        photoPrincipale = validPhotos[validPhotos.length - 1];
                       }
                     } else if (typeof variante.photo_voiture === 'object' && variante.photo_voiture.name) {
                       photoPrincipale = variante.photo_voiture;
@@ -395,8 +406,10 @@ const ListeVariantes = () => {
                   if (!photoPrincipale && variante.voiture?.photo_voiture) {
                     if (Array.isArray(variante.voiture.photo_voiture) && variante.voiture.photo_voiture.length > 0) {
                       const validPhotos = variante.voiture.photo_voiture.filter(p => p && (p.name || p._id));
-                      if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[0];
+                      if (validPhotos.length > 2) {
+                        photoPrincipale = validPhotos[2];
+                      } else if (validPhotos.length > 0) {
+                        photoPrincipale = validPhotos[validPhotos.length - 1];
                       }
                     } else if (typeof variante.voiture.photo_voiture === 'object' && variante.voiture.photo_voiture.name) {
                       photoPrincipale = variante.voiture.photo_voiture;
@@ -407,8 +420,10 @@ const ListeVariantes = () => {
                   if (!photoPrincipale && variante.voiture_base?.photo_voiture) {
                     if (Array.isArray(variante.voiture_base.photo_voiture) && variante.voiture_base.photo_voiture.length > 0) {
                       const validPhotos = variante.voiture_base.photo_voiture.filter(p => p && (p.name || p._id));
-                      if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[0];
+                      if (validPhotos.length > 2) {
+                        photoPrincipale = validPhotos[2];
+                      } else if (validPhotos.length > 0) {
+                        photoPrincipale = validPhotos[validPhotos.length - 1];
                       }
                     } else if (typeof variante.voiture_base.photo_voiture === 'object' && variante.voiture_base.photo_voiture.name) {
                       photoPrincipale = variante.voiture_base.photo_voiture;
@@ -419,99 +434,85 @@ const ListeVariantes = () => {
                 const nomVariante = variante.nom_model || 'Modèle';
                 const specifications = variante.specifications || {};
 
-                return (
-                  <article key={variante._id} className="variante-card-finder">
-                    {/* Badge Essence */}
-                    <span className="variante-fuel-badge-finder">Essence</span>
+                // Construction de l'URL de la photo
+                const photoUrl = photoPrincipale?.name?.startsWith('http')
+                  ? photoPrincipale.name
+                  : photoPrincipale?.name?.startsWith('/')
+                    ? buildUrl(photoPrincipale.name)
+                    : photoPrincipale?.name
+                      ? buildUrl(photoPrincipale.name)
+                      : null;
 
-                    {/* Image unique */}
-                    <div className="variante-image-finder">
-                      {photoPrincipale && photoPrincipale.name ? (
+                return (
+                  <div
+                    key={variante._id}
+                    className="catalogue-modele-card-neuf-porsche"
+                  >
+                    {/* Titre */}
+                    <h2 className="catalogue-modele-title-porsche">
+                      {nomVariante}
+                    </h2>
+
+                    {/* Image */}
+                    <div className="catalogue-modele-image-porsche">
+                      {photoUrl ? (
                         <img
-                          src={photoPrincipale.name?.startsWith('http')
-                            ? photoPrincipale.name
-                            : photoPrincipale.name?.startsWith('/')
-                              ? buildUrl(photoPrincipale.name)
-                              : buildUrl(photoPrincipale.name)}
+                          src={photoUrl}
                           alt={nomVariante}
-                          className="variante-image-photo-finder"
+                          className="catalogue-modele-img-porsche"
                           onError={(e) => {
-                            e.target.style.display = 'none';
-                            if (e.target.nextSibling) {
-                              e.target.nextSibling.style.display = 'flex';
+                            try {
+                              if (e.target.dataset.fallback) {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                return;
+                              }
+                              e.target.dataset.fallback = '1';
+                              e.target.src = '/Logo/Logo_porsche_black.jpg';
+                            } catch (err) {
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) {
+                                e.target.nextSibling.style.display = 'flex';
+                              }
                             }
                           }}
                         />
                       ) : null}
                       <div
-                        className="variante-placeholder-finder"
-                        style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
+                        className="catalogue-modele-placeholder-porsche"
+                        style={{ display: photoUrl ? 'none' : 'flex' }}
                       >
-                        <span className="variante-letter-finder">
+                        <span className="catalogue-modele-letter-porsche">
                           {nomVariante?.charAt(0) || '?'}
                         </span>
                       </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="variante-content-finder">
-                      {/* Nom */}
-                      <h3 className="variante-name-finder">
-                        {nomVariante}
-                      </h3>
-
-                      {/* Prix */}
-                      {(variante.prix_base || variante.prix_calcule) > 0 && (
-                        <div className="variante-price-finder">
-                          À partir de {formatPrice(variante.prix_base || variante.prix_calcule)} TTC
-                        </div>
+                    {/* Prix */}
+                    <div className="catalogue-modele-prix-porsche">
+                      {(variante.prix_base || variante.prix_calcule) > 0 ? (
+                        <>
+                          <span className="catalogue-prix-label">Prix à partir de</span>
+                          <span className="catalogue-prix-montant">
+                            {formatPrice(variante.prix_base || variante.prix_calcule)}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="catalogue-prix-label">Prix</span>
+                          <span className="catalogue-prix-montant">Sur demande</span>
+                        </>
                       )}
-
-                      {/* Spécifications de performance */}
-                      <div className="variante-performances-finder">
-                        {specifications.puissance > 0 && (
-                          <div className="variante-performance-item-finder">
-                            <div className="variante-performance-value-finder">
-                              {specifications.puissance} ch
-                            </div>
-                            <div className="variante-performance-label-finder">
-                              Puissance (ch)
-                            </div>
-                          </div>
-                        )}
-                        {specifications.acceleration_0_100 > 0 && (
-                          <div className="variante-performance-item-finder">
-                            <div className="variante-performance-value-finder">
-                              {specifications.acceleration_0_100} s
-                            </div>
-                            <div className="variante-performance-label-finder">
-                              Accélération de 0 à 100 km/h
-                            </div>
-                          </div>
-                        )}
-                        {specifications.vitesse_max > 0 && (
-                          <div className="variante-performance-item-finder">
-                            <div className="variante-performance-value-finder">
-                              {specifications.vitesse_max} km/h
-                            </div>
-                            <div className="variante-performance-label-finder">
-                              Vitesse maximale sur circuit
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="variante-actions-finder">
-                        <button
-                          className="variante-configure-btn-finder"
-                          onClick={() => navigate(isNeuf ? `/variante/${variante._id}` : `/occasion/${variante._id}`)}
-                        >
-                          {isNeuf ? 'Configurer' : 'Voir les détails'}
-                        </button>
-                      </div>
                     </div>
-                  </article>
+
+                    {/* Bouton */}
+                    <button
+                      className="catalogue-modele-btn-porsche"
+                      onClick={() => navigate(isNeuf ? `/variante/${variante._id}` : `/occasion/${variante._id}`)}
+                    >
+                      {isNeuf ? 'Configurer' : 'Voir les détails'}
+                    </button>
+                  </div>
                 );
               })}
             </div>

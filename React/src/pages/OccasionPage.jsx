@@ -7,6 +7,7 @@ import { formatPrice } from '../utils/format.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/OccasionPage.css';
 import '../css/ListeVariantes.css';
+import '../css/CatalogueModeles.css';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 
@@ -448,267 +449,162 @@ const OccasionPage = () => {
 
   if (isListeMode && modeleBase) {
     return (
-      <div className="variantes-container-finder">
-        <div className="variantes-layout-finder">
-          {/* Sidebar gauche avec filtres */}
-          {occasionsListe.length > 0 && (
-            <aside className="variantes-sidebar-finder">
-              {/* Barre de recherche */}
-              <div className="variantes-search-finder">
-                <label htmlFor="occasion-recherche" className="variantes-search-label">Recherche</label>
-                <div className="variantes-search-input-wrapper">
-                  <input
-                    name="recherche"
-                    id="occasion-recherche"
-                    type="text"
-                    placeholder="par exemple Carrera S, GTS, Turbo"
-                    value={recherche}
-                    onChange={(e) => setRecherche(e.target.value)}
-                    className="variantes-search-input"
-                  />
-                  <button
-                    className="variantes-search-clear"
-                    onClick={() => setRecherche('')}
-                    style={{ display: recherche ? 'block' : 'none' }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+      <div className="catalogue-modeles-container">
+        <div className="catalogue-modeles-content">
+          {/* Header */}
+          <div className="catalogue-modeles-header">
+            <button
+              onClick={() => navigate('/catalogue/occasion')}
+              className="catalogue-back-btn"
+            >
+              ← Retour au catalogue
+            </button>
+            <h1 className="catalogue-modeles-title">
+              {modeleBase?.nom_model} d'occasion
+            </h1>
+            <p className="catalogue-modeles-subtitle">
+              {occasionsFiltrees.length} {occasionsFiltrees.length > 1 ? 'véhicules disponibles' : 'véhicule disponible'}
+            </p>
+          </div>
 
-              {/* Filtre Carrosserie */}
-              {filterOptions.carrosseries.length > 0 && (
-                <div className="variantes-filter-section-finder">
-                  <h3 className="variantes-filter-section-title-finder">Carrosserie</h3>
-                  <div className="variantes-filter-options-finder">
-                    {filterOptions.carrosseries.map(carrosserie => (
-                      <label key={carrosserie} className="variantes-filter-checkbox-finder">
-                        <input
-                          type="checkbox"
-                          name="carrosserie"
-                          id={`occasion-carrosserie-${carrosserie.replace(/\s+/g, '-').toLowerCase()}`}
-                          value={carrosserie}
-                          checked={filtres.carrosserie.includes(carrosserie)}
-                          onChange={() => handleFilterChange('carrosserie', carrosserie)}
-                        />
-                        <span>{carrosserie}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Filtre Boîte de vitesse */}
-              {filterOptions.transmissions.length > 0 && (
-                <div className="variantes-filter-section-finder">
-                  <h3 className="variantes-filter-section-title-finder">Boîte de vitesse</h3>
-                  <div className="variantes-filter-options-finder">
-                    {filterOptions.transmissions.map(trans => (
-                      <label key={trans} className="variantes-filter-checkbox-finder">
-                        <input
-                          type="checkbox"
-                          name="boiteVitesse"
-                          id={`occasion-boitevitesse-${trans.replace(/\s+/g, '-').toLowerCase()}`}
-                          value={trans}
-                          checked={filtres.boiteVitesse.includes(trans)}
-                          onChange={() => handleFilterChange('boiteVitesse', trans)}
-                        />
-                        <span>{trans}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Bouton réinitialiser */}
-              {(filtres.carrosserie.length > 0 ||
-                filtres.boiteVitesse.length > 0 ||
-                filtres.puissanceMin ||
-                filtres.prixMax ||
-                recherche) && (
-                  <button
-                    onClick={handleResetFilter}
-                    className="variantes-reset-filters-finder"
-                  >
-                    Réinitialiser tous les filtres
-                  </button>
-                )}
-            </aside>
-          )}
-
-          {/* Zone principale */}
-          <div className="variantes-main-finder">
-            {/* Header */}
-            <div className="variantes-header-finder">
-              <button
-                onClick={() => navigate('/catalogue/occasion')}
-                className="variantes-back-link-finder"
-              >
-                Retour au catalogue d'occasion
-              </button>
-              <h1 className="variantes-title-finder">
-                Quel modèle {modeleBase?.nom_model} d'occasion vous intéresse ?
-              </h1>
+          {/* Liste des occasions */}
+          {occasionsListe.length === 0 ? (
+            <div className="catalogue-empty">
+              <p>Aucune {modeleBase?.nom_model} d'occasion disponible pour le moment.</p>
             </div>
+          ) : occasionsFiltrees.length === 0 ? (
+            <div className="catalogue-empty">
+              <p>Aucune occasion ne correspond aux filtres sélectionnés.</p>
+            </div>
+          ) : (
+            <div className="catalogue-modeles-grid-occasion">
+              {occasionsFiltrees.map((occasion) => {
+                let photoPrincipale = null;
 
-            {/* Liste des occasions */}
-            {occasionsListe.length === 0 ? (
-              <div className="variantes-empty-finder">
-                <p>Aucune {modeleBase?.nom_model} d'occasion disponible pour le moment.</p>
-              </div>
-            ) : occasionsFiltrees.length === 0 ? (
-              <div className="variantes-empty-finder">
-                <p>Aucune occasion ne correspond aux filtres sélectionnés.</p>
-                <button
-                  onClick={handleResetFilter}
-                  className="variantes-reset-filters-finder"
-                >
-                  Réinitialiser les filtres
-                </button>
-              </div>
-            ) : (
-              <div className="variantes-grid-finder">
-                {occasionsFiltrees.map((occasion) => {
-                  let photoPrincipale = null;
-
-                  if (occasion.photo_porsche && Array.isArray(occasion.photo_porsche) && occasion.photo_porsche.length > 0) {
-                    const validPhotos = occasion.photo_porsche.filter(p => p && (p.name || p._id));
-                    if (validPhotos.length > 0) {
-                      photoPrincipale = validPhotos[0];
-                    }
-                  } else if (occasion.photo_voiture && Array.isArray(occasion.photo_voiture) && occasion.photo_voiture.length > 0) {
-                    const validPhotos = occasion.photo_voiture.filter(p => p && (p.name || p._id));
-                    if (validPhotos.length > 0) {
-                      photoPrincipale = validPhotos[0];
-                    }
-                  } else if (occasion.voiture_base?.photo_voiture) {
-                    if (Array.isArray(occasion.voiture_base.photo_voiture) && occasion.voiture_base.photo_voiture.length > 0) {
-                      const validPhotos = occasion.voiture_base.photo_voiture.filter(p => p && (p.name || p._id));
-                      if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[1];
-                      }
-                    } else if (occasion.voiture_base.photo_voiture && typeof occasion.voiture_base.photo_voiture === 'object' && occasion.voiture_base.photo_voiture.name) {
-                      photoPrincipale = occasion.voiture_base.photo_voiture;
-                    }
+                // Priorité : photo_porsche[2] (première photo de la galerie, exclut index 0 et 1)
+                if (occasion.photo_porsche && Array.isArray(occasion.photo_porsche) && occasion.photo_porsche.length > 0) {
+                  const validPhotos = occasion.photo_porsche.filter(p => p && (p.name || p._id));
+                  if (validPhotos.length > 2) {
+                    // Utiliser la photo à l'index 2 (première de la galerie)
+                    photoPrincipale = validPhotos[2];
+                  } else if (validPhotos.length > 0) {
+                    // Fallback : dernière photo disponible
+                    photoPrincipale = validPhotos[validPhotos.length - 1];
                   }
+                } else if (occasion.photo_voiture && Array.isArray(occasion.photo_voiture) && occasion.photo_voiture.length > 0) {
+                  const validPhotos = occasion.photo_voiture.filter(p => p && (p.name || p._id));
+                  if (validPhotos.length > 2) {
+                    photoPrincipale = validPhotos[2];
+                  } else if (validPhotos.length > 0) {
+                    photoPrincipale = validPhotos[validPhotos.length - 1];
+                  }
+                } else if (occasion.voiture_base?.photo_voiture) {
+                  if (Array.isArray(occasion.voiture_base.photo_voiture) && occasion.voiture_base.photo_voiture.length > 0) {
+                    const validPhotos = occasion.voiture_base.photo_voiture.filter(p => p && (p.name || p._id));
+                    if (validPhotos.length > 2) {
+                      photoPrincipale = validPhotos[2];
+                    } else if (validPhotos.length > 0) {
+                      photoPrincipale = validPhotos[validPhotos.length - 1];
+                    }
+                  } else if (occasion.voiture_base.photo_voiture && typeof occasion.voiture_base.photo_voiture === 'object' && occasion.voiture_base.photo_voiture.name) {
+                    photoPrincipale = occasion.voiture_base.photo_voiture;
+                  }
+                }
 
-                  // Pour les occasions, nom_model contient la variante (Carrera S, GTS, Turbo, etc.)
-                  const nomVariante = occasion.nom_model || '';
-                  const nomModeleBase = modeleBase?.nom_model || '';
-                  const nomComplet = nomVariante && nomVariante !== nomModeleBase
-                    ? `${nomModeleBase} ${nomVariante}`.trim()
-                    : nomVariante || nomModeleBase;
+                // Pour les occasions, nom_model contient la variante (Carrera S, GTS, Turbo, etc.)
+                const nomVariante = occasion.nom_model || '';
+                const nomModeleBase = modeleBase?.nom_model || '';
+                const nomComplet = nomVariante && nomVariante !== nomModeleBase
+                  ? `${nomModeleBase} ${nomVariante}`.trim()
+                  : nomVariante || nomModeleBase;
 
-                  const specifications = occasion.specifications || {};
-                  const transmissionType = getTransmissionType(occasion);
+                // Construction de l'URL de la photo
+                const photoUrl = photoPrincipale?.name?.startsWith('http')
+                  ? photoPrincipale.name
+                  : photoPrincipale?.name?.startsWith('/')
+                    ? buildUrl(photoPrincipale.name)
+                    : photoPrincipale?.name
+                      ? buildUrl(photoPrincipale.name)
+                      : null;
 
-                  return (
-                    <article key={occasion._id} className="variante-card-finder">
-                      {/* Badge Essence */}
-                      <span className="variante-fuel-badge-finder">Essence</span>
+                return (
+                  <div
+                    key={occasion._id}
+                    className="catalogue-modele-card-neuf-porsche"
+                  >
+                    {/* Titre */}
+                    <h2 className="catalogue-modele-title-porsche">
+                      {nomComplet}
+                    </h2>
 
-                      {/* Image unique */}
-                      <div className="variante-image-finder">
-                        {photoPrincipale && photoPrincipale.name ? (
-                          <img
-                            src={photoPrincipale.name?.startsWith('http')
-                              ? photoPrincipale.name
-                              : photoPrincipale.name?.startsWith('/')
-                                ? buildUrl(photoPrincipale.name)
-                                : buildUrl(photoPrincipale.name)}
-                            alt={nomComplet}
-                            className="variante-image-photo-finder"
-                            onError={(e) => {
+                    {/* Image */}
+                    <div className="catalogue-modele-image-porsche">
+                      {photoUrl ? (
+                        <img
+                          src={photoUrl}
+                          alt={nomComplet}
+                          className="catalogue-modele-img-porsche"
+                          onError={(e) => {
+                            try {
+                              if (e.target.dataset.fallback) {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                return;
+                              }
+                              e.target.dataset.fallback = '1';
+                              e.target.src = '/Logo/Logo_porsche_black.jpg';
+                            } catch (err) {
                               e.target.style.display = 'none';
                               if (e.target.nextSibling) {
                                 e.target.nextSibling.style.display = 'flex';
                               }
-                            }}
-                          />
-                        ) : null}
-                        <div
-                          className="variante-placeholder-finder"
-                          style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
-                        >
-                          <span className="variante-letter-finder">
-                            {nomComplet?.charAt(0) || '?'}
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className="catalogue-modele-placeholder-porsche"
+                        style={{ display: photoUrl ? 'none' : 'flex' }}
+                      >
+                        <span className="catalogue-modele-letter-porsche">
+                          {nomComplet?.charAt(0) || '?'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Prix */}
+                    <div className="catalogue-modele-prix-porsche">
+                      {(occasion.prix_base || occasion.prix_base_variante) > 0 ? (
+                        <>
+                          <span className="catalogue-prix-label">Prix à partir de</span>
+                          <span className="catalogue-prix-montant">
+                            {formatPrice(occasion.prix_base || occasion.prix_base_variante)}
                           </span>
-                        </div>
-                      </div>
+                        </>
+                      ) : (
+                        <>
+                          <span className="catalogue-prix-label">Prix</span>
+                          <span className="catalogue-prix-montant">Sur demande</span>
+                        </>
+                      )}
+                    </div>
 
-                      {/* Content */}
-                      <div className="variante-content-finder">
-                        {/* Nom */}
-                        <h3 className="variante-name-finder">
-                          {nomComplet}
-                        </h3>
-
-                        {/* Prix */}
-                        {(occasion.prix_base || occasion.prix_base_variante) > 0 && (
-                          <div className="variante-price-finder">
-                            {formatPrice(occasion.prix_base || occasion.prix_base_variante)} TTC
-                          </div>
-                        )}
-
-                        {/* Spécifications de performance */}
-                        <div className="variante-performances-finder">
-                          {specifications.puissance > 0 && (
-                            <div className="variante-performance-item-finder">
-                              <div className="variante-performance-value-finder">
-                                {specifications.puissance} ch
-                              </div>
-                              <div className="variante-performance-label-finder">
-                                Puissance (ch)
-                              </div>
-                            </div>
-                          )}
-                          {specifications.acceleration_0_100 > 0 && (
-                            <div className="variante-performance-item-finder">
-                              <div className="variante-performance-value-finder">
-                                {specifications.acceleration_0_100} s
-                              </div>
-                              <div className="variante-performance-label-finder">
-                                Accélération de 0 à 100 km/h
-                              </div>
-                            </div>
-                          )}
-                          {specifications.vitesse_max > 0 && (
-                            <div className="variante-performance-item-finder">
-                              <div className="variante-performance-value-finder">
-                                {specifications.vitesse_max} km/h
-                              </div>
-                              <div className="variante-performance-label-finder">
-                                Vitesse maximale
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Actions - Pas de bouton Configurer pour les occasions */}
-                        <div className="variante-actions-finder">
-                          <button
-                            className="variante-configure-btn-finder"
-                            onClick={() => navigate(`/occasion/${occasion._id}`)}
-                          >
-                            Voir les détails
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    {/* Bouton */}
+                    <button
+                      className="catalogue-modele-btn-porsche"
+                      onClick={() => navigate(`/occasion/${occasion._id}`)}
+                    >
+                      Voir les détails
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     );
-  }
-
-  if (!pageData || !pageData.occasion) {
+  } if (!pageData || !pageData.occasion) {
     return (
       <div className="occasion-page-error">
         <Alert type="warning">Occasion non trouvée</Alert>

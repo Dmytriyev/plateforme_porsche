@@ -31,7 +31,11 @@
   color: #6b7280;
   margin: 0;
 }
-.catalogue-modeles-grid-neuf {
+/* Grid pour neuves et occasions - identique */
+.catalogue-modeles-grid,
+.catalogue-modeles-grid-neuf,
+.catalogue-modeles-grid-occasion {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
   max-width: 1200px;
   margin: 0 auto;
@@ -66,7 +70,8 @@
   color: #000;
   letter-spacing: -0.02em;
 }
-.catalogue-modele-card {
+/* Carte Porsche unifiée - pour neuves ET occasions */
+.catalogue-modele-card-neuf-porsche {
   background-color: #fff;
   border: 3px solid #e5e7eb;
   border-radius: 1rem;
@@ -76,50 +81,41 @@
   display: flex;
   flex-direction: column;
 }
-.catalogue-modele-card:hover {
+
+.catalogue-modele-card-neuf-porsche:hover {
   border-color: #000;
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
-.catalogue-modele-card-occasion {
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-.catalogue-modele-card-occasion:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-  border-color: #000;
-}
-.catalogue-modele-image-container {
+
+.catalogue-modele-image-porsche {
   position: relative;
   width: 100%;
-  aspect-ratio: 16/9;
   background-color: #f3f4f6;
   overflow: hidden;
-  padding: 0 1.5rem;
+  padding: 1rem 1.5rem;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.catalogue-modele-card-neuf .catalogue-modele-image-container {
-  padding: 1rem 1.5rem;
-  min-height: 300px;
-}
-.catalogue-modele-image {
+
+.catalogue-modele-img-porsche {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.3s ease;
-}
-.catalogue-modele-card:hover .catalogue-modele-image {
-  transform: scale(1.05);
-}
-.catalogue-modele-card-neuf .catalogue-modele-image {
   object-fit: contain;
   max-height: 100%;
+  transition: transform 0.3s ease;
 }
-.catalogue-modele-placeholder {
+
+.catalogue-modele-card-neuf-porsche:hover .catalogue-modele-img-porsche {
+  transform: scale(1.05);
+}
+
+.catalogue-modele-placeholder-porsche {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
@@ -127,126 +123,62 @@
   align-items: center;
   justify-content: center;
 }
-.catalogue-modele-letter {
+
+.catalogue-modele-letter-porsche {
   font-size: 4rem;
   font-weight: 700;
   color: #fff;
-  opacity: 0.5;
+  opacity: 0.3;
 }
-.catalogue-modele-specs {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-.catalogue-modele-spec-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-}
-.catalogue-modele-spec-label {
+
+.catalogue-empty {
+  text-align: center;
+  padding: 3rem;
   color: #6b7280;
-  font-weight: 500;
 }
-.catalogue-modele-spec-value {
-  color: #000;
-  font-weight: 600;
-}
-.catalogue-modele-annee {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0;
-  font-weight: 500;
-}
-.catalogue-modele-annee-inline {
-  font-size: 1.25rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-.catalogue-modele-prix {
-  font-size: 1rem;
-  color: #000;
-  margin: 0;
-  font-weight: 700;
-}
-.catalogue-modele-carrosseries {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0;
-  font-weight: 500;
-}
-.catalogue-modele-carrosserie {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0.5rem 0;
-  font-weight: 500;
-}
-.catalogue-modele-puissance {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0.5rem 0;
-  font-weight: 500;
-}
-.catalogue-modele-variantes {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-}
-.catalogue-modele-badge {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  width: fit-content;
-}
-.catalogue-modele-badge-disponible {
-  background-color: #10b981;
+
+/* Bouton commun pour toutes les cartes Porsche */
+.catalogue-modele-btn-porsche {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #000;
   color: #fff;
-  margin-top: 0.5rem;
-}
-.catalogue-modele-prix-occasion {
-  font-size: 1.25rem;
+  border: none;
+  font-size: 1rem;
   font-weight: 600;
-  color: #000;
-  margin: 0.5rem 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
-.catalogue-modele-count-occasion {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 1rem;
+
+.catalogue-modele-btn-porsche:hover {
+  background-color: #1f2937;
 }
-.catalogue-modele-card-neuf .catalogue-modele-cta {
-  margin-top: auto;
-  border-radius: 0;
+
+.catalogue-modele-btn-porsche:active {
+  transform: scale(0.98);
 }
+
+/* Responsive Design */
 @media (max-width: 1024px) {
-  .catalogue-modeles-grid-neuf {
-    grid-template-columns: 1fr;
-  }
+  .catalogue-modeles-grid,
+  .catalogue-modeles-grid-neuf,
   .catalogue-modeles-grid-occasion {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
+
 @media (max-width: 768px) {
-  .catalogue-modeles-grid-occasion {
-    grid-template-columns: 1fr;
-  }
   .catalogue-modeles-title {
     font-size: 2rem;
   }
-  .catalogue-modeles-grid {
-    grid-template-columns: 1fr;
-  }
-  .catalogue-modele-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .catalogue-modele-card-neuf .catalogue-modele-image-container {
+
+  .catalogue-modele-image-porsche {
     min-height: 250px;
+  }
+
+  .catalogue-modele-title-porsche {
+    font-size: 2rem;
   }
 }

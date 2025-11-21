@@ -230,43 +230,6 @@ const CatalogueModeles = () => {
     }
   };
 
-  /**
-   * Fonction pour obtenir les informations spécifiques d'un modèle
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * Cette fonction retourne les informations formatées pour chaque modèle
-   * en utilisant UNIQUEMENT les données disponibles dans la base de données
-   */
-  const getModeleInfo = (modele) => {
-    // Descriptions par défaut (utilisées si description non disponible)
-    const descriptions = {
-      '911': 'L\'icône de génération en génération.',
-      '718': 'La sportive deux places au moteur central arrière.',
-      'Cayman': 'La sportive deux places au moteur central arrière.',
-      'Cayenne': 'Le SUV à l\'ADN sportif et familial.',
-    };
-
-    // Nombre de places par modèle (données statiques car non disponibles dans la base)
-    const seats = {
-      '911': '2+2',
-      '718': '2',
-      'Cayman': '2',
-      'Cayenne': '5',
-    };
-
-    // Utiliser les données enrichies du backend si disponibles
-    return {
-      description: modele.description || descriptions[modele.nom_model] || 'Découvrez ce modèle emblématique',
-      bodyTypes: modele.carrosseries_disponibles || [],
-      seats: seats[modele.nom_model] || '2',
-      transmissions: modele.transmissions_disponibles || [],
-      prixDepuis: modele.prix_depuis || 0,
-      nombreOccasions: modele.nombre_occasions || 0,
-      fuelType: 'Essence', // Par défaut, toutes les Porsche sont essence
-    };
-  };
-
   if (loading) {
     return <Loading fullScreen message="Chargement des modèles..." />;
   }
@@ -291,12 +254,12 @@ const CatalogueModeles = () => {
             ← Retour au choix
           </button>
           <h1 className="catalogue-modeles-title">
-            {isNeuf ? 'Porsche Neuves' : 'Toutes les Voitures d\'Occasion'}
+            {isNeuf ? 'Porsche Neuves' : 'Porsche d\'Occasion'}
           </h1>
           <p className="catalogue-modeles-subtitle">
             {isNeuf
               ? 'Choisissez votre modèle à configurer'
-              : `${modeles.length} ${modeles.length > 1 ? 'occasions disponibles' : 'occasion disponible'}`
+              : 'Choisissez votre modèle'
             }
           </p>
         </div>
@@ -311,9 +274,11 @@ const CatalogueModeles = () => {
             {modeles.map((modele) => {
               if (isNeuf) {
                 // Pour les neuves: cartes simplifiées avec seulement titre, image, prix et bouton
-                const photoPrincipale = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0
-                  ? modele.photo_voiture[1]
-                  : null;
+                const photoPrincipale = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 2
+                  ? modele.photo_voiture[2]
+                  : modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0
+                    ? modele.photo_voiture[modele.photo_voiture.length - 1]
+                    : null;
                 const photoUrl = photoPrincipale?.name?.startsWith('http')
                   ? photoPrincipale.name
                   : photoPrincipale?.name?.startsWith('/')
@@ -393,144 +358,89 @@ const CatalogueModeles = () => {
                   </div>
                 );
               } else {
-                // Pour les occasions: garder l'affichage actuel
-                const modeleInfo = getModeleInfo(modele);
+                // Pour les occasions: EXACTEMENT le même style que les neuves
+                const photoPrincipale = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 2
+                  ? modele.photo_voiture[2]
+                  : modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0
+                    ? modele.photo_voiture[modele.photo_voiture.length - 1]
+                    : null;
+                const photoUrl = photoPrincipale?.name?.startsWith('http')
+                  ? photoPrincipale.name
+                  : photoPrincipale?.name?.startsWith('/')
+                    ? `${API_URL}${photoPrincipale.name}`
+                    : photoPrincipale?.name
+                      ? `${API_URL}/${photoPrincipale.name}`
+                      : null;
 
                 return (
-                  <button
+                  <div
                     key={modele._id}
-                    data-modele-id={modele._id}
-                    onClick={() => handleModeleClick(modele)}
-                    className="catalogue-modele-card-occasion"
+                    className="catalogue-modele-card-neuf-porsche"
                   >
-                    {/* Header avec nom et badge carburant */}
-                    <div className="catalogue-modele-header">
-                      <h2 className="catalogue-modele-name">
-                        {modele.nom_model}
-                      </h2>
-                      <span className="catalogue-modele-fuel-badge">
-                        {modeleInfo.fuelType}
-                      </span>
-                    </div>
+                    {/* Titre */}
+                    <h2 className="catalogue-modele-title-porsche">
+                      {modele.nom_model}
+                    </h2>
 
                     {/* Image */}
-                    <div className="catalogue-modele-image-container">
-                      {(() => {
-                        let photoPrincipale = null;
-
-                        if (modele.photo_porsche && Array.isArray(modele.photo_porsche) && modele.photo_porsche.length > 0) {
-                          const validPhotos = modele.photo_porsche.filter(p => p && (p.name || p._id));
-                          if (validPhotos.length > 0) {
-                            photoPrincipale = validPhotos[0];
-                          }
-                        }
-                        if (!photoPrincipale && modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0) {
-                          const validPhotos = modele.photo_voiture.filter(p => p && (p.name || p._id));
-                          if (validPhotos.length > 0) {
-                            photoPrincipale = validPhotos[0];
-                          }
-                        }
-
-                        if (photoPrincipale && photoPrincipale.name) {
-                          let photoUrl = photoPrincipale.name;
-                          if (!photoUrl.startsWith('http')) {
-                            photoUrl = photoUrl.startsWith('/')
-                              ? `${API_URL}${photoUrl}`
-                              : `${API_URL}/${photoUrl}`;
-                          }
-
-                          return (
-                            <img
-                              src={photoUrl}
-                              alt={photoPrincipale.alt || modele.nom_model}
-                              className="catalogue-modele-image"
-                              onError={(e) => {
-                                try {
-                                  const src = e.target.src || '';
-                                  if (e.target.dataset.fallback) {
-                                    e.target.style.display = 'none';
-                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                    return;
-                                  }
-                                  e.target.dataset.fallback = '1';
-                                  e.target.src = '/Logo/Logo_porsche_black.jpg';
-                                } catch (err) {
-                                  e.target.style.display = 'none';
-                                  if (e.target.nextSibling) {
-                                    e.target.nextSibling.style.display = 'flex';
-                                  }
-                                }
-                              }}
-                            />
-                          );
-                        }
-                        return null;
-                      })()}
+                    <div className="catalogue-modele-image-porsche">
+                      {photoUrl ? (
+                        <img
+                          src={photoUrl}
+                          alt={photoPrincipale?.alt || modele.nom_model}
+                          className="catalogue-modele-img-porsche"
+                          onError={(e) => {
+                            try {
+                              const src = e.target.src || '';
+                              if (e.target.dataset.fallback) {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                return;
+                              }
+                              e.target.dataset.fallback = '1';
+                              e.target.src = '/Logo/Logo_porsche_black.jpg';
+                            } catch (err) {
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) {
+                                e.target.nextSibling.style.display = 'flex';
+                              }
+                            }
+                          }}
+                        />
+                      ) : null}
                       <div
-                        className="catalogue-modele-placeholder"
-                        style={{
-                          display: (() => {
-                            const hasPhotoPorsche = modele.photo_porsche && Array.isArray(modele.photo_porsche) && modele.photo_porsche.length > 0 && modele.photo_porsche.some(p => p && p.name);
-                            const hasPhotoVoiture = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0 && modele.photo_voiture.some(p => p && p.name);
-                            return (hasPhotoPorsche || hasPhotoVoiture) ? 'none' : 'flex';
-                          })()
-                        }}
+                        className="catalogue-modele-placeholder-porsche"
+                        style={{ display: photoUrl ? 'none' : 'flex' }}
                       >
-                        <span className="catalogue-modele-letter">
+                        <span className="catalogue-modele-letter-porsche">
                           {modele.nom_model?.charAt(0) || '?'}
                         </span>
                       </div>
                     </div>
 
-                    {/* Informations */}
-                    <div className="catalogue-modele-info">
-                      <p className="catalogue-modele-description">
-                        {modeleInfo.description}
-                      </p>
-
-                      {modeleInfo.prixDepuis > 0 && (
-                        <div className="catalogue-modele-prix-occasion">
-                          À partir de {formatPrice(modeleInfo.prixDepuis)} TTC
-                        </div>
+                    {/* Prix */}
+                    <div className="catalogue-modele-prix-porsche">
+                      {modele.prix_depuis > 0 ? (
+                        <>
+                          <span className="catalogue-prix-label">Prix à partir de</span>
+                          <span className="catalogue-prix-montant">{formatPrice(modele.prix_depuis)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="catalogue-prix-label">Prix</span>
+                          <span className="catalogue-prix-montant">Sur demande</span>
+                        </>
                       )}
-
-                      {modeleInfo.nombreOccasions > 0 && (
-                        <div className="catalogue-modele-count-occasion">
-                          {modeleInfo.nombreOccasions} {modeleInfo.nombreOccasions > 1 ? 'véhicules disponibles' : 'véhicule disponible'}
-                        </div>
-                      )}
-
-                      <div className="catalogue-modele-specs">
-                        {modeleInfo.bodyTypes.length > 0 && (
-                          <div className="catalogue-modele-spec-item">
-                            <span className="catalogue-modele-spec-label">Carrosserie</span>
-                            <span className="catalogue-modele-spec-value">
-                              {modeleInfo.bodyTypes.join(', ')}
-                            </span>
-                          </div>
-                        )}
-                        <div className="catalogue-modele-spec-item">
-                          <span className="catalogue-modele-spec-label">Sièges</span>
-                          <span className="catalogue-modele-spec-value">
-                            {modeleInfo.seats}
-                          </span>
-                        </div>
-                        {modeleInfo.transmissions.length > 0 && (
-                          <div className="catalogue-modele-spec-item">
-                            <span className="catalogue-modele-spec-label">Boîte de vitesse</span>
-                            <span className="catalogue-modele-spec-value">
-                              {modeleInfo.transmissions.join(', ')}
-                            </span>
-                          </div>
-                        )}
-                      </div>
                     </div>
 
-                    {/* Bouton CTA */}
-                    <div className="catalogue-modele-cta">
-                      Voir les {modeleInfo.nombreOccasions} {modeleInfo.nombreOccasions > 1 ? 'véhicules' : 'véhicule'} →
-                    </div>
-                  </button>
+                    {/* Bouton */}
+                    <button
+                      className="catalogue-modele-btn-porsche"
+                      onClick={() => handleModeleClick(modele)}
+                    >
+                      Voir {modele.nom_model}
+                    </button>
+                  </div>
                 );
               }
             })}
