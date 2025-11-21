@@ -1,17 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { accesoireService } from '../services';
-import { usePanier } from '../hooks/usePanier.jsx';
+import { PanierContext } from '../context/PanierContext.jsx';
 import { Loading, Alert, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
-import { API_URL } from '../config/api.jsx';
 import buildUrl from '../utils/buildUrl';
-import './AccessoireDetail.css';
+import '../css/AccessoireDetail.css';
 
 const AccessoireDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { ajouterAccessoire } = usePanier();
+  const { ajouterAccessoire } = useContext(PanierContext);
 
   const [accessoire, setAccessoire] = useState(null);
   const [loading, setLoading] = useState(true);

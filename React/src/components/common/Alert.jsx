@@ -1,18 +1,10 @@
-import './Alert.css';
+import '../../css/components/Alert.css';
 
-/**
- * Composant Alert - Message d'alerte avec CSS dédié
- * 
- * Props:
- * - type: 'success' | 'error' | 'warning' | 'info'
- * - message: Message à afficher
- * - onClose: Fonction pour fermer l'alerte
- */
 const Alert = ({ type = 'info', message, onClose }) => {
   const icons = {
     success: '✓',
     error: '✕',
-    warning: '⚠',
+    warning: '',
     info: 'ℹ',
   };
 

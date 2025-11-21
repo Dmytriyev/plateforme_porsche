@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { commandeService, maVoitureService } from '../services';
 import { Loading, Alert } from '../components/common';
-import { API_URL } from '../config/api.jsx';
+import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice, formatDate } from '../utils/format.js';
-import './MonCompte.css';
+import '../css/MonCompte.css';
 
 /**
  * Page Mon Compte - Design style Tesla/Connect Store
@@ -24,7 +24,7 @@ import './MonCompte.css';
  */
 const MonCompte = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout } = useContext(AuthContext);
 
   const [activeSection, setActiveSection] = useState('mes-produits');
   const [loading, setLoading] = useState(true);

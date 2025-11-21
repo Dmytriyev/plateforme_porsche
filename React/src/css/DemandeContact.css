@@ -1,0 +1,43 @@
+.demande-contact-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  transition: opacity 0.2s ease;
+}
+.demande-contact-back:hover {
+  opacity: 0.7;
+}
+.demande-contact-error {
+  margin-bottom: 1.5rem;
+}
+.demande-contact-success {
+  margin-bottom: 1.5rem;
+}
+.demande-contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.demande-contact-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+.demande-contact-field-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.25rem;
+}
+.demande-contact-privacy {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  margin-top: 0.5rem;
+}

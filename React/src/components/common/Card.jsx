@@ -1,13 +1,3 @@
-/**
- * Composant Card - Carte réutilisable
- * 
- * Props:
- * - children: Contenu de la carte
- * - className: Classes supplémentaires
- * - padding: Taille du padding ('sm' | 'md' | 'lg')
- * - hover: Effet hover
- * - onClick: Fonction au clic
- */
 const Card = ({
   children,
   className = '',

@@ -1,24 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { commandeService } from '../services';
 import { Loading, Alert } from '../components/common';
-import { API_URL } from '../config/api.jsx';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
-import './Panier.css';
-
+import '../css/Panier.css';
 
 const Panier = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  // Données du panier
-  const [_panierData, setPanierData] = useState(null);
   const [lignes, setLignes] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -33,13 +28,9 @@ const Panier = () => {
       setLoading(true);
       setError('');
       const data = await commandeService.getPanier();
-
-      // Le backend retourne { panier, lignes, nombreArticles, total, note }
-      setPanierData(data.panier || null);
       setLignes(Array.isArray(data.lignes) ? data.lignes : []);
       setTotal(data.total || 0);
     } catch (err) {
-      // Si pas de panier, c'est normal (panier vide)
       if (err.message?.includes('Panier') || err.message?.includes('Aucun panier')) {
         setLignes([]);
         setTotal(0);
@@ -52,9 +43,7 @@ const Panier = () => {
   };
 
   const handleUpdateQuantite = async (ligneId, nouvelleQuantite) => {
-    if (nouvelleQuantite < 1) {
-      return;
-    }
+    if (nouvelleQuantite < 1) return;
 
     try {
       setError('');
@@ -68,9 +57,7 @@ const Panier = () => {
   };
 
   const handleSupprimerLigne = async (ligneId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir retirer cet article du panier ?')) {
-      return;
-    }
+    if (!window.confirm('Êtes-vous sûr de vouloir retirer cet article du panier ?')) return;
 
     try {
       setError('');
@@ -100,12 +87,10 @@ const Panier = () => {
     return <Loading fullScreen message="Chargement de votre panier..." />;
   }
 
-  // Calculer le nombre total d'articles
   const nombreArticles = lignes.reduce((sum, ligne) => sum + (ligne.quantite || 1), 0);
 
   return (
     <div className="panier-container-porsche">
-      {/* Lien retour */}
       <div className="panier-back-link">
         <Link to="/" className="panier-back-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -115,10 +100,8 @@ const Panier = () => {
         </Link>
       </div>
 
-      {/* Titre */}
       <h1 className="panier-title-porsche">Mon panier</h1>
 
-      {/* Messages */}
       {error && (
         <div className="panier-messages">
           <Alert variant="error">{error}</Alert>
@@ -144,35 +127,22 @@ const Panier = () => {
         </div>
       ) : (
         <div className="panier-layout-porsche">
-          {/* Liste des articles */}
           <div className="panier-articles-porsche">
             {lignes.map((ligne) => {
               const isVoiture = ligne.type_produit === true;
               const produit = isVoiture ? ligne.model_porsche_id : ligne.accesoire;
-
               if (!produit) return null;
 
-              // Récupérer les photos
-              let photos = [];
-              if (isVoiture && ligne.model_porsche_id?.photo_porsche) {
-                photos = Array.isArray(ligne.model_porsche_id.photo_porsche)
-                  ? ligne.model_porsche_id.photo_porsche.filter(p => p && (p.name || p._id))
-                  : [];
-              } else if (!isVoiture && ligne.accesoire?.photo_accesoire) {
-                photos = Array.isArray(ligne.accesoire.photo_accesoire)
-                  ? ligne.accesoire.photo_accesoire.filter(p => p && (p.name || p._id))
-                  : [];
-              }
+              const photos = isVoiture
+                ? ligne.model_porsche_id?.photo_porsche?.filter(p => p && (p.name || p._id)) || []
+                : ligne.accesoire?.photo_accesoire?.filter(p => p && (p.name || p._id)) || [];
 
-              const photoPrincipale = photos.length > 0 ? photos[0] : null;
-
-              // Prix à afficher : acompte pour voiture, prix total pour accessoire
+              const photoPrincipale = photos[0] || null;
               const prixAAfficher = isVoiture ? (ligne.acompte || 0) : (ligne.prix || 0);
               const prixTotalLigne = prixAAfficher * (ligne.quantite || 1);
 
               return (
                 <article key={ligne._id} className="panier-article-card-porsche">
-                  {/* Bouton supprimer */}
                   <button
                     className="panier-article-remove-porsche"
                     onClick={() => handleSupprimerLigne(ligne._id)}
@@ -184,7 +154,6 @@ const Panier = () => {
                     </svg>
                   </button>
 
-                  {/* Image */}
                   <div className="panier-article-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
@@ -212,13 +181,11 @@ const Panier = () => {
                     </div>
                   </div>
 
-                  {/* Détails */}
                   <div className="panier-article-details-porsche">
                     <h3 className="panier-article-name-porsche">
                       {isVoiture ? produit.nom_model : produit.nom_accesoire}
                     </h3>
 
-                    {/* Attributs pour accessoire */}
                     {!isVoiture && ligne.accesoire && (
                       <div className="panier-article-attributes-porsche">
                         {ligne.accesoire.couleur_accesoire && (
@@ -248,7 +215,6 @@ const Panier = () => {
                       </div>
                     )}
 
-                    {/* Configuration pour voiture */}
                     {isVoiture && ligne.model_porsche_id && (
                       <div className="panier-article-attributes-porsche">
                         {ligne.model_porsche_id.couleur_exterieur && (
@@ -278,7 +244,6 @@ const Panier = () => {
                       </div>
                     )}
 
-                    {/* Sélecteur de quantité (uniquement pour accessoires) */}
                     {!isVoiture && (
                       <div className="panier-quantity-porsche">
                         <button
@@ -299,7 +264,6 @@ const Panier = () => {
                     )}
                   </div>
 
-                  {/* Prix */}
                   <div className="panier-article-price-porsche">
                     {formatPrice(prixTotalLigne)}
                   </div>
@@ -307,7 +271,6 @@ const Panier = () => {
               );
             })}
 
-            {/* Message d'information */}
             <div className="panier-info-porsche">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-info-icon-porsche">
                 <circle cx="12" cy="12" r="10" />
@@ -317,7 +280,6 @@ const Panier = () => {
             </div>
           </div>
 
-          {/* Résumé de commande */}
           <aside className="panier-summary-porsche">
             <div className="panier-summary-card-porsche">
               <h2 className="panier-summary-title-porsche">Montant total</h2>
@@ -334,7 +296,6 @@ const Panier = () => {
                 </svg>
               </button>
 
-              {/* Bouton passer commande */}
               <button
                 className="panier-checkout-btn-porsche"
                 onClick={handlePasserCommande}
@@ -342,7 +303,6 @@ const Panier = () => {
                 Passer la commande
               </button>
 
-              {/* Détails */}
               <div className="panier-summary-details-porsche">
                 <div className="panier-summary-detail-item-porsche">
                   <span>{nombreArticles} produit{nombreArticles > 1 ? 's' : ''}</span>
@@ -354,7 +314,6 @@ const Panier = () => {
                 </div>
               </div>
 
-              {/* Sécurité */}
               <div className="panier-security-porsche">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-security-icon-porsche">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />

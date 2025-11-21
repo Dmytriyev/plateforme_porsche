@@ -1,51 +1,66 @@
-// variantes disponibles par modèle Porsche et les types de carrosserie.
+/**
+ * Constantes pour les modèles Porsche
+ * Définit les variantes, carrosseries et leurs validations
+ */
+
+// Types de carrosserie disponibles
 export const TYPES_CARROSSERIE = ["Coupe", "Cabriolet", "Targa", "SUV"];
 
+// Variantes disponibles par modèle
 export const VARIANTES_PAR_MODELE = {
   911: ["Carrera S", "GTS", "Turbo", "GT3", "GT3 RS", "Targa GTS", "Targa 4S"],
   Cayman: ["GTS", "GT4 RS"],
   Cayenne: ["E-Hybrid", "S", "GTS"],
 };
 
-// Liste des noms de modèles Porsche disponibles
-export const NOMS_MODELES = Object.keys(VARIANTES_PAR_MODELE);
-// Alias pour compatibilité (nom plus parlant utilisé dans l'API)
-export const PORSCHE_MODELS = NOMS_MODELES;
+// Liste des modèles Porsche (alias: NOMS_MODELES)
+export const PORSCHE_MODELS = Object.keys(VARIANTES_PAR_MODELE);
+export const NOMS_MODELES = PORSCHE_MODELS;
 
-// liste plate pour validation globale
+// Liste plate de toutes les variantes
 export const TOUTES_VARIANTES = Object.values(VARIANTES_PAR_MODELE).flat();
 
-// des types de carrosserie typiques par modèle
+// Carrosseries typiques par modèle
 export const CARROSSERIES_PAR_MODELE = {
   911: ["Coupe", "Cabriolet", "Targa"],
   Cayman: ["Coupe"],
   Cayenne: ["SUV"],
 };
 
-// Vérifie si une variante est valide pour un modèle donné
+/**
+ * Vérifie si une variante est valide pour un modèle
+ */
 export const isValidVariante = (nomModel, variante) => {
-  const variantes = VARIANTES_PAR_MODELE[nomModel];
-  return variantes ? variantes.includes(variante) : false;
+  return VARIANTES_PAR_MODELE[nomModel]?.includes(variante) || false;
 };
 
+/**
+ * Vérifie si un type de carrosserie est valide
+ */
 export const isValidCarrosserie = (typeCarrosserie) => {
   return TYPES_CARROSSERIE.includes(typeCarrosserie);
 };
 
-// Vérifie si un type de carrosserie est compatible avec un modèle
+/**
+ * Vérifie la compatibilité carrosserie/modèle
+ */
 export const isCarrosserieCompatible = (nomModel, typeCarrosserie) => {
-  const carrosseries = CARROSSERIES_PAR_MODELE[nomModel];
-  return carrosseries ? carrosseries.includes(typeCarrosserie) : false;
+  return CARROSSERIES_PAR_MODELE[nomModel]?.includes(typeCarrosserie) || false;
 };
-// Liste des variantes disponibles pour un modèle donné
+
+/**
+ * Retourne les variantes d'un modèle au format {value, label}
+ */
 export const getVariantesByModel = (nomModel) => {
-  const variantes = VARIANTES_PAR_MODELE[nomModel] || [];
-  return variantes.map((variante) => ({
+  return (VARIANTES_PAR_MODELE[nomModel] || []).map((variante) => ({
     value: variante,
     label: variante,
   }));
 };
-// Liste des types de carrosserie disponibles
+
+/**
+ * Retourne tous les types de carrosserie au format {value, label}
+ */
 export const getAvailableCarrosseries = () => {
   return TYPES_CARROSSERIE.map((type) => ({
     value: type,
@@ -53,38 +68,39 @@ export const getAvailableCarrosseries = () => {
   }));
 };
 
-// Les carrosseries compatibles avec un modèle
+/**
+ * Retourne les carrosseries d'un modèle au format {value, label}
+ */
 export const getCarrosseriesByModel = (nomModel) => {
-  const carrosseries = CARROSSERIES_PAR_MODELE[nomModel] || [];
-  return carrosseries.map((type) => ({
+  return (CARROSSERIES_PAR_MODELE[nomModel] || []).map((type) => ({
     value: type,
     label: type,
   }));
 };
 
-// Les variantes avec leur modèle associé
+/**
+ * Retourne un mapping variante -> modèle
+ */
 export const getAllVariantesWithModel = () => {
-  return Object.entries(VARIANTES_PAR_MODELE).reduce(
-    (acc, [model, variantes]) => {
-      variantes.forEach((variante) => {
-        acc[variante] = model;
-      });
-      return acc;
-    },
-    {}
-  );
+  const mapping = {};
+  Object.entries(VARIANTES_PAR_MODELE).forEach(([model, variantes]) => {
+    variantes.forEach((variante) => {
+      mapping[variante] = model;
+    });
+  });
+  return mapping;
 };
 
-// Descriptions structurées par modèle puis variante pour éviter les clés dupliquées
+// Descriptions des variantes par modèle
 export const VARIANTE_DESCRIPTIONS = {
   911: {
     "Carrera S":
       "Version sportive équilibrée avec moteur 3.0L bi-turbo de 450 CV",
-    GTS: "Version Gran Turismo Sport avec performances améliorées avec moteur 3.0L bi-turbo de 480 CV",
+    GTS: "Version Gran Turismo Sport avec moteur 3.0L bi-turbo de 480 CV",
     Turbo: "Version turbo haute performance moteur 3.8L bi-turbo de 580 CV",
-    GT3: "Version piste homologuée route avec moteur atmosphérique 4.0L de 500 CV",
+    GT3: "Version piste homologuée route avec moteur 4.0L de 500 CV",
     "GT3 RS":
-      "Version ultime orientée piste avec aérodynamique optimisée avec moteur 4.0L bi-turbo de 520 CV",
+      "Version ultime orientée piste avec moteur 4.0L bi-turbo de 520 CV",
   },
   Cayman: {
     GTS: "Version Gran Turismo Sport du Cayman avec 365 CV",
@@ -98,21 +114,24 @@ export const VARIANTE_DESCRIPTIONS = {
     GTS: "Version Gran Turismo Sport du Cayenne avec moteur V8 bi-turbo de 460 CV",
   },
 };
-// Récupère la description d'une variante pour un modèle donné
+
+/**
+ * Récupère la description d'une variante
+ * @param {string} variante - Nom de la variante
+ * @param {string} nomModel - Nom du modèle (optionnel)
+ */
 export const getVarianteDescription = (variante, nomModel = null) => {
-  if (nomModel && VARIANTE_DESCRIPTIONS[nomModel]) {
-    return VARIANTE_DESCRIPTIONS[nomModel][variante] || "";
+  // Si le modèle est spécifié, chercher directement
+  if (nomModel && VARIANTE_DESCRIPTIONS[nomModel]?.[variante]) {
+    return VARIANTE_DESCRIPTIONS[nomModel][variante];
   }
-  // Recherche globale si le modèle n'est pas spécifié
-  for (const model of Object.keys(VARIANTE_DESCRIPTIONS)) {
-    if (
-      Object.prototype.hasOwnProperty.call(
-        VARIANTE_DESCRIPTIONS[model],
-        variante
-      )
-    ) {
+
+  // Recherche globale
+  for (const model in VARIANTE_DESCRIPTIONS) {
+    if (VARIANTE_DESCRIPTIONS[model][variante]) {
       return VARIANTE_DESCRIPTIONS[model][variante];
     }
   }
+
   return "";
 };

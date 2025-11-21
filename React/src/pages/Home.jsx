@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { voitureService } from '../services';
-import { API_URL } from '../config/api.jsx';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
-import './Home.css';
+import '../css/Home.css';
 
-/**
- * Page d'accueil - Affiche 911, Cayman, Cayenne avec photos réelles
- */
 const Home = () => {
   const navigate = useNavigate();
   const [modeles, setModeles] = useState([]);
@@ -21,90 +17,40 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-
-      // OPTIMISÉ: Utiliser l'endpoint dédié pour voitures neuves
-      // Backend: GET /voiture/neuve
       const response = await voitureService.getVoituresNeuves();
-
       const data = Array.isArray(response) ? response : [];
-
-      const modelesAffiches = data.filter(v =>
-        ['911', 'Cayman', 'Cayenne'].includes(v.nom_model)
-      );
-
-      const uniqueModeles = [];
-      const nomsVus = new Set();
-
-      modelesAffiches.forEach(voiture => {
-        if (!nomsVus.has(voiture.nom_model)) {
-          nomsVus.add(voiture.nom_model);
-          uniqueModeles.push(voiture);
-        }
-      });
-
+      const filtered = data.filter(v => ['911', 'Cayman', 'Cayenne'].includes(v.nom_model));
+      const uniqueModeles = [...new Map(filtered.map(v => [v.nom_model, v])).values()];
       setModeles(uniqueModeles);
-    } catch (error) {
+    } catch {
       setModeles([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleModeleClick = (modele) => {
-    // Rediriger vers la liste des variantes de ce modèle (neuves)
-    navigate(`/variantes/neuve/${modele._id}`);
+  const handleModeleClick = (modele) => navigate(`/variantes/neuve/${modele._id}`);
+
+  const DESCRIPTIONS = {
+    '911': 'L\'icône de génération en génération.',
+    '718': 'La sportive deux places au moteur central arrière.',
+    'Cayman': 'La sportive deux places au moteur central arrière.',
+    'Cayenne': 'Le SUV à l\'ADN sportif et familial.',
   };
 
-  /**
-   * Fonction pour obtenir les informations spécifiques d'un modèle
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * Cette fonction retourne les informations formatées pour chaque modèle
-   * en utilisant UNIQUEMENT les données disponibles dans la base de données
-   * 
-   * Les données enrichies du backend contiennent :
-   * - prix_depuis : prix minimum depuis les variantes
-   * - carrosseries_disponibles : liste des carrosseries disponibles
-   * - transmissions_disponibles : liste des transmissions disponibles
-   * - description : description du modèle
-   * - photo_voiture : photos du modèle
-   */
-  const getModeleInfo = (modele) => {
-    // Descriptions par défaut (utilisées si description non disponible)
-    const descriptions = {
-      '911': 'L\'icône de génération en génération.',
-      '718': 'La sportive deux places au moteur central arrière.',
-      'Cayman': 'La sportive deux places au moteur central arrière.',
-      'Cayenne': 'Le SUV à l\'ADN sportif et familial.',
-    };
-
-    // Nombre de places par modèle (données statiques car non disponibles dans la base)
-    const seats = {
-      '911': '2+2',
-      '718': '2',
-      'Cayman': '2',
-      'Cayenne': '5',
-    };
-
-    // Utiliser les données enrichies du backend si disponibles
-    return {
-      description: modele.description || descriptions[modele.nom_model] || 'Découvrez ce modèle emblématique',
-      bodyTypes: modele.carrosseries_disponibles || [],
-      seats: seats[modele.nom_model] || '2',
-      transmissions: modele.transmissions_disponibles || [],
-      prixDepuis: modele.prix_depuis || 0,
-      fuelType: 'Essence', // Par défaut, toutes les Porsche sont essence
-    };
-  };
+  const getModeleInfo = (modele) => ({
+    description: modele.description || DESCRIPTIONS[modele.nom_model] || 'Découvrez ce modèle emblématique',
+    bodyTypes: modele.carrosseries_disponibles || [],
+    transmissions: modele.transmissions_disponibles || [],
+    prixDepuis: modele.prix_depuis || 0,
+    fuelType: 'Essence',
+  });
 
   return (
     <div className="home-container-porsche">
-      {/* Hero Section avec slogan et boutons */}
       <section className="home-hero-section">
         <div className="home-hero-content">
           <div className="home-hero-image-container">
-            {/* Image hero - utiliser une image de Porsche si disponible */}
             <div className="home-hero-image">
               <div className="home-hero-placeholder">
                 <span className="home-hero-logo">PORSCHE</span>
@@ -128,7 +74,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Modèles à choisir: 911, 718, Cayenne */}
       <section className="models-section-porsche">
         <div className="models-header-porsche">
           <h2 className="section-title-porsche">Sélectionner une gamme</h2>
@@ -144,22 +89,11 @@ const Home = () => {
           <div className="models-grid-porsche">
             {modeles.map((modele) => {
               const modeleInfo = getModeleInfo(modele);
-
-              // Récupérer la photo principale (une seule image)
-              let photoPrincipale = null;
-              if (modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0) {
-                const validPhotos = modele.photo_voiture.filter(p => p && (p.name || p._id));
-                if (validPhotos.length > 0) {
-                  photoPrincipale = validPhotos[0];
-                }
-              }
+              const photos = modele.photo_voiture?.filter(p => p?.name) || [];
+              const photoPrincipale = photos[0] || null;
 
               return (
-                <article
-                  key={modele._id}
-                  className="model-card-porsche"
-                >
-                  {/* Image unique */}
+                <article key={modele._id} className="model-card-porsche">
                   <div className="model-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
@@ -184,9 +118,7 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="model-content-porsche">
-                    {/* Header avec nom et badge */}
                     <div className="model-header-porsche">
                       <h2 className="model-name-porsche">
                         {modele.nom_model}
@@ -195,20 +127,14 @@ const Home = () => {
                         {modeleInfo.fuelType}
                       </span>
                     </div>
-
-                    {/* Description */}
                     <p className="model-description-porsche">
                       {modeleInfo.description}
                     </p>
-
-                    {/* Prix */}
                     {modeleInfo.prixDepuis > 0 && (
                       <div className="model-price-porsche">
                         À partir de {formatPrice(modeleInfo.prixDepuis)} TTC
                       </div>
                     )}
-
-                    {/* Spécifications */}
                     <div className="model-specs-porsche">
                       {modeleInfo.bodyTypes.length > 0 && (
                         <div className="model-spec-item-porsche">
@@ -218,7 +144,6 @@ const Home = () => {
                           </span>
                         </div>
                       )}
-                      {/* Sièges supprimés */}
                       {modeleInfo.transmissions.length > 0 && (
                         <div className="model-spec-item-porsche">
                           <span className="model-spec-label-porsche">Boîte de vitesse</span>
@@ -228,8 +153,6 @@ const Home = () => {
                         </div>
                       )}
                     </div>
-
-                    {/* Bouton CTA */}
                     <button
                       className="model-cta-porsche"
                       onClick={() => handleModeleClick(modele)}
@@ -244,7 +167,6 @@ const Home = () => {
         )}
       </section>
 
-      {/* Section Accessoires */}
       <section className="home-accessoires-section">
         <div className="home-accessoires-content">
           <div className="home-accessoires-text">
@@ -262,17 +184,14 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section Porsche Approved */}
       <section className="home-approved-section">
         <div className="home-approved-container">
-          {/* Image à gauche */}
           <div className="home-approved-image">
             <div className="home-approved-image-placeholder">
               <span className="home-approved-image-text">Porsche Approved</span>
             </div>
           </div>
 
-          {/* Contenu à droite */}
           <div className="home-approved-content">
             <h2 className="home-approved-title">
               Véhicules d'occasion<br />

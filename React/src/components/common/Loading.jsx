@@ -1,13 +1,5 @@
-import './Loading.css';
+import '../../css/components/Loading.css';
 
-/**
- * Composant Loading - Indicateur de chargement avec CSS dédié
- * 
- * Props:
- * - size: 'sm' | 'md' | 'lg'
- * - fullScreen: Afficher en plein écran
- * - message: Message à afficher
- */
 const Loading = ({ size = 'md', fullScreen = false, message = '' }) => {
   const spinner = (
     <div className="loading-content">

@@ -1,5 +1,12 @@
-export const info = (...args) => console.log(...args);
-export const warn = (...args) => console.warn(...args);
-export const error = (...args) => console.error(...args);
+/**
+ * Logger simple pour l'application
+ * Encapsule console.log/warn/error pour une gestion centralisée des logs
+ */
 
-export default { info, warn, error };
+const logger = {
+  info: (...args) => console.log("[INFO]", ...args),
+  warn: (...args) => console.warn("[WARN]", ...args),
+  error: (...args) => console.error("[ERROR]", ...args),
+};
+
+export default logger;

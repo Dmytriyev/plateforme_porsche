@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { commandeService } from '../services';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { Loading, Button, Card, Alert } from '../components/common';
 import { formatPrice, formatDate } from '../utils/format.js';
-import './MesCommandes.css';
+import '../css/MesCommandes.css';
 
 /**
  * Page Mes Commandes - Historique des commandes
  */
 const MesCommandes = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   const [commandes, setCommandes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +81,7 @@ const MesCommandes = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             <p className="mes-commandes-empty-text">Vous n'avez aucune commande</p>
-            <Button onClick={() => navigate('/voitures')}>
+            <Button onClick={() => navigate('/choix-voiture')}>
               Découvrir nos voitures
             </Button>
           </div>

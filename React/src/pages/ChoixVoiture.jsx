@@ -1,53 +1,9 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { voitureService } from '../services';
-import buildUrl from '../utils/buildUrl';
-import './ChoixVoiture.css';
+import '../css/ChoixVoiture.css';
 
 const ChoixVoiture = () => {
   const navigate = useNavigate();
-  const [imageNeuve, setImageNeuve] = useState(null);
-  const [imageOccasion, setImageOccasion] = useState(null);
-  // Récupère des images exemples pour les cartes "Neuve" et "Occasion"
-  async function fetchImages() {
-    try {
-      // Récupérer une image pour "Neuve"
-      const voituresNeuves = await voitureService.getVoituresNeuves();
-      if (Array.isArray(voituresNeuves) && voituresNeuves.length > 0) {
-        const voitureNeuve = voituresNeuves.find(v =>
-          v.photo_voiture &&
-          Array.isArray(v.photo_voiture) &&
-          v.photo_voiture.length > 0
-        );
-        if (voitureNeuve && voitureNeuve.photo_voiture[0]) {
-          setImageNeuve(voitureNeuve.photo_voiture[0]);
-        }
-      }
-
-      // Récupérer une image pour "Occasion"
-      const voituresOccasions = await voitureService.getVoituresOccasion();
-      if (Array.isArray(voituresOccasions) && voituresOccasions.length > 0) {
-        const voitureOccasion = voituresOccasions.find(v =>
-          v.photo_voiture &&
-          Array.isArray(v.photo_voiture) &&
-          v.photo_voiture.length > 0
-        );
-        if (voitureOccasion && voitureOccasion.photo_voiture[0]) {
-          setImageOccasion(voitureOccasion.photo_voiture[0]);
-        }
-      }
-    } catch (error) {
-      // En cas d'erreur, on continue avec les placeholders
-    }
-  };
-
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      fetchImages();
-    }, 0);
-    return () => clearTimeout(t);
-  }, []);
+  const imageStatic = '/Logo/Logo_porsche_black.jpg';
 
   const handleConfigurer = () => {
     navigate('/catalogue/neuve');
@@ -57,32 +13,22 @@ const ChoixVoiture = () => {
     navigate('/catalogue/occasion');
   };
 
-  const getImageUrl = (photo) => {
-    if (!photo || !photo.name) return null;
-    return buildUrl(photo.name);
-  };
-
-  const imageNeuveUrl = getImageUrl(imageNeuve);
-  const imageOccasionUrl = getImageUrl(imageOccasion);
+  const imageNeuveUrl = imageStatic;
+  const imageOccasionUrl = imageStatic;
 
   return (
     <div className="choix-container">
       <div className="choix-content">
-        {/* En-tête */}
         <div className="choix-header">
           <h1 className="choix-title">Choisissez votre Porsche</h1>
         </div>
 
-        {/* Cartes */}
         <div className="choix-grid-porsche">
-          {/* Carte Voiture Neuve */}
           <div className="choix-card-porsche">
-            {/* Titre */}
             <h2 className="choix-card-title-porsche">
               Voiture Neuve
             </h2>
 
-            {/* Image */}
             <div className="choix-card-image-porsche">
               {imageNeuveUrl ? (
                 <img
@@ -105,7 +51,6 @@ const ChoixVoiture = () => {
               </div>
             </div>
 
-            {/* Bouton */}
             <button
               className="choix-card-btn-porsche"
               onClick={handleConfigurer}
@@ -114,14 +59,11 @@ const ChoixVoiture = () => {
             </button>
           </div>
 
-          {/* Carte Voiture Occasion */}
           <div className="choix-card-porsche">
-            {/* Titre */}
             <h2 className="choix-card-title-porsche">
               Voiture Occasion
             </h2>
 
-            {/* Image */}
             <div className="choix-card-image-porsche">
               {imageOccasionUrl ? (
                 <img
@@ -144,7 +86,6 @@ const ChoixVoiture = () => {
               </div>
             </div>
 
-            {/* Bouton */}
             <button
               className="choix-card-btn-porsche"
               onClick={handleReserver}

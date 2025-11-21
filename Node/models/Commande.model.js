@@ -36,6 +36,28 @@ const CommandeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // Date de livraison prévue
+    date_livraison: {
+      type: Date,
+    },
+    // Date de livraison effective
+    date_livraison_effective: {
+      type: Date,
+    },
+    // Statut de livraison
+    statut_livraison: {
+      type: String,
+      enum: ["en_attente", "en_preparation", "en_transit", "livree"],
+      default: "en_attente",
+    },
+    // Notes internes (staff)
+    notes: [
+      {
+        date: { type: Date, default: Date.now },
+        staff: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        contenu: { type: String, maxlength: 500 },
+      },
+    ],
     // Relation Many-to-One: Utilisateur propriétaire
     user: {
       type: mongoose.Schema.Types.ObjectId,

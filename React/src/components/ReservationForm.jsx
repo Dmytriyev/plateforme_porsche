@@ -6,10 +6,6 @@ import { Elements } from '@stripe/react-stripe-js';
 import Button from './common/Button.jsx';
 import ContactButton from './ContactButton.jsx';
 
-// ReservationForm: exemple minimal d'usage
-// - calcule/serialise une "config" minimale et appelle createReservation
-// - affiche la zone de paiement lorsque backend retourne clientSecret
-
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 export default function ReservationForm({ initialConfig = {}, onCompleted, vehiculeId }) {
@@ -25,9 +21,7 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
         setError(null);
         setCreating(true);
         try {
-            // envoyer uniquement la config côté serveur; le backend doit calculer le montant
             const data = await createReservation({ config });
-            // lancer polling pour détecter la finalisation (optionnel)
             if (data?.reservationToken) {
                 pollReservationStatus(data.reservationToken, { interval: 3000 });
             } else if (data?.token) {
@@ -41,7 +35,6 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
     };
 
     const handlePaymentSuccess = async (paymentIntent) => {
-        // Optionnel: récupérer la reservation finale et informer parent
         try {
             const token = reservationToken;
             if (token) {
@@ -51,7 +44,7 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
                 onCompleted(reservation, paymentIntent);
             }
         } catch (e) {
-            // ignore
+            if (import.meta.env.DEV) console.error('Erreur handlePaymentSuccess:', e);
         }
     };
 

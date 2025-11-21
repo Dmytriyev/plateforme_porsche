@@ -20,12 +20,19 @@ import {
   getCarrosseriesByModel,
   VARIANTES_PAR_MODELE,
 } from "../utils/model_porsche.constants.js";
+import { anonymizeIp, formatTypeVoiture } from "../utils/log.utils.js";
 import logger from "../utils/logger.js";
+
+// Protection temporaire en mémoire pour éviter les logs dupliqués
+// Clé = action:voitureId:clientIp  -> timestamp
+const recentLogSuppress = new Map();
+
+// (anonymizeIp and formatTypeVoiture moved to utils/log.utils.js)
 
 // Champs pour les références dans Model_porsche
 const POPULATE_FIELDS = {
-  photo_porsche: "name alt",
-  voiture: "nom_model type_voiture description",
+  photo_porsche: "name alt couleur_exterieur couleur_interieur",
+  voiture: "nom_model type_voiture description photo_voiture",
   couleur_exterieur: "nom_couleur photo_couleur prix",
   couleur_interieur: "nom_couleur photo_couleur prix",
   taille_jante: "taille_jante couleur_jante prix",
@@ -57,8 +64,28 @@ const validateEntities = async (Model, ids, entityName) => {
 // Fonction pour les références dans Model_porsche
 const populateModel = (query) => {
   return query
-    .populate("photo_porsche", POPULATE_FIELDS.photo_porsche)
-    .populate("voiture", POPULATE_FIELDS.voiture)
+    .populate({
+      path: "photo_porsche",
+      select: POPULATE_FIELDS.photo_porsche,
+      populate: [
+        {
+          path: "couleur_exterieur",
+          select: "_id nom_couleur",
+        },
+        {
+          path: "couleur_interieur",
+          select: "_id nom_couleur",
+        },
+      ],
+    })
+    .populate({
+      path: "voiture",
+      select: POPULATE_FIELDS.voiture,
+      populate: {
+        path: "photo_voiture",
+        select: "name alt",
+      },
+    })
     .populate("couleur_exterieur", POPULATE_FIELDS.couleur_exterieur)
     .populate("couleur_interieur", POPULATE_FIELDS.couleur_interieur)
     .populate("taille_jante", POPULATE_FIELDS.taille_jante)
@@ -289,6 +316,38 @@ const getConfigurationsByVoiture = async (req, res) => {
       Model_porsche.find({ voiture: voitureId })
     ).sort({ prix_base: 1 }); // Trier par prix de base croissant
 
+    // le nombre de configurations trouvées pour cette voiture
+    try {
+      // Inclure l'IP cliente dans la clé pour éviter logs répétés par même client
+      const clientIp =
+        req.ip ||
+        (req.headers && req.headers["x-forwarded-for"]?.split(",")[0]) ||
+        "unknown";
+      const logKey = `getConfigurationsByVoiture:${voitureId}:${clientIp}`;
+      const now = Date.now();
+      const last = recentLogSuppress.get(logKey) || 0;
+      // Ne pas répéter le même log pour la même voiture+client pendant 5s
+      const SUPPRESSION_WINDOW_MS = 5000;
+      // Si le dernier log est trop ancien, faire le log à nouveau
+      if (now - last > SUPPRESSION_WINDOW_MS) {
+        recentLogSuppress.set(logKey, now);
+        // Nettoyage asynchrone pour éviter croissance mémoire
+        setTimeout(
+          () => recentLogSuppress.delete(logKey),
+          SUPPRESSION_WINDOW_MS + 1000
+        );
+        // Faire le log des informations pertinentes (IP anonymisée, type formaté)
+        const maskedIp = anonymizeIp(clientIp);
+        const typeVoiture = formatTypeVoiture(voiture.type_voiture);
+        logger.info(
+          `[getConfigurationsByVoiture] voiture=${voitureId} (${voiture.nom_model}) type_voiture=${typeVoiture} total_configurations=${configurations.length} client_ip=${maskedIp}`
+        );
+      }
+    } catch (err) {
+      // Ne pas faire échouer la route pour un souci de logging
+      logger.warn("Logging suppression check failed", { error: err.message });
+    }
+
     // Calculer le prix pour chaque configuration et ajouter au résultat final
     const configurationsAvecPrix = configurations.map((config) => ({
       ...config.toObject(),
@@ -299,7 +358,7 @@ const getConfigurationsByVoiture = async (req, res) => {
       voiture: {
         _id: voiture._id,
         nom_model: voiture.nom_model,
-        type_voiture: voiture.type_voiture,
+        type_voiture: voiture.type_voiture ? "neuve" : "occasion",
         description: voiture.description,
       },
       nombre_configurations: configurationsAvecPrix.length,
@@ -797,17 +856,17 @@ const getModelPorscheOccasions = async (req, res) => {
     const voitureIds = voituresOccasion.map((v) => v._id);
 
     // Récupérer les model_porsche liés aux voitures d'occasion
+    // Retirer le filtre disponible: true car il peut bloquer certaines occasions
     const occasions = await populateModel(
       Model_porsche.find({
         voiture: { $in: voitureIds },
-        disponible: true,
-      })
-    ).sort({ annee_production: -1 });
+      }).sort({ annee_production: -1 })
+    );
 
     // Retourner les occasions avec leur prix fixe
     const occasionsWithPrix = occasions.map((model) => ({
       ...model.toObject(),
-      prix_fixe: model.prix_base,
+      prix_fixe: model.prix_base || model.prix,
       type: "occasion",
     }));
 
@@ -837,8 +896,8 @@ const getModelPorscheNeuves = async (req, res) => {
       Model_porsche.find({
         voiture: { $in: voitureIds },
         disponible: true,
-      })
-    ).sort({ prix_base: 1 });
+      }).sort({ prix_base: 1 })
+    );
 
     // Calculer le prix total pour chaque voiture neuve
     const neuvesWithPrix = neuves.map((model) => ({
@@ -1011,7 +1070,7 @@ const getOccasionPage = async (req, res) => {
     }
 
     // Calculer le prix fixe (pour les occasions, le prix est fixe)
-    const prixFixe = model_porsche.prix_base || 0;
+    const prixFixe = model_porsche.prix_base || model_porsche.prix || 0;
 
     // Formater les options de la voiture d'occasion
     const options = {

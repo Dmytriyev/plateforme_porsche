@@ -1,68 +1,80 @@
-// Helper to normalize API responses and errors for services
-export function extractData(response) {
-  if (!response) return null;
-  const d = response.data;
-  if (d === undefined) return null;
-  // Prefer `.data` when present (standard API envelope), otherwise return the object itself
-  if (d && d.data !== undefined) return d.data;
-  return d;
-}
+/**
+ * Helpers HTTP pour les requêtes API
+ * Gère l'extraction des données et les erreurs de manière standardisée
+ */
 
-export function extractArray(response) {
-  if (!response) {
-    return [];
-  }
-  
-  // Cas 1: response.data est directement un tableau
-  if (response.data && Array.isArray(response.data)) {
-    return response.data;
-  }
-  
-  // Cas 2: Format standardisé sendSuccess { success: true, data: [...], message: "..." }
-  if (response.data && response.data.data !== undefined) {
-    if (Array.isArray(response.data.data)) {
-      return response.data.data;
-    }
-    // Si data.data est un objet avec une propriété voitures/accesoires/etc.
-    if (typeof response.data.data === 'object' && !Array.isArray(response.data.data)) {
-      const arrayKeys = ['voitures', 'accesoires', 'data', 'items', 'results'];
-      for (const key of arrayKeys) {
-        if (response.data.data[key] && Array.isArray(response.data.data[key])) {
-          return response.data.data[key];
-        }
-      }
-    }
-  }
-  
-  // Cas 3: Utiliser extractData pour extraire les données
-  const data = extractData(response);
-  
-  // Si data est déjà un tableau, le retourner directement
-  if (Array.isArray(data)) {
-    return data;
-  }
-  
-  // Cas 4: Si data est un objet, chercher des propriétés communes qui contiennent des tableaux
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    const arrayKeys = ['data', 'voitures', 'accesoires', 'objets', 'items', 'results'];
-    for (const key of arrayKeys) {
-      if (data[key] && Array.isArray(data[key])) {
-        return data[key];
-      }
-    }
-  }
-  
-  return [];
-}
-
-export function handleServiceError(error) {
-  // normalize thrown value for callers
-  const payload = error?.response?.data || error;
-  throw payload;
-}
-
-export default {
-  extractData,
-  extractArray,
-  handleServiceError,
+/**
+ * Extrait les données d'une réponse API
+ * @param {Object} response - Réponse Axios
+ * @returns {*} Les données extraites ou null
+ */
+const extractData = (response) => {
+  if (!response?.data) return null;
+  const { data } = response;
+  return data?.data ?? data;
 };
+
+/**
+ * Extrait un tableau de données d'une réponse API
+ * Cherche dans différents emplacements possibles
+ * @param {Object} response - Réponse Axios
+ * @returns {Array} Le tableau extrait ou []
+ */
+const extractArray = (response) => {
+  if (!response?.data) return [];
+
+  const { data } = response;
+
+  // Cas simple: data est déjà un tableau
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+
+  // Chercher dans les clés courantes
+  const extracted = data?.data || data;
+  const arrayKeys = [
+    "configurations",
+    "voitures",
+    "accesoires",
+    "items",
+    "results",
+    "porsches",
+  ];
+
+  for (const key of arrayKeys) {
+    if (Array.isArray(extracted?.[key])) {
+      return extracted[key];
+    }
+  }
+
+  return [];
+};
+
+/**
+ * Wrapper pour les requêtes API avec gestion d'erreurs
+ * @param {Function} requestFn - Fonction de requête à exécuter
+ * @param {Object} options - Options de configuration
+ * @param {boolean} options.returnArray - Retourner un tableau
+ * @param {*} options.defaultValue - Valeur par défaut en cas d'erreur ignorée
+ * @param {Array<number>} options.ignoreErrors - Codes HTTP à ignorer
+ * @returns {Promise<*>} Les données extraites
+ */
+export const apiRequest = async (requestFn, options = {}) => {
+  const {
+    returnArray = false,
+    defaultValue = null,
+    ignoreErrors = [],
+  } = options;
+
+  try {
+    const response = await requestFn();
+    return returnArray ? extractArray(response) : extractData(response);
+  } catch (error) {
+    // Ignorer certains codes d'erreur et retourner la valeur par défaut
+    if (ignoreErrors.includes(error?.response?.status)) {
+      return defaultValue;
+    }
+    throw error?.response?.data || error;
+  }
+};
+
+export { extractData, extractArray };

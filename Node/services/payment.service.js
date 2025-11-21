@@ -24,14 +24,25 @@ const buildLineItems = (ligneCommandes) => {
         : "Produit personnalisé";
     }
 
-    const unitAmountInCents = Math.round(unitPrice * 100);
+    // Normaliser la quantité et le prix
+    const quantity = Number(line.quantite) > 0 ? Number(line.quantite) : 1;
+    const unitPriceNum = Number(unitPrice) || 0;
+
+    if (unitPriceNum <= 0) {
+      logger.warn(
+        `Ligne ignorée dans buildLineItems: prix non valide pour produit=${productName} commandeLigneId=${line._id}`
+      );
+      return; // ignorer les items sans prix valide
+    }
+
+    const unitAmountInCents = Math.round(unitPriceNum * 100);
     items.push({
       price_data: {
         currency: "eur",
         product_data: { name: productName },
         unit_amount: unitAmountInCents,
       },
-      quantity: line.quantite,
+      quantity,
     });
   });
   return items;

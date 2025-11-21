@@ -13,6 +13,7 @@ import Voiture from "../models/voiture.model.js";
 import voitureValidation from "../validations/voiture.validation.js";
 import Photo from "../models/photo_voiture.model.js";
 import { PORSCHE_MODELS } from "../utils/constants.js";
+import logger from "../utils/logger.js";
 import {
   sendSuccess,
   sendError,
@@ -413,7 +414,7 @@ const getVoituresOccasionFinder = async (req, res) => {
     const voitures = await Voiture.find(voituresQuery)
       .populate("photo_voiture", "name alt")
       .lean();
-
+    // Vérifier si des voitures d'occasion ont été trouvées
     if (!voitures || voitures.length === 0) {
       return sendSuccess(res, {
         voitures: [],
@@ -425,13 +426,14 @@ const getVoituresOccasionFinder = async (req, res) => {
     // Filtres model_porsche
     const filters = {
       voiture: { $in: voitures.map((v) => v._id) },
-      // Seulement les voitures d'occasion disponibles
-      disponible: true,
     };
 
+    // Appliquer les filtres de recherche
     if (carrosserie) {
       filters.type_carrosserie = new RegExp(carrosserie, "i");
     }
+
+    // Appliquer les filtres d'année de production
     if (annee_min || annee_max) {
       filters.annee_production = {};
       // Filtrer par année de production
@@ -444,20 +446,59 @@ const getVoituresOccasionFinder = async (req, res) => {
     }
     // Récupérer occasions avec les filtres appliqués
     const occasions = await Model_porsche.find(filters)
-      .populate("voiture", "nom_model description photo_voiture")
+      .populate("voiture", "nom_model description")
       .populate("couleur_exterieur", "nom_couleur")
       .populate("couleur_interieur", "nom_couleur")
       .sort({ annee_production: -1 })
       .lean();
 
+    // Récupérer les voitures uniques pour charger leurs photos
+    const voitureIds = [
+      ...new Set(occasions.map((o) => o.voiture?._id).filter(Boolean)),
+    ];
+    const voituresAvecPhotos = await Voiture.find({ _id: { $in: voitureIds } })
+      .populate("photo_voiture", "name alt")
+      .lean();
+
+    // Créer un map pour accès rapide
+    const voituresMap = new Map(
+      voituresAvecPhotos.map((v) => [v._id.toString(), v])
+    );
+
     // Si aucune variante Model_porsche n'existe, retourner les Voitures d'occasion de base
     if (!occasions || occasions.length === 0) {
+      logger.warn(
+        "[getVoituresOccasionFinder] Aucun Model_porsche trouvé, retour des Voitures de base"
+      );
+      // Retourner les voitures d'occasion de base sans variantes détaillées
       const voituresSimples = voitures.map((voiture) => ({
         _id: voiture._id,
         nom_model: voiture.nom_model,
+        voiture_base: {
+          _id: voiture._id,
+          nom_model: voiture.nom_model,
+          description: voiture.description,
+          photo_voiture: voiture.photo_voiture || [],
+        },
         description: voiture.description,
         photo_voiture: voiture.photo_voiture || [],
         type_voiture: voiture.type_voiture,
+        type_carrosserie: "N/A",
+        annee_production: null,
+        couleur_exterieur: "N/A",
+        couleur_interieur: "N/A",
+        specifications: {
+          moteur: "N/A",
+          puissance: 0,
+          transmission: "N/A",
+          acceleration_0_100: 0,
+          vitesse_max: 0,
+          consommation: 0,
+        },
+        prix_base_variante: 0,
+        concessionnaire: "Centre Porsche",
+        numero_vin: "N/A",
+        disponible: true,
         message:
           "Variantes détaillées non disponibles - Contactez le concessionnaire",
       }));
@@ -477,17 +518,31 @@ const getVoituresOccasionFinder = async (req, res) => {
 
     // Appliquer les filtres et formater les résultats Porsche Certified
     const occasionsFiltrees = occasions;
+
+    // Log la première occasion pour voir si voiture est populé
+    if (occasionsFiltrees.length > 0) {
+      logger.info(`[getVoituresOccasionFinder] Première occasion:`, {
+        _id: occasionsFiltrees[0]._id,
+        nom_model: occasionsFiltrees[0].nom_model,
+        voiture: occasionsFiltrees[0].voiture,
+        voiture_id_raw: occasionsFiltrees[0].voiture?._id || "undefined",
+      });
+    }
+    // Formater les données de chaque voiture d'occasion
     const voituresFormatees = occasionsFiltrees.map((occasion) => {
       const voiture = occasion.voiture || {};
+      const voitureAvecPhotos =
+        voituresMap.get(voiture._id?.toString()) || voiture;
+
       // Assembler les données formatées de la voiture d'occasion
       return {
         _id: occasion._id,
-        nom_model: occasion.nom_model,
+        nom_model: occasion.nom_model || (voiture && voiture.nom_model) || "",
         voiture_base: {
-          _id: voiture._id,
-          nom_model: voiture.nom_model,
-          description: voiture.description,
-          photo_voiture: voiture.photo_voiture || [],
+          _id: voiture._id || null,
+          nom_model: voiture.nom_model || "",
+          description: voiture.description || "",
+          photo_voiture: voitureAvecPhotos.photo_voiture || [],
         },
         type_carrosserie: occasion.type_carrosserie,
         annee_production: occasion.annee_production,
@@ -525,17 +580,16 @@ const getVoituresOccasionFinder = async (req, res) => {
   }
 };
 
-// Page explicative complète d'une voiture model-start (911, Cayman, Cayenne)
-// Retourne toutes les informations nécessaires pour afficher une page détaillée
+// Page  complète d'une voiture model-start (911, Cayman, Cayenne)
 const getVoiturePage = async (req, res) => {
   try {
     const voitureId = req.params.id;
-    
+
     // Récupérer la voiture avec ses photos
     const voiture = await Voiture.findById(voitureId)
       .populate("photo_voiture", "name alt")
       .lean();
-    
+    // Vérifier que la voiture existe
     if (!voiture) {
       return sendNotFound(res, "Gamme de voiture introuvable");
     }
@@ -545,26 +599,34 @@ const getVoiturePage = async (req, res) => {
       .default;
 
     // Récupérer toutes les variantes disponibles pour cette voiture
-    const variantes = await Model_porsche.find({ 
+    const variantes = await Model_porsche.find({
       voiture: voitureId,
-      disponible: true 
+      disponible: true,
     })
-      .select("nom_model type_carrosserie description specifications prix_base photo_porsche")
+      .select(
+        "nom_model type_carrosserie description specifications prix_base photo_porsche"
+      )
       .populate("photo_porsche", "name alt")
       .sort({ prix_base: 1 })
       .lean();
 
     // Calculer les statistiques agrégées
-    const prixMin = variantes.length > 0 
-      ? Math.min(...variantes.map(v => v.prix_base || 0).filter(p => p > 0))
-      : 0;
-    
-    const carrosseries = [...new Set(variantes.map(v => v.type_carrosserie).filter(Boolean))];
-    
+    const prixMin =
+      variantes.length > 0
+        ? Math.min(
+            ...variantes.map((v) => v.prix_base || 0).filter((p) => p > 0)
+          )
+        : 0;
+    // Carrosseries disponibles pour ce modèle
+    const carrosseries = [
+      ...new Set(variantes.map((v) => v.type_carrosserie).filter(Boolean)),
+    ];
+    // Transmissions disponibles pour ce modèle
     const transmissions = new Set();
-    variantes.forEach(v => {
+    variantes.forEach((v) => {
       const trans = v.specifications?.transmission || "";
-      if (trans.includes("PDK") || trans.includes("Automatique")) transmissions.add("Automatique");
+      if (trans.includes("PDK") || trans.includes("Automatique"))
+        transmissions.add("Automatique");
       if (trans.includes("Manuelle")) transmissions.add("Manuelle");
     });
 
@@ -585,7 +647,7 @@ const getVoiturePage = async (req, res) => {
         carrosseries_disponibles: carrosseries,
         transmissions_disponibles: Array.from(transmissions),
       },
-      variantes: variantes.map(v => ({
+      variantes: variantes.map((v) => ({
         _id: v._id,
         nom_model: v.nom_model,
         type_carrosserie: v.type_carrosserie,
@@ -596,9 +658,10 @@ const getVoiturePage = async (req, res) => {
           transmission: v.specifications?.transmission || "N/A",
           acceleration_0_100: v.specifications?.acceleration_0_100 || 0,
         },
-        photo_principale: v.photo_porsche && v.photo_porsche.length > 0 
-          ? v.photo_porsche[0] 
-          : null,
+        photo_principale:
+          v.photo_porsche && v.photo_porsche.length > 0
+            ? v.photo_porsche[0]
+            : null,
         nombre_photos: v.photo_porsche ? v.photo_porsche.length : 0,
       })),
     };
@@ -607,6 +670,313 @@ const getVoiturePage = async (req, res) => {
       res,
       pageData,
       `Page explicative de la ${voiture.nom_model} récupérée avec succès`
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+// ==================== FONCTIONS STAFF ====================
+
+/**
+ * Ajouter une voiture d'occasion (staff uniquement)
+ */
+const ajouterVoitureOccasion = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { body } = req;
+
+    if (!body || Object.keys(body).length === 0) {
+      return sendValidationError(res, "Pas de données dans la requête");
+    }
+
+    // Valider les données requises
+    if (!body.nom_model) {
+      return sendValidationError(res, "Le nom du modèle est requis");
+    }
+
+    if (!body.prix) {
+      return sendValidationError(res, "Le prix est requis");
+    }
+
+    if (!body.kilometrage) {
+      return sendValidationError(res, "Le kilométrage est requis");
+    }
+
+    // Créer d'abord l'entrée Voiture (gamme générale)
+    let voiture;
+    if (body.voiture_id) {
+      // Si une voiture existe déjà, l'utiliser
+      voiture = await Voiture.findById(body.voiture_id);
+      if (!voiture) {
+        return sendNotFound(res, "Voiture (gamme)");
+      }
+    } else {
+      // Sinon créer une nouvelle entrée Voiture
+      voiture = await new Voiture({
+        type_voiture: false, // Occasion
+        nom_model: body.nom_model_gamme || body.nom_model,
+        description: body.description_gamme || body.description,
+        photo_voiture: body.photos_gamme || [],
+      }).save();
+    }
+
+    // Import dynamique pour éviter dépendance circulaire
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+
+    // Créer le Model_porsche (configuration spécifique d'occasion)
+    const modelPorsche = await new Model_porsche({
+      nom_model: body.nom_model,
+      type_carrosserie: body.type_carrosserie || "Coupe",
+      annee_production: body.annee_production || new Date(),
+      specifications: body.specifications || {
+        moteur: body.moteur || "Non spécifié",
+        puissance: body.puissance || 0,
+        couple: body.couple || 0,
+        transmission: body.transmission || "Manuelle",
+        acceleration_0_100: body.acceleration_0_100 || 0,
+        vitesse_max: body.vitesse_max || 0,
+        consommation: body.consommation || 0,
+      },
+      description: body.description,
+      prix: body.prix,
+      kilometrage: body.kilometrage,
+      couleur_exterieur: body.couleur_exterieur,
+      couleur_interieur: body.couleur_interieur,
+      taille_jante: body.taille_jante,
+      siege: body.siege,
+      package: body.package,
+      photo_porsche: body.photos || [],
+      voiture: voiture._id,
+    }).save();
+
+    // Populer les données complètes
+    const modelComplet = await Model_porsche.findById(modelPorsche._id)
+      .populate("voiture")
+      .populate("couleur_exterieur")
+      .populate("couleur_interieur")
+      .populate("taille_jante")
+      .populate("siege")
+      .populate("package")
+      .populate("photo_porsche");
+
+    return sendSuccess(
+      res,
+      modelComplet,
+      "Voiture d'occasion ajoutée avec succès",
+      201
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Supprimer une voiture d'occasion (staff uniquement)
+ */
+const supprimerVoitureOccasion = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+
+    // Import dynamique
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+    const modelPorsche = await Model_porsche.findById(id).populate("voiture");
+
+    if (!modelPorsche) {
+      return sendNotFound(res, "Voiture d'occasion");
+    }
+
+    // Vérifier que c'est bien une voiture d'occasion
+    if (modelPorsche.voiture.type_voiture !== false) {
+      return sendValidationError(
+        res,
+        "Cette action est réservée aux voitures d'occasion"
+      );
+    }
+
+    // Vérifier qu'il n'y a pas de réservations actives
+    const Reservation = (await import("../models/reservation.model.js"))
+      .default;
+    const reservationsActives = await Reservation.countDocuments({
+      model_porsche: id,
+      status: true,
+    });
+
+    if (reservationsActives > 0) {
+      return sendError(
+        res,
+        "Impossible de supprimer cette voiture, elle a des réservations actives",
+        400
+      );
+    }
+
+    // Supprimer le model_porsche
+    await Model_porsche.findByIdAndDelete(id);
+
+    return sendSuccess(res, { id }, "Voiture d'occasion supprimée avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Récupérer toutes les voitures d'occasion (staff)
+ */
+const getVoituresOccasion = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+    const voitures = await Model_porsche.find()
+      .populate({
+        path: "voiture",
+        match: { type_voiture: false },
+      })
+      .populate("couleur_exterieur")
+      .populate("couleur_interieur")
+      .populate("taille_jante")
+      .populate("siege")
+      .populate("package")
+      .populate("photo_porsche")
+      .sort({ createdAt: -1 });
+
+    // Filtrer pour ne garder que les voitures d'occasion
+    const voituresOccasion = voitures.filter(
+      (v) => v.voiture && v.voiture.type_voiture === false
+    );
+
+    return sendSuccess(res, {
+      voitures: voituresOccasion,
+      total: voituresOccasion.length,
+    });
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Mettre à jour une voiture d'occasion (staff uniquement)
+ */
+const modifierVoitureOccasion = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+    const { body } = req;
+
+    if (!body || Object.keys(body).length === 0) {
+      return sendValidationError(res, "Pas de données dans la requête");
+    }
+
+    const Model_porsche = (await import("../models/model_porsche.model.js"))
+      .default;
+    const modelPorsche = await Model_porsche.findById(id).populate("voiture");
+
+    if (!modelPorsche) {
+      return sendNotFound(res, "Voiture d'occasion");
+    }
+
+    // Vérifier que c'est bien une voiture d'occasion
+    if (modelPorsche.voiture.type_voiture !== false) {
+      return sendValidationError(
+        res,
+        "Cette action est réservée aux voitures d'occasion"
+      );
+    }
+
+    // Mettre à jour les champs autorisés
+    const champsAutorisés = [
+      "nom_model",
+      "type_carrosserie",
+      "annee_production",
+      "specifications",
+      "description",
+      "prix",
+      "kilometrage",
+      "couleur_exterieur",
+      "couleur_interieur",
+      "taille_jante",
+      "siege",
+      "package",
+      "photo_porsche",
+    ];
+
+    champsAutorisés.forEach((champ) => {
+      if (body[champ] !== undefined) {
+        modelPorsche[champ] = body[champ];
+      }
+    });
+
+    await modelPorsche.save();
+
+    // Populer les données complètes
+    const modelComplet = await Model_porsche.findById(id)
+      .populate("voiture")
+      .populate("couleur_exterieur")
+      .populate("couleur_interieur")
+      .populate("taille_jante")
+      .populate("siege")
+      .populate("package")
+      .populate("photo_porsche");
+
+    return sendSuccess(
+      res,
+      modelComplet,
+      "Voiture d'occasion modifiée avec succès"
     );
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
@@ -625,4 +995,9 @@ export {
   getVoituresNeuves,
   getVoituresOccasionFinder,
   getVoiturePage,
+  // Fonctions staff
+  ajouterVoitureOccasion,
+  supprimerVoitureOccasion,
+  getVoituresOccasion,
+  modifierVoitureOccasion,
 };

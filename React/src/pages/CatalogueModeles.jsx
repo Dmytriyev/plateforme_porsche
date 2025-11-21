@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { voitureService } from '../services';
+import { voitureService, modelPorscheService } from '../services';
 import { Loading, Alert } from '../components/common';
 import { formatPrice } from '../utils/format.js';
-import { API_URL } from '../config/api.jsx';
-import buildUrl from '../utils/buildUrl';
-import './CatalogueModeles.css';
-
+import { API_URL } from '../config/api.js';
+import '../css/CatalogueModeles.css';
 
 const CatalogueModeles = () => {
   const { type } = useParams(); // 'neuve' ou 'occasion'
@@ -23,6 +21,11 @@ const CatalogueModeles = () => {
 
     const fetchModeles = async () => {
       try {
+        setLoading(true);
+        setError('');
+
+        // OPTIMISÉ: Utiliser l'endpoint dédié du backend au lieu de filtrer côté client
+        // Backend: GET /voiture/neuve ou GET /voiture/occasion
         const response = isNeuf
           ? await voitureService.getVoituresNeuves()
           : await voitureService.getVoituresOccasion();
@@ -35,6 +38,7 @@ const CatalogueModeles = () => {
         if (isNeuf) {
           // Pour les neuves: grouper par nom_model et calculer le prix minimum
           const modelesGroupes = {};
+
           data.forEach(voiture => {
             const nomModel = voiture.nom_model;
             if (!nomModel) return;
@@ -49,7 +53,7 @@ const CatalogueModeles = () => {
               };
             }
 
-            // Mettre à jour le prix minimum
+            // Mettre à jour le prix minimum depuis la voiture de base
             const prix = voiture.prix_base || 0;
             if (prix > 0 && (modelesGroupes[nomModel].prix_base === 0 || prix < modelesGroupes[nomModel].prix_base)) {
               modelesGroupes[nomModel].prix_base = prix;
@@ -62,15 +66,47 @@ const CatalogueModeles = () => {
           });
 
           const uniqueModeles = Object.values(modelesGroupes);
-          if (isMounted) setModeles(uniqueModeles);
+
+          // Récupérer les prix depuis les variantes/configurations pour chaque modèle
+          const modelesAvecPrix = await Promise.all(
+            uniqueModeles.map(async (modele) => {
+              try {
+                // Toujours chercher dans les variantes pour avoir le prix le plus bas
+                const variantes = await modelPorscheService.getConfigurationsByVoiture(modele._id);
+
+                if (Array.isArray(variantes) && variantes.length > 0) {
+                  const variantesNeuves = variantes.filter(v =>
+                    v.voiture?.type_voiture === true ||
+                    v.voiture?.type_voiture === 'neuve' ||
+                    v.voiture?.type_voiture === 'true'
+                  );
+
+                  // Extraire tous les prix valides
+                  const prixVariantes = variantesNeuves
+                    .map(v => v.prix_base || v.prix_calcule || 0)
+                    .filter(p => p > 0);
+
+                  if (prixVariantes.length > 0) {
+                    const prixMin = Math.min(...prixVariantes);
+                    modele.prix_base = prixMin;
+                  }
+                }
+              } catch (error) {
+              }
+              return modele;
+            })
+          );
+
+          if (isMounted) setModeles(modelesAvecPrix);
         } else {
-          const modelesAffiches = ['911', 'Cayman', 'Cayenne'];
           const modelesGroupes = {};
 
           data.forEach(occasion => {
-            const nomModel = occasion.nom_model || occasion.voiture_base?.nom_model || '';
+            // Pour les occasions, utiliser le nom du modèle de BASE (911, Cayman, Cayenne)
+            // et non le nom de la variante (GT4 RS, Carrera S, etc.)
+            const nomModel = occasion.voiture_base?.nom_model || occasion.nom_model || '';
 
-            if (!modelesAffiches.includes(nomModel)) return;
+            if (!nomModel) return;
 
             if (!modelesGroupes[nomModel]) {
               modelesGroupes[nomModel] = {
@@ -276,9 +312,15 @@ const CatalogueModeles = () => {
               if (isNeuf) {
                 // Pour les neuves: cartes simplifiées avec seulement titre, image, prix et bouton
                 const photoPrincipale = modele.photo_voiture && Array.isArray(modele.photo_voiture) && modele.photo_voiture.length > 0
-                  ? modele.photo_voiture[0]
+                  ? modele.photo_voiture[1]
                   : null;
-                const photoUrl = photoPrincipale?.name ? buildUrl(photoPrincipale.name) : null;
+                const photoUrl = photoPrincipale?.name?.startsWith('http')
+                  ? photoPrincipale.name
+                  : photoPrincipale?.name?.startsWith('/')
+                    ? `${API_URL}${photoPrincipale.name}`
+                    : photoPrincipale?.name
+                      ? `${API_URL}/${photoPrincipale.name}`
+                      : null;
 
                 return (
                   <div
@@ -298,9 +340,20 @@ const CatalogueModeles = () => {
                           alt={photoPrincipale?.alt || modele.nom_model}
                           className="catalogue-modele-img-porsche"
                           onError={(e) => {
-                            e.target.style.display = 'none';
-                            if (e.target.nextSibling) {
-                              e.target.nextSibling.style.display = 'flex';
+                            try {
+                              const src = e.target.src || '';
+                              if (e.target.dataset.fallback) {
+                                e.target.style.display = 'none';
+                                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                return;
+                              }
+                              e.target.dataset.fallback = '1';
+                              e.target.src = '/Logo/Logo_porsche_black.jpg';
+                            } catch (err) {
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) {
+                                e.target.nextSibling.style.display = 'flex';
+                              }
                             }
                           }}
                         />
@@ -315,12 +368,20 @@ const CatalogueModeles = () => {
                       </div>
                     </div>
 
-                    {/* Prix */}
-                    {modele.prix_base > 0 && (
-                      <div className="catalogue-modele-prix-porsche">
-                        À partir de {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(modele.prix_base)} TTC
-                      </div>
-                    )}
+                    {/* Prix - Affiché entre l'image et le bouton */}
+                    <div className="catalogue-modele-prix-porsche">
+                      {modele.prix_base > 0 ? (
+                        <>
+                          <span className="catalogue-prix-label">Prix à partir de</span>
+                          <span className="catalogue-prix-montant">{formatPrice(modele.prix_base)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="catalogue-prix-label">Prix</span>
+                          <span className="catalogue-prix-montant">Sur demande</span>
+                        </>
+                      )}
+                    </div>
 
                     {/* Bouton */}
                     <button
@@ -371,7 +432,12 @@ const CatalogueModeles = () => {
                         }
 
                         if (photoPrincipale && photoPrincipale.name) {
-                          const photoUrl = buildUrl(photoPrincipale.name);
+                          let photoUrl = photoPrincipale.name;
+                          if (!photoUrl.startsWith('http')) {
+                            photoUrl = photoUrl.startsWith('/')
+                              ? `${API_URL}${photoUrl}`
+                              : `${API_URL}/${photoUrl}`;
+                          }
 
                           return (
                             <img
@@ -379,9 +445,20 @@ const CatalogueModeles = () => {
                               alt={photoPrincipale.alt || modele.nom_model}
                               className="catalogue-modele-image"
                               onError={(e) => {
-                                e.target.style.display = 'none';
-                                if (e.target.nextSibling) {
-                                  e.target.nextSibling.style.display = 'flex';
+                                try {
+                                  const src = e.target.src || '';
+                                  if (e.target.dataset.fallback) {
+                                    e.target.style.display = 'none';
+                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                    return;
+                                  }
+                                  e.target.dataset.fallback = '1';
+                                  e.target.src = '/Logo/Logo_porsche_black.jpg';
+                                } catch (err) {
+                                  e.target.style.display = 'none';
+                                  if (e.target.nextSibling) {
+                                    e.target.nextSibling.style.display = 'flex';
+                                  }
                                 }
                               }}
                             />

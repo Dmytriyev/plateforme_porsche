@@ -1,20 +1,5 @@
-import './Input.css';
+import '../../css/components/Input.css';
 
-/**
- * Composant Input - Champ de saisie avec CSS dédié
- * 
- * Props:
- * - label: Label du champ
- * - type: Type d'input
- * - name: Nom du champ
- * - value: Valeur
- * - onChange: Fonction de changement
- * - placeholder: Placeholder
- * - error: Message d'erreur
- * - required: Champ obligatoire
- * - disabled: Désactivé
- * - className: Classes supplémentaires
- */
 const Input = ({
   label,
   type = 'text',

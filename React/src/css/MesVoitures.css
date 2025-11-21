@@ -1,0 +1,179 @@
+.mes-voitures-container-finder {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  width: 100%;
+}
+.mes-voitures-actions-header-finder {
+  width: 100%;
+  background-color: #fff;
+  padding: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.mes-voitures-actions-container-finder {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.mes-voitures-action-btn-finder {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mes-voitures-action-btn-finder:hover {
+  background-color: #1f2937;
+}
+.mes-voitures-action-btn-finder:last-child {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+.mes-voitures-action-btn-finder:last-child:hover {
+  background-color: #f9fafb;
+}
+.mes-voitures-empty-finder {
+  max-width: 1400px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+.mes-voitures-empty-content-finder {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.mes-voitures-empty-text-finder {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0 0 2rem 0;
+}
+.mes-voitures-empty-btn-finder {
+  padding: 1rem 2rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mes-voitures-empty-btn-finder:hover {
+  background-color: #1f2937;
+}
+.mes-voitures-card-finder {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 0;
+  border: 1px solid #e5e7eb;
+}
+.mes-voitures-info-finder {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.mes-voitures-header-card-finder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mes-voitures-name-finder {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+}
+.mes-voitures-status-finder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.mes-voitures-approved-badge-finder {
+  font-size: 0.875rem;
+  color: #000;
+  font-weight: 500;
+}
+.mes-voitures-date-finder {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+.mes-voitures-actions-card-finder {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mes-voitures-btn-details-finder {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.mes-voitures-btn-details-finder:hover {
+  background-color: #1f2937;
+}
+.mes-voitures-btn-compare-finder {
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mes-voitures-btn-compare-finder:hover {
+  background-color: #f9fafb;
+}
+.mes-voitures-btn-compare-finder.enregistre {
+  background-color: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+.mes-voitures-btn-compare-finder.enregistre:hover {
+  background-color: #059669;
+}
+.mes-voitures-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  padding: 2rem;
+}
+.mes-voitures-error p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+.mes-voitures-error button {
+  padding: 0.75rem 1.5rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}

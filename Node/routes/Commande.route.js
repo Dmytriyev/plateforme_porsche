@@ -19,33 +19,37 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Routes admin
+// ============================================
+// ROUTES ADMIN
+// ============================================
 router.get("/all", auth, isAdmin, getAllCommandes);
 
-// Routes user
-
-// panier
+// ============================================
+// ROUTES PANIER (Utilisateur authentifié)
+// ============================================
 router.get("/panier", auth, getPanier);
 router.get("/panier/create", auth, getOrCreatePanier);
 router.post("/panier/addConfig", auth, ajouterConfigurationAuPanier);
+router.post("/panier/valider", auth, validerPanier);
+
+// Gestion des lignes de panier
 router.delete(
   "/delete/ligne/:ligne_id",
   auth,
-  validateObjectId("ligne_id"), // id ligne commande
+  validateObjectId("ligne_id"),
   supprimerLignePanier
 );
 router.patch(
   "/updateQuantite/ligne/:ligne_id",
   auth,
-  validateObjectId("ligne_id"), // id ligne commande
+  validateObjectId("ligne_id"),
   modifierQuantitePanier
 );
-router.post("/panier/valider", auth, validerPanier); // valider le panier
 
-// Route historique
+// ============================================
+// ROUTES COMMANDES (Utilisateur)
+// ============================================
 router.get("/historique", auth, getMyCommandes);
-
-// Route commande
 router.post("/new", auth, createCommande);
 router.get("/:id", auth, validateObjectId("id"), getCommandeById);
 router.put("/update/:id", auth, validateObjectId("id"), updateCommande);

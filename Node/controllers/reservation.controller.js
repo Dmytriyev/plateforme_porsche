@@ -89,6 +89,7 @@ const createReservation = async (req, res) => {
           select: "nom_model type_voiture description",
         },
       });
+
     return sendSuccess(
       res,
       infoReservation,
@@ -300,6 +301,94 @@ const checkReservations = async (req, res) => {
   }
 };
 
+// Accepter une réservation
+const accepterReservation = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendError(res, "Authentification requise", 401);
+    }
+    // Vérifier les rôles du staff
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+    // Récupérer la réservation à accepter
+    const { id } = req.params;
+    // Trouver la réservation par ID
+    const reservation = await Reservation.findById(id)
+      .populate("user", "nom prenom email telephone")
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture",
+        },
+      });
+    // Vérifier que la réservation existe
+    if (!reservation) {
+      return sendNotFound(res, "Réservation");
+    }
+
+    // Vérifier que la réservation est toujours active
+    if (reservation.status === false) {
+      return sendError(res, "Cette réservation a déjà été annulée", 400);
+    }
+
+    return sendSuccess(res, reservation, "Réservation acceptée avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+// Refuser une réservation
+const refuserReservation = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendError(res, "Authentification requise", 401);
+    }
+    // Vérifier les rôles du staff
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+    // Récupérer la réservation à refuser
+    const { id } = req.params;
+    const { motif } = req.body;
+    // Trouver la réservation par ID
+    const reservation = await Reservation.findById(id)
+      .populate("user", "nom prenom email telephone")
+      .populate({
+        path: "model_porsche",
+        populate: {
+          path: "voiture",
+          select: "nom_model type_voiture",
+        },
+      });
+
+    if (!reservation) {
+      return sendNotFound(res, "Réservation");
+    }
+
+    // Annuler la réservation en mettant à jour le statut
+    reservation.status = false;
+    await reservation.save();
+
+    return sendSuccess(res, reservation, "Réservation refusée avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
 export {
   createReservation,
   getAllReservations,
@@ -309,4 +398,6 @@ export {
   getReservationsByUser,
   getReservationsByVoiture,
   checkReservations,
+  accepterReservation,
+  refuserReservation,
 };

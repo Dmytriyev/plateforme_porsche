@@ -16,7 +16,6 @@
  * - `acompte` : acompte à conserver/afficher
  * - `error` : null si OK, sinon message d'erreur
  */
-import Voiture from "../models/voiture.model.js";
 import Accesoire from "../models/accesoire.model.js";
 export const calculerPrixEtAcompte = async (body) => {
   let prixTotal = 0;

@@ -1,7 +1,3 @@
-/**
- * Export centralisé des composants communs
- */
-
 export { default as Button } from './Button.jsx';
 export { default as Loading } from './Loading.jsx';
 export { default as Input } from './Input.jsx';

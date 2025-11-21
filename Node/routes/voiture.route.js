@@ -16,41 +16,34 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 import isStaff from "../middlewares/isStaff.js";
-import { upload } from "../middlewares/multer.js";
+import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
 
-// Middleware flexible pour accepter multipart/form-data
-const optionalUpload = (req, res, next) => {
-  const contentType = req.headers && req.headers["content-type"];
-  const isMultipart =
-    contentType && contentType.includes("multipart/form-data");
-  if (!isMultipart) return next();
-  // Si c'est multipart/form-data, utiliser multer
-  return upload.any()(req, res, (err) => {
-    if (err) return next(err);
-    // multer met les champs texte dans req.body et les fichiers dans req.files
-    // Normaliser pour compatibilité : si un seul fichier, exposer req.file
-    if (req.files && req.files.length > 0) {
-      req.file = req.files[0];
-    }
-    next();
-  });
-};
+// ============================================
+// ROUTES PUBLIQUES
+// ============================================
+// IMPORTANT: Routes spécifiques avant la route générique /:id
 
-// Routes publiques
+// Routes de liste et filtres
 router.get("/all", getAllVoitures);
 router.get("/neuve", getVoituresNeuves);
 router.get("/occasion", getVoituresOccasionFinder);
-router.get("/page/:id", validateObjectId("id"), getVoiturePage); // Page explicative complète d'une voiture
+
+// Routes avec paramètres spécifiques (avant /:id)
+router.get("/page/:id", validateObjectId("id"), getVoiturePage);
 router.get(
   "/modelsPorsche/:id",
-  validateObjectId("id"), //id voiture
+  validateObjectId("id"),
   getModelsPorscheByVoiture
-); // Récupérer les modèles Porsche associés à une voiture
-router.get("/:id", validateObjectId("id"), getVoitureById); // Récupérer une voiture par son ID
+);
 
-// Routes réservées au personnel
+// Route générique (en dernier)
+router.get("/:id", validateObjectId("id"), getVoitureById);
+
+// ============================================
+// ROUTES STAFF (Création/Modification)
+// ============================================
 router.post("/new", auth, isStaff, optionalUpload, createVoiture);
 router.put(
   "/update/:id",
@@ -60,13 +53,11 @@ router.put(
   optionalUpload,
   updateVoiture
 );
-
-// Routes réservées au personnel
 router.patch(
   "/addImages/:id",
   auth,
   isStaff,
-  validateObjectId("id"), //id voiture
+  validateObjectId("id"),
   optionalUpload,
   addImages
 );
@@ -74,7 +65,7 @@ router.patch(
   "/removeImages/:id",
   auth,
   isStaff,
-  validateObjectId("id"), //id voiture
+  validateObjectId("id"),
   optionalUpload,
   removeImages
 );

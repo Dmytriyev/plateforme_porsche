@@ -1,18 +1,5 @@
-import './Button.css';
+import '../../css/components/Button.css';
 
-/**
- * Composant Button - Bouton réutilisable avec CSS dédié
- * 
- * Props:
- * - children: Contenu du bouton
- * - variant: 'primary' | 'secondary' | 'danger' | 'outline'
- * - size: 'sm' | 'md' | 'lg'
- * - onClick: Fonction au clic
- * - disabled: Désactivé
- * - fullWidth: Largeur complète
- * - type: 'button' | 'submit' | 'reset'
- * - className: Classes CSS supplémentaires
- */
 const Button = ({
   children,
   variant = 'primary',

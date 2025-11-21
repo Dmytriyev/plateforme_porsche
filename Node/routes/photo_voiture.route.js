@@ -7,29 +7,13 @@ import {
   deletePhoto_voiture,
   getPhotosByCriteria,
 } from "../controllers/photo_voiture.controller.js";
-import { upload } from "../middlewares/multer.js";
+import optionalUpload from "../middlewares/optionalUpload.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
-
-// Middleware flexible pour accepter différents noms de champ (plus tolérant)
-const optionalUpload = (req, res, next) => {
-  // Si c'est multipart/form-data, utiliser multer.any() puis normaliser req.file
-  if (req.is("multipart/form-data")) {
-    return upload.any()(req, res, (err) => {
-      if (err) return next(err);
-      if (req.files && req.files.length > 0) {
-        req.file = req.files[0];
-      }
-      return next();
-    });
-  }
-  // Sinon, body-parser gère le JSON
-  next();
-};
 
 // Routes staff
 router.post("/new", auth, isStaff, optionalUpload, createPhoto_voiture);

@@ -1,0 +1,171 @@
+.variante-page-error {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.variante-page-container-porsche {
+  min-height: 100vh;
+  background: #fff;
+}
+.variante-hero-porsche {
+  position: relative;
+  width: 100%;
+  min-height: 60vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+}
+.variante-hero-image-porsche {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.variante-hero-img-porsche {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+.variante-info-header-porsche {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+.variante-name-porsche {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.variante-fuel-badge-porsche {
+  background-color: #e5e7eb;
+  color: #000;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.variante-price-porsche {
+  font-size: 1rem;
+  color: #000;
+  text-align: center;
+}
+.variante-left-column-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.variante-performances-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.variante-performance-item-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.variante-performance-value-porsche {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  line-height: 1.2;
+}
+.variante-performance-label-porsche {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+.variante-technical-details-btn-porsche {
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border: 1px solid #000;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  align-self: flex-start;
+}
+.variante-technical-details-btn-porsche:hover {
+  background: #000;
+  color: #fff;
+}
+.variante-description-section-porsche {
+  max-width: 1400px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+.variante-description-title-porsche {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.2;
+}
+.variante-description-text-porsche {
+  font-size: 1.125rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 800px;
+}
+@media (max-width: 968px) {
+  .variante-nav-top-porsche {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .variante-nav-top-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .variante-name-porsche {
+    font-size: 2rem;
+  }
+  .variante-content-layout-porsche {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .variante-right-column-porsche {
+    justify-content: center;
+  }
+  .variante-actions-bottom-porsche {
+    flex-direction: column;
+  }
+  .variante-action-btn-porsche {
+    width: 100%;
+    min-width: auto;
+  }
+}
+@media (max-width: 768px) {
+  .variante-hero-porsche {
+    min-height: 40vh;
+  }
+  .variante-carrosserie-nav-porsche {
+    gap: 1rem;
+  }
+  .variante-performance-value-porsche {
+    font-size: 2rem;
+  }
+  .variante-description-title-porsche {
+    font-size: 2rem;
+  }
+}

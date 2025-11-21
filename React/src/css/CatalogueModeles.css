@@ -1,0 +1,252 @@
+.catalogue-modeles-header {
+  margin-bottom: 3rem;
+}
+.catalogue-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-white);
+  border: var(--border-width) solid #e5e7eb;
+  border-radius: 0.75rem;
+  color: #374151;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
+  margin-bottom: 2rem;
+}
+.catalogue-back-btn:hover {
+  border-color: var(--color-black);
+  color: var(--color-black);
+}
+.catalogue-modeles-title {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
+  margin: 0 0 1rem 0;
+}
+.catalogue-modeles-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+.catalogue-modeles-grid-neuf {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+.catalogue-modele-title-porsche {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.catalogue-modele-prix-porsche {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+.catalogue-prix-label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.catalogue-prix-montant {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: -0.02em;
+}
+.catalogue-modele-card {
+  background-color: #fff;
+  border: 3px solid #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.catalogue-modele-card:hover {
+  border-color: #000;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+.catalogue-modele-card-occasion {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.catalogue-modele-card-occasion:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: #000;
+}
+.catalogue-modele-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #f3f4f6;
+  overflow: hidden;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.catalogue-modele-card-neuf .catalogue-modele-image-container {
+  padding: 1rem 1.5rem;
+  min-height: 300px;
+}
+.catalogue-modele-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+.catalogue-modele-card:hover .catalogue-modele-image {
+  transform: scale(1.05);
+}
+.catalogue-modele-card-neuf .catalogue-modele-image {
+  object-fit: contain;
+  max-height: 100%;
+}
+.catalogue-modele-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.catalogue-modele-letter {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0.5;
+}
+.catalogue-modele-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.catalogue-modele-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+.catalogue-modele-spec-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+.catalogue-modele-spec-value {
+  color: #000;
+  font-weight: 600;
+}
+.catalogue-modele-annee {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  font-weight: 500;
+}
+.catalogue-modele-annee-inline {
+  font-size: 1.25rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+.catalogue-modele-prix {
+  font-size: 1rem;
+  color: #000;
+  margin: 0;
+  font-weight: 700;
+}
+.catalogue-modele-carrosseries {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  font-weight: 500;
+}
+.catalogue-modele-carrosserie {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+.catalogue-modele-puissance {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+.catalogue-modele-variantes {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+.catalogue-modele-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  width: fit-content;
+}
+.catalogue-modele-badge-disponible {
+  background-color: #10b981;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+.catalogue-modele-prix-occasion {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0.5rem 0;
+}
+.catalogue-modele-count-occasion {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+.catalogue-modele-card-neuf .catalogue-modele-cta {
+  margin-top: auto;
+  border-radius: 0;
+}
+@media (max-width: 1024px) {
+  .catalogue-modeles-grid-neuf {
+    grid-template-columns: 1fr;
+  }
+  .catalogue-modeles-grid-occasion {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .catalogue-modeles-grid-occasion {
+    grid-template-columns: 1fr;
+  }
+  .catalogue-modeles-title {
+    font-size: 2rem;
+  }
+  .catalogue-modeles-grid {
+    grid-template-columns: 1fr;
+  }
+  .catalogue-modele-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .catalogue-modele-card-neuf .catalogue-modele-image-container {
+    min-height: 250px;
+  }
+}

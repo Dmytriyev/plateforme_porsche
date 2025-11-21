@@ -27,45 +27,37 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 import isStaff from "../middlewares/isStaff.js";
-import { upload } from "../middlewares/multer.js";
+import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
 
-// Middleware flexible pour accepter multipart/form-data
-const optionalUpload = (req, res, next) => {
-  const contentType = req.headers && req.headers["content-type"];
-  const isMultipart =
-    contentType && contentType.includes("multipart/form-data");
-  if (!isMultipart) return next();
-  // Si c'est multipart/form-data, utiliser multer
-  return upload.any()(req, res, (err) => {
-    if (err) return next(err);
-    // multer met les champs texte dans req.body et les fichiers dans req.files
-    // Normaliser pour compatibilité : si un seul fichier, exposer req.file
-    if (req.files && req.files.length > 0) {
-      req.file = req.files[0];
-    }
-    next();
-  });
-};
+// ============================================
+// ROUTES PUBLIQUES
+// ============================================
+// IMPORTANT: Les routes spécifiques DOIVENT être avant la route générique /:id
 
-// Routes publiques
-router.get("/", getAllModel_porsches); // Route racine: tous les modèles Porsche
-router.get("/carrosseries", getAllCarrosseries); // toutes carrosseries disponibles (SUV, Coupé, Cabriolet, etc.)
-router.get("/variantes", getAllVariantes); // toutes variantes disponibles (ex: 911, Cayenne, Macan, etc.)
-router.get("/variantes/:nomModel", getVariantesByVoitureModel); // ex: /variantes/911 (retourne toutes variantes de la 911)
-router.get("/occasions", getModelPorscheOccasions); // modèles d'occasion
-router.get("/neuves", getModelPorscheNeuves); // modèles neufs
-router.get("/all", getAllModel_porsches); // tous les modèles Porsche (alias de la racine)
-router.get("/prixTotal/:id", validateObjectId("id"), calculatePrixTotal); // calcul prix total avec options (couleurs, jantes, accessoires)
+// Route racine
+router.get("/", getAllModel_porsches);
+
+// Routes pour les catégories et filtres
+router.get("/all", getAllModel_porsches); // Alias de la racine
+router.get("/carrosseries", getAllCarrosseries); // Toutes carrosseries (SUV, Coupé, Cabriolet, etc.)
+router.get("/variantes", getAllVariantes); // Toutes variantes (911, Cayenne, Macan, etc.)
+router.get("/occasions", getModelPorscheOccasions); // Modèles d'occasion
+router.get("/neuves", getModelPorscheNeuves); // Modèles neufs
+
+// Routes avec paramètres spécifiques (avant /:id)
+router.get("/variantes/:nomModel", getVariantesByVoitureModel); // Ex: /variantes/911
+router.get("/prixTotal/:id", validateObjectId("id"), calculatePrixTotal); // Calcul prix total
 router.get(
   "/voiture/:voiture_id",
-  validateObjectId("voiture_id"), // id de la voiture
+  validateObjectId("voiture_id"),
   getConfigurationsByVoiture
-); // récupérer configurations d'une voiture spécifique (avec couleurs, jantes, accessoires)
-router.get("/page/:id", validateObjectId("id"), getModelPorschePage); // Page explicative complète d'une variante
-router.get("/occasion/page/:id", validateObjectId("id"), getOccasionPage); // Page explicative complète d'une voiture d'occasion
-// Route paramétrée id (doit être après les routes plus spécifiques)
+); // Configurations d'une voiture
+router.get("/page/:id", validateObjectId("id"), getModelPorschePage); // Page complète variante
+router.get("/occasion/page/:id", validateObjectId("id"), getOccasionPage); // Page complète occasion
+
+// Route générique (DOIT être en dernier pour éviter conflits)
 router.get("/:id", validateObjectId("id"), getModel_porscheById);
 
 // Routes staff (création/modification)

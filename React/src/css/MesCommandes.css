@@ -1,0 +1,101 @@
+.mes-commandes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+.mes-commandes-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+.mes-commandes-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .mes-commandes-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+.mes-commandes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.commande-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.commande-numero {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.25rem 0;
+}
+.commande-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+.commande-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.commande-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.commande-label {
+  font-weight: 600;
+  color: #374151;
+}
+.commande-value {
+  color: #6b7280;
+}
+.commande-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+}
+.commande-restant {
+  font-weight: 600;
+  color: #dc2626;
+}
+.commande-facture-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+.commande-facture-link:hover {
+  text-decoration: underline;
+}
+.mes-commandes-info {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border-left: 4px solid #000;
+}
+.mes-commandes-info h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.mes-commandes-info ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+.mes-commandes-info li {
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+}

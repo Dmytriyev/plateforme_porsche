@@ -15,27 +15,21 @@ import {
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
-import { upload } from "../middlewares/multer.js";
+import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
 
-// Middleware pour parser multipart/form-data et rendre req.body disponible
-const optionalUpload = (req, res, next) => {
-  if (!req.is("multipart/form-data")) return next();
-  return upload.any()(req, res, (err) => {
-    if (err) return next(err);
-    // req.body est maintenant rempli avec les champs textuels
-    next();
-  });
-};
-
-// Routes publiques
+// ============================================
+// ROUTES PUBLIQUES
+// ============================================
 router.get("/types", getAvailableTypesAccesoireOptions);
 router.get("/all", getAllAccesoires);
 router.get("/search", getAccesoiresByCriteria);
 router.get("/:id", validateObjectId("id"), getAccesoireById);
 
-// Routes admin uniquement
+// ============================================
+// ROUTES ADMIN (Création/Modification)
+// ============================================
 router.post("/new", auth, isAdmin, optionalUpload, createAccesoire);
 router.put(
   "/update/:id",
@@ -45,15 +39,18 @@ router.put(
   optionalUpload,
   updateAccesoire
 );
+
+// Gestion des images
 router.patch("/addImage/:id", auth, isAdmin, validateObjectId("id"), addImages);
 router.patch(
   "/removeImages/:id",
   auth,
   isAdmin,
-  validateObjectId("id"), // id accesoire
+  validateObjectId("id"),
   removeImages
 );
-// Many-to-One
+
+// Gestion des couleurs (Many-to-One)
 router.patch(
   "/addCouleur/:id",
   auth,

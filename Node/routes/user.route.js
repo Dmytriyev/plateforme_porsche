@@ -20,31 +20,53 @@ import {
   getUserDashboard,
   getAvailableUserRoles,
 } from "../controllers/user.controller.js";
+import { body } from "express-validator";
+import validateRequest from "../middlewares/validateRequest.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// Limiteurs spécifiques pour /register et /login
+// Limiters pour les tentatives de connexion et d'inscription
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 10, // max 10 tentatives par IP
   message: "Trop de tentatives de connexion, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
 });
+
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50,
+  max: 5, // max 5 inscriptions par IP
   message: "Trop d'inscriptions, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 // Routes publiques
-router.post("/register", registerLimiter, register);
-router.post("/login", loginLimiter, login);
+router.post(
+  "/register",
+  registerLimiter,
+  // validators
+  body("email").isEmail().withMessage("Email invalide").normalizeEmail(),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Le mot de passe doit contenir au moins 6 caractères"),
+  body("nom").optional().isString().trim().escape(),
+  body("prenom").optional().isString().trim().escape(),
+  validateRequest,
+  register
+);
+router.post(
+  "/login",
+  loginLimiter,
+  body("email").isEmail().withMessage("Email invalide").normalizeEmail(),
+  body("password").exists().withMessage("Mot de passe requis"),
+  validateRequest,
+  login
+);
 
 // Routes admin
 router.get("/all", auth, isAdmin, getAllUsers);

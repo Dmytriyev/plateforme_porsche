@@ -1,22 +1,27 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, personnalisationService } from '../services';
-import { usePanier } from '../hooks/usePanier.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
+import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import { Loading, Button, Alert } from '../components/common';
-import ContactButton from '../components/ContactButton.jsx';
-import { formatPrice, formatPriceMonthly } from '../utils/format.js';
-import './Configurateur.css';
-import { API_URL } from '../config/api.jsx';
+import { formatPrice } from '../utils/format.js';
+import { API_URL } from '../config/api.js';
+import '../css/Configurateur.css';
 import buildUrl from '../utils/buildUrl';
 
 const Configurateur = () => {
-  const { voitureId } = useParams();
+  const { voitureId, varianteId } = useParams();
   const navigate = useNavigate();
-  const { ajouterArticle } = usePanier();
+  const location = useLocation();
+
+  const { isAuthenticated } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  //  État pour stocker le voitureId (peut être déduit de la variante)
+  const [voitureIdActuel, setVoitureIdActuel] = useState(voitureId);
 
   // Données disponibles
   const [variantes, setVariantes] = useState([]);
@@ -25,6 +30,7 @@ const Configurateur = () => {
   const [jantes, setJantes] = useState([]);
   const [sieges, setSieges] = useState([]);
   const [_packages, setPackages] = useState([]);
+  const [packagesFiltres, setPackagesFiltres] = useState([]);
 
   // Configuration sélectionnée
   const [config, setConfig] = useState({
@@ -37,7 +43,9 @@ const Configurateur = () => {
   });
 
   const [prixTotal, setPrixTotal] = useState(0);
-  const [prixMensuel, setPrixMensuel] = useState(0);
+  const [acompte, setAcompte] = useState(0);
+  const [ajoutEnCours, setAjoutEnCours] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // États pour l'interface
   const [photoActive, setPhotoActive] = useState(0);
@@ -46,9 +54,8 @@ const Configurateur = () => {
     jantes: false,
     couleursInt: true, // Ouvert par défaut
     sieges: false,
-    packages: false,
+    packages: true, //  Ouvert par défaut pour voir les packages
   });
-  const [recherche, setRecherche] = useState('');
 
   // Charger les options disponibles
   useEffect(() => {
@@ -57,8 +64,62 @@ const Configurateur = () => {
         setLoading(true);
         setError('');
 
-        const variantesData = await modelPorscheService.getConfigurationsByVoiture(voitureId);
-        setVariantes(Array.isArray(variantesData) ? variantesData : []);
+
+        let voitureIdActuel = voitureId;
+
+        //  AMÉLIORATION: Si varianteId est fourni mais pas voitureId (cas edge)
+        // Charger la variante pour obtenir le voitureId
+        if (!voitureId && varianteId) {
+          try {
+            const varianteData = await modelPorscheService.getModelById(varianteId);
+
+            if (varianteData?.voiture?._id || varianteData?.voiture) {
+              // Gérer le cas où voiture est un ObjectId (string) ou un objet
+              voitureIdActuel = typeof varianteData.voiture === 'string'
+                ? varianteData.voiture
+                : varianteData.voiture._id;
+
+
+              //  IMPORTANT: Sauvegarder le voitureId dans le state pour l'utiliser ailleurs
+              setVoitureIdActuel(voitureIdActuel);
+
+              //  NE PAS faire navigate() ici - cela crée une boucle infinie !
+              // On continue simplement avec le voitureIdActuel trouvé
+            } else {
+              throw new Error('VoitureId introuvable dans la variante');
+            }
+          } catch (err) {
+            setError('Variante introuvable');
+            setLoading(false);
+            return;
+          }
+        } else if (voitureId) {
+          setVoitureIdActuel(voitureId);
+        }
+
+        if (!voitureIdActuel) {
+          setError('ID de voiture manquant');
+          setLoading(false);
+          return;
+        }
+
+
+        // Charger les variantes de la gamme (pour permettre de changer de variante)
+        const responseData = await modelPorscheService.getConfigurationsByVoiture(voitureIdActuel);
+
+        const variantesData = Array.isArray(responseData)
+          ? responseData
+          : (responseData?.configurations || []);
+
+        if (import.meta.env.DEV) {
+          console.log('[Configurateur] Variantes chargées:', {
+            voitureId: voitureIdActuel,
+            totalVariantes: variantesData.length,
+            premiereVariante: variantesData[0]?.nom_model
+          });
+        }
+
+        setVariantes(variantesData);
 
         // Charger les options de personnalisation
         const [couleursExtData, couleursIntData, jantesData, siegesData, packagesData] =
@@ -72,25 +133,79 @@ const Configurateur = () => {
 
         setCouleursExt(couleursExtData);
         setCouleursInt(couleursIntData);
-        setJantes(jantesData);
-        setSieges(siegesData);
-        setPackages(packagesData);
+        const jantesFiltrees = Array.isArray(jantesData)
+          ? jantesData.filter(jante => {
+            const taille = jante.taille_jante;
+            // Exclure si taille = 16 (number) OU taille = "16" (string)
+            return taille !== 16 && taille !== "16" && String(taille) !== "16";
+          })
+          : [];
 
-        // Sélectionner la première variante par défaut
+        if (import.meta.env.DEV) {
+        }
+
+        setJantes(jantesFiltrees);
+        setSieges(siegesData);
+        setPackages(packagesData);        //  NOUVELLE LOGIQUE: Sélectionner la variante spécifique ou la première par défaut
         if (variantesData.length > 0) {
-          setConfig((prev) => ({ ...prev, variante: variantesData[0] }));
+          let varianteSelectionnee = null;
+
+          // Log détaillé des variantes disponibles
+          if (import.meta.env.DEV) {
+          }
+          if (varianteId) {
+            varianteSelectionnee = variantesData.find(v => v._id === varianteId);
+
+            if (import.meta.env.DEV) {
+            }
+          }
+
+          // Fallback: sélectionner la première variante si varianteId non trouvé
+          if (!varianteSelectionnee) {
+            varianteSelectionnee = variantesData[0];
+
+            if (import.meta.env.DEV && varianteId) {
+            }
+          }
+
+          if (import.meta.env.DEV) {
+          }
+
+          setConfig((prev) => ({ ...prev, variante: varianteSelectionnee }));
+        } else {
         }
       } catch (err) {
-        setError('Erreur lors du chargement des options');
+        console.error('[Configurateur] Erreur chargement:', err);
+        setError(err.message || 'Erreur lors du chargement des options');
       } finally {
         setLoading(false);
       }
     };
 
-    if (voitureId) {
+    if (voitureId || varianteId) {
       fetchOptions();
+    } else {
+      setLoading(false);
+      setError('Paramètres manquants : voitureId ou varianteId requis');
+
+      if (import.meta.env.DEV) {
+        console.error('[Configurateur] Paramètres manquants:', { voitureId, varianteId });
+      }
     }
-  }, [voitureId]);
+  }, [voitureId, varianteId]);
+
+  useEffect(() => {
+    if (config.variante && _packages.length > 0) {
+      const packagesFiltresParModele = filtrerPackagesParModele(_packages, config.variante);
+      setPackagesFiltres(packagesFiltresParModele);
+
+      if (config.package && !packagesFiltresParModele.find(p => p._id === config.package._id)) {
+        setConfig(prev => ({ ...prev, package: null }));
+      }
+    } else {
+      setPackagesFiltres([]);
+    }
+  }, [config.variante, _packages]);
 
   useEffect(() => {
     let total = 0;
@@ -120,24 +235,176 @@ const Configurateur = () => {
     }
 
     setPrixTotal(total);
-    // Calcul du prix mensuel (exemple : 80 mois à 0%)
-    // Éviter la division par zéro
-    setPrixMensuel(total > 0 ? total / 80 : 0);
+    // Calcul de l'acompte (20% du prix total)
+    setAcompte(Math.round(total * 0.2));
   }, [config]);
 
-  const _handleVarianteChange = (variante) => navigate(`/configuration/${variante._id}`);
 
+
+  const findPhotoIndexByCouleur = (couleur, type) => {
+    if (!couleur?._id || !type) {
+      if (import.meta.env.DEV) {
+      }
+      return null;
+    }
+    if (!['exterieur', 'interieur'].includes(type)) {
+      if (import.meta.env.DEV) {
+      }
+      return null;
+    }
+
+    const photos = getPhotosVariante();
+    if (!Array.isArray(photos) || photos.length === 0) {
+      if (import.meta.env.DEV) {
+      }
+      return null;
+    }
+
+    if (import.meta.env.DEV) {
+    }
+    const visiblePhotosWithIndex = photos
+      .map((photo, originalIndex) => ({ photo, originalIndex }))
+      .filter(({ photo, originalIndex }) => {
+        const id = photo._id || photo.id || '';
+        const name = photo.name || '';
+        return originalIndex >= 2 &&
+          !(id === 'id_0' || id === 'id_1' ||
+            name.includes('id_0') || name.includes('id_1'));
+      });
+
+    if (import.meta.env.DEV) {
+    }
+
+    // Chercher la photo correspondant à la couleur sélectionnée
+    const fieldName = type === 'exterieur' ? 'couleur_exterieur' : 'couleur_interieur';
+    const foundIndex = visiblePhotosWithIndex.findIndex(({ photo }) => {
+      const photoCouleurId = photo[fieldName]?._id || photo[fieldName];
+
+      if (import.meta.env.DEV) {
+      }
+
+      return photoCouleurId && photoCouleurId.toString() === couleur._id.toString();
+    });
+
+    if (import.meta.env.DEV) {
+    }
+
+    // Retourner l'index dans le tableau des photos visibles
+    return foundIndex >= 0 ? foundIndex : null;
+  };
+
+  /**
+   *  Handler pour changement de couleur extérieure
+   * Applique le principe DRY (Don't Repeat Yourself)
+   */
   const handleCouleurExtChange = (couleur) => {
     setConfig({ ...config, couleur_exterieur: couleur });
+
+    // Trouver et afficher la photo correspondante
+    const photoIndex = findPhotoIndexByCouleur(couleur, 'exterieur');
+    if (photoIndex !== null) {
+      setPhotoActive(photoIndex);
+
+      if (import.meta.env.DEV) {
+      }
+    }
   };
 
   const handleCouleurIntChange = (couleur) => {
     setConfig({ ...config, couleur_interieur: couleur });
+
+    // Trouver et afficher la photo correspondante
+    const photoIndex = findPhotoIndexByCouleur(couleur, 'interieur');
+    if (photoIndex !== null) {
+      setPhotoActive(photoIndex);
+
+      if (import.meta.env.DEV) {
+      }
+    }
+  };
+
+  const handleChangerModele = () => {
+    //  Utiliser voitureIdActuel (state) qui peut être déduit de la variante
+    const idVoiture = voitureIdActuel || voitureId;
+    if (!idVoiture) {
+      if (import.meta.env.DEV) {
+      }
+      navigate('/choix-voiture');
+      return;
+    }
+    const typeVoiture = config.variante?.voiture?.type_voiture === false ? 'occasion' : 'neuve';
+    const targetRoute = `/variantes/${typeVoiture}/${idVoiture}`;
+
+    if (import.meta.env.DEV) {
+    }
+
+    navigate(targetRoute);
   };
 
   const toggleSection = (section) => setSectionsOuvertes((prev) => ({ ...prev, [section]: !prev[section] }));
 
   const getPhotosVariante = () => (Array.isArray(config.variante?.photo_porsche) ? config.variante.photo_porsche : []);
+
+  // Photos et filtrage: retirer complètement les photos avec id_0 / id_1 (indices 0 et 1)
+  const photos = getPhotosVariante();
+  const visiblePhotos = Array.isArray(photos)
+    ? photos.filter((p, index) => {
+      const id = p._id || p.id || '';
+      const name = p.name || '';
+      // Exclure les indices 0 et 1, ou les photos avec id_0/id_1 dans leur identifiant/nom
+      return index >= 2 && !(id === 'id_0' || id === 'id_1' || name.includes('id_0') || name.includes('id_1'));
+    })
+    : [];
+
+  // Veiller à ce que l'index actif reste valide quand la liste change
+  useEffect(() => {
+    setPhotoActive((prev) => (prev >= visiblePhotos.length ? 0 : prev));
+  }, [visiblePhotos.length]);
+
+  const filtrerPackagesParModele = (packages, variante) => {
+    if (!variante || !Array.isArray(packages)) {
+      if (import.meta.env.DEV) {
+      }
+      return [];
+    }
+
+    // Extraire et normaliser le nom du modèle de base
+    const nomModel = (variante.nom_model || '').trim().toUpperCase();
+
+    let modeleBase;
+    if (nomModel.includes('GT3') || nomModel.includes('GT2') ||
+      nomModel.includes('TURBO') || nomModel.includes('CARRERA') ||
+      nomModel.includes('TARGA') || nomModel.includes('911')) {
+      modeleBase = '911';
+    }
+    else if (nomModel.includes('CAYMAN')) {
+      modeleBase = 'CAYMAN';
+    }
+    else if (nomModel.includes('CAYENNE')) {
+      modeleBase = 'CAYENNE';
+    }
+    else {
+      modeleBase = nomModel.split(' ')[0];
+    }
+    const packagesFiltres = packages.filter(pkg => {
+      const nomPackage = (pkg.nom_package || '').trim();
+
+      //  Sport Chrono: disponible pour TOUS les modèles
+      if (nomPackage.includes('Sport Chrono') || nomPackage.includes('sport chrono')) {
+        return true;
+      }
+
+      //  Weissach: uniquement pour 911 et Cayman (performance sportive)
+      if (nomPackage.includes('Weissach') || nomPackage.includes('weissach')) {
+        // Liste blanche des modèles autorisés (Whitelist Security Pattern)
+        const modelesAutorises = ['911', 'CAYMAN'];
+        return modelesAutorises.includes(modeleBase);
+      }
+      return true;
+    });
+
+    return packagesFiltres;
+  };
 
   const handleJanteChange = (jante) => {
     setConfig({ ...config, taille_jante: jante });
@@ -151,26 +418,40 @@ const Configurateur = () => {
     setConfig({ ...config, package: pkg });
   };
 
-  const _handleAddToCart = () => {
+  const handleAcheter = async () => {
+    if (!isAuthenticated()) {
+      setShowLoginPrompt(true);
+      return;
+    }
     if (!config.variante) {
       setError('Veuillez sélectionner une variante');
       return;
     }
 
-    // Ajouter la configuration au panier
-    ajouterArticle({
-      id: `config-${Date.now()}`,
-      nom: `${config.variante.nom_model} - Configuration personnalisée`,
-      prix: prixTotal,
-      type: 'configuration',
-      quantite: 1,
-      configuration: config,
-    });
+    try {
+      setAjoutEnCours(true);
+      setError('');
 
-    setSuccess('Configuration ajoutée au panier !');
-    setTimeout(() => {
-      navigate('/panier');
-    }, 1500);
+      // Utiliser l'ID de la variante (model_porsche) sélectionnée
+      const modelPorscheId = config.variante._id;
+
+      // Importer le service commande dynamiquement
+      const { commandeService } = await import('../services');
+
+      // Ajouter la configuration au panier via l'API backend
+      await commandeService.ajouterConfigurationAuPanier(modelPorscheId, 1);
+
+      setSuccess('Configuration ajoutée au panier avec succès !');
+
+      // Rediriger vers le panier après 1.5 secondes
+      setTimeout(() => {
+        navigate('/panier');
+      }, 1500);
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'ajout au panier');
+    } finally {
+      setAjoutEnCours(false);
+    }
   };
 
   if (loading) {
@@ -181,12 +462,11 @@ const Configurateur = () => {
     return (
       <div className="error-container">
         <Alert type="error">{error}</Alert>
-        <Button onClick={() => navigate('/voitures')}>Retour au catalogue</Button>
+        <Button onClick={() => navigate('/choix-voiture')}>Retour au catalogue</Button>
       </div>
     );
   }
 
-  const photos = getPhotosVariante();
   const nomModel = config.variante?.nom_model || config.variante?.voiture?.nom_model || '911 GT3';
   const annee = new Date().getFullYear() + 1; // Année du modèle
 
@@ -198,56 +478,24 @@ const Configurateur = () => {
       {/* Header avec navigation et prix */}
       <header className="configurateur-top-header">
         <div className="configurateur-header-left">
-          <button className="configurateur-header-link" onClick={() => navigate('/voitures')}>
+          <button className="configurateur-header-link" onClick={handleChangerModele}>
             Changer de modèle
-          </button>
-          <button className="configurateur-header-link" onClick={() => { }}>
-            Sauvegarder
-          </button>
-          <button className="configurateur-header-link" onClick={() => { }}>
-            Créer un code Porsche
           </button>
         </div>
 
         <div className="configurateur-header-center">
-          <div className="configurateur-header-price-group">
-            <div className="configurateur-header-price-item">
-              <span className="configurateur-header-price-amount">
-                {formatPriceMonthly(prixMensuel)} /mois
-              </span>
-              <button className="configurateur-header-info-icon" title="Informations">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-            <button className="configurateur-header-link-small">Calculer la mensualité</button>
-          </div>
-
-          <div className="configurateur-header-price-group">
-            <div className="configurateur-header-price-item">
-              <span className="configurateur-header-price-total">{formatPrice(prixTotal)}</span>
-              <button className="configurateur-header-info-icon" title="Informations">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-            <span className="configurateur-header-price-label">incluant TVA</span>
-          </div>
+          <img src="/Logo/Logo_Porsche.png" alt="Porsche" className="configurateur-header-logo" />
         </div>
 
         <div className="configurateur-header-right">
-          <Button variant="outline" onClick={() => { }}>
-            Aperçu
-          </Button>
-          <ContactButton
-            vehiculeId={config.variante?._id}
-            typeVehicule="neuf"
-            variant="primary"
-          />
+          <div className="configurateur-header-price-group">
+            <div className="configurateur-header-price-item">
+              <span className="configurateur-header-price-label">Prix de base</span>
+              <span className="configurateur-header-price-total">{formatPrice(prixTotal)}</span>
+              <button className="configurateur-header-info-icon" title="Informations">
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -257,17 +505,10 @@ const Configurateur = () => {
         {/* Zone de visualisation (gauche) */}
         <div className="configurateur-visual-area">
           <div className="configurateur-visual-main">
-            {/* Bouton plein écran */}
-            <button className="configurateur-fullscreen-btn" title="Plein écran">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-              </svg>
-            </button>
-
             {/* Image principale */}
-            {photos.length > 0 ? (
+            {visiblePhotos.length > 0 ? (
               <img
-                src={buildUrl(photos[photoActive]?.name)}
+                src={buildUrl(visiblePhotos[photoActive]?.name)}
                 alt={nomModel}
                 className="configurateur-main-image"
                 onError={(e) => {
@@ -278,45 +519,18 @@ const Configurateur = () => {
             ) : null}
             <div
               className="configurateur-visual-placeholder"
-              style={{ display: photos.length > 0 ? 'none' : 'flex' }}
+              style={{ display: visiblePhotos.length > 0 ? 'none' : 'flex' }}
             >
               <span className="configurateur-visual-letter">
                 {nomModel?.charAt(0) || '?'}
               </span>
             </div>
-
-            {/* Bouton vue 360° */}
-            <button className="configurateur-360-btn">
-              Ouvrir la vue à 360
-            </button>
-          </div>
-
-          {/* Contrôles au-dessus des miniatures */}
-          <div className="configurateur-visual-controls">
-            <button className="configurateur-control-btn" title="Photos">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-            </button>
-            <button className="configurateur-control-btn" title="Vue nuit">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            </button>
-            <button className="configurateur-control-btn" title="Caméra">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-            </button>
           </div>
 
           {/* Miniatures */}
-          {photos.length > 1 && (
+          {visiblePhotos.length > 1 && (
             <div className="configurateur-thumbnails">
-              {photos.map((photo, index) => (
+              {visiblePhotos.map((photo, index) => (
                 <button
                   key={index}
                   onClick={() => setPhotoActive(index)}
@@ -343,28 +557,6 @@ const Configurateur = () => {
             <span className="configurateur-panel-year">{annee}</span>
           </div>
 
-          <a href="#" className="configurateur-panel-link">
-            Données techniques et équipement de série
-          </a>
-
-          {/* Barre de recherche */}
-          <div className="configurateur-search">
-            <svg className="configurateur-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-            <input
-              name="config_recherche"
-              id="config-recherche"
-              type="text"
-              placeholder="Recherche d'options d'équipement"
-              value={recherche}
-              onChange={(e) => setRecherche(e.target.value)}
-              className="configurateur-search-input"
-            />
-          </div>
-
-          {/* Section Couleurs Extérieures */}
           {couleursExt.length > 0 && (
             <div className="configurateur-option-section">
               <button
@@ -372,7 +564,7 @@ const Configurateur = () => {
                 onClick={() => toggleSection('couleursExt')}
               >
                 <span className="configurateur-option-section-title">
-                  Couleurs Extérieures <span className="configurateur-option-count">1</span>
+                  Couleurs Extérieures
                 </span>
                 <svg
                   className={`configurateur-option-section-icon ${sectionsOuvertes.couleursExt ? 'open' : ''}`}
@@ -430,7 +622,7 @@ const Configurateur = () => {
                 onClick={() => toggleSection('jantes')}
               >
                 <span className="configurateur-option-section-title">
-                  Jantes <span className="configurateur-option-count">1</span>
+                  Jantes
                 </span>
                 <svg
                   className={`configurateur-option-section-icon ${sectionsOuvertes.jantes ? 'open' : ''}`}
@@ -447,19 +639,57 @@ const Configurateur = () => {
               {sectionsOuvertes.jantes && (
                 <div className="configurateur-option-section-content">
                   <div className="configurateur-jantes-list">
-                    {jantes.map((jante) => (
-                      <button
-                        key={jante._id}
-                        onClick={() => handleJanteChange(jante)}
-                        className={`configurateur-jante-item ${config.taille_jante?._id === jante._id ? 'selected' : ''
-                          }`}
-                      >
-                        <span className="configurateur-jante-size">{jante.taille_jante}"</span>
-                        {jante.prix > 0 && (
-                          <span className="configurateur-jante-price">+{formatPrice(jante.prix)}</span>
-                        )}
-                      </button>
-                    ))}
+                    {jantes.map((jante) => {
+                      // Gérer l'image de la jante
+                      const imageJante = jante.photo_jante;
+                      let imageUrl = null;
+
+                      if (imageJante) {
+                        if (typeof imageJante === 'string') {
+                          imageUrl = imageJante.startsWith('http')
+                            ? imageJante
+                            : `${API_URL}${imageJante.startsWith('/') ? '' : '/'}${imageJante}`;
+                        } else if (imageJante.name) {
+                          imageUrl = imageJante.name.startsWith('http')
+                            ? imageJante.name
+                            : `${API_URL}${imageJante.name.startsWith('/') ? '' : '/'}${imageJante.name}`;
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={jante._id}
+                          onClick={() => handleJanteChange(jante)}
+                          className={`configurateur-jante-item ${config.taille_jante?._id === jante._id ? 'selected' : ''}`}
+                        >
+                          {imageUrl && (
+                            <div className="configurateur-jante-image">
+                              <img
+                                src={imageUrl}
+                                alt={`Jante ${jante.taille_jante}"`}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling?.classList.add('show');
+                                }}
+                              />
+                              <div className="configurateur-jante-placeholder">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                  <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+                                  <circle cx="12" cy="12" r="6" strokeWidth="1.5" />
+                                  <circle cx="12" cy="12" r="2" fill="currentColor" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                          <div className="configurateur-jante-info">
+                            <span className="configurateur-jante-size">{jante.taille_jante}"</span>
+                            {jante.prix > 0 && (
+                              <span className="configurateur-jante-price">+{formatPrice(jante.prix)}</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -490,51 +720,33 @@ const Configurateur = () => {
               </button>
               {sectionsOuvertes.couleursInt && (
                 <div className="configurateur-option-section-content">
-                  {/* Standard */}
-                  <div className="configurateur-interior-standard">
-                    <div className="configurateur-interior-standard-header">
-                      <span className="configurateur-interior-standard-label">Standard</span>
-                      <span className="configurateur-interior-standard-price">0,00 €</span>
-                      <button className="configurateur-header-info-icon" title="Informations">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
-                          <path d="M8 6V8M8 10H8.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                        </svg>
-                      </button>
-                    </div>
-                    <p className="configurateur-interior-standard-desc">
-                      Intérieur en cuir / Race-Tex Noir et en couleur contrastante Argent GT
-                    </p>
-                    <div className="configurateur-interior-standard-swatch">
-                      <div className="configurateur-interior-swatch-item"></div>
-                    </div>
-                  </div>
-
-                  {/* Cuir */}
-                  <div className="configurateur-interior-leather">
-                    <span className="configurateur-interior-category">Cuir</span>
-                    <div className="configurateur-interior-swatches">
-                      {couleursInt.map((couleur) => (
-                        <button
-                          key={couleur._id}
-                          onClick={() => handleCouleurIntChange(couleur)}
-                          className={`configurateur-interior-swatch-item ${config.couleur_interieur?._id === couleur._id ? 'selected' : ''
-                            }`}
-                          title={couleur.nom_couleur}
-                        >
-                          {couleur.photo_couleur ? (
-                            <img
-                              src={buildUrl(couleur.photo_couleur)}
-                              alt={couleur.nom_couleur}
-                            />
-                          ) : (
-                            <div
-                              style={{ backgroundColor: couleur.code_hex || '#ccc' }}
-                            />
+                  <div className="configurateur-colors-list">
+                    {couleursInt.map((couleur) => (
+                      <button
+                        key={couleur._id}
+                        onClick={() => handleCouleurIntChange(couleur)}
+                        className={`configurateur-color-item ${config.couleur_interieur?._id === couleur._id ? 'selected' : ''}`}
+                      >
+                        {couleur.photo_couleur ? (
+                          <img
+                            src={buildUrl(couleur.photo_couleur)}
+                            alt={couleur.nom_couleur}
+                            className="configurateur-color-item-image"
+                          />
+                        ) : (
+                          <div
+                            className="configurateur-color-item-swatch"
+                            style={{ backgroundColor: couleur.code_hex || '#ccc' }}
+                          />
+                        )}
+                        <div className="configurateur-color-item-info">
+                          <span className="configurateur-color-item-name">{couleur.nom_couleur}</span>
+                          {couleur.prix > 0 && (
+                            <span className="configurateur-color-item-price">+{formatPrice(couleur.prix)}</span>
                           )}
-                        </button>
-                      ))}
-                    </div>
+                        </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
@@ -566,24 +778,188 @@ const Configurateur = () => {
               {sectionsOuvertes.sieges && (
                 <div className="configurateur-option-section-content">
                   <div className="configurateur-sieges-list">
-                    {sieges.map((siege) => (
-                      <button
-                        key={siege._id}
-                        onClick={() => handleSiegeChange(siege)}
-                        className={`configurateur-siege-item ${config.siege?._id === siege._id ? 'selected' : ''
-                          }`}
-                      >
-                        <span className="configurateur-siege-name">{siege.nom_siege}</span>
-                        {siege.prix > 0 && (
-                          <span className="configurateur-siege-price">+{formatPrice(siege.prix)}</span>
-                        )}
-                      </button>
-                    ))}
+                    {sieges.map((siege) => {
+                      // Gérer l'image du siège
+                      const imageSiege = siege.photo_siege;
+                      let imageUrl = null;
+
+                      if (imageSiege) {
+                        if (typeof imageSiege === 'string') {
+                          imageUrl = imageSiege.startsWith('http')
+                            ? imageSiege
+                            : `${API_URL}${imageSiege.startsWith('/') ? '' : '/'}${imageSiege}`;
+                        } else if (imageSiege.name) {
+                          imageUrl = imageSiege.name.startsWith('http')
+                            ? imageSiege.name
+                            : `${API_URL}${imageSiege.name.startsWith('/') ? '' : '/'}${imageSiege.name}`;
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={siege._id}
+                          onClick={() => handleSiegeChange(siege)}
+                          className={`configurateur-siege-item ${config.siege?._id === siege._id ? 'selected' : ''}`}
+                        >
+                          {imageUrl && (
+                            <div className="configurateur-siege-image">
+                              <img
+                                src={imageUrl}
+                                alt={siege.nom_siege}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling?.classList.add('show');
+                                }}
+                              />
+                              <div className="configurateur-siege-placeholder">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M5 12h14M12 5l7 7-7 7" />
+                                  <rect x="6" y="14" width="12" height="6" rx="1" />
+                                  <path d="M6 14V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                          <div className="configurateur-siege-info">
+                            <span className="configurateur-siege-name">{siege.nom_siege}</span>
+                            {siege.prix > 0 && (
+                              <span className="configurateur-siege-price">+{formatPrice(siege.prix)}</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
             </div>
           )}
+
+          {/*  Section Packages - Affichage des packages filtrés selon le modèle */}
+          {packagesFiltres.length > 0 && (
+            <div className="configurateur-option-section">
+              <button
+                className="configurateur-option-section-header"
+                onClick={() => toggleSection('packages')}
+              >
+                <span className="configurateur-option-section-title">
+                  Packages
+                </span>
+                <svg
+                  className={`configurateur-option-section-icon ${sectionsOuvertes.packages ? 'open' : ''}`}
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              {sectionsOuvertes.packages && (
+                <div className="configurateur-option-section-content">
+                  <div className="configurateur-packages-list">
+                    {packagesFiltres.map((pkg) => {
+                      // Gérer l'image du package
+                      const imagePackage = pkg.photo_package;
+                      let imageUrl = null;
+
+                      if (imagePackage) {
+                        if (typeof imagePackage === 'string') {
+                          imageUrl = imagePackage.startsWith('http')
+                            ? imagePackage
+                            : buildUrl(imagePackage);
+                        } else if (imagePackage.name) {
+                          imageUrl = imagePackage.name.startsWith('http')
+                            ? imagePackage.name
+                            : buildUrl(imagePackage.name);
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={pkg._id}
+                          onClick={() => _handlePackageChange(pkg)}
+                          className={`configurateur-package-item ${config.package?._id === pkg._id ? 'selected' : ''}`}
+                        >
+                          <div className="configurateur-package-image">
+                            {imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={pkg.nom_package}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div className="configurateur-package-placeholder" style={{ display: imageUrl ? 'none' : 'flex' }}>
+                              <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                <path d="M2 17l10 5 10-5" />
+                                <path d="M2 12l10 5 10-5" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="configurateur-package-info">
+                            <span className="configurateur-package-name">{pkg.nom_package}</span>
+                            {pkg.description && (
+                              <p className="configurateur-package-description">{pkg.description}</p>
+                            )}
+                            {pkg.prix > 0 && (
+                              <span className="configurateur-package-price">+{formatPrice(pkg.prix)}</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Boutons d'action en bas */}
+          <div className="configurateur-actions">
+            <div className="configurateur-actions-info">
+              <div className="configurateur-acompte-info">
+                <span className="configurateur-acompte-label">Acompte à régler maintenant :</span>
+                <span className="configurateur-acompte-montant">{formatPrice(acompte)}</span>
+              </div>
+              <div className="configurateur-reste-info">
+                <span className="configurateur-reste-label">À payer à la livraison :</span>
+                <span className="configurateur-reste-montant">{formatPrice(prixTotal - acompte)}</span>
+              </div>
+            </div>
+            <div className="configurateur-actions-buttons">
+              <button
+                className="configurateur-btn-acheter"
+                onClick={handleAcheter}
+                disabled={ajoutEnCours || !config.variante}
+              >
+                {ajoutEnCours ? 'Ajout en cours...' : 'Acheter'}
+              </button>
+              <button
+                className="configurateur-btn-contact"
+                onClick={() => navigate('/demande-contact', {
+                  state: {
+                    vehiculeId: config.variante?._id,
+                    typeVehicule: 'neuf',
+                  },
+                })}
+              >
+                Nous contacter
+              </button>
+              {showLoginPrompt && (
+                <LoginPromptModal
+                  onClose={() => setShowLoginPrompt(false)}
+                  onLogin={() => navigate('/login', { state: { from: location.pathname } })}
+                  initialPath={location.pathname}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

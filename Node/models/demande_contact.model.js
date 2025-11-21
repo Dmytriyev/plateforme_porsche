@@ -34,16 +34,16 @@ const demandeContactSchema = new mongoose.Schema(
     },
     vehicule_id: {
       type: mongoose.Schema.Types.ObjectId,
-      refPath: 'type_vehicule_model',
+      refPath: "type_vehicule_model",
     },
     type_vehicule: {
       type: String,
-      enum: ['occasion', 'neuf', 'autre'],
-      default: 'autre',
+      enum: ["occasion", "neuf", "autre"],
+      default: "autre",
     },
     type_vehicule_model: {
       type: String,
-      enum: ['Model_porsche', 'Voiture', null],
+      enum: ["Model_porsche", "Voiture", null],
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -51,9 +51,17 @@ const demandeContactSchema = new mongoose.Schema(
     },
     statut: {
       type: String,
-      enum: ['nouvelle', 'en_cours', 'traitee', 'fermee'],
-      default: 'nouvelle',
+      enum: ["nouvelle", "en_cours", "traitee", "fermee"],
+      default: "nouvelle",
     },
+    // Réponses du staff
+    reponse: [
+      {
+        date: { type: Date, default: Date.now },
+        staff_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        contenu: { type: String, maxlength: 2000 },
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -65,4 +73,3 @@ demandeContactSchema.index({ createdAt: -1 });
 demandeContactSchema.index({ user_id: 1 });
 
 export default mongoose.model("Demande_contact", demandeContactSchema);
-

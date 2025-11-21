@@ -1,51 +1,23 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
-import { Alert } from '../components/common';
-import { validateEmail } from '../utils/validation.js';
-import './Login.css';
-
+import { AuthContext } from '../context/AuthContext.jsx';
+import { Alert, Input, Button } from '../components/common';
+import { validateLoginForm, handleFormChange } from '../utils/formHelpers.js';
+import '../css/Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useContext(AuthContext);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
-  };
+  const handleChange = handleFormChange(setFormData, setErrors);
 
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = 'L\'email est requis';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email invalide';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Le mot de passe est requis';
-    }
-
+    const newErrors = validateLoginForm(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -64,11 +36,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
-        // Utiliser replace pour éviter les problèmes de cache du navigateur
-        // et un petit délai pour s'assurer que le contexte est mis à jour
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 100);
+        navigate('/', { replace: true });
       } else {
         setErrorMessage(result.error || 'Erreur de connexion');
         setLoading(false);
@@ -83,79 +51,53 @@ const Login = () => {
     <div className="login-container-porsche">
       <div className="login-form-wrapper-porsche">
         <div className="login-form-card-porsche">
-          {/* Titre */}
           <h1 className="login-title-porsche">Connexion</h1>
 
-          {/* Message d'erreur */}
           {errorMessage && (
             <div className="login-error-porsche">
               <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
             </div>
           )}
 
-          {/* Formulaire */}
           <form onSubmit={handleSubmit} className="login-form-porsche">
-            {/* Champ Email */}
-            <div className="login-field-porsche">
-              <label htmlFor="email" className="login-label-porsche">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="email@gmail.com"
-                className={`login-input-porsche ${errors.email ? 'error' : ''}`}
-                autoComplete="email"
-                required
-              />
-              {errors.email && (
-                <span className="login-field-error-porsche">{errors.email}</span>
-              )}
-            </div>
+            <Input
+              label="Email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="email@gmail.com"
+              error={errors.email}
+              autoComplete="email"
+              required
+            />
 
-            {/* Champ Password */}
-            <div className="login-field-porsche">
-              <label htmlFor="password" className="login-label-porsche">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Mot de passe"
-                className={`login-input-porsche ${errors.password ? 'error' : ''}`}
-                autoComplete="current-password"
-                required
-              />
-              {errors.password && (
-                <span className="login-field-error-porsche">{errors.password}</span>
-              )}
-            </div>
+            <Input
+              label="Mot de passe"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Mot de passe"
+              error={errors.password}
+              autoComplete="current-password"
+              required
+            />
 
-            {/* Bouton Se connecter */}
-            <button
+            <Button
               type="submit"
-              className="login-btn-primary-porsche"
+              variant="primary"
+              fullWidth
               disabled={loading}
             >
               {loading ? 'Connexion...' : 'Se connecter'}
-            </button>
+            </Button>
 
-            {/* Séparateur */}
             <div className="login-separator-porsche">
               <span className="login-separator-text-porsche">Ou</span>
             </div>
 
-            {/* Bouton Créer un compte */}
-            <Link
-              to="/register"
-              className="login-btn-secondary-porsche"
-            >
+            <Link to="/register" className="login-btn-secondary-porsche">
               Créer un compte
             </Link>
           </form>

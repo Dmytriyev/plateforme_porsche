@@ -1,91 +1,58 @@
 import { Component } from 'react';
 import { Button } from './common';
-import logger from '../utils/logger';
-import './ErrorBoundary.css';
+import '../css/ErrorBoundary.css';
 
 class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
-  }
+  state = { hasError: false, error: null };
 
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    this.setState({
-      error,
-      errorInfo,
-    });
-
+    this.setState({ error });
     if (import.meta.env.DEV) {
-      // Log error in dev for easier debugging
-      logger.error('ErrorBoundary caught error:', error, errorInfo);
+      console.error('ErrorBoundary:', error, errorInfo);
     }
   }
 
-  handleReload = () => {
-    window.location.reload();
-  };
-
-  handleGoHome = () => {
-    window.location.href = '/';
-  };
+  handleReload = () => window.location.reload();
+  handleHome = () => window.location.href = '/';
 
   render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-boundary-container">
-          <div className="error-boundary-content">
-            <div>
-              <div className="error-boundary-icon" aria-hidden="true" />
-              <h1 className="error-boundary-title">Oups !</h1>
-              <p className="error-boundary-message">
-                Une erreur inattendue s'est produite
-              </p>
+    if (!this.state.hasError) return this.props.children;
 
-              {import.meta.env.DEV && this.state.error && (
-                <details className="error-boundary-details">
-                  <summary>
-                    Détails de l'erreur (dev only)
-                  </summary>
-                  <div className="error-details-box">
-                    <p className="error-message">
-                      {this.state.error.toString()}
-                    </p>
-                    {this.state.errorInfo && (
-                      <pre className="error-stack">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    )}
-                  </div>
-                </details>
-              )}
-            </div>
+    const { error } = this.state;
 
-            <div className="error-boundary-buttons">
-              <Button onClick={this.handleReload} variant="primary">
-                Recharger la page
-              </Button>
-              <Button onClick={this.handleGoHome} variant="secondary">
-                Retour à l'accueil
-              </Button>
-            </div>
+    return (
+      <div className="error-boundary-container">
+        <div className="error-boundary-content">
+          <div>
+            <div className="error-boundary-icon" aria-hidden="true" />
+            <h1 className="error-boundary-title">Oups !</h1>
+            <p className="error-boundary-message">Une erreur inattendue s'est produite</p>
 
-            <p className="error-boundary-footer">
-              Si le problème persiste, contactez le support
-            </p>
+            {import.meta.env.DEV && error && (
+              <details className="error-boundary-details">
+                <summary>Détails de l'erreur</summary>
+                <pre className="error-stack">{error.toString()}</pre>
+              </details>
+            )}
           </div>
-        </div>
-      );
-    }
 
-    return this.props.children;
+          <div className="error-boundary-buttons">
+            <Button onClick={this.handleReload} variant="primary">
+              Recharger la page
+            </Button>
+            <Button onClick={this.handleHome} variant="secondary">
+              Retour à l'accueil
+            </Button>
+          </div>
+
+          <p className="error-boundary-footer">Si le problème persiste, contactez le support</p>
+        </div>
+      </div>
+    );
   }
 }
 

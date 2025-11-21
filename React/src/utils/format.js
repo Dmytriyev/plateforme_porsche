@@ -1,84 +1,45 @@
-/**
- * Utilitaires de formatage
- */
+const priceFormatter = new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
 
-/**
- * Formater un prix en euros
- * @param {number} prix - Prix à formater
- * @returns {string} Prix formaté
- */
-export const formatPrice = (prix) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(prix);
-};
+const priceMonthlyFormatter = new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
-/**
- * Formater un prix mensuel en euros avec décimales
- * @param {number} prix - Prix mensuel à formater
- * @returns {string} Prix formaté avec 2 décimales
- */
-export const formatPriceMonthly = (prix) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(prix);
-};
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
 
-/**
- * Formater une date
- * @param {string|Date} date - Date à formater
- * @returns {string} Date formatée
- */
-export const formatDate = (date) => {
-  return new Intl.DateTimeFormat('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(date));
-};
+const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
-/**
- * Formater une date avec l'heure
- * @param {string|Date} date - Date à formater
- * @returns {string} Date et heure formatées
- */
-export const formatDateTime = (date) => {
-  return new Intl.DateTimeFormat('fr-FR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
-};
+const numberFormatter = new Intl.NumberFormat("fr-FR");
 
-/**
- * Formater un kilométrage
- * @param {number} km - Kilométrage
- * @returns {string} Kilométrage formaté
- */
-export const formatKilometrage = (km) => {
-  return new Intl.NumberFormat('fr-FR').format(km) + ' km';
-};
+export const formatPrice = (prix) => priceFormatter.format(prix);
+export const formatPriceMonthly = (prix) => priceMonthlyFormatter.format(prix);
+export const formatDate = (date) => dateFormatter.format(new Date(date));
+export const formatDateTime = (date) =>
+  dateTimeFormatter.format(new Date(date));
+export const formatKilometrage = (km) => `${numberFormatter.format(km)} km`;
 
-/**
- * Formater un numéro de téléphone français
- * @param {string} tel - Numéro de téléphone
- * @returns {string} Téléphone formaté
- */
 export const formatTelephone = (tel) => {
-  if (!tel) return '';
-  const cleaned = tel.replace(/\D/g, '');
+  if (!tel) return "";
+  const cleaned = tel.replace(/\D/g, "");
   const match = cleaned.match(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/);
-  if (match) {
-    return `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}`;
-  }
-  return tel;
+  return match
+    ? `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}`
+    : tel;
 };
-

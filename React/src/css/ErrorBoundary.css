@@ -1,0 +1,5 @@
+@media (min-width: 640px) {
+  .error-boundary-buttons {
+    flex-direction: row;
+  }
+}

@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { maVoitureService } from '../services';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { Loading, Alert } from '../components/common';
-import { API_URL } from '../config/api.jsx';
+import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
-import './MesVoitures.css';
+import '../css/MesVoitures.css';
 
 
 const MesVoitures = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   const [voitures, setVoitures] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -9,7 +9,7 @@ const demandeContactCreate = joi.object({
   telephone: joi.string().required().max(20).min(10),
   message: joi.string().max(2000),
   vehicule_id: mongoIdSchema(),
-  type_vehicule: joi.string().valid('occasion', 'neuf', 'autre'),
+  type_vehicule: joi.string().valid("occasion", "neuf"),
   user_id: mongoIdSchema(),
 });
 
@@ -18,4 +18,3 @@ export default function demandeContactValidation(body) {
     demandeContactCreate: demandeContactCreate.validate(body),
   };
 }
-

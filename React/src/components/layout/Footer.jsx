@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import './Footer.css';
+import '../../css/Footer.css';
 
 /**
  * Composant Footer - Pied de page
@@ -24,7 +24,7 @@ const Footer = () => {
             <h4 className="footer-section-title">Navigation</h4>
             <ul className="footer-list">
               <li>
-                <Link to="/voitures" className="footer-link">
+                <Link to="/choix-voiture" className="footer-link">
                   Voitures
                 </Link>
               </li>

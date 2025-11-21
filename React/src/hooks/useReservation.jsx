@@ -1,12 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { sanitizeObject } from '../utils/sanitize';
 
-// Hook simple pour gérer la création et le suivi d'une réservation côté client.
-// Attention: le backend doit exposer les endpoints suivants :
-// POST /api/reservations  -> { reservationToken, clientSecret, amount, expiresAt }
-// GET  /api/reservations/:token
-// POST /api/reservations/:token/cancel
-
 export default function useReservation() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -76,7 +70,6 @@ export default function useReservation() {
         }
     }, []);
 
-    // Poll the reservation status until it is completed/failed/expired.
     const pollReservationStatus = useCallback((token, { interval = 3000, stopWhen } = {}) => {
         if (!token) return;
         if (pollRef.current) clearInterval(pollRef.current);
@@ -84,13 +77,12 @@ export default function useReservation() {
             try {
                 const data = await getReservation(token);
                 const status = data?.status;
-                if (stopWhen ? stopWhen(status) : ['completed', 'failed', 'expired', 'cancelled'].includes(status)) {
+                const shouldStop = stopWhen ? stopWhen(status) : ['completed', 'failed', 'expired', 'cancelled'].includes(status);
+                if (shouldStop) {
                     clearInterval(pollRef.current);
                     pollRef.current = null;
                 }
-            } catch (e) {
-                // ignore transient errors during polling
-            }
+            } catch { }
         }, interval);
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);

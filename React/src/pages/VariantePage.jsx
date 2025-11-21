@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
 import { Loading, Alert, Button } from '../components/common';
-import logger from '../utils/logger';
 import { formatPrice } from '../utils/format.js';
-import './VariantePage.css';
-import { API_URL } from '../config/api.jsx';
+import '../css/VariantePage.css';
+import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
-
 
 const VariantePage = () => {
   const { id } = useParams();
@@ -39,7 +37,6 @@ const VariantePage = () => {
               }
             }
           } catch (err) {
-            logger.warn('VariantePage: failed to fetch voiture page', err);
           }
         }
       } catch (err) {
@@ -82,29 +79,28 @@ const VariantePage = () => {
 
   const { variante, voiture_base, specifications, options: _options, photos, prix, type } = pageData;
 
-  /**
-   * Convertir la puissance en kW
-   * 
-   * EXPLICATION POUR ÉTUDIANT:
-   * ==========================
-   * 1 PS (Pferdestärke) = 0.7355 kW
-   * Donc pour convertir ch (chevaux) en kW:
-   * kW = ch * 0.7355
-   */
-  const formatPower = (puissance) => {
-    if (!puissance) return { ch: 0, kw: 0 };
-    const kw = Math.round(puissance * 0.7355);
-    return { ch: puissance, kw };
-  };
-
-  const powerInfo = formatPower(specifications?.puissance);
-
-  /**
-   * Navigation vers la configuration
-   */
   const handleConfigurer = () => {
-    if (type === 'neuf' && voiture_base?._id) {
-      navigate(`/configurateur/${voiture_base._id}`);
+    if (type === 'neuf' && variante?._id && voiture_base?._id) {
+      const targetUrl = `/configurateur/${voiture_base._id}/${variante._id}`;
+
+      if (import.meta.env.DEV) {
+        console.log('[VariantePage] Navigation vers configurateur:', {
+          voitureId: voiture_base._id,
+          varianteId: variante._id,
+          url: targetUrl
+        });
+      }
+
+      navigate(targetUrl);
+    } else {
+      if (import.meta.env.DEV) {
+        console.error('[VariantePage] Données manquantes pour configurer:', {
+          type,
+          varianteId: variante?._id,
+          voitureId: voiture_base?._id
+        });
+      }
+      setError('Impossible de configurer cette variante. Données manquantes.');
     }
   };
 
@@ -152,13 +148,17 @@ const VariantePage = () => {
           >
             Configurer
           </button>
-          <button
-            className="variante-nav-link"
-            onClick={handleAcheter}
-          >
-            Acheter des voitures neuves et d'occasion
-          </button>
-          <button className="variante-nav-link">Comparer</button>
+          {type !== 'neuf' && (
+            <button
+              className="variante-nav-link"
+              onClick={handleAcheter}
+            >
+              Acheter des voitures neuves et d'occasion
+            </button>
+          )}
+          {type !== 'neuf' && (
+            <button className="variante-nav-link">Comparer</button>
+          )}
         </div>
       </nav>
 
@@ -183,14 +183,14 @@ const VariantePage = () => {
             {carrosseriesNav.map((carrosserie) => (
               <button
                 key={carrosserie}
-                className={`variante-carrosserie-nav-item-porsche ${selectedCarrosserie === carrosserie ? 'active' : ''
-                  }`}
+                className={`variante-carrosserie-nav-item-porsche ${selectedCarrosserie === carrosserie ? 'active' : ''}`}
                 onClick={() => setSelectedCarrosserie(carrosserie)}
               >
                 {carrosserie}
               </button>
             ))}
           </nav>
+
         )}
 
         {/* Informations variante */}
@@ -224,10 +224,10 @@ const VariantePage = () => {
               {specifications.puissance > 0 && (
                 <div className="variante-performance-item-porsche">
                   <div className="variante-performance-value-porsche">
-                    {powerInfo.kw} kW / {powerInfo.ch} ch
+                    {specifications.puissance} ch
                   </div>
                   <div className="variante-performance-label-porsche">
-                    Puissance (kW)/Puissance (ch)
+                    Puissance
                   </div>
                 </div>
               )}
@@ -244,9 +244,11 @@ const VariantePage = () => {
             </div>
           )}
 
-          <button className="variante-technical-details-btn-porsche">
-            Tous les détails techniques
-          </button>
+          {type !== 'neuf' && (
+            <button className="variante-technical-details-btn-porsche">
+              Tous les détails techniques
+            </button>
+          )}
         </div>
 
         {/* Colonne droite: Image secondaire */}
@@ -290,12 +292,14 @@ const VariantePage = () => {
         >
           Configurer
         </button>
-        <button
-          className="variante-action-btn-porsche variante-action-btn-white"
-          onClick={handleAcheter}
-        >
-          Acheter des voitures neuves et d'occasion
-        </button>
+        {type !== 'neuf' && (
+          <button
+            className="variante-action-btn-porsche variante-action-btn-white"
+            onClick={handleAcheter}
+          >
+            Acheter des voitures neuves et d'occasion
+          </button>
+        )}
       </div>
     </div>
   );

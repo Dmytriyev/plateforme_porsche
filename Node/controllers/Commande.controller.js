@@ -494,6 +494,310 @@ const modifierQuantitePanier = async (req, res) => {
   }
 };
 
+// ==================== FONCTIONS STAFF ====================
+
+/**
+ * Mettre à jour le paiement d'une commande (staff uniquement)
+ */
+const mettreAJourPaiement = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+    const { montant_paye, type_paiement, date_livraison, notes } = req.body;
+
+    const commande = await Commande.findById(id).populate(
+      "user",
+      "nom prenom email"
+    );
+
+    if (!commande) {
+      return sendNotFound(res, "Commande");
+    }
+
+    // Vérifier que la commande est validée
+    if (!commande.status) {
+      return sendError(
+        res,
+        "Cette commande n'est pas encore validée (toujours dans le panier)",
+        400
+      );
+    }
+
+    let message = "";
+
+    // Gérer le paiement
+    if (montant_paye !== undefined) {
+      if (montant_paye <= 0) {
+        return sendValidationError(
+          res,
+          "Le montant payé doit être supérieur à 0"
+        );
+      }
+
+      // Vérifier qu'on ne dépasse pas le montant total
+      const montantRestant = commande.prix - commande.acompte;
+      if (montant_paye > montantRestant) {
+        return sendValidationError(
+          res,
+          `Le montant payé ne peut pas dépasser le montant restant (${montantRestant}€)`
+        );
+      }
+
+      commande.acompte += montant_paye;
+
+      if (type_paiement === "acompte") {
+        message = `Acompte de ${montant_paye}€ enregistré pour la commande`;
+      } else if (type_paiement === "total") {
+        message = `Paiement de ${montant_paye}€ enregistré. `;
+        if (commande.acompte >= commande.prix) {
+          message += "Commande entièrement payée.";
+        } else {
+          message += `Reste à payer: ${commande.prix - commande.acompte}€`;
+        }
+      }
+    }
+
+    // Gérer la date de livraison
+    if (date_livraison) {
+      const dateObj = new Date(date_livraison);
+      if (isNaN(dateObj.getTime())) {
+        return sendValidationError(res, "Date de livraison invalide");
+      }
+
+      // Vérifier que la date n'est pas dans le passé
+      if (dateObj < new Date()) {
+        return sendValidationError(
+          res,
+          "La date de livraison ne peut pas être dans le passé"
+        );
+      }
+
+      commande.date_livraison = dateObj;
+      message += ` Date de livraison prévue: ${dateObj.toLocaleDateString(
+        "fr-FR"
+      )}`;
+    }
+
+    // Ajouter des notes si fournies
+    if (notes) {
+      if (!commande.notes) {
+        commande.notes = [];
+      }
+      commande.notes.push({
+        date: new Date(),
+        staff: req.user.id,
+        contenu: notes,
+      });
+    }
+
+    await commande.save();
+
+    // Récupérer la commande complète
+    const commandeComplete = await Commande.findById(id).populate(
+      "user",
+      "nom prenom email telephone"
+    );
+
+    return sendSuccess(
+      res,
+      {
+        commande: commandeComplete,
+        message,
+      },
+      "Paiement mis à jour avec succès"
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Récupérer le détail d'une commande avec les lignes (staff)
+ */
+const getDetailCommande = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+
+    const commande = await Commande.findById(id).populate(
+      "user",
+      "nom prenom email telephone"
+    );
+
+    if (!commande) {
+      return sendNotFound(res, "Commande");
+    }
+
+    // Récupérer les lignes de commande
+    const lignes = await LigneCommande.find({ commande: id })
+      .populate("voiture", "nom_model type_voiture prix")
+      .populate("accesoire", "nom_accesoire prix type_accesoire")
+      .populate("model_porsche_id", "nom_model type_carrosserie");
+
+    const montantPaye = commande.acompte;
+    const montantRestant = commande.prix - montantPaye;
+    const pourcentagePaye = ((montantPaye / commande.prix) * 100).toFixed(2);
+
+    return sendSuccess(res, {
+      commande,
+      lignes,
+      paiement: {
+        total: commande.prix,
+        paye: montantPaye,
+        restant: montantRestant,
+        pourcentage: pourcentagePaye,
+        entierementPaye: montantRestant <= 0,
+      },
+    });
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Récupérer toutes les commandes avec filtres (staff)
+ */
+const getCommandesAvecFiltres = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { status, dateDebut, dateFin, paiement } = req.query;
+
+    const filter = {};
+
+    // Filtrer par status
+    if (status !== undefined) {
+      filter.status = status === "true";
+    }
+
+    // Filtrer par date
+    if (dateDebut || dateFin) {
+      filter.date_commande = {};
+      if (dateDebut) {
+        filter.date_commande.$gte = new Date(dateDebut);
+      }
+      if (dateFin) {
+        filter.date_commande.$lte = new Date(dateFin);
+      }
+    }
+
+    const commandes = await Commande.find(filter)
+      .populate("user", "nom prenom email telephone")
+      .sort({ date_commande: -1 })
+      .limit(100);
+
+    // Filtrer par statut de paiement si demandé
+    let commandesFiltrees = commandes;
+    if (paiement === "complet") {
+      commandesFiltrees = commandes.filter((c) => c.acompte >= c.prix);
+    } else if (paiement === "partiel") {
+      commandesFiltrees = commandes.filter(
+        (c) => c.acompte > 0 && c.acompte < c.prix
+      );
+    } else if (paiement === "aucun") {
+      commandesFiltrees = commandes.filter((c) => c.acompte === 0);
+    }
+
+    return sendSuccess(res, {
+      commandes: commandesFiltrees,
+      total: commandesFiltrees.length,
+    });
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Marquer une commande comme livrée (staff)
+ */
+const marquerCommeLivree = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+
+    const commande = await Commande.findById(id).populate(
+      "user",
+      "nom prenom email"
+    );
+
+    if (!commande) {
+      return sendNotFound(res, "Commande");
+    }
+
+    // Vérifier que la commande est payée
+    if (commande.acompte < commande.prix) {
+      return sendError(
+        res,
+        "La commande n'est pas entièrement payée. Impossible de marquer comme livrée.",
+        400
+      );
+    }
+
+    commande.statut_livraison = "livree";
+    commande.date_livraison_effective = new Date();
+    await commande.save();
+
+    return sendSuccess(
+      res,
+      commande,
+      "Commande marquée comme livrée avec succès"
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
 export {
   createCommande,
   getAllCommandes,
@@ -507,4 +811,9 @@ export {
   ajouterConfigurationAuPanier,
   supprimerLignePanier,
   modifierQuantitePanier,
+  // Fonctions staff
+  mettreAJourPaiement,
+  getDetailCommande,
+  getCommandesAvecFiltres,
+  marquerCommeLivree,
 };

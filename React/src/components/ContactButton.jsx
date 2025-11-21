@@ -1,14 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import './ContactButton.css';
+import '../css/ContactButton.css';
 
-/**
- * Bouton de contact réutilisable
- * @param {Object} props
- * @param {string} props.vehiculeId - ID du véhicule concerné
- * @param {string} props.typeVehicule - Type de véhicule ('occasion', 'neuf', etc.)
- * @param {string} props.className - Classes CSS supplémentaires
- * @param {string} props.variant - Variante du bouton ('primary', 'secondary', 'outline')
- */
 const ContactButton = ({ vehiculeId, typeVehicule = 'occasion', className = '', variant = 'primary' }) => {
   const navigate = useNavigate();
 

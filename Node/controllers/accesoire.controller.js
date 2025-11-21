@@ -360,10 +360,226 @@ const getAccesoiresByCriteria = async (req, res) => {
 const getAvailableTypesAccesoireOptions = async (req, res) => {
   try {
     const types = getAvailableTypesAccesoire();
+    return sendSuccess(res, types, "Types d'accesoires récupérés avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+// ==================== FONCTIONS STAFF ====================
+
+/**
+ * Ajouter un accessoire (staff uniquement)
+ */
+const ajouterAccessoire = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { body } = req;
+
+    if (!body || Object.keys(body).length === 0) {
+      return sendValidationError(res, "Pas de données dans la requête");
+    }
+    if (!body.type_accesoire) {
+      return sendValidationError(res, "Le type d'accessoire est requis");
+    }
+    if (!body.nom_accesoire) {
+      return sendValidationError(res, "Le nom de l'accessoire est requis");
+    }
+    if (!body.description) {
+      return sendValidationError(res, "La description est requise");
+    }
+    if (!body.prix || body.prix <= 0) {
+      return sendValidationError(res, "Le prix doit être supérieur à 0");
+    }
+
+    // Créer l'accessoire
+    const accessoire = await new Accesoire({
+      type_accesoire: body.type_accesoire,
+      nom_accesoire: body.nom_accesoire,
+      description: body.description,
+      prix: body.prix,
+      couleur_accesoire: body.couleur_accesoire,
+      photo_accesoire: body.photos || [],
+    }).save();
+
+    // Populer les données complètes
+    const accessoireComplet = await Accesoire.findById(accessoire._id)
+      .populate("couleur_accesoire")
+      .populate("photo_accesoire");
+
     return sendSuccess(
       res,
-      types,
-      "Types d'accesoires récupérés avec succès"
+      accessoireComplet,
+      "Accessoire ajouté avec succès",
+      201
+    );
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Supprimer un accessoire (staff uniquement)
+ */
+const supprimerAccessoire = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+
+    const accessoire = await Accesoire.findById(id);
+
+    if (!accessoire) {
+      return sendNotFound(res, "Accessoire");
+    }
+
+    // Vérifier qu'il n'y a pas de lignes de commande actives
+    const LigneCommande = (await import("../models/ligneCommande.model.js"))
+      .default;
+
+    // Trouver les commandes actives (panier) avec cet accessoire
+    const lignesActives = await LigneCommande.find({
+      accesoire: id,
+    }).populate("commande");
+
+    const paniers = lignesActives.filter(
+      (ligne) => ligne.commande && ligne.commande.status === false
+    );
+
+    if (paniers.length > 0) {
+      return sendError(
+        res,
+        "Impossible de supprimer cet accessoire, il est dans des paniers actifs",
+        400
+      );
+    }
+
+    // Supprimer l'accessoire
+    await Accesoire.findByIdAndDelete(id);
+
+    return sendSuccess(res, { id }, "Accessoire supprimé avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Récupérer tous les accessoires (staff)
+ */
+const getAccessoires = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const accessoires = await Accesoire.find()
+      .populate("couleur_accesoire")
+      .populate("photo_accesoire")
+      .sort({ createdAt: -1 });
+
+    return sendSuccess(res, {
+      accessoires,
+      total: accessoires.length,
+    });
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Mettre à jour un accessoire (staff uniquement)
+ */
+const modifierAccessoire = async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est staff
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const staffRoles = ["admin", "responsable", "conseillere"];
+    if (!req.user.isAdmin && !staffRoles.includes(req.user.role)) {
+      return sendError(
+        res,
+        "Accès refusé. Vous devez être membre du staff.",
+        403
+      );
+    }
+
+    const { id } = req.params;
+    const { body } = req;
+
+    if (!body || Object.keys(body).length === 0) {
+      return sendValidationError(res, "Pas de données dans la requête");
+    }
+
+    const accessoire = await Accesoire.findById(id);
+
+    if (!accessoire) {
+      return sendNotFound(res, "Accessoire");
+    }
+
+    // Mettre à jour les champs autorisés
+    const champsAutorisés = [
+      "type_accesoire",
+      "nom_accesoire",
+      "description",
+      "prix",
+      "couleur_accesoire",
+      "photo_accesoire",
+    ];
+
+    champsAutorisés.forEach((champ) => {
+      if (body[champ] !== undefined) {
+        accessoire[champ] = body[champ];
+      }
+    });
+
+    await accessoire.save();
+
+    // Populer les données complètes
+    const accessoireComplet = await Accesoire.findById(id)
+      .populate("couleur_accesoire")
+      .populate("photo_accesoire");
+
+    return sendSuccess(
+      res,
+      accessoireComplet,
+      "Accessoire modifié avec succès"
     );
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
@@ -382,4 +598,9 @@ export {
   removeCouleur,
   getAccesoiresByCriteria,
   getAvailableTypesAccesoireOptions,
+  // Fonctions staff
+  ajouterAccessoire,
+  supprimerAccessoire,
+  getAccessoires,
+  modifierAccessoire,
 };

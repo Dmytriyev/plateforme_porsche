@@ -1,18 +1,17 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
-import apiClient from '../config/api.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
+import apiClient from '../config/api.js';
 import { extractData } from '../services/httpHelper';
 import { Alert } from '../components/common';
-import { validateEmail, validateTelephone } from '../utils/validation.js';
-import './DemandeContact.css';
+import { validateContactForm, handleFormChange } from '../utils/formHelpers.js';
+import '../css/DemandeContact.css';
 
 const DemandeContact = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
-  // Récupérer les paramètres depuis l'état de navigation ou les query params
   const searchParams = new URLSearchParams(location.search);
   const vehiculeId = searchParams.get('vehicule') || location.state?.vehiculeId;
   const typeVehicule = searchParams.get('type') || location.state?.typeVehicule || 'occasion';
@@ -30,43 +29,10 @@ const DemandeContact = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
-  };
+  const handleChange = handleFormChange(setFormData, setErrors);
 
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.prenom.trim()) {
-      newErrors.prenom = 'Le prénom est requis';
-    }
-
-    if (!formData.nom.trim()) {
-      newErrors.nom = 'Le nom est requis';
-    }
-
-    if (!formData.email) {
-      newErrors.email = 'L\'email est requis';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email invalide';
-    }
-
-    if (!formData.telephone) {
-      newErrors.telephone = 'Le téléphone est requis';
-    } else if (!validateTelephone(formData.telephone)) {
-      newErrors.telephone = 'Numéro de téléphone invalide';
-    }
-
+    const newErrors = validateContactForm(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -119,7 +85,6 @@ const DemandeContact = () => {
   return (
     <div className="demande-contact-container">
       <div className="demande-contact-content">
-        {/* Bouton Retour */}
         <button
           className="demande-contact-back"
           onClick={() => navigate(-1)}
@@ -130,10 +95,8 @@ const DemandeContact = () => {
           Retour
         </button>
 
-        {/* Titre */}
         <h1 className="demande-contact-title">Demande d'information</h1>
 
-        {/* Messages d'erreur et de succès */}
         {errorMessage && (
           <div className="demande-contact-error">
             <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
@@ -146,9 +109,7 @@ const DemandeContact = () => {
           </div>
         )}
 
-        {/* Formulaire */}
         <form onSubmit={handleSubmit} className="demande-contact-form">
-          {/* Prénom et Nom sur la même ligne */}
           <div className="demande-contact-row">
             <div className="demande-contact-field">
               <label htmlFor="prenom" className="demande-contact-label">
@@ -191,7 +152,6 @@ const DemandeContact = () => {
             </div>
           </div>
 
-          {/* Email */}
           <div className="demande-contact-field">
             <label htmlFor="email" className="demande-contact-label">
               Email <span className="demande-contact-required">*</span>
@@ -212,7 +172,6 @@ const DemandeContact = () => {
             )}
           </div>
 
-          {/* Téléphone */}
           <div className="demande-contact-field">
             <label htmlFor="telephone" className="demande-contact-label">
               Téléphone <span className="demande-contact-required">*</span>
@@ -233,7 +192,6 @@ const DemandeContact = () => {
             )}
           </div>
 
-          {/* Message */}
           <div className="demande-contact-field">
             <label htmlFor="message" className="demande-contact-label">
               Message
@@ -252,7 +210,6 @@ const DemandeContact = () => {
             )}
           </div>
 
-          {/* Bouton Soumettre */}
           <button
             type="submit"
             className="demande-contact-submit"
@@ -261,7 +218,6 @@ const DemandeContact = () => {
             {loading ? 'Envoi en cours...' : 'Envoyer ma demande'}
           </button>
 
-          {/* Texte de confidentialité */}
           <p className="demande-contact-privacy">
             En soumettant ce formulaire, vous acceptez notre politique de confidentialité.
           </p>

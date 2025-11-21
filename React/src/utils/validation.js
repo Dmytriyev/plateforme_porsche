@@ -1,69 +1,29 @@
-/**
- * Utilitaires de validation
- */
+export const validateEmail = (email) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-/**
- * Valider un email
- * @param {string} email - Email à valider
- * @returns {boolean} true si valide
- */
-export const validateEmail = (email) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
-};
+export const validatePassword = (password) =>
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
 
-/**
- * Valider un mot de passe
- * Minimum 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre
- * @param {string} password - Mot de passe à valider
- * @returns {boolean} true si valide
- */
-export const validatePassword = (password) => {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return regex.test(password);
-};
+export const validateTelephone = (telephone) =>
+  /^0[1-9](?:[\s.-]?\d{2}){4}$/.test(telephone);
 
-/**
- * Valider un numéro de téléphone français
- * @param {string} telephone - Téléphone à valider
- * @returns {boolean} true si valide
- */
-export const validateTelephone = (telephone) => {
-  const regex = /^0[1-9](?:[\s.-]?\d{2}){4}$/;
-  return regex.test(telephone);
-};
+export const validateCodePostal = (codePostal) => /^\d{5}$/.test(codePostal);
 
-/**
- * Valider un code postal français
- * @param {string} codePostal - Code postal à valider
- * @returns {boolean} true si valide
- */
-export const validateCodePostal = (codePostal) => {
-  const regex = /^\d{5}$/;
-  return regex.test(codePostal);
-};
-
-/**
- * Obtenir les messages d'erreur pour le mot de passe
- * @param {string} password - Mot de passe à vérifier
- * @returns {string[]} Liste des erreurs
- */
 export const getPasswordErrors = (password) => {
   const errors = [];
 
   if (password.length < 8) {
-    errors.push('Le mot de passe doit contenir au moins 8 caractères');
+    errors.push("Le mot de passe doit contenir au moins 8 caractères");
   }
   if (!/[a-z]/.test(password)) {
-    errors.push('Le mot de passe doit contenir au moins une minuscule');
+    errors.push("Le mot de passe doit contenir au moins une minuscule");
   }
   if (!/[A-Z]/.test(password)) {
-    errors.push('Le mot de passe doit contenir au moins une majuscule');
+    errors.push("Le mot de passe doit contenir au moins une majuscule");
   }
   if (!/\d/.test(password)) {
-    errors.push('Le mot de passe doit contenir au moins un chiffre');
+    errors.push("Le mot de passe doit contenir au moins un chiffre");
   }
 
   return errors;
 };
-

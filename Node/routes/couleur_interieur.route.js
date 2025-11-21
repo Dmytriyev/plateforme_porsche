@@ -7,35 +7,29 @@ import {
   deleteCouleurInterieur,
   getAvailableCouleursInterieurOptions,
 } from "../controllers/couleur_interieur.controller.js";
-import { upload } from "../middlewares/multer.js";
+import optionalUpload from "../middlewares/optionalUpload.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
 
 const router = Router();
 
-// Middleware flexible pour accepter multipart/form-data
-const optionalUpload = (req, res, next) => {
-  // Si c'est multipart/form-data, utiliser multer
-  if (req.is("multipart/form-data")) {
-    return upload.single("photo")(req, res, next);
-  }
-  // Sinon, body-parser gère le JSON
-  next();
-};
-
-// Routes publiques
+// ============================================
+// ROUTES PUBLIQUES
+// ============================================
 router.get("/couleurs", getAvailableCouleursInterieurOptions);
 router.get("/all", getAllCouleurInterieur);
 router.get("/:id", validateObjectId("id"), getCouleurInterieurById);
 
-// Routes admin
+// ============================================
+// ROUTES ADMIN
+// ============================================
 router.post("/new", auth, isAdmin, optionalUpload, createCouleurInterieur);
 router.put(
   "/update/:id",
   auth,
   isAdmin,
-  validateObjectId("id"), // id couleur intérieur
+  validateObjectId("id"),
   optionalUpload,
   updateCouleurInterieur
 );

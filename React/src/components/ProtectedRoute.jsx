@@ -1,27 +1,16 @@
+import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { Loading } from './common';
-import './ProtectedRoute.css';
+import '../css/ProtectedRoute.css';
 
-/**
- * Composant ProtectedRoute - Route protégée nécessitant authentification
- * 
- * Props:
- * - children: Composant à afficher si autorisé
- * - requireRole: Rôle requis (optionnel)
- */
-const ProtectedRoute = ({ children, requireRole }) => {
-  const { loading, isAuthenticated, hasRole } = useAuth();
+const ProtectedRoute = ({ children, roles }) => {
+  const { loading, isAuthenticated, hasRole } = useContext(AuthContext);
 
-  if (loading) {
-    return <Loading fullScreen message="Vérification..." />;
-  }
+  if (loading) return <Loading fullScreen message="Vérification..." />;
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
 
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (requireRole && !hasRole(requireRole)) {
+  if (roles && !hasRole(roles)) {
     return (
       <div className="protected-route-denied">
         <div className="protected-route-content">
@@ -29,9 +18,7 @@ const ProtectedRoute = ({ children, requireRole }) => {
           <p className="protected-route-message">
             Vous n'avez pas les permissions nécessaires pour accéder à cette page.
           </p>
-          <a href="/" className="protected-route-link">
-            Retour à l'accueil
-          </a>
+          <a href="/" className="protected-route-link">Retour à l'accueil</a>
         </div>
       </div>
     );

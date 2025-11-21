@@ -1,4 +1,7 @@
-//  Autorise l'accès uniquement si l'utilisateur connecté est un admin.
+/**
+ * Middleware d'autorisation Admin
+ * Vérifie que l'utilisateur authentifié a les droits d'administrateur
+ */
 const isAdmin = (req, res, next) => {
   if (!req.user?.isAdmin) {
     return res

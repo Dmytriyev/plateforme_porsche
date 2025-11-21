@@ -1,0 +1,12 @@
+.occasion-detail-actions .contact-button {
+  width: 100%;
+  justify-content: center;
+}
+.occasion-detail-actions .contact-button-primary {
+  background-color: #000;
+  color: #fff;
+  border-radius: 0.375rem;
+}
+.occasion-detail-actions .contact-button-primary:hover {
+  background-color: #1f2937;
+}

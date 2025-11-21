@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import accesoireService from '../services/accesoire.service.jsx';
-import { usePanier } from '../hooks/usePanier.jsx';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import accesoireService from '../services/accesoire.service.js';
+import { PanierContext } from '../context/PanierContext.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 import { Loading, Alert } from '../components/common';
-import { /* formatPrice */ } from '../utils/format.js';
+import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import buildUrl from '../utils/buildUrl';
-import './Accessoires.css';
+import '../css/Accessoires.css';
 
-/**
- * Page catalogue des accessoires avec images et filtres
- */
 const Accessoires = () => {
   const navigate = useNavigate();
   const [accessoires, setAccessoires] = useState([]);
@@ -18,7 +16,10 @@ const Accessoires = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [filtreType, setFiltreType] = useState('tous');
   const [wishlist, setWishlist] = useState(new Set());
-  const { ajouterAccessoire } = usePanier();
+  const { ajouterAccessoire } = useContext(PanierContext);
+  const { isAuthenticated } = useContext(AuthContext);
+  const location = useLocation();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     fetchAccessoires();
@@ -45,6 +46,11 @@ const Accessoires = () => {
   };
 
   const handleAjouterAuPanier = (accessoire) => {
+    if (!isAuthenticated()) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     ajouterAccessoire(accessoire, 1);
     setSuccessMessage(`${accessoire.nom_accesoire} ajouté au panier`);
     setTimeout(() => setSuccessMessage(''), 3000);
@@ -66,14 +72,10 @@ const Accessoires = () => {
   const handleVoirDetails = (accessoireId) => {
     navigate(`/accessoires/detail/${accessoireId}`);
   };
+  const accessoiresFiltres = accessoires.filter((acc) =>
+    filtreType === 'tous' || acc.type_accesoire === filtreType
+  );
 
-  // Filtrer les accessoires
-  const accessoiresFiltres = accessoires.filter((acc) => {
-    if (filtreType === 'tous') return true;
-    return acc.type_accesoire === filtreType;
-  });
-
-  // Types disponibles
   const types = ['tous', ...new Set(accessoires.map(a => a.type_accesoire).filter(Boolean))];
 
   if (loading) return <Loading fullScreen message="Chargement des accessoires..." />;
@@ -89,7 +91,6 @@ const Accessoires = () => {
   return (
     <div className="accessoires-container">
       <div className="accessoires-content">
-        {/* En-tête */}
         <div className="accessoires-header">
           <div>
             <h1 className="accessoires-title">Accessoires Porsche</h1>
@@ -99,14 +100,23 @@ const Accessoires = () => {
           </div>
         </div>
 
-        {/* Message de succès */}
         {successMessage && (
           <Alert variant="success" onClose={() => setSuccessMessage('')}>
             {successMessage}
           </Alert>
         )}
 
-        {/* Filtres par type */}
+        {showLoginPrompt && (
+          <LoginPromptModal
+            onClose={() => setShowLoginPrompt(false)}
+            onLogin={() => navigate('/login', { state: { from: location.pathname } })}
+            title="Connexion requise"
+            message="Vous devez être connecté pour ajouter un accessoire au panier. Connectez‑vous ou créez un compte pour continuer."
+            primaryText="Se connecter / Créer un compte"
+            secondaryText="Annuler"
+          />
+        )}
+
         {types.length > 1 && (
           <div className="accessoires-filtres">
             {types.map((type) => (
@@ -121,12 +131,10 @@ const Accessoires = () => {
           </div>
         )}
 
-        {/* Compteur */}
         <div className="accessoires-count">
           <p>{accessoiresFiltres.length} accessoire{accessoiresFiltres.length > 1 ? 's' : ''}</p>
         </div>
 
-        {/* Liste des accessoires */}
         {accessoiresFiltres.length === 0 ? (
           <div className="accessoires-empty">
             <svg className="accessoires-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,23 +147,14 @@ const Accessoires = () => {
         ) : (
           <div className="accessoires-grid-porsche">
             {accessoiresFiltres.map((accessoire) => {
-              const photoPrincipale = accessoire.photo_accesoire && accessoire.photo_accesoire.length > 0
-                ? accessoire.photo_accesoire[0]
-                : null;
-              const photoUrl = photoPrincipale?.name?.startsWith('http')
-                ? buildUrl(photoPrincipale.name)
-                : photoPrincipale?.name?.startsWith('/')
-                  ? buildUrl(photoPrincipale.name)
-                  : photoPrincipale?.name
-                    ? buildUrl(photoPrincipale.name)
-                    : null;
+              const photoPrincipale = accessoire.photo_accesoire?.[0] || null;
+              const photoUrl = photoPrincipale?.name ? buildUrl(photoPrincipale.name) : null;
               const isWishlisted = wishlist.has(accessoire._id);
               const isOutOfStock = accessoire.stock === 0 || accessoire.disponible === false;
               const hasDiscount = accessoire.prix_promotion && accessoire.prix_promotion < accessoire.prix;
 
               return (
                 <div key={accessoire._id} className="accessoire-card-porsche" data-accessoire-id={accessoire._id}>
-                  {/* Image Container */}
                   <div className="accessoire-card-image-container">
                     {isOutOfStock && (
                       <div className="accessoire-card-out-of-stock">
@@ -190,7 +189,6 @@ const Accessoires = () => {
                         {accessoire.nom_accesoire?.charAt(0) || '?'}
                       </span>
                     </div>
-                    {/* Wishlist Icon */}
                     <button
                       className={`accessoire-card-wishlist ${isWishlisted ? 'active' : ''}`}
                       onClick={(e) => handleToggleWishlist(accessoire._id, e)}
@@ -202,17 +200,13 @@ const Accessoires = () => {
                     </button>
                   </div>
 
-                  {/* Content */}
                   <div className="accessoire-card-content">
-                    {/* Brand */}
                     <div className="accessoire-card-brand">PORSCHE DESIGN</div>
 
-                    {/* Name */}
                     <h3 className="accessoire-card-name">
                       {accessoire.nom_accesoire}
                     </h3>
 
-                    {/* Price */}
                     <div className="accessoire-card-price">
                       {hasDiscount ? (
                         <>
@@ -230,7 +224,6 @@ const Accessoires = () => {
                       )}
                     </div>
 
-                    {/* Buttons */}
                     <div className="accessoire-card-actions">
                       <button
                         className="accessoire-card-btn accessoire-card-btn-primary"
