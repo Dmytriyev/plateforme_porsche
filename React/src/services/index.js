@@ -5,6 +5,4 @@ export { default as accesoireService } from "./accesoire.service.js";
 export { default as personnalisationService } from "./personnalisation.service.js";
 export { default as commandeService } from "./commande.service.js";
 export { default as maVoitureService } from "./ma_voiture.service.js";
-export { default as dashboardService } from "./dashboard.service.js";
-export { default as staffService } from "./staff.service.js";
 export { default as tokenService } from "./token.service.js";

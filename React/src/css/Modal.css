@@ -1,21 +1,69 @@
-.modal-container-small {
-  max-width: 480px;
+/* Modal message styling */
+.modal-message-porsche {
+  margin: 0 0 2rem 0;
+  color: #000;
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
-.login-btn-primary.configurateur-btn-acheter,
-.configurateur-btn-acheter.login-btn-primary {
-  background: var(--color-black);
+
+/* Modal footer styling */
+.modal-footer-porsche {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Primary button */
+.modal-btn-primary-porsche {
+  background-color: #000;
   color: #fff;
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.configurateur-btn-acheter.login-btn-primary:hover:not(:disabled) {
-  background: #111827;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+
+.modal-btn-primary-porsche:hover:not(:disabled) {
+  background-color: #333;
 }
-.login-btn-secondary {
-  flex: 0 0 140px;
-  padding: 10px 14px;
-  font-size: 14px;
+
+.modal-btn-primary-porsche:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
+.modal-btn-secondary-porsche {
+  background-color: #fff;
+  color: #000;
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-btn-secondary-porsche:hover {
+  border-color: #000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .modal-footer-porsche {
+    flex-direction: column;
+  }
+
+  .modal-btn-primary-porsche,
+  .modal-btn-secondary-porsche {
+    width: 100%;
+  }
 }
 .modal-body {
   padding: 24px;

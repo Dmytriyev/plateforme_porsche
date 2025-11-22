@@ -137,7 +137,7 @@
   width: 80px;
   height: 80px;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 50%;
   overflow: hidden;
   background: #fff;
   display: flex;
@@ -328,12 +328,12 @@
 }
 
 .configurateur-btn-acheter {
-  background-color: #000;
+  background-color: #d5001c;
   color: #fff;
 }
 
 .configurateur-btn-acheter:hover:not(:disabled) {
-  background-color: #1f2937;
+  background-color: #b00016;
 }
 
 .configurateur-btn-acheter:disabled {
@@ -590,7 +590,7 @@
 .configurateur-color-item-swatch {
   width: 60px;
   height: 60px;
-  border-radius: 4px;
+  border-radius: 50%;
   border: 1px solid #ddd;
   flex-shrink: 0;
   object-fit: cover;

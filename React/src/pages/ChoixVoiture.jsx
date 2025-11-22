@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import '../css/CatalogueModeles.css';
 import '../css/ChoixVoiture.css';
 
 const ChoixVoiture = () => {
@@ -24,17 +25,20 @@ const ChoixVoiture = () => {
         </div>
 
         <div className="choix-grid-porsche">
-          <div className="choix-card-porsche">
-            <h2 className="choix-card-title-porsche">
+          {/* Carte Neuve - Style unifié */}
+          <div className="catalogue-modele-card-neuf-porsche">
+            {/* Titre */}
+            <h2 className="catalogue-modele-title-porsche">
               Voiture Neuve
             </h2>
 
-            <div className="choix-card-image-porsche">
+            {/* Image */}
+            <div className="catalogue-modele-image-porsche">
               {imageNeuveUrl ? (
                 <img
                   src={imageNeuveUrl}
                   alt="Porsche Neuve"
-                  className="choix-card-img-porsche"
+                  className="catalogue-modele-img-porsche"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     if (e.target.nextSibling) {
@@ -44,32 +48,36 @@ const ChoixVoiture = () => {
                 />
               ) : null}
               <div
-                className="choix-card-image-placeholder-porsche"
+                className="catalogue-modele-placeholder-porsche"
                 style={{ display: imageNeuveUrl ? 'none' : 'flex' }}
               >
-                <span className="choix-card-image-letter-porsche">N</span>
+                <span className="catalogue-modele-letter-porsche">N</span>
               </div>
             </div>
 
+            {/* Bouton */}
             <button
-              className="choix-card-btn-porsche"
+              className="catalogue-modele-btn-porsche"
               onClick={handleConfigurer}
             >
               Configurer
             </button>
           </div>
 
-          <div className="choix-card-porsche">
-            <h2 className="choix-card-title-porsche">
-              Voiture Occasion
+          {/* Carte Occasion - Style unifié */}
+          <div className="catalogue-modele-card-neuf-porsche">
+            {/* Titre */}
+            <h2 className="catalogue-modele-title-porsche">
+              Voiture d'Occasion
             </h2>
 
-            <div className="choix-card-image-porsche">
+            {/* Image */}
+            <div className="catalogue-modele-image-porsche">
               {imageOccasionUrl ? (
                 <img
                   src={imageOccasionUrl}
                   alt="Porsche Occasion"
-                  className="choix-card-img-porsche"
+                  className="catalogue-modele-img-porsche"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     if (e.target.nextSibling) {
@@ -79,15 +87,16 @@ const ChoixVoiture = () => {
                 />
               ) : null}
               <div
-                className="choix-card-image-placeholder-porsche"
+                className="catalogue-modele-placeholder-porsche"
                 style={{ display: imageOccasionUrl ? 'none' : 'flex' }}
               >
-                <span className="choix-card-image-letter-porsche">O</span>
+                <span className="catalogue-modele-letter-porsche">O</span>
               </div>
             </div>
 
+            {/* Bouton */}
             <button
-              className="choix-card-btn-porsche"
+              className="catalogue-modele-btn-porsche"
               onClick={handleReserver}
             >
               Réserver

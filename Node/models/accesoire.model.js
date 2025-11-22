@@ -30,6 +30,26 @@ const accesoireSchema = new mongoose.Schema(
       min: 0,
       max: 100000,
     },
+    // Prix promotionnel optionnel
+    prix_promotion: {
+      type: Number,
+      min: 0,
+      max: 100000,
+      default: null,
+    },
+    // Stock disponible
+    stock: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    // Disponibilité
+    disponible: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
     // Relation Many-to-One: Couleur de l'accessoire
     couleur_accesoire: {
       type: mongoose.Schema.Types.ObjectId,

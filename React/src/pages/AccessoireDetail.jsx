@@ -1,23 +1,28 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { accesoireService } from '../services';
 import { PanierContext } from '../context/PanierContext.jsx';
-import { Loading, Alert, Button } from '../components/common';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { Loading, Button } from '../components/common';
+import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import { formatPrice } from '../utils/format.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/AccessoireDetail.css';
+import '../css/components/Message.css';
 
 const AccessoireDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { ajouterAccessoire } = useContext(PanierContext);
+  const { isAuthenticated } = useContext(AuthContext);
 
   const [accessoire, setAccessoire] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [photoActive, setPhotoActive] = useState(0);
-  const [isWishlist, setIsWishlist] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const fetchAccessoire = useCallback(async () => {
     try {
@@ -37,6 +42,11 @@ const AccessoireDetail = () => {
   }, [fetchAccessoire]);
 
   const handleAddToCart = () => {
+    if (!isAuthenticated()) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     if (accessoire) {
       ajouterAccessoire(accessoire, 1);
       setSuccess('Accessoire ajouté au panier !');
@@ -45,8 +55,6 @@ const AccessoireDetail = () => {
       }, 3000);
     }
   };
-
-  const handleToggleWishlist = () => setIsWishlist((s) => !s);
 
   const handlePrevPhoto = () => {
     if (accessoire?.photo_accesoire && accessoire.photo_accesoire.length > 0) {
@@ -71,7 +79,9 @@ const AccessoireDetail = () => {
   if (error || !accessoire) {
     return (
       <div className="error-container">
-        <Alert variant="error">{error || 'Accessoire introuvable'}</Alert>
+        <div className="message-box message-error">
+          <p>{error || 'Accessoire introuvable'}</p>
+        </div>
         <Button onClick={() => navigate('/accessoires')}>
           Retour aux accessoires
         </Button>
@@ -86,8 +96,19 @@ const AccessoireDetail = () => {
     <div className="accessoire-detail-container-porsche">
       {success && (
         <div className="accessoire-success-message">
-          <Alert variant="success">{success}</Alert>
+          <div className="message-box message-success">
+            <p>{success}</p>
+          </div>
         </div>
+      )}
+
+      {showLoginPrompt && (
+        <LoginPromptModal
+          onClose={() => setShowLoginPrompt(false)}
+          onLogin={() => navigate('/login', { state: { from: location.pathname } })}
+          title="Connexion requise"
+          message="Vous devez être connecté pour ajouter un accessoire au panier. Connectez-vous ou créez un compte pour continuer."
+        />
       )}
 
       <div className="accessoire-detail-content-porsche">
@@ -189,19 +210,6 @@ const AccessoireDetail = () => {
 
           {/* Informations */}
           <div className="accessoire-info-porsche">
-            {/* Wishlist icon en haut à droite */}
-            <div className="accessoire-wishlist-header">
-              <button
-                className={`accessoire-wishlist-icon-btn ${isWishlist ? 'active' : ''}`}
-                onClick={handleToggleWishlist}
-                aria-label={isWishlist ? 'Retirer de la liste de souhaits' : 'Ajouter à la liste de souhaits'}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-              </button>
-            </div>
-
             {/* Catégorie */}
             <div className="accessoire-category-porsche">
               Accessoires {accessoire?.type_accesoire && `/${accessoire.type_accesoire.charAt(0).toUpperCase() + accessoire.type_accesoire.slice(1)}`}
@@ -237,32 +245,12 @@ const AccessoireDetail = () => {
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
-                Ajouter au panier
+                AJOUTER AU PANIER
               </button>
-            </div>
-
-            {/* Informations de livraison */}
-            <div className="accessoire-delivery-info-porsche">
-              <div className="accessoire-delivery-line"></div>
-              <span className="accessoire-delivery-text">
-                Livraison gratuite en 3–5 jours ouvrables via DHL
-              </span>
             </div>
 
             {/* Sections d'informations supplémentaires */}
             <div className="accessoire-sections-porsche">
-              {/* Description complète */}
-              {accessoire.description && (
-                <section className="accessoire-section-porsche">
-                  <h2 className="accessoire-section-title-porsche">Description</h2>
-                  <div className="accessoire-section-content-porsche">
-                    <p className="accessoire-description-text-porsche">
-                      {accessoire.description}
-                    </p>
-                  </div>
-                </section>
-              )}
-
               {/* Caractéristiques générales */}
               <section className="accessoire-section-porsche">
                 <h2 className="accessoire-section-title-porsche">Caractéristiques</h2>

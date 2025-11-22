@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { voitureService, modelPorscheService } from '../services';
-import { Loading, Alert } from '../components/common';
+import { Loading } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/ListeVariantes.css';
 import '../css/CatalogueModeles.css';
+import '../css/components/Message.css';
 
 const ListeVariantes = () => {
   const { type, modeleId } = useParams();
@@ -234,7 +235,9 @@ const ListeVariantes = () => {
   if (error) {
     return (
       <div className="error-container">
-        <Alert variant="error">{error}</Alert>
+        <div className="message-box message-error">
+          <p>{error}</p>
+        </div>
       </div>
     );
   }

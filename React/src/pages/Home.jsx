@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { voitureService } from '../services';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
+import '../css/CatalogueModeles.css';
 import '../css/Home.css';
 
 const Home = () => {
@@ -40,10 +41,6 @@ const Home = () => {
 
   const getModeleInfo = (modele) => ({
     description: modele.description || DESCRIPTIONS[modele.nom_model] || 'Découvrez ce modèle emblématique',
-    bodyTypes: modele.carrosseries_disponibles || [],
-    transmissions: modele.transmissions_disponibles || [],
-    prixDepuis: modele.prix_depuis || 0,
-    fuelType: 'Essence',
   });
 
   return (
@@ -90,16 +87,23 @@ const Home = () => {
             {modeles.map((modele) => {
               const modeleInfo = getModeleInfo(modele);
               const photos = modele.photo_voiture?.filter(p => p?.name) || [];
-              const photoPrincipale = photos[0] || null;
+              // Utiliser la photo à l'index 1 comme demandé
+              const photoPrincipale = photos.length > 1 ? photos[1] : (photos[0] || null);
 
               return (
-                <article key={modele._id} className="model-card-porsche">
-                  <div className="model-image-porsche">
+                <article key={modele._id} className="catalogue-modele-card-neuf-porsche">
+                  {/* Titre */}
+                  <h2 className="catalogue-modele-title-porsche">
+                    {modele.nom_model}
+                  </h2>
+
+                  {/* Image */}
+                  <div className="catalogue-modele-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
                         src={buildUrl(photoPrincipale.name)}
                         alt={`Porsche ${modele.nom_model}`}
-                        className="model-image-photo-porsche"
+                        className="catalogue-modele-img-porsche"
                         onError={(e) => {
                           e.target.style.display = 'none';
                           if (e.target.nextSibling) {
@@ -109,57 +113,29 @@ const Home = () => {
                       />
                     ) : null}
                     <div
-                      className="model-placeholder-porsche"
+                      className="catalogue-modele-placeholder-porsche"
                       style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
                     >
-                      <span className="model-letter-porsche">
+                      <span className="catalogue-modele-letter-porsche">
                         {modele.nom_model?.charAt(0) || '?'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="model-content-porsche">
-                    <div className="model-header-porsche">
-                      <h2 className="model-name-porsche">
-                        {modele.nom_model}
-                      </h2>
-                      <span className="model-fuel-badge-porsche">
-                        {modeleInfo.fuelType}
-                      </span>
-                    </div>
-                    <p className="model-description-porsche">
+                  {/* Information (Description) */}
+                  <div className="home-model-info">
+                    <p className="home-model-description">
                       {modeleInfo.description}
                     </p>
-                    {modeleInfo.prixDepuis > 0 && (
-                      <div className="model-price-porsche">
-                        À partir de {formatPrice(modeleInfo.prixDepuis)} TTC
-                      </div>
-                    )}
-                    <div className="model-specs-porsche">
-                      {modeleInfo.bodyTypes.length > 0 && (
-                        <div className="model-spec-item-porsche">
-                          <span className="model-spec-label-porsche">Carrosserie</span>
-                          <span className="model-spec-value-porsche">
-                            {modeleInfo.bodyTypes.join(', ')}
-                          </span>
-                        </div>
-                      )}
-                      {modeleInfo.transmissions.length > 0 && (
-                        <div className="model-spec-item-porsche">
-                          <span className="model-spec-label-porsche">Boîte de vitesse</span>
-                          <span className="model-spec-value-porsche">
-                            {modeleInfo.transmissions.join(', ')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      className="model-cta-porsche"
-                      onClick={() => handleModeleClick(modele)}
-                    >
-                      Configurer {modele.nom_model}
-                    </button>
                   </div>
+
+                  {/* Bouton */}
+                  <button
+                    className="catalogue-modele-btn-porsche"
+                    onClick={() => handleModeleClick(modele)}
+                  >
+                    Configurer {modele.nom_model}
+                  </button>
                 </article>
               );
             })}

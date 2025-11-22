@@ -12,6 +12,97 @@
   min-height: 100vh;
   background: #fff;
 }
+
+/* Navigation Top */
+.variante-nav-top-porsche {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.variante-nav-top-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.variante-nav-model-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.variante-nav-change-model {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  background: #fff;
+  color: #000;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.variante-nav-change-model:hover {
+  background: #f5f5f5;
+}
+
+.variante-nav-top-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.variante-nav-link {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #000;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  text-transform: uppercase;
+}
+
+.variante-nav-link:hover {
+  color: #666;
+}
+
+/* Navigation Carrosserie */
+.variante-carrosserie-nav-porsche {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 0 2rem;
+}
+
+.variante-carrosserie-nav-item-porsche {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  background: transparent;
+  color: #000;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.variante-carrosserie-nav-item-porsche:hover {
+  background: #f5f5f5;
+}
+
+.variante-carrosserie-nav-item-porsche.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
 .variante-hero-porsche {
   position: relative;
   width: 100%;
@@ -64,11 +155,39 @@
   color: #000;
   text-align: center;
 }
+
+/* Layout du contenu */
+.variante-content-layout-porsche {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  max-width: 1400px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+}
+
 .variante-left-column-porsche {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
+.variante-right-column-porsche {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.variante-secondary-image-porsche {
+  width: 100%;
+  max-width: 600px;
+}
+
+.variante-secondary-img-porsche {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 .variante-performances-porsche {
   display: flex;
   flex-direction: column;
@@ -96,7 +215,8 @@
   border: 1px solid #000;
   color: #000;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s ease;
   width: fit-content;
@@ -125,6 +245,49 @@
   margin: 0;
   max-width: 800px;
 }
+
+/* Actions boutons */
+.variante-actions-bottom-porsche {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 3rem auto;
+  padding: 0 2rem;
+  max-width: 1400px;
+}
+
+.variante-action-btn-porsche {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+  white-space: nowrap;
+}
+
+.variante-action-btn-black {
+  background: #000;
+  color: #fff;
+}
+
+.variante-action-btn-black:hover {
+  background: #333;
+}
+
+.variante-action-btn-white {
+  background: #fff;
+  color: #000;
+  border: 1px solid #e0e0e0;
+}
+
+.variante-action-btn-white:hover {
+  background: #f5f5f5;
+}
+
 @media (max-width: 968px) {
   .variante-nav-top-porsche {
     flex-direction: column;

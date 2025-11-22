@@ -2,9 +2,10 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { commandeService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading, Button, Card, Alert } from '../components/common';
+import { Loading, Button, Card } from '../components/common';
 import { formatPrice, formatDate } from '../utils/format.js';
 import '../css/MesCommandes.css';
+import '../css/components/Message.css';
 
 /**
  * Page Mes Commandes - Historique des commandes
@@ -72,7 +73,11 @@ const MesCommandes = () => {
         </div>
 
         {/* Messages */}
-        {error && <Alert variant="error">{error}</Alert>}
+        {error && (
+          <div className="message-box message-error">
+            <p>{error}</p>
+          </div>
+        )}
 
         {/* Liste des commandes */}
         {commandes.length === 0 ? (

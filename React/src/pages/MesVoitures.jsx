@@ -2,10 +2,11 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { maVoitureService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading, Alert } from '../components/common';
+import { Loading } from '../components/common';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/MesVoitures.css';
+import '../css/components/Message.css';
 
 
 const MesVoitures = () => {
@@ -152,12 +153,16 @@ const MesVoitures = () => {
       {/* Messages */}
       {error && (
         <div className="mes-voitures-messages-finder">
-          <Alert variant="error">{error}</Alert>
+          <div className="message-box message-error">
+            <p>{error}</p>
+          </div>
         </div>
       )}
       {success && (
         <div className="mes-voitures-messages-finder">
-          <Alert variant="success">{success}</Alert>
+          <div className="message-box message-success">
+            <p>{success}</p>
+          </div>
         </div>
       )}
 

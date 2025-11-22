@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Alert, Input, Button } from '../components/common';
+import { Input, Button } from '../components/common';
 import { validateRegisterForm, handleFormChange } from '../utils/formHelpers.js';
 import '../css/Register.css';
 
@@ -74,8 +74,9 @@ const Register = () => {
           <h1 className="register-title-porsche">Création de compte</h1>
 
           {errorMessage && (
-            <div className="register-error-porsche">
-              <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
+            <div className="register-error-message">
+              <p>{errorMessage}</p>
+              <button onClick={() => setErrorMessage('')} className="error-close">×</button>
             </div>
           )}
 
@@ -171,15 +172,22 @@ const Register = () => {
               required
             />
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              fullWidth
+              className="register-btn-primary-porsche"
               disabled={loading}
             >
-              {loading ? 'Création...' : 'Créer mon compte'}
-            </Button>
+              {loading ? 'CRÉATION...' : 'CRÉER MON COMPTE'}
+            </button>
           </form>
+
+          <div className="register-separator-porsche">
+            <span className="register-separator-text-porsche">ou</span>
+          </div>
+
+          <Link to="/login" className="register-btn-secondary-porsche">
+            SE CONNECTER
+          </Link>
         </div>
       </div>
     </div>

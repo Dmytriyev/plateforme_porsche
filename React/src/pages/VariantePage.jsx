@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
-import { Loading, Alert, Button } from '../components/common';
+import { Loading, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import '../css/VariantePage.css';
+import '../css/components/Message.css';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 
@@ -58,7 +59,9 @@ const VariantePage = () => {
   if (error) {
     return (
       <div className="variante-page-error">
-        <Alert type="error">{error}</Alert>
+        <div className="message-box message-error">
+          <p>{error}</p>
+        </div>
         <Button onClick={() => navigate('/choix-voiture')}>
           Retour au choix
         </Button>
@@ -69,7 +72,9 @@ const VariantePage = () => {
   if (!pageData || !pageData.variante) {
     return (
       <div className="variante-page-error">
-        <Alert type="warning">Variante non trouvée</Alert>
+        <div className="message-box message-warning">
+          <p>Variante non trouvée</p>
+        </div>
         <Button onClick={() => navigate('/choix-voiture')}>
           Retour au choix
         </Button>
@@ -138,7 +143,7 @@ const VariantePage = () => {
             className="variante-nav-change-model"
             onClick={handleChangerModele}
           >
-            Changer de modèle
+            CHANGER DE MODÈLE
           </button>
         </div>
         <div className="variante-nav-top-right">
@@ -146,18 +151,18 @@ const VariantePage = () => {
             className="variante-nav-link"
             onClick={handleConfigurer}
           >
-            Configurer
+            CONFIGURER
           </button>
           {type !== 'neuf' && (
             <button
               className="variante-nav-link"
               onClick={handleAcheter}
             >
-              Acheter des voitures neuves et d'occasion
+              ACHETER DES VOITURES NEUVES ET D'OCCASION
             </button>
           )}
           {type !== 'neuf' && (
-            <button className="variante-nav-link">Comparer</button>
+            <button className="variante-nav-link">COMPARER</button>
           )}
         </div>
       </nav>
@@ -195,11 +200,10 @@ const VariantePage = () => {
 
         {/* Informations variante */}
         <div className="variante-info-header-porsche">
-          <h1 className="variante-name-porsche">{variante.nom_model}</h1>
-          <span className="variante-fuel-badge-porsche">Essence</span>
+          <h1 className="variante-name-porsche">Porsche {variante.nom_model}</h1>
           {prix && (prix.prix_base_variante || prix.prix_total) > 0 && (
             <div className="variante-price-porsche">
-              à partir de {formatPrice(prix.prix_base_variante || prix.prix_total)} TTC Prix client conseillé
+              à partir de {formatPrice(prix.prix_base_variante || prix.prix_total)} TTC
             </div>
           )}
         </div>
@@ -246,7 +250,7 @@ const VariantePage = () => {
 
           {type !== 'neuf' && (
             <button className="variante-technical-details-btn-porsche">
-              Tous les détails techniques
+              TOUS LES DÉTAILS TECHNIQUES
             </button>
           )}
         </div>
@@ -284,20 +288,20 @@ const VariantePage = () => {
           className="variante-action-btn-porsche variante-action-btn-black"
           onClick={handleChangerModele}
         >
-          Changer de modèle
+          CHANGER DE MODÈLE
         </button>
         <button
           className="variante-action-btn-porsche variante-action-btn-white"
           onClick={handleConfigurer}
         >
-          Configurer
+          CONFIGURER
         </button>
         {type !== 'neuf' && (
           <button
             className="variante-action-btn-porsche variante-action-btn-white"
             onClick={handleAcheter}
           >
-            Acheter des voitures neuves et d'occasion
+            ACHETER DES VOITURES NEUVES ET D'OCCASION
           </button>
         )}
       </div>

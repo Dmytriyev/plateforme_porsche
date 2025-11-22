@@ -3,10 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import accesoireService from '../services/accesoire.service.js';
 import { PanierContext } from '../context/PanierContext.jsx';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading, Alert } from '../components/common';
+import { Loading } from '../components/common';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import buildUrl from '../utils/buildUrl';
 import '../css/Accessoires.css';
+import '../css/components/Message.css';
 
 const Accessoires = () => {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ const Accessoires = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [filtreType, setFiltreType] = useState('tous');
-  const [wishlist, setWishlist] = useState(new Set());
   const { ajouterAccessoire } = useContext(PanierContext);
   const { isAuthenticated } = useContext(AuthContext);
   const location = useLocation();
@@ -56,19 +56,6 @@ const Accessoires = () => {
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
-  const handleToggleWishlist = (accessoireId, e) => {
-    e.stopPropagation();
-    setWishlist(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(accessoireId)) {
-        newSet.delete(accessoireId);
-      } else {
-        newSet.add(accessoireId);
-      }
-      return newSet;
-    });
-  };
-
   const handleVoirDetails = (accessoireId) => {
     navigate(`/accessoires/detail/${accessoireId}`);
   };
@@ -83,7 +70,9 @@ const Accessoires = () => {
   if (error) {
     return (
       <div className="error-container">
-        <Alert variant="error">{error}</Alert>
+        <div className="message-box message-error">
+          <p>{error}</p>
+        </div>
       </div>
     );
   }
@@ -101,9 +90,10 @@ const Accessoires = () => {
         </div>
 
         {successMessage && (
-          <Alert variant="success" onClose={() => setSuccessMessage('')}>
-            {successMessage}
-          </Alert>
+          <div className="message-box message-success">
+            <p>{successMessage}</p>
+            <button onClick={() => setSuccessMessage('')} className="message-close">×</button>
+          </div>
         )}
 
         {showLoginPrompt && (
@@ -125,15 +115,11 @@ const Accessoires = () => {
                 className={`accessoires-filtre-btn ${filtreType === type ? 'active' : ''}`}
                 onClick={() => setFiltreType(type)}
               >
-                {type === 'tous' ? 'Tous' : type.charAt(0).toUpperCase() + type.slice(1)}
+                {type === 'tous' ? 'Tous les produits' : type === 'Porsche Design' ? 'Porsche Design portes-clés' : type.charAt(0).toUpperCase() + type.slice(1)}
               </button>
             ))}
           </div>
         )}
-
-        <div className="accessoires-count">
-          <p>{accessoiresFiltres.length} accessoire{accessoiresFiltres.length > 1 ? 's' : ''}</p>
-        </div>
 
         {accessoiresFiltres.length === 0 ? (
           <div className="accessoires-empty">
@@ -149,13 +135,17 @@ const Accessoires = () => {
             {accessoiresFiltres.map((accessoire) => {
               const photoPrincipale = accessoire.photo_accesoire?.[0] || null;
               const photoUrl = photoPrincipale?.name ? buildUrl(photoPrincipale.name) : null;
-              const isWishlisted = wishlist.has(accessoire._id);
               const isOutOfStock = accessoire.stock === 0 || accessoire.disponible === false;
               const hasDiscount = accessoire.prix_promotion && accessoire.prix_promotion < accessoire.prix;
 
               return (
                 <div key={accessoire._id} className="accessoire-card-porsche" data-accessoire-id={accessoire._id}>
                   <div className="accessoire-card-image-container">
+                    {hasDiscount && !isOutOfStock && (
+                      <div className="accessoire-card-badge">
+                        Cyber Week
+                      </div>
+                    )}
                     {isOutOfStock && (
                       <div className="accessoire-card-out-of-stock">
                         En rupture de stock
@@ -189,20 +179,9 @@ const Accessoires = () => {
                         {accessoire.nom_accesoire?.charAt(0) || '?'}
                       </span>
                     </div>
-                    <button
-                      className={`accessoire-card-wishlist ${isWishlisted ? 'active' : ''}`}
-                      onClick={(e) => handleToggleWishlist(accessoire._id, e)}
-                      aria-label={isWishlisted ? 'Retirer de la liste de souhaits' : 'Ajouter à la liste de souhaits'}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill={isWishlisted ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                      </svg>
-                    </button>
                   </div>
 
                   <div className="accessoire-card-content">
-                    <div className="accessoire-card-brand">PORSCHE DESIGN</div>
-
                     <h3 className="accessoire-card-name">
                       {accessoire.nom_accesoire}
                     </h3>
@@ -230,13 +209,13 @@ const Accessoires = () => {
                         onClick={() => handleAjouterAuPanier(accessoire)}
                         disabled={isOutOfStock}
                       >
-                        Ajouter au panier
+                        AJOUTER AU PANIER
                       </button>
                       <button
                         className="accessoire-card-btn accessoire-card-btn-secondary"
                         onClick={() => handleVoirDetails(accessoire._id)}
                       >
-                        Détails
+                        DÉTAILS
                       </button>
                     </div>
                   </div>

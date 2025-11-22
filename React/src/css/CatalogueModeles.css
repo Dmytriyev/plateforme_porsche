@@ -153,7 +153,8 @@
 }
 
 .catalogue-modele-btn-porsche:hover {
-  background-color: #1f2937;
+  background-color: #333;
+  color: #fff;
 }
 
 .catalogue-modele-btn-porsche:active {

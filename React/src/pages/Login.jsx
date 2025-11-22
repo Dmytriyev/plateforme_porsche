@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Alert, Input, Button } from '../components/common';
+import { Input, Button } from '../components/common';
 import { validateLoginForm, handleFormChange } from '../utils/formHelpers.js';
 import '../css/Login.css';
 
@@ -54,8 +54,9 @@ const Login = () => {
           <h1 className="login-title-porsche">Connexion</h1>
 
           {errorMessage && (
-            <div className="login-error-porsche">
-              <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
+            <div className="login-error-message">
+              <p>{errorMessage}</p>
+              <button onClick={() => setErrorMessage('')} className="error-close">×</button>
             </div>
           )}
 

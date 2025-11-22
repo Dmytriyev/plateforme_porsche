@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 import apiClient from '../config/api.js';
 import { extractData } from '../services/httpHelper';
-import { Alert } from '../components/common';
 import { validateContactForm, handleFormChange } from '../utils/formHelpers.js';
 import '../css/DemandeContact.css';
+import '../css/components/Message.css';
 
 const DemandeContact = () => {
   const navigate = useNavigate();
@@ -98,14 +98,15 @@ const DemandeContact = () => {
         <h1 className="demande-contact-title">Demande d'information</h1>
 
         {errorMessage && (
-          <div className="demande-contact-error">
-            <Alert type="error" message={errorMessage} onClose={() => setErrorMessage('')} />
+          <div className="message-box message-error">
+            <p>{errorMessage}</p>
+            <button onClick={() => setErrorMessage('')} className="message-close">×</button>
           </div>
         )}
 
         {successMessage && (
-          <div className="demande-contact-success">
-            <Alert type="success" message={successMessage} />
+          <div className="message-box message-success">
+            <p>{successMessage}</p>
           </div>
         )}
 

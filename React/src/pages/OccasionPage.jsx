@@ -1,13 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
-import { Loading, Alert, Button } from '../components/common';
+import { Loading, Button } from '../components/common';
 import ContactButton from '../components/ContactButton.jsx';
 import { formatPrice } from '../utils/format.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/OccasionPage.css';
 import '../css/ListeVariantes.css';
 import '../css/CatalogueModeles.css';
+import '../css/components/Message.css';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 
@@ -430,11 +431,13 @@ const OccasionPage = () => {
   if (error) {
     return (
       <div className="occasion-page-error">
-        <Alert type="error">
-          {error.includes("introuvable") || error.includes("404")
-            ? "Cette voiture d'occasion n'est plus disponible ou n'existe pas."
-            : error}
-        </Alert>
+        <div className="message-box message-error">
+          <p>
+            {error.includes("introuvable") || error.includes("404")
+              ? "Cette voiture d'occasion n'est plus disponible ou n'existe pas."
+              : error}
+          </p>
+        </div>
         <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
           <Button onClick={() => navigate(-1)}>
             ← Retour
@@ -576,7 +579,7 @@ const OccasionPage = () => {
                     <div className="catalogue-modele-prix-porsche">
                       {(occasion.prix_base || occasion.prix_base_variante) > 0 ? (
                         <>
-                          <span className="catalogue-prix-label">Prix à partir de</span>
+                          <span className="catalogue-prix-label">Prix TTC</span>
                           <span className="catalogue-prix-montant">
                             {formatPrice(occasion.prix_base || occasion.prix_base_variante)}
                           </span>
@@ -607,7 +610,9 @@ const OccasionPage = () => {
   } if (!pageData || !pageData.occasion) {
     return (
       <div className="occasion-page-error">
-        <Alert type="warning">Occasion non trouvée</Alert>
+        <div className="message-box message-warning">
+          <p>Occasion non trouvée</p>
+        </div>
         <Button onClick={() => navigate('/choix-voiture')}>
           Retour au choix
         </Button>
@@ -631,16 +636,6 @@ const OccasionPage = () => {
 
   const dateImmat = formatDateImmat();
   const annee = occasion.annee_production ? new Date(occasion.annee_production).getFullYear() : null;
-
-  // Calculer la génération (991 I, 992, etc.) à partir de l'année
-  const getGeneration = () => {
-    if (!annee) return '';
-    if (annee >= 2012 && annee < 2020) return '991 I';
-    if (annee >= 2020) return '992';
-    return '';
-  };
-
-  const generation = getGeneration();
   const kilometrage = occasion.kilometrage || occasion.kilometrage_actuel || 0;
   const proprietaire = occasion.nombre_proprietaires || 0;
   const accidents = occasion.accidents || false;
@@ -652,21 +647,29 @@ const OccasionPage = () => {
 
   return (
     <div className="occasion-detail-container">
-      {/* Header Navigation - Barre grise avec bouton retour et concessionnaire */}
-      <div className="occasion-detail-nav-bar">
-        <div className="occasion-detail-nav-left">
-          <button className="occasion-detail-nav-back-btn" onClick={() => navigate(-1)}>
+      {/* Barre noire supérieure avec bouton, logo et prix */}
+      <header className="occasion-top-header">
+        <div className="occasion-header-left">
+          <button className="occasion-header-link" onClick={() => navigate(-1)}>
             ← Retour
           </button>
         </div>
-        {occasion.concessionnaire && (
-          <div className="occasion-detail-nav-center">
-            {occasion.concessionnaire}
-          </div>
-        )}
-      </div>
 
-      {/* Main Gallery - Grande image à gauche, grille 2x2 à droite (exclut photos index 0 et 1) */}
+        <div className="occasion-header-center">
+          <img src="/Logo/Logo_Porsche.png" alt="Porsche" className="occasion-header-logo" />
+        </div>
+
+        <div className="occasion-header-right">
+          <div className="occasion-header-price-group">
+            <div className="occasion-header-price-item">
+              <span className="occasion-header-price-label">Prix TTC</span>
+              <span className="occasion-header-price-total">{formatPrice(prixOccasion)}</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Gallery - Grande image à gauche, grille 2x2 à droite (démarre à index 2) */}
       {photos && photos.length > 2 && (
         <>
           <div className="occasion-detail-gallery">
@@ -685,40 +688,13 @@ const OccasionPage = () => {
                 }}
               />
             </div>
-            {/* Grille 2x2 à droite (photos index 3-6) */}
-            {photos.length > 3 && (
-              <div className="occasion-detail-gallery-grid">
-                {photos.slice(3, 7).map((photo, index) => (
-                  <button
-                    key={index + 3}
-                    onClick={() => setSelectedImage(index + 3)}
-                    className={`occasion-detail-grid-thumbnail ${selectedImage === index + 3 ? 'active' : ''}`}
-                  >
-                    <img
-                      src={photo.name?.startsWith('http')
-                        ? photo.name
-                        : photo.name?.startsWith('/')
-                          ? buildUrl(photo.name)
-                          : buildUrl(photo.name)}
-                      alt={`Vue ${index + 4}`}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Grille continue en dessous (photos à partir de l'index 7) */}
-          {photos.length > 7 && (
-            <div className="occasion-detail-gallery-extended">
-              {photos.slice(7).map((photo, index) => (
+            {/* Grille 2x2 à droite (4 premières photos à partir de l'index 2) */}
+            <div className="occasion-detail-gallery-grid">
+              {photos.slice(2, 6).map((photo, index) => (
                 <button
-                  key={index + 7}
-                  onClick={() => setSelectedImage(index + 7)}
-                  className={`occasion-detail-gallery-extended-item ${selectedImage === index + 7 ? 'active' : ''}`}
+                  key={index + 2}
+                  onClick={() => setSelectedImage(index + 2)}
+                  className={`occasion-detail-grid-thumbnail ${selectedImage === index + 2 ? 'active' : ''}`}
                 >
                   <img
                     src={photo.name?.startsWith('http')
@@ -726,7 +702,32 @@ const OccasionPage = () => {
                       : photo.name?.startsWith('/')
                         ? buildUrl(photo.name)
                         : buildUrl(photo.name)}
-                    alt={`Vue ${index + 8}`}
+                    alt={`Vue ${index + 3}`}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Grille continue en dessous (photos à partir de l'index 6) */}
+          {photos.length > 6 && (
+            <div className="occasion-detail-gallery-extended">
+              {photos.slice(6).map((photo, index) => (
+                <button
+                  key={index + 6}
+                  onClick={() => setSelectedImage(index + 6)}
+                  className={`occasion-detail-gallery-extended-item ${selectedImage === index + 6 ? 'active' : ''}`}
+                >
+                  <img
+                    src={photo.name?.startsWith('http')
+                      ? photo.name
+                      : photo.name?.startsWith('/')
+                        ? buildUrl(photo.name)
+                        : buildUrl(photo.name)}
+                    alt={`Vue ${index + 7}`}
                     onError={(e) => {
                       e.target.style.display = 'none';
                     }}
@@ -744,228 +745,100 @@ const OccasionPage = () => {
         <div className="occasion-detail-left">
           {/* Title Section */}
           <div className="occasion-detail-title-section">
-            <h1 className="occasion-detail-title">
-              {occasion.nom_model} {generation && `(${generation})`}
-            </h1>
-            <div className="occasion-detail-badges">
-              <div className="occasion-detail-badge">
-                Véhicule d'occasion Porsche Approved
+            <div className="occasion-detail-title-row">
+              <h1 className="occasion-detail-title">
+                Porsche {occasion.nom_model}
+              </h1>
+              <div className="occasion-detail-badge-approved">
+                Porsche certifié
               </div>
-              {disponibleDate && (
-                <div className="occasion-detail-availability">
-                  Disponible à partir de {new Date(disponibleDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                </div>
-              )}
             </div>
+            {disponibleDate && (
+              <div className="occasion-detail-availability">
+                Disponible à partir de {new Date(disponibleDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'numeric', year: 'numeric' }).replace(/\//g, '/')}
+              </div>
+            )}
           </div>
 
-          {/* Specifications en deux colonnes */}
-          <div className="occasion-detail-specs-grid">
-            {/* Colonne gauche */}
-            <div className="occasion-detail-specs-column">
-              {/* Teinte extérieure */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Teinte extérieure</span>
-                <div className="occasion-detail-spec-value-group">
-                  <div
-                    className="occasion-detail-color-swatch"
-                    style={{ backgroundColor: '#000' }}
-                  />
-                  <span className="occasion-detail-spec-value">{couleurExt}</span>
-                </div>
-              </div>
-
-              {/* Kilométrage */}
-              {kilometrage > 0 && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">Kilométrage</span>
-                  <span className="occasion-detail-spec-value">{new Intl.NumberFormat('fr-FR').format(kilometrage)} km</span>
-                </div>
-              )}
-
-              {/* Historique des dommages */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Historique des dommages</span>
-                <span className="occasion-detail-spec-value">
-                  {accidents ? 'Dommages signalés' : "Aucun dommage ou accident n'a été signalé"}
-                </span>
-              </div>
-
-              {/* Boîte de vitesse */}
-              {specifications?.transmission && specifications.transmission !== 'N/A' && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">Boîte de vitesse</span>
-                  <span className="occasion-detail-spec-value">{specifications.transmission}</span>
-                </div>
-              )}
-
-              {/* Accélération */}
-              {specifications?.acceleration_0_100 > 0 && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">Accélération de 0 à 100 km/h {specifications?.pack_sport_chrono ? 'avec le Pack Sport Chrono' : ''}</span>
-                  <span className="occasion-detail-spec-value">{specifications.acceleration_0_100} s</span>
-                </div>
-              )}
-            </div>
-
-            {/* Colonne droite */}
-            <div className="occasion-detail-specs-column">
-              {/* Teintes intérieures */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Teintes intérieures & matière</span>
-                <div className="occasion-detail-spec-value-group">
-                  <div
-                    className="occasion-detail-color-swatch"
-                    style={{ backgroundColor: '#000' }}
-                  />
-                  <span className="occasion-detail-spec-value">{couleurInt}</span>
-                </div>
-              </div>
-
-              {/* 1ère immatriculation */}
-              {dateImmat && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">1ère immatriculation</span>
-                  <span className="occasion-detail-spec-value">{dateImmat}</span>
-                </div>
-              )}
-
-              {/* Propriétaires précédents */}
-              {proprietaire > 0 && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">Propriétaire(s) préc.</span>
-                  <span className="occasion-detail-spec-value">{proprietaire}</span>
-                </div>
-              )}
-
-              {/* Garantie Porsche Approved */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Garantie Porsche Approved</span>
-                <span className="occasion-detail-spec-value">12 mois</span>
-              </div>
-
-              {/* Moteur */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Moteur</span>
-                <span className="occasion-detail-spec-value">{carburant}</span>
-              </div>
-
-              {/* Transmission */}
-              <div className="occasion-detail-spec-item">
-                <span className="occasion-detail-spec-label">Transmission</span>
-                <span className="occasion-detail-spec-value">Propulsion</span>
-              </div>
-
-              {/* Puissance */}
-              {specifications?.puissance > 0 && (
-                <div className="occasion-detail-spec-item">
-                  <span className="occasion-detail-spec-label">Puissance maximale du moteur à combustion</span>
-                  <span className="occasion-detail-spec-value">{powerInfo.ch} ch / {powerInfo.kw} kW</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Section État et historique */}
-          <div className="occasion-detail-state-history">
-            <h2 className="occasion-detail-section-title">État et historique</h2>
-
-            {/* Cartes de vérification */}
-            <div className="occasion-detail-verification-cards">
-              <div className="occasion-detail-verification-card">
-                <div className="occasion-detail-verification-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                </div>
-                <div className="occasion-detail-verification-content">
-                  <h3 className="occasion-detail-verification-title">Contrôle technique et mécanique</h3>
-                  <p className="occasion-detail-verification-desc">Selon les normes rigoureuses de Porsche</p>
-                </div>
-                <button className="occasion-detail-info-icon" title="Plus d'informations">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="occasion-detail-verification-card">
-                <div className="occasion-detail-verification-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                </div>
-                <div className="occasion-detail-verification-content">
-                  <h3 className="occasion-detail-verification-title">Remise à neuf esthétique</h3>
-                  <p className="occasion-detail-verification-desc">Selon les normes de rénovation de Porsche</p>
-                </div>
-                <button className="occasion-detail-info-icon" title="Plus d'informations">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
-                  </svg>
-                </button>
+          {/* Specifications en grille 4 colonnes */}
+          <div className="occasion-detail-specs-grid-four">
+            {/* Teinte extérieure */}
+            <div className="occasion-detail-spec-item">
+              <span className="occasion-detail-spec-label">Teinte extérieure</span>
+              <div className="occasion-detail-spec-value-group">
+                <div
+                  className="occasion-detail-color-swatch"
+                  style={{ backgroundColor: '#000' }}
+                />
+                <span className="occasion-detail-spec-value">{couleurExt}</span>
               </div>
             </div>
 
-            {/* Liste détaillée */}
-            <div className="occasion-detail-history-list">
-              <div className="occasion-detail-history-item">
-                <span className="occasion-detail-history-label">État</span>
-                <div className="occasion-detail-history-value-group">
-                  <span className="occasion-detail-history-value">Véhicule d'occasion Porsche Approved</span>
-                  <p className="occasion-detail-history-desc">Véhicule de qualité certifiée, avec un historique complet et des pièces d'origine.</p>
-                </div>
-              </div>
-
-              {kilometrage > 0 && (
-                <div className="occasion-detail-history-item">
-                  <span className="occasion-detail-history-label">Kilométrage</span>
-                  <span className="occasion-detail-history-value">{new Intl.NumberFormat('fr-FR').format(kilometrage)} km</span>
-                </div>
-              )}
-
-              {dateImmat && (
-                <div className="occasion-detail-history-item">
-                  <span className="occasion-detail-history-label">1ère immatriculation</span>
-                  <span className="occasion-detail-history-value">{dateImmat}</span>
-                </div>
-              )}
-
-              {proprietaire > 0 && (
-                <div className="occasion-detail-history-item">
-                  <span className="occasion-detail-history-label">Propriétaire(s) préc.</span>
-                  <span className="occasion-detail-history-value">{proprietaire}</span>
-                </div>
-              )}
-
-              <div className="occasion-detail-history-item">
-                <span className="occasion-detail-history-label">Historique de Service</span>
-                <span className="occasion-detail-history-value">Oui, tous les services sont effectués au Centre Porsche</span>
-              </div>
-
-              {occasion.derniere_maintenance && (
-                <div className="occasion-detail-history-item">
-                  <span className="occasion-detail-history-label">Dernière maintenance</span>
-                  <span className="occasion-detail-history-value">
-                    {new Date(occasion.derniere_maintenance.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                    {' '}avec {new Intl.NumberFormat('fr-FR').format(occasion.derniere_maintenance.kilometrage)} km {occasion.derniere_maintenance.centre || ''}
-                  </span>
-                </div>
-              )}
-
-              <div className="occasion-detail-history-item">
-                <span className="occasion-detail-history-label">Historique des dommages</span>
-                <span className="occasion-detail-history-value">
-                  {accidents ? 'Dommages signalés' : "Aucun dommage ou accident n'a été signalé"}
-                </span>
+            {/* Teintes intérieures */}
+            <div className="occasion-detail-spec-item">
+              <span className="occasion-detail-spec-label">Teintes intérieures & matière</span>
+              <div className="occasion-detail-spec-value-group">
+                <div
+                  className="occasion-detail-color-swatch"
+                  style={{ backgroundColor: '#000' }}
+                />
+                <span className="occasion-detail-spec-value">{couleurInt}</span>
               </div>
             </div>
+
+            {/* Kilométrage */}
+            {kilometrage > 0 && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">Kilométrage</span>
+                <span className="occasion-detail-spec-value">{new Intl.NumberFormat('fr-FR').format(kilometrage)} km</span>
+              </div>
+            )}
+
+            {/* 1ère immatriculation */}
+            {dateImmat && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">1ère immatriculation</span>
+                <span className="occasion-detail-spec-value">{dateImmat}</span>
+              </div>
+            )}
+
+            {/* Propriétaires précédents */}
+            {proprietaire > 0 && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">Propriétaire(s) préc.</span>
+                <span className="occasion-detail-spec-value">{proprietaire}</span>
+              </div>
+            )}
+
+            {/* Moteur */}
+            <div className="occasion-detail-spec-item">
+              <span className="occasion-detail-spec-label">Moteur</span>
+              <span className="occasion-detail-spec-value">{carburant}</span>
+            </div>
+
+            {/* Boîte de vitesse */}
+            {specifications?.transmission && specifications.transmission !== 'N/A' && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">Boîte de vitesse</span>
+                <span className="occasion-detail-spec-value">{specifications.transmission}</span>
+              </div>
+            )}
+
+            {/* Puissance */}
+            {specifications?.puissance > 0 && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">Puissance de moteur</span>
+                <span className="occasion-detail-spec-value">{powerInfo.ch} ch</span>
+              </div>
+            )}
+
+            {/* Accélération */}
+            {specifications?.acceleration_0_100 > 0 && (
+              <div className="occasion-detail-spec-item">
+                <span className="occasion-detail-spec-label">Accélération de 0 à 100 km/h {specifications?.pack_sport_chrono ? 'avec le Pack Sport Chrono' : ''}</span>
+                <span className="occasion-detail-spec-value">{specifications.acceleration_0_100} s</span>
+              </div>
+            )}
           </div>
 
           {/* Description */}
@@ -982,30 +855,27 @@ const OccasionPage = () => {
           {/* Price Section */}
           {prixOccasion > 0 && (
             <div className="occasion-detail-price-box">
-              <div className="occasion-detail-price">
+              <div className="occasion-detail-price-main">
                 <span className="occasion-detail-price-amount">
                   {formatPrice(prixOccasion)}
                 </span>
-                <span className="occasion-detail-price-label">TVA non-déductible</span>
               </div>
 
-              {/* Financement retiré */}
-
               <div className="occasion-detail-actions">
-                <ContactButton
-                  vehiculeId={pageData?._id}
-                  typeVehicule="occasion"
-                  variant="primary"
-                />
                 <Button
-                  variant="outline"
+                  variant="primary"
                   onClick={() => {
                     handleReservation();
                   }}
-                  className="occasion-detail-action-btn occasion-detail-action-btn-outline"
+                  className="occasion-detail-action-btn occasion-detail-action-btn-primary"
                 >
-                  Réserver en ligne
+                  RÉSERVER EN LIGNE
                 </Button>
+                <ContactButton
+                  vehiculeId={pageData?._id}
+                  typeVehicule="occasion"
+                  variant="outline"
+                />
               </div>
             </div>
           )}

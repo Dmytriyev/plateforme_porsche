@@ -2,10 +2,11 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { commandeService } from '../services';
-import { Loading, Alert } from '../components/common';
+import { Loading } from '../components/common';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice } from '../utils/format.js';
 import '../css/Panier.css';
+import '../css/components/Message.css';
 
 const Panier = () => {
   const navigate = useNavigate();
@@ -104,12 +105,16 @@ const Panier = () => {
 
       {error && (
         <div className="panier-messages">
-          <Alert variant="error">{error}</Alert>
+          <div className="message-box message-error">
+            <p>{error}</p>
+          </div>
         </div>
       )}
       {success && (
         <div className="panier-messages">
-          <Alert variant="success">{success}</Alert>
+          <div className="message-box message-success">
+            <p>{success}</p>
+          </div>
         </div>
       )}
 

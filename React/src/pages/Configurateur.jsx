@@ -3,10 +3,11 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, personnalisationService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
-import { Loading, Button, Alert } from '../components/common';
+import { Loading, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.js';
 import '../css/Configurateur.css';
+import '../css/components/Message.css';
 import buildUrl from '../utils/buildUrl';
 
 const Configurateur = () => {
@@ -461,7 +462,9 @@ const Configurateur = () => {
   if (error && variantes.length === 0) {
     return (
       <div className="error-container">
-        <Alert type="error">{error}</Alert>
+        <div className="message-box message-error">
+          <p>{error}</p>
+        </div>
         <Button onClick={() => navigate('/choix-voiture')}>Retour au catalogue</Button>
       </div>
     );
@@ -472,8 +475,16 @@ const Configurateur = () => {
 
   return (
     <div className="configurateur-container">
-      {success && <Alert type="success">{success}</Alert>}
-      {error && !success && <Alert type="error">{error}</Alert>}
+      {success && (
+        <div className="message-box message-success">
+          <p>{success}</p>
+        </div>
+      )}
+      {error && !success && (
+        <div className="message-box message-error">
+          <p>{error}</p>
+        </div>
+      )}
 
       {/* Header avec navigation et prix */}
       <header className="configurateur-top-header">
@@ -553,7 +564,7 @@ const Configurateur = () => {
         <div className="configurateur-options-panel">
           {/* En-tête du panneau */}
           <div className="configurateur-panel-header">
-            <h2 className="configurateur-panel-title">{nomModel}</h2>
+            <h2 className="configurateur-panel-title">Porsche {nomModel}</h2>
             <span className="configurateur-panel-year">{annee}</span>
           </div>
 
@@ -667,18 +678,7 @@ const Configurateur = () => {
                               <img
                                 src={imageUrl}
                                 alt={`Jante ${jante.taille_jante}"`}
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling?.classList.add('show');
-                                }}
                               />
-                              <div className="configurateur-jante-placeholder">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
-                                  <circle cx="12" cy="12" r="6" strokeWidth="1.5" />
-                                  <circle cx="12" cy="12" r="2" fill="currentColor" />
-                                </svg>
-                              </div>
                             </div>
                           )}
                           <div className="configurateur-jante-info">
@@ -806,18 +806,7 @@ const Configurateur = () => {
                               <img
                                 src={imageUrl}
                                 alt={siege.nom_siege}
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling?.classList.add('show');
-                                }}
                               />
-                              <div className="configurateur-siege-placeholder">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                  <path d="M5 12h14M12 5l7 7-7 7" />
-                                  <rect x="6" y="14" width="12" height="6" rx="1" />
-                                  <path d="M6 14V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6" />
-                                </svg>
-                              </div>
                             </div>
                           )}
                           <div className="configurateur-siege-info">

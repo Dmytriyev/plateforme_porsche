@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { commandeService, maVoitureService } from '../services';
-import { Loading, Alert } from '../components/common';
+import { Loading } from '../components/common';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import { formatPrice, formatDate } from '../utils/format.js';
 import '../css/MonCompte.css';
+import '../css/components/Message.css';
 
 /**
  * Page Mon Compte - Design style Tesla/Connect Store
@@ -188,12 +189,16 @@ const MonCompte = () => {
         {/* Messages */}
         {error && (
           <div className="mon-compte-messages">
-            <Alert variant="error">{error}</Alert>
+            <div className="message-box message-error">
+              <p>{error}</p>
+            </div>
           </div>
         )}
         {success && (
           <div className="mon-compte-messages">
-            <Alert variant="success">{success}</Alert>
+            <div className="message-box message-success">
+              <p>{success}</p>
+            </div>
           </div>
         )}
 
