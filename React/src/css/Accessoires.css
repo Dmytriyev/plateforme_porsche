@@ -340,3 +340,159 @@
     width: 100%;
   }
 }
+
+/* ============================================
+   GESTION ADMIN/STAFF - ACCESSOIRES
+   ============================================ */
+
+.accessoires-admin-box {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px solid #000;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.accessoires-admin-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #000 0%, #666 100%);
+}
+
+.accessoires-admin-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: #000;
+  letter-spacing: -0.01em;
+}
+
+.accessoires-admin-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accessoires-admin-btn {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 1rem 1.5rem;
+  border: 2px solid;
+  border-radius: 1rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: -0.01em;
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.accessoires-admin-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.accessoires-admin-btn:hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.accessoires-admin-btn:hover svg {
+  transform: rotate(90deg);
+}
+
+.accessoires-admin-btn:active {
+  transform: translateY(0);
+}
+
+/* Boutons admin sur les cartes */
+.accessoire-card-admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.accessoire-card-admin-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  border: 2px solid;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: -0.01em;
+}
+
+.accessoire-card-admin-btn svg {
+  flex-shrink: 0;
+}
+
+.accessoire-card-admin-btn-edit {
+  background: #fff;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.accessoire-card-admin-btn-edit:hover {
+  background: #2563eb;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.accessoire-card-admin-btn-delete {
+  background: #fff;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.accessoire-card-admin-btn-delete:hover {
+  background: #dc2626;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+.accessoire-card-admin-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive admin */
+@media (max-width: 768px) {
+  .accessoires-admin-actions {
+    flex-direction: column;
+  }
+
+  .accessoires-admin-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .accessoire-card-admin-actions {
+    flex-direction: column;
+  }
+
+  .accessoire-card-admin-btn {
+    width: 100%;
+  }
+}

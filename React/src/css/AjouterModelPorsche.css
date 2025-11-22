@@ -1,0 +1,395 @@
+/* === Container === */
+.ajouter-model-porsche-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.ajouter-model-porsche-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.ajouter-model-porsche-textarea:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.ajouter-model-porsche-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* === Breadcrumb === */
+.ajouter-model-porsche-breadcrumb {
+  margin-bottom: 2rem;
+}
+
+.ajouter-model-porsche-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 1rem;
+  font-size: 0.938rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ajouter-model-porsche-back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* === Header === */
+.ajouter-model-porsche-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.ajouter-model-porsche-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.ajouter-model-porsche-subtitle {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0;
+}
+
+/* === Content === */
+.ajouter-model-porsche-content {
+  background: #fff;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+/* === Messages === */
+.message-box {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 2px solid;
+}
+
+.message-error {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.message-success {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.message-box p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* === Form === */
+.ajouter-model-porsche-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* === Section === */
+.ajouter-model-porsche-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.ajouter-model-porsche-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ajouter-model-porsche-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.label-hint {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #666;
+  font-style: italic;
+}
+
+/* === Form Row === */
+.ajouter-model-porsche-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ajouter-model-porsche-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Form Groups === */
+.ajouter-model-porsche-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ajouter-model-porsche-label {
+  font-size: 0.938rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.ajouter-model-porsche-input,
+.ajouter-model-porsche-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  background: #fff;
+  color: #000;
+  transition: all 0.3s ease;
+}
+
+.ajouter-model-porsche-input:focus,
+.ajouter-model-porsche-select:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.ajouter-model-porsche-input::placeholder {
+  color: #999;
+}
+
+/* === Checkbox === */
+.ajouter-model-porsche-checkbox-group {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.ajouter-model-porsche-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #000;
+}
+
+.ajouter-model-porsche-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: #000;
+}
+
+.ajouter-model-porsche-checkbox-label:hover {
+  color: #333;
+}
+
+/* === Upload Area === */
+.ajouter-model-porsche-upload-area {
+  position: relative;
+}
+
+.ajouter-model-porsche-file-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ajouter-model-porsche-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  border: 2px dashed #e5e5e5;
+  border-radius: 1rem;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ajouter-model-porsche-upload-label:hover {
+  border-color: #000;
+  background: #f5f5f5;
+}
+
+.ajouter-model-porsche-upload-label svg {
+  color: #666;
+}
+
+.ajouter-model-porsche-upload-label > span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.upload-hint {
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  color: #666 !important;
+}
+
+/* === Photo Grid === */
+.ajouter-model-porsche-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ajouter-model-porsche-photo-item {
+  position: relative;
+  aspect-ratio: 4/3;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.ajouter-model-porsche-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ajouter-model-porsche-photo-remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 38, 38, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ajouter-model-porsche-photo-remove:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* === Actions === */
+.ajouter-model-porsche-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e5e5;
+}
+
+.ajouter-model-porsche-btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.ajouter-model-porsche-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ajouter-model-porsche-btn-cancel {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.ajouter-model-porsche-btn-cancel:hover:not(:disabled) {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ajouter-model-porsche-btn-save {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.ajouter-model-porsche-btn-save:hover:not(:disabled) {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .ajouter-model-porsche-container {
+    padding: 1rem;
+  }
+
+  .ajouter-model-porsche-title {
+    font-size: 1.5rem;
+  }
+
+  .ajouter-model-porsche-subtitle {
+    font-size: 1rem;
+  }
+
+  .ajouter-model-porsche-content {
+    padding: 1.5rem;
+  }
+
+  .ajouter-model-porsche-actions {
+    flex-direction: column;
+  }
+
+  .ajouter-model-porsche-btn {
+    width: 100%;
+  }
+
+  .ajouter-model-porsche-photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}

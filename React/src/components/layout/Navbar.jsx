@@ -1,12 +1,12 @@
 import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import { PanierContext } from '../../context/PanierContext.jsx';
+import usePanierAPI from '../../hooks/usePanierAPI.jsx';
 import '../../css/Navbar.css';
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useContext(AuthContext);
-  const { nombreArticles } = useContext(PanierContext);
+  const { nombreArticles } = usePanierAPI();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);

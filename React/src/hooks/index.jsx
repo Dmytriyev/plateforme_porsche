@@ -1,3 +1,3 @@
 export { useAuth } from './useAuth.jsx';
-export { usePanier } from './usePanier.jsx';
+export { default as usePanierAPI } from './usePanierAPI.jsx';
 export * from './useReservation.jsx';

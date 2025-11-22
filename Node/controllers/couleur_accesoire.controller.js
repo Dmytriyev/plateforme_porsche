@@ -6,6 +6,12 @@ import {
   getValidationError,
 } from "../utils/errorHandler.js";
 import { removeUploadedFile } from "../utils/fileConstants.js";
+import {
+  sendSuccess,
+  sendError,
+  sendNotFound,
+  sendValidationError,
+} from "../utils/responses.js";
 
 // Créer une nouvelle couleur d'accesoire
 const createCouleur_accesoire = async (req, res) => {
@@ -60,8 +66,11 @@ const getAllCouleur_accesoires = async (req, res) => {
     const couleur_accesoires = await Couleur_accesoire.find()
       .sort({ nom_couleur: 1 })
       .lean();
-    // Retourner le tableau directement pour compatibilité avec extractArray
-    return res.status(200).json(couleur_accesoires);
+    return sendSuccess(
+      res,
+      couleur_accesoires,
+      "Couleurs d'accessoires récupérées avec succès"
+    );
   } catch (error) {
     return handleError(res, error, "getAllCouleur_accesoires");
   }

@@ -235,7 +235,7 @@ const getAllModel_porsches = async (req, res) => {
 
     // Si pas de données, retourner un tableau vide
     if (!model_porsches || model_porsches.length === 0) {
-      return res.status(200).json([]);
+      return sendSuccess(res, [], "Aucun modèle trouvé");
     }
 
     // Calculer le prix pour chaque modèle

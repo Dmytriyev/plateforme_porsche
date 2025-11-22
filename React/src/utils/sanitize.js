@@ -9,7 +9,9 @@ export const sanitizeHTML = (dirty, options = {}) =>
   dirty ? DOMPurify.sanitize(dirty, { ...defaultHTMLOptions, ...options }) : "";
 
 export const sanitizeText = (text) =>
-  text == null ? "" : DOMPurify.sanitize(String(text), { ALLOWED_TAGS: [] });
+  text === null || text === undefined
+    ? ""
+    : DOMPurify.sanitize(String(text), { ALLOWED_TAGS: [] });
 
 export const sanitizeURL = (url) =>
   !url || /^(javascript|data|vbscript):/i.test(url)
@@ -17,7 +19,7 @@ export const sanitizeURL = (url) =>
     : DOMPurify.sanitize(url, { ALLOWED_TAGS: [] });
 
 export const sanitizeObject = (obj) => {
-  if (obj == null || typeof obj !== "object") return obj;
+  if (obj === null || obj === undefined || typeof obj !== "object") return obj;
 
   if (Array.isArray(obj)) {
     return obj.map((item) =>

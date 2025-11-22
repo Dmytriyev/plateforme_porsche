@@ -12,7 +12,7 @@
 import Voiture from "../models/voiture.model.js";
 import voitureValidation from "../validations/voiture.validation.js";
 import Photo from "../models/photo_voiture.model.js";
-import { PORSCHE_MODELS } from "../utils/constants.js";
+import { PORSCHE_MODELS } from "../utils/model_porsche.constants.js";
 import logger from "../utils/logger.js";
 import {
   sendSuccess,
@@ -442,7 +442,7 @@ const getVoituresOccasionFinder = async (req, res) => {
     }
     // Filtrer par prix_base
     if (prix_max) {
-      filters.prix_base = { $lte: parseInt(prix_max) };
+      filters.prix_base = { $lte: parseInt(prix_max, 10) };
     }
     // Récupérer occasions avec les filtres appliqués
     const occasions = await Model_porsche.find(filters)

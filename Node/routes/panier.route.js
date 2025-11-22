@@ -39,4 +39,24 @@ router.post(
  */
 router.get("/", auth, panierController.getPanier);
 
+/**
+ * @route   PATCH /api/panier/ligne/:ligne_id/quantite
+ * @desc    Modifier la quantité d'une ligne de panier
+ * @access  Private (authentification requise)
+ */
+router.patch(
+  "/ligne/:ligne_id/quantite",
+  auth,
+  sanitizeInputs,
+  validateRequest,
+  panierController.modifierQuantiteLigne
+);
+
+/**
+ * @route   DELETE /api/panier/ligne/:ligne_id
+ * @desc    Supprimer une ligne du panier
+ * @access  Private (authentification requise)
+ */
+router.delete("/ligne/:ligne_id", auth, panierController.supprimerLignePanier);
+
 export default router;

@@ -1,0 +1,423 @@
+/* === Container === */
+.modifier-accessoire-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  min-height: 100vh;
+}
+
+/* === Header === */
+.modifier-accessoire-header {
+  margin-bottom: 2rem;
+}
+
+.modifier-accessoire-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 1rem;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.modifier-accessoire-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modifier-accessoire-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02em;
+}
+
+.modifier-accessoire-subtitle {
+  font-size: 1.125rem;
+  color: #666;
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+}
+
+/* === Messages === */
+.modifier-accessoire-message {
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  border: 2px solid;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.modifier-accessoire-message-error {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.modifier-accessoire-message-success {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+/* === Form === */
+.modifier-accessoire-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* === Section === */
+.modifier-accessoire-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.modifier-accessoire-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.modifier-accessoire-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+}
+
+.label-hint {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #666;
+  font-style: italic;
+}
+
+/* === Form Row === */
+.modifier-accessoire-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .modifier-accessoire-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Form Field === */
+.modifier-accessoire-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modifier-accessoire-label {
+  font-size: 0.938rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.modifier-accessoire-input,
+.modifier-accessoire-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  background: #fff;
+  color: #000;
+  transition: all 0.3s ease;
+}
+
+.modifier-accessoire-input:focus,
+.modifier-accessoire-select:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.modifier-accessoire-input::placeholder {
+  color: #999;
+}
+
+.modifier-accessoire-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.3s ease;
+}
+
+.modifier-accessoire-textarea:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.required {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+/* === Checkbox === */
+.modifier-accessoire-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #000;
+  padding: 0.5rem 0;
+}
+
+.modifier-accessoire-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: #000;
+  flex-shrink: 0;
+}
+
+.modifier-accessoire-checkbox-label:hover {
+  color: #333;
+}
+
+.modifier-accessoire-checkbox-label span {
+  user-select: none;
+}
+
+/* === Upload Area === */
+.modifier-accessoire-upload-area {
+  position: relative;
+}
+
+.modifier-accessoire-upload-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.modifier-accessoire-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 1rem;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modifier-accessoire-upload-label:hover {
+  border-color: #000;
+  background: #f5f5f5;
+}
+
+.modifier-accessoire-upload-label svg {
+  color: #666;
+}
+
+.modifier-accessoire-upload-label > span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.modifier-accessoire-upload-hint {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #666;
+}
+
+/* === Photo Grid === */
+.modifier-accessoire-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modifier-accessoire-photo-item {
+  position: relative;
+  aspect-ratio: 4/3;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.modifier-accessoire-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modifier-accessoire-photo-delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modifier-accessoire-photo-delete:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* === Actions === */
+.modifier-accessoire-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e5e5;
+}
+
+.modifier-accessoire-btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.modifier-accessoire-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modifier-accessoire-btn-cancel {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.modifier-accessoire-btn-cancel:hover:not(:disabled) {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modifier-accessoire-btn-submit {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.modifier-accessoire-btn-submit:hover:not(:disabled) {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .modifier-accessoire-container {
+    padding: 1rem;
+  }
+
+  .modifier-accessoire-title {
+    font-size: 1.5rem;
+  }
+
+  .modifier-accessoire-subtitle {
+    font-size: 1rem;
+  }
+
+  .modifier-accessoire-content {
+    padding: 1.5rem;
+  }
+
+  .modifier-accessoire-actions {
+    flex-direction: column;
+  }
+
+  .modifier-accessoire-btn {
+    width: 100%;
+  }
+
+  .modifier-accessoire-photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* === Styles spécifiques pour la modification === */
+
+/* Photo marquée pour suppression */
+.modifier-accessoire-photo-item.marked-delete {
+  opacity: 0.4;
+  position: relative;
+}
+
+.modifier-accessoire-photo-item.marked-delete::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 38, 38, 0.2);
+  pointer-events: none;
+}
+
+/* Bouton de restauration */
+.modifier-accessoire-photo-restore {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.modifier-accessoire-photo-restore:hover {
+  background: #15803d;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+}

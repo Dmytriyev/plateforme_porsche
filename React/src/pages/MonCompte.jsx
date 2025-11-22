@@ -25,7 +25,7 @@ import '../css/components/Message.css';
  */
 const MonCompte = () => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, isStaff } = useContext(AuthContext);
 
   const [activeSection, setActiveSection] = useState('mes-produits');
   const [loading, setLoading] = useState(true);
@@ -58,7 +58,54 @@ const MonCompte = () => {
 
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       setCommandes(Array.isArray(commandesData) ? commandesData : []);
-      setVoitures(Array.isArray(voituresData) ? voituresData : []);
+
+      // Combiner toutes les voitures : Model_porsche_actuel + occasions réservées + neuves achetées
+      const toutesLesVoitures = [];
+
+      // 1. Mes voitures personnelles (Model_porsche_actuel)
+      if (Array.isArray(voituresData)) {
+        voituresData.forEach(v => toutesLesVoitures.push({
+          ...v,
+          _source: 'mes_voitures',
+          _type: 'Model_porsche_actuel'
+        }));
+      }
+
+      // 2. Voitures d'occasion réservées
+      if (Array.isArray(reservationsData)) {
+        reservationsData.forEach(r => {
+          if (r.model_porsche) {
+            toutesLesVoitures.push({
+              ...r.model_porsche,
+              _source: 'reservation',
+              _type: 'occasion',
+              _reservationId: r._id,
+              _reservationDate: r.date_reservation
+            });
+          }
+        });
+      }
+
+      // 3. Voitures neuves achetées (dans les commandes validées)
+      if (Array.isArray(commandesData)) {
+        commandesData.forEach(commande => {
+          if (commande.status && Array.isArray(commande.lignes_commande)) {
+            commande.lignes_commande.forEach(ligne => {
+              if (ligne.model_porsche_id) {
+                toutesLesVoitures.push({
+                  ...ligne.model_porsche_id,
+                  _source: 'commande',
+                  _type: 'neuve',
+                  _commandeId: commande._id,
+                  _commandeDate: commande.date_commande
+                });
+              }
+            });
+          }
+        });
+      }
+
+      setVoitures(toutesLesVoitures);
       setUserData(user);
     } catch (err) {
       setError(err.message || 'Erreur lors du chargement des données');
@@ -403,68 +450,113 @@ const MonCompte = () => {
                 </div>
               ) : (
                 <div className="mon-compte-voitures-list">
-                  {voitures.slice(0, 3).map((voiture) => {
-                    const photoPrincipale = voiture.photo_voiture_actuel?.[0];
+                  {voitures.map((voiture) => {
+                    // Déterminer la source de la photo selon le type de voiture
+                    let photoPrincipale = null;
+                    let nomModele = '';
+                    let details = '';
+                    let sourceLabel = '';
+
+                    if (voiture._source === 'mes_voitures') {
+                      // Model_porsche_actuel
+                      photoPrincipale = voiture.photo_voiture_actuel?.[0];
+                      nomModele = voiture.type_model || 'Porsche';
+                      details = voiture.couleur_exterieur?.nom_couleur || '';
+                      sourceLabel = 'Ma voiture';
+                    } else if (voiture._source === 'reservation') {
+                      // Occasion réservée
+                      photoPrincipale = voiture.photo_voiture_actuel?.[0] ||
+                        voiture.photo_voiture?.[0] ||
+                        voiture.voiture?.photo_voiture?.[0];
+                      nomModele = voiture.type_model || voiture.voiture?.nom_model || 'Porsche';
+                      details = voiture.annee_production ?
+                        new Date(voiture.annee_production).getFullYear() : '';
+                      sourceLabel = 'Occasion réservée';
+                    } else if (voiture._source === 'commande') {
+                      // Neuve achetée
+                      photoPrincipale = voiture.photo_voiture?.[0] ||
+                        voiture.photo_porsche?.[0] ||
+                        voiture.voiture?.photo_voiture?.[0];
+                      nomModele = voiture.nom_model || voiture.type_model ||
+                        voiture.voiture?.nom_model || 'Porsche';
+                      details = voiture.couleur_exterieur?.nom_couleur ||
+                        voiture.type_carrosserie || '';
+                      sourceLabel = 'Voiture neuve';
+                    }
 
                     return (
-                      <div key={voiture._id} className="mon-compte-voiture-card">
+                      <div key={`${voiture._source}-${voiture._id}`} className="mon-compte-voiture-card">
                         {photoPrincipale && photoPrincipale.name ? (
                           <img
                             src={buildUrl(photoPrincipale.name)}
-                            alt={voiture.type_model || 'Porsche'}
+                            alt={nomModele}
                             className="mon-compte-voiture-img"
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
                           <div className="mon-compte-voiture-placeholder">
-                            <span>{voiture.type_model?.charAt(0) || 'P'}</span>
+                            <span>{nomModele.charAt(0) || 'P'}</span>
                           </div>
                         )}
                         <div className="mon-compte-voiture-info">
+                          <div className="mon-compte-voiture-badge">
+                            {sourceLabel}
+                          </div>
                           <h3 className="mon-compte-voiture-name">
-                            {voiture.type_model || 'Porsche'}
+                            {nomModele}
                           </h3>
-                          {voiture.annee_production && (
+                          {details && (
                             <p className="mon-compte-voiture-year">
-                              {new Date(voiture.annee_production).getFullYear()}
+                              {details}
                             </p>
                           )}
-                          {voiture.couleur_exterieur && (
-                            <p className="mon-compte-voiture-color">
-                              {voiture.couleur_exterieur.nom_couleur}
+                          {voiture._reservationDate && (
+                            <p className="mon-compte-voiture-date">
+                              Réservée le {formatDate(voiture._reservationDate)}
+                            </p>
+                          )}
+                          {voiture._commandeDate && (
+                            <p className="mon-compte-voiture-date">
+                              Achetée le {formatDate(voiture._commandeDate)}
                             </p>
                           )}
                         </div>
                         <div className="mon-compte-voiture-actions">
                           <button
                             className="mon-compte-voiture-btn mon-compte-voiture-btn-view"
-                            onClick={() => navigate(`/mes-voitures/${voiture._id}`)}
+                            onClick={() => navigate(`/mes-voitures/${voiture._id}`, {
+                              state: { source: voiture._source, type: voiture._type }
+                            })}
                           >
                             Voir
                           </button>
-                          <button
-                            className="mon-compte-voiture-btn mon-compte-voiture-btn-modify"
-                            onClick={() => navigate(`/mes-voitures/${voiture._id}/modifier`)}
-                          >
-                            Modifier
-                          </button>
-                          <button
-                            className="mon-compte-voiture-btn mon-compte-voiture-btn-delete"
-                            onClick={async () => {
-                              if (window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
-                                try {
-                                  await maVoitureService.supprimerMaVoiture(voiture._id);
-                                  setSuccess('Voiture supprimée avec succès');
-                                  setTimeout(() => setSuccess(''), 3000);
-                                  fetchAllData();
-                                } catch (err) {
-                                  setError(err.message || 'Erreur lors de la suppression');
-                                }
-                              }
-                            }}
-                          >
-                            Supprimer
-                          </button>
+                          {voiture._source === 'mes_voitures' && (
+                            <>
+                              <button
+                                className="mon-compte-voiture-btn mon-compte-voiture-btn-modify"
+                                onClick={() => navigate(`/mes-voitures/${voiture._id}/modifier`)}
+                              >
+                                Modifier
+                              </button>
+                              <button
+                                className="mon-compte-voiture-btn mon-compte-voiture-btn-delete"
+                                onClick={async () => {
+                                  if (window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
+                                    try {
+                                      await maVoitureService.supprimerMaVoiture(voiture._id);
+                                      setSuccess('Voiture supprimée avec succès');
+                                      setTimeout(() => setSuccess(''), 3000);
+                                      fetchAllData();
+                                    } catch (err) {
+                                      setError(err.message || 'Erreur lors de la suppression');
+                                    }
+                                  }
+                                }}
+                              >
+                                Supprimer
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     );
@@ -472,6 +564,39 @@ const MonCompte = () => {
                 </div>
               )}
             </div>
+
+            {/* Bloc: Gestion anonces (Staff/Admin uniquement) */}
+            {isStaff && isStaff() && (
+              <div className="mon-compte-block mon-compte-admin-block">
+                <div className="mon-compte-block-header">
+                  <h2 className="mon-compte-block-title">Gestion anonces</h2>
+                  <p className="mon-compte-admin-subtitle">
+                    Gérez les voitures d'occasion disponibles sur la plateforme
+                  </p>
+                </div>
+
+                <div className="mon-compte-admin-actions">
+                  <button
+                    className="mon-compte-admin-btn mon-compte-admin-btn-add"
+                    onClick={() => navigate('/occasion/ajouter')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    Ajouter une voiture Occasion
+                  </button>
+                  <button
+                    className="mon-compte-admin-btn mon-compte-admin-btn-manage"
+                    onClick={() => navigate('/accessoires/ajouter')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    Ajouter un accessoire
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

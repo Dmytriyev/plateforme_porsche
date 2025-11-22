@@ -36,6 +36,20 @@ export const routes = [
     hideFromMenu: true,
   },
   {
+    path: "/occasion/ajouter",
+    elementName: "AjouterModelPorsche",
+    title: "Ajouter voiture",
+    hideFromMenu: true,
+    requiresStaff: true,
+  },
+  {
+    path: "/occasion/:id/modifier",
+    elementName: "ModifierModelPorsche",
+    title: "Modifier voiture",
+    hideFromMenu: true,
+    requiresStaff: true,
+  },
+  {
     path: "/configurateur/:voitureId/:varianteId",
     elementName: "Configurateur",
     title: "Configurateur",
@@ -49,6 +63,20 @@ export const routes = [
   },
   { path: "/accessoires", elementName: "Accessoires", title: "Accessoires" },
   {
+    path: "/accessoires/ajouter",
+    elementName: "AjouterAccessoire",
+    title: "Ajouter accessoire",
+    hideFromMenu: true,
+    requiresStaff: true,
+  },
+  {
+    path: "/accessoires/:id/modifier",
+    elementName: "ModifierAccessoire",
+    title: "Modifier accessoire",
+    hideFromMenu: true,
+    requiresStaff: true,
+  },
+  {
     path: "/accessoires/detail/:id",
     elementName: "AccessoireDetail",
     title: "Détail accessoire",
@@ -58,12 +86,6 @@ export const routes = [
     path: "/panier",
     elementName: "Panier",
     title: "Panier",
-    hideFromMenu: true,
-  },
-  {
-    path: "/demande-contact",
-    elementName: "DemandeContact",
-    title: "Nous contacter",
     hideFromMenu: true,
   },
 ];
@@ -79,6 +101,24 @@ export const protectedRoutes = [
     path: "/mes-voitures",
     elementName: "MesVoitures",
     title: "Mes voitures",
+    hideFromMenu: true,
+  },
+  {
+    path: "/mes-voitures/:id",
+    elementName: "MaVoitureDetail",
+    title: "Détail voiture",
+    hideFromMenu: true,
+  },
+  {
+    path: "/mes-voitures/:id/modifier",
+    elementName: "ModifierMaVoiture",
+    title: "Modifier voiture",
+    hideFromMenu: true,
+  },
+  {
+    path: "/ajouter-ma-voiture",
+    elementName: "AjouterMaVoiture",
+    title: "Ajouter ma voiture",
     hideFromMenu: true,
   },
   {

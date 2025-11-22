@@ -34,23 +34,30 @@ const commandeService = {
   createPaymentSession: (commandeId) =>
     apiRequest(() => apiClient.post(`/api/payment/checkout/${commandeId}`)),
 
-  getPanier: () => apiRequest(() => apiClient.get("/commande/panier")),
+  getPanier: () => apiRequest(() => apiClient.get("/api/panier")),
 
   updateQuantiteLigne: (ligneId, quantite) =>
     apiRequest(() =>
-      apiClient.patch(`/commande/updateQuantite/ligne/${ligneId}`, { quantite })
+      apiClient.patch(`/api/panier/ligne/${ligneId}/quantite`, { quantite })
     ),
 
   supprimerLignePanier: (ligneId) =>
-    apiRequest(() => apiClient.delete(`/commande/delete/ligne/${ligneId}`)),
+    apiRequest(() => apiClient.delete(`/api/panier/ligne/${ligneId}`)),
 
   viderPanier: () =>
     apiRequest(() => apiClient.delete("/ligneCommande/panier/vider")),
 
-  ajouterConfigurationAuPanier: (modelPorscheId, quantite = 1) =>
+  ajouterVoitureNeuveAuPanier: (modelPorscheId) =>
     apiRequest(() =>
-      apiClient.post("/commande/ajouterConfiguration", {
+      apiClient.post("/api/panier/voiture-neuve", {
         model_porsche_id: modelPorscheId,
+      })
+    ),
+
+  ajouterAccessoireAuPanier: (accessoireId, quantite = 1) =>
+    apiRequest(() =>
+      apiClient.post("/api/panier/accessoire", {
+        accesoire_id: accessoireId,
         quantite,
       })
     ),

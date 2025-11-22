@@ -14,6 +14,7 @@ import {
   sendForbidden,
   sendValidationError,
 } from "../utils/responses.js";
+import { isOwnerOrAdmin } from "../utils/errorHandler.js";
 
 // Créer une nouvelle ligne de commande (ajouter au panier)
 const createLigneCommande = async (req, res) => {
@@ -184,7 +185,7 @@ const getLigneCommandeById = async (req, res) => {
 
     const commande = await Commande.findById(ligneCommande.commande);
     // Ligne appartient à l'utilisateur ou l'utilisateur est admin
-    if (commande.user.toString() !== req.user.id && !req.user.isAdmin) {
+    if (!isOwnerOrAdmin(commande, req.user)) {
       return sendForbidden(res);
     }
     // détails model_porsche

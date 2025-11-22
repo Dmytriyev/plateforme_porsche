@@ -15,6 +15,7 @@ import {
 import validateObjectId from "../middlewares/validateObjectId.js";
 import auth from "../middlewares/auth.js";
 import isAdmin from "../middlewares/isAdmin.js";
+import isStaff from "../middlewares/isStaff.js";
 import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
@@ -28,24 +29,31 @@ router.get("/search", getAccesoiresByCriteria);
 router.get("/:id", validateObjectId("id"), getAccesoireById);
 
 // ============================================
-// ROUTES ADMIN (Création/Modification)
+// ROUTES STAFF (Création/Modification)
 // ============================================
-router.post("/new", auth, isAdmin, optionalUpload, createAccesoire);
+router.post("/new", auth, isStaff, optionalUpload, createAccesoire);
 router.put(
   "/update/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"),
   optionalUpload,
   updateAccesoire
 );
 
 // Gestion des images
-router.patch("/addImage/:id", auth, isAdmin, validateObjectId("id"), addImages);
+router.patch(
+  "/addImage/:id",
+  auth,
+  isStaff,
+  validateObjectId("id"),
+  optionalUpload,
+  addImages
+);
 router.patch(
   "/removeImages/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"),
   removeImages
 );
@@ -54,14 +62,14 @@ router.patch(
 router.patch(
   "/addCouleur/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"), // id accesoire
   setCouleur
 );
 router.patch(
   "/removeCouleur/:id",
   auth,
-  isAdmin,
+  isStaff,
   validateObjectId("id"), // id accesoire
   removeCouleur
 );

@@ -424,6 +424,82 @@
   color: #000;
 }
 
+/* Admin Actions */
+.occasion-detail-admin-box {
+  background: #fff;
+  padding: 2rem;
+  border: 2px solid #000;
+  border-radius: 1rem;
+  margin-top: 1.5rem;
+}
+
+.occasion-detail-admin-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 1rem 0;
+}
+
+.occasion-detail-admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.occasion-detail-admin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.938rem;
+  font-weight: 600;
+  border: 2px solid;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.occasion-detail-admin-btn svg {
+  flex-shrink: 0;
+}
+
+.occasion-detail-admin-btn-add {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.occasion-detail-admin-btn-add:hover {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.occasion-detail-admin-btn-edit {
+  background: #fff;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.occasion-detail-admin-btn-edit:hover {
+  background: #eff6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.occasion-detail-admin-btn-delete {
+  background: #fff;
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.occasion-detail-admin-btn-delete:hover {
+  background: #fef2f2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .occasion-detail-gallery {

@@ -26,13 +26,15 @@ router.get("/all", auth, isAdmin, getAllCommandes);
 
 // ============================================
 // ROUTES PANIER (Utilisateur authentifié)
+// @DEPRECATED - Utilisez /api/panier à la place
+// Ces routes sont conservées pour compatibilité avec d'anciennes versions
 // ============================================
 router.get("/panier", auth, getPanier);
 router.get("/panier/create", auth, getOrCreatePanier);
 router.post("/panier/addConfig", auth, ajouterConfigurationAuPanier);
 router.post("/panier/valider", auth, validerPanier);
 
-// Gestion des lignes de panier
+// Gestion des lignes de panier - @DEPRECATED utilisez /api/panier/ligne/:id
 router.delete(
   "/delete/ligne/:ligne_id",
   auth,

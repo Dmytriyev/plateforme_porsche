@@ -58,23 +58,23 @@ const modelPorscheService = {
     }
   },
 
-  createModel: (data) =>
-    apiRequest(() => apiClient.post("/model-porsche/new", data)),
+  createModelPorsche: (data) =>
+    apiRequest(() => apiClient.post("/model_porsche/new", data)),
 
-  updateModel: (id, data) =>
+  updateModelPorsche: (id, data) =>
     apiRequest(() => apiClient.patch(`/model_porsche/update/${id}`, data)),
 
-  deleteModel: (id) =>
+  deleteModelPorsche: (id) =>
     apiRequest(() => apiClient.delete(`/model_porsche/delete/${id}`)),
 
-  addImages: (id, formData) =>
+  ajouterPhotos: (id, formData) =>
     apiRequest(() =>
       apiClient.patch(`/model_porsche/addImages/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
     ),
 
-  removeImages: (id, data) =>
+  supprimerPhotos: (id, data) =>
     apiRequest(() =>
       apiClient.patch(`/model_porsche/removeImages/${id}`, data)
     ),

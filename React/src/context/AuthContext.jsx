@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     hasRole,
     isAdmin: () => hasRole('admin'),
     isConseiller: () => hasRole(['conseiller', 'responsable']),
+    isStaff: () => hasRole(['admin', 'conseiller', 'responsable']),
   }), [user, loading, login, register, logout, updateProfile, isAuthenticated, hasRole]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

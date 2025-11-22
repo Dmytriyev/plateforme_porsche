@@ -1,15 +1,4 @@
-/**
- * Utilitaires de gestion d'erreurs
- * Fournit des helpers pour gérer les erreurs courantes (MongoDB, validation, etc.)
- */
 import logger from "./logger.js";
-
-/**
- * Gère les erreurs et envoie une réponse HTTP appropriée
- * @param {Object} res - Objet Response Express
- * @param {Error} error - L'erreur à traiter
- * @param {string} context - Contexte de l'erreur pour les logs
- */
 export const handleError = (res, error, context = "") => {
   // Logger l'erreur
   const logMessage = context ? `[${context}]` : "";
@@ -44,23 +33,24 @@ export const handleError = (res, error, context = "") => {
   return res.status(500).json({ message: "Erreur serveur" });
 };
 
-/**
- * Vérifie si le corps de la requête est vide
- * @param {Object} body - Corps de la requête
- * @returns {boolean}
- */
 export const isEmptyBody = (body) => {
   return !body || Object.keys(body).length === 0;
 };
 
-/**
- * Extrait le message d'erreur d'une validation Joi
- * @param {Object} validation - Résultat de validation Joi
- * @returns {Object|null}
- */
 export const getValidationError = (validation) => {
   if (validation?.error?.details?.[0]) {
     return { message: validation.error.details[0].message };
   }
   return null;
+};
+
+/**
+ * Vérifie si l'utilisateur est propriétaire de la ressource ou admin
+ * @param {Object} resource - La ressource avec un champ user
+ * @param {Object} reqUser - L'utilisateur de req.user
+ * @returns {boolean} true si autorisé, false sinon
+ */
+export const isOwnerOrAdmin = (resource, reqUser) => {
+  if (!resource || !reqUser) return false;
+  return resource.user.toString() === reqUser.id || reqUser.isAdmin;
 };

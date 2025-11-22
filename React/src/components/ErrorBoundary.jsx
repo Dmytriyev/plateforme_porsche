@@ -11,9 +11,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ error });
-    if (import.meta.env.DEV) {
-      console.error('ErrorBoundary:', error, errorInfo);
-    }
+    if (import.meta.env.DEV) console.error('ErrorBoundary:', error, errorInfo);
   }
 
   handleReload = () => window.location.reload();

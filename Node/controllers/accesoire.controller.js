@@ -158,34 +158,55 @@ const deleteAccesoire = async (req, res) => {
 // Ajouter des images à un accesoire existant dans la base de données
 const addImages = async (req, res) => {
   try {
-    const { body } = req;
-    if (!body || Object.keys(body).length === 0) {
-      return sendValidationError(res, "Pas de données dans la requête");
-    }
-
-    const { error } = accesoireValidation(body).accesoireAddOrRemoveImage;
-    if (error) {
-      return sendValidationError(res, error.details[0].message);
-    }
     // Vérifier que l'accesoire existe avant d'ajouter des images
     const accesoire = await Accesoire.findById(req.params.id);
     if (!accesoire) {
       return sendNotFound(res, `Accesoire ${req.params.id} introuvable`);
     }
 
-    // Vérifier que toutes les photos existent
-    for (let photo_accesoireId of body.photo_accesoire) {
-      const photo_accesoire = await PhotoAccesoire.findById(photo_accesoireId);
-      // Vérifier que chaque photo existe avant de l'ajouter
-      if (!photo_accesoire) {
-        return sendNotFound(res, `Photo ${photo_accesoireId} introuvable`);
+    let photoIds = [];
+
+    // Cas 1: Upload direct de fichiers via multipart/form-data
+    if (req.files && req.files.length > 0) {
+      // Créer des entrées Photo_accesoire pour chaque fichier uploadé
+      for (const file of req.files) {
+        const photoData = {
+          name: "/uploads/accesoire/" + file.filename,
+          alt: req.body.alt || `Photo ${accesoire.nom_accesoire}`,
+        };
+        const newPhoto = new PhotoAccesoire(photoData);
+        const savedPhoto = await newPhoto.save();
+        photoIds.push(savedPhoto._id);
       }
+    }
+    // Cas 2: IDs de photos existantes fournis dans le body
+    else if (
+      req.body.photo_accesoire &&
+      Array.isArray(req.body.photo_accesoire)
+    ) {
+      const { error } = accesoireValidation(req.body).accesoireAddOrRemoveImage;
+      if (error) {
+        return sendValidationError(res, error.details[0].message);
+      }
+
+      // Vérifier que toutes les photos existent
+      for (let photo_accesoireId of req.body.photo_accesoire) {
+        const photo_accesoire = await PhotoAccesoire.findById(
+          photo_accesoireId
+        );
+        if (!photo_accesoire) {
+          return sendNotFound(res, `Photo ${photo_accesoireId} introuvable`);
+        }
+      }
+      photoIds = req.body.photo_accesoire;
+    } else {
+      return sendValidationError(res, "Aucune photo fournie");
     }
 
     // $addToSet évite les doublons dans le tableau
     const updatedAccesoire = await Accesoire.findByIdAndUpdate(
       req.params.id,
-      { $addToSet: { photo_accesoire: { $each: body.photo_accesoire } } },
+      { $addToSet: { photo_accesoire: { $each: photoIds } } },
       { new: true }
     )
       .populate("photo_accesoire", "name alt")

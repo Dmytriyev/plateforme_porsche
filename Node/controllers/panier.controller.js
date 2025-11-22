@@ -13,6 +13,30 @@ import {
 } from "../utils/responses.js";
 
 /**
+ * Helper pour récupérer les lignes de commande avec toutes les relations populées
+ */
+const getLignesCommandePopulees = async (panierId) => {
+  return await LigneCommande.find({ commande: panierId })
+    .populate("voiture")
+    .populate({
+      path: "accesoire",
+      populate: [{ path: "photo_accesoire" }, { path: "couleur_accesoire" }],
+    })
+    .populate({
+      path: "model_porsche_id",
+      populate: [
+        { path: "voiture" },
+        { path: "photo_porsche" },
+        { path: "couleur_exterieur" },
+        { path: "couleur_interieur" },
+        { path: "taille_jante" },
+        { path: "package" },
+        { path: "siege" },
+      ],
+    });
+};
+
+/**
  * Ajouter une voiture neuve au panier
  * - Crée une ligne de commande avec acompte (10%)
  * - Crée une notification pour l'utilisateur et le staff
@@ -51,10 +75,11 @@ const ajouterVoitureNeuveAuPanier = async (req, res) => {
     }
 
     // Calculer le prix total de la configuration
-    const prixTotal = await calculerPrixTotalModelPorsche(model_porsche_id);
+    const prixDetails = await calculerPrixTotalModelPorsche(model_porsche_id);
+    const prixTotal = prixDetails.prix_total_avec_options;
 
     // Calculer l'acompte (10%)
-    const acompte = Math.round(prixTotal * 0.1);
+    const acompte = Math.round(prixDetails.acompte_requis);
 
     // Trouver ou créer le panier (commande avec status = false)
     let panier = await Commande.findOne({
@@ -84,7 +109,7 @@ const ajouterVoitureNeuveAuPanier = async (req, res) => {
     }).save();
 
     // Créer une ligne de commande
-    const ligneCommande = await new LigneCommande({
+    await new LigneCommande({
       type_produit: true, // true = voiture
       quantite: 1,
       prix: prixTotal,
@@ -104,10 +129,7 @@ const ajouterVoitureNeuveAuPanier = async (req, res) => {
       .populate("user", "nom prenom email")
       .lean();
 
-    const lignesCommande = await LigneCommande.find({ commande: panier._id })
-      .populate("voiture")
-      .populate("accesoire")
-      .populate("model_porsche_id");
+    const lignesCommande = await getLignesCommandePopulees(panier._id);
 
     return sendSuccess(
       res,
@@ -206,7 +228,7 @@ const ajouterAccessoireAuPanier = async (req, res) => {
     }
 
     // Créer une nouvelle ligne de commande
-    const ligneCommande = await new LigneCommande({
+    await new LigneCommande({
       type_produit: false, // false = accessoire
       quantite: quantiteFinale,
       prix: prixTotal,
@@ -224,10 +246,7 @@ const ajouterAccessoireAuPanier = async (req, res) => {
       .populate("user", "nom prenom email")
       .lean();
 
-    const lignesCommande = await LigneCommande.find({ commande: panier._id })
-      .populate("voiture")
-      .populate("accesoire")
-      .populate("model_porsche_id");
+    const lignesCommande = await getLignesCommandePopulees(panier._id);
 
     return sendSuccess(
       res,
@@ -268,11 +287,8 @@ const getPanier = async (req, res) => {
       });
     }
 
-    // Récupérer les lignes de commande
-    const lignesCommande = await LigneCommande.find({ commande: panier._id })
-      .populate("voiture")
-      .populate("accesoire")
-      .populate("model_porsche_id");
+    // Récupérer les lignes de commande avec toutes les relations
+    const lignesCommande = await getLignesCommandePopulees(panier._id);
 
     return sendSuccess(res, {
       panier,
@@ -285,8 +301,98 @@ const getPanier = async (req, res) => {
   }
 };
 
+/**
+ * Modifier la quantité d'une ligne de panier
+ */
+const modifierQuantiteLigne = async (req, res) => {
+  try {
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const { ligne_id } = req.params;
+    const { quantite } = req.body;
+
+    if (!quantite || quantite < 1) {
+      return sendValidationError(res, "La quantité doit être au moins 1");
+    }
+
+    // Trouver la ligne de commande
+    const ligne = await LigneCommande.findById(ligne_id).populate("commande");
+
+    if (!ligne) {
+      return sendNotFound(res, "Ligne de commande");
+    }
+
+    // Vérifier que la ligne appartient au panier de l'utilisateur
+    if (ligne.commande.user.toString() !== req.user.id) {
+      return sendUnauthorized(res, "Non autorisé à modifier cette ligne");
+    }
+
+    // Calculer la différence de prix
+    const ancienneQuantite = ligne.quantite;
+    const prixUnitaire = ligne.prix / ancienneQuantite;
+    const nouveauPrix = prixUnitaire * quantite;
+    const diffPrix = nouveauPrix - ligne.prix;
+
+    // Mettre à jour la ligne
+    ligne.quantite = quantite;
+    ligne.prix = nouveauPrix;
+    await ligne.save();
+
+    // Mettre à jour le prix total du panier
+    const panier = await Commande.findById(ligne.commande._id);
+    panier.prix += diffPrix;
+    await panier.save();
+
+    return sendSuccess(res, { ligne, panier }, "Quantité mise à jour");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
+/**
+ * Supprimer une ligne du panier
+ */
+const supprimerLignePanier = async (req, res) => {
+  try {
+    if (!req.user) {
+      return sendUnauthorized(res, "Authentification requise");
+    }
+
+    const { ligne_id } = req.params;
+
+    // Trouver la ligne de commande
+    const ligne = await LigneCommande.findById(ligne_id).populate("commande");
+
+    if (!ligne) {
+      return sendNotFound(res, "Ligne de commande");
+    }
+
+    // Vérifier que la ligne appartient au panier de l'utilisateur
+    if (ligne.commande.user.toString() !== req.user.id) {
+      return sendUnauthorized(res, "Non autorisé à supprimer cette ligne");
+    }
+
+    // Mettre à jour le prix total du panier
+    const panier = await Commande.findById(ligne.commande._id);
+    panier.prix -= ligne.prix;
+    panier.acompte -= ligne.acompte || 0;
+    await panier.save();
+
+    // Supprimer la ligne
+    await LigneCommande.findByIdAndDelete(ligne_id);
+
+    return sendSuccess(res, { panier }, "Article retiré du panier avec succès");
+  } catch (error) {
+    return sendError(res, "Erreur serveur", 500, error);
+  }
+};
+
 export default {
   ajouterVoitureNeuveAuPanier,
   ajouterAccessoireAuPanier,
   getPanier,
+  modifierQuantiteLigne,
+  supprimerLignePanier,
 };

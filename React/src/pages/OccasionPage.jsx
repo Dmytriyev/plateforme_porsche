@@ -2,7 +2,6 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, voitureService } from '../services';
 import { Loading, Button } from '../components/common';
-import ContactButton from '../components/ContactButton.jsx';
 import { formatPrice } from '../utils/format.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/OccasionPage.css';
@@ -16,7 +15,7 @@ const OccasionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isStaff, user } = useContext(AuthContext);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const [isListeMode, setIsListeMode] = useState(false);
@@ -692,7 +691,7 @@ const OccasionPage = () => {
             <div className="occasion-detail-gallery-grid">
               {photos.slice(2, 6).map((photo, index) => (
                 <button
-                  key={index + 2}
+                  key={photo._id || `grid-photo-${index + 2}`}
                   onClick={() => setSelectedImage(index + 2)}
                   className={`occasion-detail-grid-thumbnail ${selectedImage === index + 2 ? 'active' : ''}`}
                 >
@@ -717,7 +716,7 @@ const OccasionPage = () => {
             <div className="occasion-detail-gallery-extended">
               {photos.slice(6).map((photo, index) => (
                 <button
-                  key={index + 6}
+                  key={photo._id || `extended-photo-${index + 6}`}
                   onClick={() => setSelectedImage(index + 6)}
                   className={`occasion-detail-gallery-extended-item ${selectedImage === index + 6 ? 'active' : ''}`}
                 >
@@ -871,11 +870,55 @@ const OccasionPage = () => {
                 >
                   RÉSERVER EN LIGNE
                 </Button>
-                <ContactButton
-                  vehiculeId={pageData?._id}
-                  typeVehicule="occasion"
-                  variant="outline"
-                />
+              </div>
+            </div>
+          )}
+
+          {/* Admin/Staff Actions */}
+          {isStaff() && occasion && (
+            <div className="occasion-detail-admin-box">
+              <h3 className="occasion-detail-admin-title">Actions administrateur</h3>
+              <div className="occasion-detail-admin-actions">
+                <button
+                  className="occasion-detail-admin-btn occasion-detail-admin-btn-add"
+                  onClick={() => navigate('/occasion/ajouter')}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Ajouter
+                </button>
+                <button
+                  className="occasion-detail-admin-btn occasion-detail-admin-btn-edit"
+                  onClick={() => navigate(`/occasion/${id}/modifier`)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                  Modifier
+                </button>
+                <button
+                  className="occasion-detail-admin-btn occasion-detail-admin-btn-delete"
+                  onClick={async () => {
+                    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ? Cette action est irréversible.')) {
+                      try {
+                        await modelPorscheService.deleteModelPorsche(id);
+                        alert('Voiture supprimée avec succès');
+                        navigate('/occasion');
+                      } catch (err) {
+                        alert(err.message || 'Erreur lors de la suppression');
+                      }
+                    }
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  Supprimer
+                </button>
               </div>
             </div>
           )}

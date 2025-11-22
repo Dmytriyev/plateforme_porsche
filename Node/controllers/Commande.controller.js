@@ -573,7 +573,7 @@ const mettreAJourPaiement = async (req, res) => {
     // Gérer la date de livraison
     if (date_livraison) {
       const dateObj = new Date(date_livraison);
-      if (isNaN(dateObj.getTime())) {
+      if (Number.isNaN(dateObj.getTime())) {
         return sendValidationError(res, "Date de livraison invalide");
       }
 

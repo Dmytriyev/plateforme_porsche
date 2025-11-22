@@ -4,7 +4,6 @@ import PaymentForm from './PaymentForm';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import Button from './common/Button.jsx';
-import ContactButton from './ContactButton.jsx';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -61,11 +60,6 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
                 <Button onClick={handleCreate} disabled={creating} variant="primary">
                     {creating ? 'Création…' : 'Réserver & Payer'}
                 </Button>
-                <ContactButton
-                    vehiculeId={vehiculeId}
-                    typeVehicule="occasion"
-                    variant="secondary"
-                />
                 {error && <div className="alert" style={{ color: 'red', marginTop: 8 }}>{error}</div>}
             </div>
 

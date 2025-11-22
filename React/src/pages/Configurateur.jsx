@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { modelPorscheService, personnalisationService } from '../services';
+import { modelPorscheService, personnalisationService, commandeService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import { Loading, Button } from '../components/common';
@@ -142,41 +142,27 @@ const Configurateur = () => {
           })
           : [];
 
-        if (import.meta.env.DEV) {
-        }
-
         setJantes(jantesFiltrees);
         setSieges(siegesData);
-        setPackages(packagesData);        //  NOUVELLE LOGIQUE: Sélectionner la variante spécifique ou la première par défaut
+        setPackages(packagesData);
+
+        //  NOUVELLE LOGIQUE: Sélectionner la variante spécifique ou la première par défaut
         if (variantesData.length > 0) {
           let varianteSelectionnee = null;
 
-          // Log détaillé des variantes disponibles
-          if (import.meta.env.DEV) {
-          }
           if (varianteId) {
             varianteSelectionnee = variantesData.find(v => v._id === varianteId);
-
-            if (import.meta.env.DEV) {
-            }
           }
 
           // Fallback: sélectionner la première variante si varianteId non trouvé
           if (!varianteSelectionnee) {
             varianteSelectionnee = variantesData[0];
-
-            if (import.meta.env.DEV && varianteId) {
-            }
-          }
-
-          if (import.meta.env.DEV) {
           }
 
           setConfig((prev) => ({ ...prev, variante: varianteSelectionnee }));
-        } else {
         }
       } catch (err) {
-        console.error('[Configurateur] Erreur chargement:', err);
+        if (import.meta.env.DEV) console.error('[Configurateur] Erreur chargement:', err);
         setError(err.message || 'Erreur lors du chargement des options');
       } finally {
         setLoading(false);
@@ -189,9 +175,7 @@ const Configurateur = () => {
       setLoading(false);
       setError('Paramètres manquants : voitureId ou varianteId requis');
 
-      if (import.meta.env.DEV) {
-        console.error('[Configurateur] Paramètres manquants:', { voitureId, varianteId });
-      }
+      if (import.meta.env.DEV) console.error('[Configurateur] Paramètres manquants:', { voitureId, varianteId });
     }
   }, [voitureId, varianteId]);
 
@@ -378,7 +362,8 @@ const Configurateur = () => {
       nomModel.includes('TARGA') || nomModel.includes('911')) {
       modeleBase = '911';
     }
-    else if (nomModel.includes('CAYMAN')) {
+    else if (nomModel.includes('CAYMAN') || nomModel.includes('GT4')) {
+      // GT4 est une variante du Cayman
       modeleBase = 'CAYMAN';
     }
     else if (nomModel.includes('CAYENNE')) {
@@ -387,6 +372,7 @@ const Configurateur = () => {
     else {
       modeleBase = nomModel.split(' ')[0];
     }
+
     const packagesFiltres = packages.filter(pkg => {
       const nomPackage = (pkg.nom_package || '').trim();
 
@@ -436,11 +422,8 @@ const Configurateur = () => {
       // Utiliser l'ID de la variante (model_porsche) sélectionnée
       const modelPorscheId = config.variante._id;
 
-      // Importer le service commande dynamiquement
-      const { commandeService } = await import('../services');
-
       // Ajouter la configuration au panier via l'API backend
-      await commandeService.ajouterConfigurationAuPanier(modelPorscheId, 1);
+      await commandeService.ajouterVoitureNeuveAuPanier(modelPorscheId);
 
       setSuccess('Configuration ajoutée au panier avec succès !');
 
@@ -543,7 +526,7 @@ const Configurateur = () => {
             <div className="configurateur-thumbnails">
               {visiblePhotos.map((photo, index) => (
                 <button
-                  key={index}
+                  key={photo._id || `photo-${index}`}
                   onClick={() => setPhotoActive(index)}
                   className={`configurateur-thumbnail ${photoActive === index ? 'configurateur-thumbnail-active' : ''}`}
                 >
@@ -929,17 +912,7 @@ const Configurateur = () => {
               >
                 {ajoutEnCours ? 'Ajout en cours...' : 'Acheter'}
               </button>
-              <button
-                className="configurateur-btn-contact"
-                onClick={() => navigate('/demande-contact', {
-                  state: {
-                    vehiculeId: config.variante?._id,
-                    typeVehicule: 'neuf',
-                  },
-                })}
-              >
-                Nous contacter
-              </button>
+
               {showLoginPrompt && (
                 <LoginPromptModal
                   onClose={() => setShowLoginPrompt(false)}

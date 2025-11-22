@@ -5,6 +5,12 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import {
+  sendError,
+  sendSuccess,
+  sendNotFound,
+  sendValidationError,
+} from "../utils/responses.js";
 import { getJanteOptions } from "../utils/jante.constants.js";
 import { removeUploadedFile } from "../utils/fileConstants.js";
 
@@ -16,7 +22,7 @@ const createTaille_jante = async (req, res) => {
       if (req.file) {
         removeUploadedFile(req.file.filename, "taille_jante");
       }
-      return res.status(400).json({ message: "Pas de données" });
+      return sendError(res, "Pas de données", 400);
     }
 
     // Si un fichier est uploadé, ajouter le chemin complet de la photo
@@ -32,11 +38,16 @@ const createTaille_jante = async (req, res) => {
       if (req.file) {
         removeUploadedFile(req.file.filename, "taille_jante");
       }
-      return res.status(400).json(validationError);
+      return sendValidationError(res, validationError.message);
     }
     // Créer et enregistrer la nouvelle taille de jante dans la base de données
     const taille_jante = await new Taille_jante(req.body).save();
-    return res.status(201).json(taille_jante);
+    return sendSuccess(
+      res,
+      taille_jante,
+      "Taille de jante créée avec succès",
+      201
+    );
   } catch (error) {
     if (req.file) {
       removeUploadedFile(req.file.filename, "taille_jante");
@@ -48,7 +59,11 @@ const createTaille_jante = async (req, res) => {
 const getAllTaille_jantes = async (req, res) => {
   try {
     const taille_jantes = await Taille_jante.find();
-    return res.json(taille_jantes);
+    return sendSuccess(
+      res,
+      taille_jantes,
+      "Tailles de jantes récupérées avec succès"
+    );
   } catch (error) {
     return handleError(res, error, "getAllTaille_jantes");
   }
@@ -58,9 +73,13 @@ const getTaille_janteById = async (req, res) => {
   try {
     const taille_jante = await Taille_jante.findById(req.params.id);
     if (!taille_jante) {
-      return res.status(404).json({ message: "Introuvable" });
+      return sendNotFound(res, "Taille de jante");
     }
-    return res.json(taille_jante);
+    return sendSuccess(
+      res,
+      taille_jante,
+      "Taille de jante récupérée avec succès"
+    );
   } catch (error) {
     return handleError(res, error, "getTaille_janteById");
   }
@@ -69,7 +88,7 @@ const getTaille_janteById = async (req, res) => {
 const updateTaille_jante = async (req, res) => {
   try {
     if (isEmptyBody(req.body) && !req.file) {
-      return res.status(400).json({ message: "Pas de données" });
+      return sendError(res, "Pas de données", 400);
     }
 
     // Si un fichier est uploadé, ajouter le chemin complet de la photo
@@ -84,7 +103,7 @@ const updateTaille_jante = async (req, res) => {
       if (req.file) {
         removeUploadedFile(req.file.filename, "taille_jante");
       }
-      return res.status(400).json(validationError);
+      return sendValidationError(res, validationError.message);
     }
 
     // Récupérer l'ancienne jante pour supprimer l'ancienne photo si une nouvelle est uploadée
@@ -106,9 +125,13 @@ const updateTaille_jante = async (req, res) => {
       if (req.file) {
         removeUploadedFile(req.file.filename, "taille_jante");
       }
-      return res.status(404).json({ message: "Introuvable" });
+      return sendNotFound(res, "Taille de jante");
     }
-    return res.json(taille_jante);
+    return sendSuccess(
+      res,
+      taille_jante,
+      "Taille de jante mise à jour avec succès"
+    );
   } catch (error) {
     if (req.file) {
       removeUploadedFile(req.file.filename, "taille_jante");
@@ -121,7 +144,7 @@ const deleteTaille_jante = async (req, res) => {
   try {
     const taille_jante = await Taille_jante.findByIdAndDelete(req.params.id);
     if (!taille_jante) {
-      return res.status(404).json({ message: "Introuvable" });
+      return sendNotFound(res, "Taille de jante");
     }
 
     // Supprimer la photo associée si elle existe
@@ -130,7 +153,7 @@ const deleteTaille_jante = async (req, res) => {
       removeUploadedFile(filename, "taille_jante");
     }
 
-    return res.json({ message: "Supprimé avec succès" });
+    return sendSuccess(res, null, "Taille de jante supprimée avec succès");
   } catch (error) {
     return handleError(res, error, "deleteTaille_jante");
   }
@@ -139,7 +162,11 @@ const deleteTaille_jante = async (req, res) => {
 const getAvailableJanteOptions = async (req, res) => {
   try {
     const options = getJanteOptions();
-    return res.json(options);
+    return sendSuccess(
+      res,
+      options,
+      "Options de jantes récupérées avec succès"
+    );
   } catch (error) {
     return handleError(res, error, "getAvailableJanteOptions");
   }

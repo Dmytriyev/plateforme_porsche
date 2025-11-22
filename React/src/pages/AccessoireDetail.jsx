@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { accesoireService } from '../services';
-import { PanierContext } from '../context/PanierContext.jsx';
 import { AuthContext } from '../context/AuthContext.jsx';
+import usePanierAPI from '../hooks/usePanierAPI.jsx';
 import { Loading, Button } from '../components/common';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import { formatPrice } from '../utils/format.js';
@@ -14,7 +14,7 @@ const AccessoireDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { ajouterAccessoire } = useContext(PanierContext);
+  const { ajouterAccessoire } = usePanierAPI();
   const { isAuthenticated } = useContext(AuthContext);
 
   const [accessoire, setAccessoire] = useState(null);
@@ -41,18 +41,25 @@ const AccessoireDetail = () => {
     fetchAccessoire();
   }, [fetchAccessoire]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isAuthenticated()) {
       setShowLoginPrompt(true);
       return;
     }
 
     if (accessoire) {
-      ajouterAccessoire(accessoire, 1);
-      setSuccess('Accessoire ajouté au panier !');
-      setTimeout(() => {
-        setSuccess('');
-      }, 3000);
+      try {
+        await ajouterAccessoire(accessoire._id, 1);
+        setSuccess('Accessoire ajouté au panier !');
+        setTimeout(() => {
+          setSuccess('');
+        }, 3000);
+      } catch (err) {
+        setError(err.message || 'Erreur lors de l\'ajout au panier');
+        setTimeout(() => {
+          setError('');
+        }, 3000);
+      }
     }
   };
 
@@ -190,7 +197,7 @@ const AccessoireDetail = () => {
               <div className="gallery-thumbs-porsche">
                 {photos.map((photo, index) => (
                   <button
-                    key={index}
+                    key={photo._id || `photo-${index}`}
                     onClick={() => setPhotoActive(index)}
                     className={`gallery-thumb-porsche ${photoActive === index ? 'gallery-thumb-active-porsche' : ''}`}
                     aria-label={`Voir la photo ${index + 1}`}

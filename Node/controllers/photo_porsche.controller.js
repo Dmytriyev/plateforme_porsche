@@ -41,12 +41,7 @@ const createPhoto_porsche = async (req, res) => {
     // Supprimer du body les champs correspondant aux fichiers envoyés (ex: "photo")
     if (req.files && Array.isArray(req.files)) {
       for (const f of req.files) {
-        if (
-          f &&
-          f.fieldname &&
-          body &&
-          Object.prototype.hasOwnProperty.call(body, f.fieldname)
-        ) {
+        if (f && f.fieldname && body && Object.hasOwn(body, f.fieldname)) {
           delete body[f.fieldname];
         }
       }
@@ -163,12 +158,7 @@ const updatePhoto_porsche = async (req, res) => {
     // Supprimer du body les champs correspondant aux fichiers envoyés (ex: "photo")
     if (req.files && Array.isArray(req.files)) {
       for (const f of req.files) {
-        if (
-          f &&
-          f.fieldname &&
-          body &&
-          Object.prototype.hasOwnProperty.call(body, f.fieldname)
-        ) {
+        if (f && f.fieldname && body && Object.hasOwn(body, f.fieldname)) {
           delete body[f.fieldname];
         }
       }

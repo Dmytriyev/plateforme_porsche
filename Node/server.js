@@ -35,7 +35,6 @@ import packageRoutes from "./routes/package.route.js";
 import accesoireRoutes from "./routes/accesoire.route.js";
 import photo_accesoireRoutes from "./routes/photo_accesoire.route.js";
 import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
-import demandeContactRoutes from "./routes/demande_contact.route.js";
 
 // __dirname pour retrouver le dossier courant
 const __filename = fileURLToPath(import.meta.url);
@@ -159,7 +158,6 @@ app.use("/model_porsche_actuel", model_porsche_actuelRoutes);
 app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);
 app.use("/accesoire", accesoireRoutes);
-app.use("/contact", demandeContactRoutes);
 
 // ============================================
 // GESTION DES ERREURS

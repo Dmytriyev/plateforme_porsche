@@ -1,6 +1,6 @@
 // les requêtes liées aux gammes de voitures
 import joi from "joi";
-import { PORSCHE_MODELS } from "../utils/constants.js";
+import { PORSCHE_MODELS } from "../utils/model_porsche.constants.js";
 
 export default function voitureValidation(body) {
   const mongoIdSchema = () => joi.string().hex().length(24);

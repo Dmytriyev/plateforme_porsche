@@ -41,19 +41,6 @@ export const validateRegisterForm = (formData) => {
   return errors;
 };
 
-export const validateContactForm = (formData) => {
-  const errors = {};
-  if (!formData.prenom?.trim()) errors.prenom = "Le prénom est requis";
-  if (!formData.nom?.trim()) errors.nom = "Le nom est requis";
-  if (!formData.email) errors.email = "L'email est requis";
-  else if (!validateEmail(formData.email)) errors.email = "Email invalide";
-  if (!formData.telephone) errors.telephone = "Le téléphone est requis";
-  else if (!validateTelephone(formData.telephone)) {
-    errors.telephone = "Numéro de téléphone invalide";
-  }
-  return errors;
-};
-
 export const handleFormChange = (setFormData, setErrors) => (e) => {
   const { name, value } = e.target;
   setFormData((prev) => ({ ...prev, [name]: value }));

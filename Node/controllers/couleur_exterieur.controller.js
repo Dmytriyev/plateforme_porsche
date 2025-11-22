@@ -6,6 +6,11 @@ import {
   isEmptyBody,
   getValidationError,
 } from "../utils/errorHandler.js";
+import {
+  sendError,
+  sendSuccess,
+  sendValidationError,
+} from "../utils/responses.js";
 import { removeUploadedFile } from "../utils/fileConstants.js";
 
 // Créer une nouvelle couleur extérieure
@@ -16,9 +21,7 @@ const createCouleurExterieur = async (req, res) => {
         // Supprimer le fichier uploadé en cas d'erreur de validation
         removeUploadedFile(req.file.filename, "couleur_exterieur");
       }
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return sendError(res, "Pas de données dans la requête", 400);
     }
 
     // Si un fichier est uploadé, ajouter le chemin complet de la photo
@@ -38,17 +41,19 @@ const createCouleurExterieur = async (req, res) => {
         // Supprimer le fichier uploadé en cas d'erreur de validation
         removeUploadedFile(req.file.filename, "couleur_exterieur");
       }
-      return res.status(400).json({ message: validationError });
+      return sendValidationError(res, validationError.message);
     }
 
     // Créer et sauvegarder la nouvelle couleur extérieure
     const couleur_exterieur = new Couleur_exterieur(req.body);
     const newCouleur_exterieur = await couleur_exterieur.save();
 
-    return res.status(201).json({
-      message: "Couleur extérieure créée avec succès",
-      couleur: newCouleur_exterieur,
-    });
+    return sendSuccess(
+      res,
+      newCouleur_exterieur,
+      "Couleur extérieure créée avec succès",
+      201
+    );
   } catch (error) {
     if (req.file) {
       removeUploadedFile(req.file.filename, "couleur_exterieur");
@@ -92,9 +97,7 @@ const updateCouleurExterieur = async (req, res) => {
   try {
     // Vérifier si le corps de la requête est vide
     if (isEmptyBody(req.body) && !req.file) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return sendError(res, "Pas de données dans la requête", 400);
     }
 
     // Si un fichier est uploadé, ajouter le chemin complet de la photo
@@ -112,7 +115,7 @@ const updateCouleurExterieur = async (req, res) => {
       if (req.file) {
         removeUploadedFile(req.file.filename, "couleur_exterieur");
       }
-      return res.status(400).json({ message: validationError });
+      return sendValidationError(res, validationError.message);
     }
 
     // Récupérer l'ancienne couleur pour supprimer l'ancienne photo si une nouvelle est uploadée

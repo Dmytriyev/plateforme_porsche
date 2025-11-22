@@ -20,7 +20,7 @@ const createPhoto_voiture = async (req, res) => {
     // Assurer que body est un objet même si req.body est undefined
     let body = req.body || {};
     // Si la requête ne contient ni body ni fichier, rejeter la requête
-    if ((Object.keys(body).length === 0 || body === null) && !req.file) {
+    if (Object.keys(body).length === 0 && !req.file) {
       return res
         .status(400)
         .json({ message: "Pas de données dans la requête" });
@@ -36,7 +36,9 @@ const createPhoto_voiture = async (req, res) => {
       if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
         try {
           body.voiture = JSON.parse(trimmed);
-        } catch (err) {}
+        } catch (err) {
+          // Garder la chaîne originale si le parsing échoue
+        }
         // Si ce n'est pas un tableau après parsing, le remettre en string pour validation
       } else if (trimmed.includes(",")) {
         body.voiture = trimmed

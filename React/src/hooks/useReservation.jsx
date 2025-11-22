@@ -82,7 +82,9 @@ export default function useReservation() {
                     clearInterval(pollRef.current);
                     pollRef.current = null;
                 }
-            } catch { }
+            } catch {
+                // Silent fail - le polling continuera au prochain intervalle
+            }
         }, interval);
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);

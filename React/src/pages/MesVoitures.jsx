@@ -228,7 +228,7 @@ const MesVoitures = () => {
                   {thumbnails.length > 0 && (
                     <div className="mes-voitures-thumbnails-finder">
                       {thumbnails.map((thumb, index) => (
-                        <div key={index} className="mes-voitures-thumbnail-finder">
+                        <div key={thumb._id || `thumb-${index}`} className="mes-voitures-thumbnail-finder">
                           <img
                             src={buildUrl(thumb.name)}
                             alt={`Vue ${index + 2}`}

@@ -15,10 +15,10 @@ const maVoitureService = {
     apiRequest(() => apiClient.post("/model-porsche-actuel/new", data)),
 
   updateMaVoiture: (id, data) =>
-    apiRequest(() => apiClient.put(`/model_porsche_actuel/${id}`, data)),
+    apiRequest(() => apiClient.put(`/model_porsche_actuel/update/${id}`, data)),
 
   supprimerMaVoiture: (id) =>
-    apiRequest(() => apiClient.delete(`/model_porsche_actuel/${id}`)),
+    apiRequest(() => apiClient.delete(`/model_porsche_actuel/delete/${id}`)),
 
   ajouterPhoto: (formData) =>
     apiRequest(() =>
@@ -29,6 +29,11 @@ const maVoitureService = {
 
   supprimerPhoto: (id) =>
     apiRequest(() => apiClient.delete(`/photo-voiture-actuel/delete/${id}`)),
+
+  supprimerPhotos: (id, data) =>
+    apiRequest(() =>
+      apiClient.patch(`/model_porsche_actuel/removeImages/${id}`, data)
+    ),
 };
 
 export default maVoitureService;
