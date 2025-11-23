@@ -291,6 +291,7 @@ const getPanier = async (req, res) => {
     const lignesCommande = await getLignesCommandePopulees(panier._id);
 
     return sendSuccess(res, {
+      commande: panier,
       panier,
       lignesCommande,
       total: panier.prix,

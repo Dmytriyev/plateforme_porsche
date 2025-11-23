@@ -1,0 +1,294 @@
+/* Container */
+.modifier-compte-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 2rem 1rem;
+}
+
+.modifier-compte-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Header */
+.modifier-compte-header {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modifier-compte-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+
+.modifier-compte-back:hover {
+  color: #000;
+}
+
+.modifier-compte-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+  font-family: "Porsche Next", -apple-system, sans-serif;
+}
+
+.modifier-compte-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* Messages */
+.modifier-compte-message {
+  padding: 1rem 2.5rem;
+  margin: 0;
+  font-size: 14px;
+}
+
+.modifier-compte-message-error {
+  background: #fee;
+  color: #c00;
+  border-bottom: 1px solid #fcc;
+}
+
+.modifier-compte-message-success {
+  background: #efe;
+  color: #060;
+  border-bottom: 1px solid #cfc;
+}
+
+/* Form */
+.modifier-compte-form {
+  padding: 2.5rem;
+}
+
+/* Sections */
+.modifier-compte-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modifier-compte-section:last-of-type {
+  border-bottom: none;
+}
+
+.modifier-compte-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 1.5rem 0;
+  font-family: "Porsche Next", -apple-system, sans-serif;
+}
+
+.modifier-compte-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Fields */
+.modifier-compte-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.modifier-compte-field:last-child {
+  margin-bottom: 0;
+}
+
+.modifier-compte-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.modifier-compte-field input {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.modifier-compte-field input:focus {
+  outline: none;
+  border-color: #d5001c;
+}
+
+.modifier-compte-field input:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Row for side-by-side fields */
+.modifier-compte-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Password Section */
+.modifier-compte-toggle-password {
+  background: transparent;
+  color: #d5001c;
+  border: 1px solid #d5001c;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modifier-compte-toggle-password:hover {
+  background: #d5001c;
+  color: white;
+}
+
+.modifier-compte-password-fields {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Actions */
+.modifier-compte-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modifier-compte-btn-cancel,
+.modifier-compte-btn-save {
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: "Porsche Next", -apple-system, sans-serif;
+}
+
+.modifier-compte-btn-cancel {
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.modifier-compte-btn-cancel:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.modifier-compte-btn-save {
+  background: #d5001c;
+  color: white;
+}
+
+.modifier-compte-btn-save:hover:not(:disabled) {
+  background: #b00016;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+}
+
+.modifier-compte-btn-save:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modifier-compte-container {
+    padding: 1rem 0;
+  }
+
+  .modifier-compte-content {
+    border-radius: 0;
+  }
+
+  .modifier-compte-header {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .modifier-compte-form {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .modifier-compte-title {
+    font-size: 24px;
+  }
+
+  .modifier-compte-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .modifier-compte-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .modifier-compte-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .modifier-compte-toggle-password {
+    width: 100%;
+  }
+
+  .modifier-compte-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modifier-compte-btn-cancel,
+  .modifier-compte-btn-save {
+    width: 100%;
+  }
+}
+
+/* Focus visible for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #d5001c;
+  outline-offset: 2px;
+}

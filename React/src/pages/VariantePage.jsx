@@ -148,21 +148,21 @@ const VariantePage = () => {
         </div>
         <div className="variante-nav-top-right">
           <button
-            className="variante-nav-link"
+            className="variante-nav-link variante-btn-configurer"
             onClick={handleConfigurer}
           >
             CONFIGURER
           </button>
           {type !== 'neuf' && (
             <button
-              className="variante-nav-link"
+              className="variante-nav-link variante-btn-acheter"
               onClick={handleAcheter}
             >
               ACHETER DES VOITURES NEUVES ET D'OCCASION
             </button>
           )}
           {type !== 'neuf' && (
-            <button className="variante-nav-link">COMPARER</button>
+            <button className="variante-nav-link variante-btn-comparer">COMPARER</button>
           )}
         </div>
       </nav>
@@ -285,13 +285,13 @@ const VariantePage = () => {
       {/* Boutons d'action en bas */}
       <div className="variante-actions-bottom-porsche">
         <button
-          className="variante-action-btn-porsche variante-action-btn-black"
+          className="variante-action-btn-porsche variante-action-btn-white"
           onClick={handleChangerModele}
         >
           CHANGER DE MODÈLE
         </button>
         <button
-          className="variante-action-btn-porsche variante-action-btn-white"
+          className="variante-action-btn-porsche variante-action-btn-black"
           onClick={handleConfigurer}
         >
           CONFIGURER

@@ -1,11 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { commandeService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading, Button, Card } from '../components/common';
 import { formatPrice, formatDate } from '../utils/format.js';
 import '../css/MesCommandes.css';
-import '../css/components/Message.css';
 
 /**
  * Page Mes Commandes - Historique des commandes
@@ -13,14 +11,25 @@ import '../css/components/Message.css';
 const MesCommandes = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [searchParams] = useSearchParams();
 
   const [commandes, setCommandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
+    // Vérifier si on vient d'un paiement réussi
+    const paymentSuccess = searchParams.get('payment');
+    if (paymentSuccess === 'success') {
+      setSuccessMessage('Paiement effectué avec succès ! Votre commande a été validée.');
+      // Supprimer le paramètre de l'URL
+      window.history.replaceState({}, '', '/mes-commandes');
+      // Masquer le message après 5 secondes
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
     fetchCommandes();
-  }, []);
+  }, [searchParams]);
 
   const fetchCommandes = async () => {
     try {
@@ -47,14 +56,23 @@ const MesCommandes = () => {
 
   if (!user) {
     return (
-      <div className="error-container">
-        <p className="error-text">Vous devez être connecté pour accéder à cette page</p>
-        <Button onClick={() => navigate('/login')}>Se connecter</Button>
+      <div className="mes-commandes-error">
+        <p>Vous devez être connecté pour accéder à cette page</p>
+        <button onClick={() => navigate('/login')} className="mes-commandes-btn">
+          Se connecter
+        </button>
       </div>
     );
   }
 
-  if (loading) return <Loading fullScreen message="Chargement de vos commandes..." />;
+  if (loading) {
+    return (
+      <div className="mes-commandes-loading">
+        <div className="mes-commandes-spinner"></div>
+        <p>Chargement de vos commandes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mes-commandes-container">
@@ -67,14 +85,23 @@ const MesCommandes = () => {
               Historique de vos achats et réservations
             </p>
           </div>
-          <Button onClick={() => navigate('/panier')}>
+          <button onClick={() => navigate('/panier')} className="mes-commandes-btn-panier">
             Voir mon panier
-          </Button>
+          </button>
         </div>
 
         {/* Messages */}
+        {successMessage && (
+          <div className="mes-commandes-success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <p>{successMessage}</p>
+          </div>
+        )}
+
         {error && (
-          <div className="message-box message-error">
+          <div className="mes-commandes-error-message">
             <p>{error}</p>
           </div>
         )}
@@ -82,18 +109,20 @@ const MesCommandes = () => {
         {/* Liste des commandes */}
         {commandes.length === 0 ? (
           <div className="mes-commandes-empty">
-            <svg className="mes-commandes-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
             <p className="mes-commandes-empty-text">Vous n'avez aucune commande</p>
-            <Button onClick={() => navigate('/choix-voiture')}>
-              Découvrir nos voitures
-            </Button>
+            <div className="mes-commandes-empty-actions">
+              <button onClick={() => navigate('/catalogue/neuve')} className="mes-commandes-btn mes-commandes-btn-primary">
+                Découvrir nos voitures
+              </button>
+              <button onClick={() => navigate('/accessoires')} className="mes-commandes-btn mes-commandes-btn-secondary">
+                Découvrir nos accessoires
+              </button>
+            </div>
           </div>
         ) : (
           <div className="mes-commandes-list">
             {commandes.map((commande) => (
-              <Card key={commande._id} padding="lg">
+              <div key={commande._id} className="commande-card">
                 <div className="commande-item">
                   {/* En-tête commande */}
                   <div className="commande-header">
@@ -157,19 +186,8 @@ const MesCommandes = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Actions */}
-                  <div className="commande-actions">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/commandes/${commande._id}`)}
-                    >
-                      Voir le détail
-                    </Button>
-                  </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}

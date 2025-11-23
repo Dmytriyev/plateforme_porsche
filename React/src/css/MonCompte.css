@@ -50,7 +50,7 @@
   font-size: 0.9375rem;
   color: #374151;
   cursor: pointer;
-  border-radius: 1rem;
+  border-radius: 4px;
   transition: all 0.2s ease;
   font-weight: 500;
 }
@@ -141,7 +141,7 @@
 .mon-compte-block-btn {
   padding: 0.75rem 1.5rem;
   border: 2px solid transparent;
-  border-radius: 1rem;
+  border-radius: 4px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
@@ -226,8 +226,8 @@
 /* Cards Réservations */
 .mon-compte-reservation-card {
   background-color: #fff;
-  border: 2px solid #e5e7eb;
-  border-radius: 1rem;
+  border: 2px solid #000;
+  border-radius: 4px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -235,9 +235,7 @@
 }
 
 .mon-compte-reservation-card:hover {
-  border-color: #000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .mon-compte-reservation-img,
@@ -322,10 +320,10 @@
 .mon-compte-voiture-btn {
   flex: 1 1 0;
   min-width: 100px;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.5rem;
   border: 2px solid transparent;
-  border-radius: 1rem;
-  font-size: 0.875rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -333,7 +331,7 @@
   text-align: center;
 }
 
-.mon-compte-reservation-btn-modify,
+.mon-compte-reservation-btn-view,
 .mon-compte-voiture-btn-modify,
 .mon-compte-voiture-btn-view {
   background-color: #fff;
@@ -341,7 +339,7 @@
   border-color: #000;
 }
 
-.mon-compte-reservation-btn-modify:hover,
+.mon-compte-reservation-btn-view:hover,
 .mon-compte-voiture-btn-modify:hover,
 .mon-compte-voiture-btn-view:hover {
   background-color: #f9fafb;
@@ -361,6 +359,104 @@
   background-color: #fee2e2;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+}
+
+.mon-compte-reservation-btn-accept {
+  background-color: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+.mon-compte-reservation-btn-accept:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.mon-compte-reservation-btn-refuse {
+  background-color: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.mon-compte-reservation-btn-refuse:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Informations utilisateur pour staff */
+.mon-compte-reservation-user-info {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border-left: 3px solid #000;
+}
+
+.mon-compte-reservation-user-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.mon-compte-reservation-user-details {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.mon-compte-reservation-user-contact {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.mon-compte-reservation-concessionnaire {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.mon-compte-reservation-status-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mon-compte-reservation-status-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.mon-compte-reservation-status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mon-compte-reservation-status-badge.status-confirmed {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.mon-compte-reservation-status-badge.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.mon-compte-reservation-card-staff {
+  border-color: #000;
 }
 
 /* Cards Commandes */
@@ -842,14 +938,14 @@
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
-  padding: 1rem 1.5rem;
+  padding: 1rem 2rem;
   border: 2px solid;
-  border-radius: 1rem;
+  border-radius: 4px;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  text-align: center;
 }
 
 .mon-compte-admin-btn svg {
@@ -875,15 +971,15 @@
 
 .mon-compte-admin-btn-manage {
   background: #fff;
-  color: #2563eb;
-  border-color: #2563eb;
+  color: #000;
+  border-color: #000;
 }
 
 .mon-compte-admin-btn-manage:hover {
-  background: #2563eb;
-  color: #fff;
+  background: #f5f5f5;
+  color: #000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .mon-compte-admin-btn-manage:hover svg {
@@ -892,6 +988,485 @@
 
 .mon-compte-admin-btn:active {
   transform: translateY(0);
+}
+
+/* ============================================
+   GESTION DES ACHATS (Staff/Admin)
+   ============================================ */
+
+.gestion-achats-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.gestion-achats-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 2px solid #000;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gestion-achats-filter-btn:hover {
+  background: #f5f5f5;
+}
+
+.gestion-achats-filter-btn.active {
+  background: #000;
+  border-color: #000;
+  color: white;
+}
+
+.sort-arrow {
+  margin-left: 0.25rem;
+  font-size: 1rem;
+}
+
+.gestion-achats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gestion-achat-card {
+  background: white;
+  border: 2px solid #000;
+  border-radius: 4px;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.gestion-achat-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gestion-achat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.gestion-achat-numero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gestion-achat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+}
+
+.gestion-achat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.gestion-achat-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.gestion-achat-date svg {
+  color: #d5001c;
+}
+
+.gestion-achat-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.gestion-achat-user {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+  min-height: 100%;
+  height: 100%;
+}
+
+.gestion-achat-user-icon {
+  width: 36px;
+  height: 36px;
+  background: #f5f5f5;
+  border: 2px solid #e5e5e5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gestion-achat-user-icon svg {
+  color: #666;
+}
+
+.gestion-achat-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gestion-achat-user-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.gestion-achat-user-email {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.gestion-achat-user-email svg {
+  flex-shrink: 0;
+}
+
+.gestion-achat-user-phone {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.gestion-achat-user-phone svg {
+  flex-shrink: 0;
+}
+
+.gestion-achat-user-adresse {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  line-height: 1.4;
+}
+
+.gestion-achat-user-adresse svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Section produits */
+.gestion-achat-produits {
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border-left: 3px solid #d5001c;
+}
+
+.gestion-achat-produits-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gestion-achat-produits-title svg {
+  color: #d5001c;
+}
+
+.gestion-achat-produits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gestion-achat-produit-item {
+  display: block;
+  padding: 0.5rem 0;
+  list-style: none;
+}
+
+.gestion-achat-produit-item:not(:last-child) {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.gestion-achat-produit-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #d5001c 0%, #b50018 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gestion-achat-produit-icon svg {
+  color: white;
+}
+
+.gestion-achat-produit-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.gestion-achat-produit-nom {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.gestion-achat-produit-type {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.gestion-achat-produit-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.gestion-achat-produit-quantite {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.gestion-achat-produit-prix {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #d5001c;
+  margin: 0;
+}
+
+.gestion-achat-produit-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.gestion-achat-produit-spec {
+  font-size: 0.8rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.gestion-achat-produit-spec strong {
+  color: #1a1a1a;
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+.gestion-achat-concessionnaire {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.gestion-achat-concessionnaire strong {
+  color: #856404;
+}
+
+.gestion-achat-produit-total {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.gestion-achat-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  grid-column: 1 / -1;
+  padding-top: 1rem;
+  border-top: 2px solid #e5e5e5;
+}
+
+.gestion-achat-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.gestion-achat-detail-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.gestion-achat-detail-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.gestion-achat-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #d5001c;
+}
+
+.gestion-achat-reste {
+  color: #ff6b00;
+  font-size: 1.1rem;
+}
+
+.gestion-achat-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gestion-achat-btn-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #d5001c 0%, #b50018 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(213, 0, 28, 0.2);
+}
+
+.gestion-achat-btn-detail:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+}
+
+.gestion-achat-btn-detail svg {
+  flex-shrink: 0;
+}
+
+.gestion-achat-facture-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d5001c;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.gestion-achat-facture-link:hover {
+  color: #b50018;
+  text-decoration: underline;
+}
+
+.gestion-achat-facture-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Section prix */
+.gestion-achat-prix {
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+  min-height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.gestion-achat-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem 0;
+}
+
+.gestion-achat-total strong {
+  color: #d5001c;
+}
+
+.gestion-achat-restant {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Section facture */
+.gestion-achat-facture {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+
+.gestion-achat-btn-facture {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.gestion-achat-btn-facture:hover {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.gestion-achat-btn-facture svg {
+  flex-shrink: 0;
 }
 
 /* Responsive */
@@ -903,5 +1478,32 @@
   .mon-compte-admin-btn {
     width: 100%;
     min-width: 0;
+  }
+
+  .gestion-achats-filters {
+    flex-direction: column;
+  }
+
+  .gestion-achats-filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .gestion-achat-body {
+    grid-template-columns: 1fr;
+  }
+
+  .gestion-achat-produit-item {
+    flex-direction: column;
+  }
+
+  .gestion-achat-produit-icon {
+    align-self: flex-start;
+  }
+
+  .gestion-achat-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }

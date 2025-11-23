@@ -20,7 +20,7 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 const router = Router();
 
 // ============================================
-// ROUTES ADMIN
+// ROUTES ADMIN/STAFF
 // ============================================
 router.get("/all", auth, isAdmin, getAllCommandes);
 

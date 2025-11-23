@@ -81,7 +81,7 @@
 }
 
 .home-hero-btn {
-  padding: 1rem 2rem;
+  padding: 0.67rem 2rem;
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
@@ -209,7 +209,7 @@
 }
 
 .home-accessoires-btn {
-  padding: 1rem 2rem;
+  padding: 0.67rem 2rem;
   background-color: #000;
   color: #fff;
   text-decoration: none;
@@ -361,7 +361,7 @@
   opacity: 0.9;
 }
 .home-approved-btn {
-  padding: 1rem 2rem;
+  padding: 0.67rem 2rem;
   background-color: #fff;
   color: #000;
   text-decoration: none;

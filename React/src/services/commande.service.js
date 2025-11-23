@@ -15,10 +15,18 @@ const commandeService = {
   cancelReservation: (id) =>
     apiRequest(() => apiClient.delete(`/reservation/delete/${id}`)),
 
+  acceptReservation: (id) =>
+    apiRequest(() => apiClient.patch(`/reservation/${id}/accepter`)),
+
+  refuseReservation: (id) =>
+    apiRequest(() => apiClient.patch(`/reservation/${id}/refuser`)),
+
   createCommande: (data) =>
     apiRequest(() => apiClient.post("/commande/new", data)),
 
   getMyCommandes: () => apiRequest(() => apiClient.get("/commande/historique")),
+
+  getAllCommandes: () => apiRequest(() => apiClient.get("/commande/all")),
 
   getCommandeById: (id) => apiRequest(() => apiClient.get(`/commande/${id}`)),
 

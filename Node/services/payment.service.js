@@ -78,11 +78,14 @@ export const createCheckoutSession = async ({ commandeId, user }) => {
   });
 
   const successUrl = process.env.FRONTEND_URL
-    ? `${process.env.FRONTEND_URL.replace(/\/$/, "")}/success`
-    : "http://localhost:3001/success";
+    ? `${process.env.FRONTEND_URL.replace(
+        /\/$/,
+        ""
+      )}/mes-commandes?payment=success`
+    : "http://localhost:5173/mes-commandes?payment=success";
   const cancelUrl = process.env.FRONTEND_URL
-    ? `${process.env.FRONTEND_URL.replace(/\/$/, "")}/cancel`
-    : "http://localhost:3001/cancel";
+    ? `${process.env.FRONTEND_URL.replace(/\/$/, "")}/panier`
+    : "http://localhost:5173/panier";
 
   const session = await stripe.checkout.sessions.create({
     customer: customer.id,
@@ -123,6 +126,8 @@ export const processWebhook = async ({ rawBody, signature }) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const commandeId = session.metadata && session.metadata.commandeId;
+    console.log("Webhook checkout.session.completed - commandeId:", commandeId);
+
     if (!commandeId) {
       throw Object.assign(new Error("commandeId manquant dans metadata"), {
         status: 400,
@@ -130,10 +135,20 @@ export const processWebhook = async ({ rawBody, signature }) => {
     }
 
     const commande = await Commande.findById(commandeId);
-    if (!commande)
+    if (!commande) {
+      console.error("Commande introuvable:", commandeId);
       throw Object.assign(new Error("Commande introuvable"), { status: 404 });
+    }
+
+    console.log("Commande trouvée:", {
+      id: commande._id,
+      status: commande.status,
+      user: commande.user,
+    });
+
     // Idempotence: si déjà traitée, ignorer
     if (commande.status === true && commande.factureUrl) {
+      console.log("Commande déjà traitée, ignorer");
       return { handled: false, reason: "déjà traité" };
     }
 
@@ -161,6 +176,13 @@ export const processWebhook = async ({ rawBody, signature }) => {
     commande.date_commande = new Date();
     await commande.save();
 
+    console.log("Commande mise à jour:", {
+      id: commande._id,
+      status: commande.status,
+      prix: commande.prix,
+      factureUrl: commande.factureUrl,
+    });
+
     // Créer un nouveau panier pour l'utilisateur
     const nouveauPanier = new Commande({
       user: commande.user,
@@ -170,6 +192,8 @@ export const processWebhook = async ({ rawBody, signature }) => {
       status: false,
     });
     await nouveauPanier.save();
+
+    console.log("Nouveau panier créé pour l'utilisateur:", nouveauPanier._id);
 
     // Ici on pourrait envoyer un email ou émettre un event socket
     logger.info(

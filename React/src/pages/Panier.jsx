@@ -24,7 +24,7 @@ const Panier = () => {
       setError('');
       const data = await commandeService.getPanier();
       setLignes(Array.isArray(data.lignesCommande) ? data.lignesCommande : []);
-      setTotal(data.total || 0);
+      // Le total sera recalculé dans useEffect
     } catch (err) {
       if (err.message?.includes('Panier') || err.message?.includes('Aucun panier')) {
         setLignes([]);
@@ -43,6 +43,20 @@ const Panier = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Recalculer le total : acompte pour voitures neuves, prix complet pour accessoires
+  useEffect(() => {
+    const nouveauTotal = lignes.reduce((sum, ligne) => {
+      const isVoiture = ligne.type_produit === true;
+      // Pour les voitures : utiliser l'acompte
+      // Pour les accessoires : utiliser le prix * quantité
+      const montantLigne = isVoiture
+        ? (ligne.acompte || 0)
+        : (ligne.prix || 0) * (ligne.quantite || 1);
+      return sum + montantLigne;
+    }, 0);
+    setTotal(nouveauTotal);
+  }, [lignes]);
 
   const handleUpdateQuantite = async (ligneId, nouvelleQuantite) => {
     if (nouvelleQuantite < 1) return;
@@ -147,20 +161,10 @@ const Panier = () => {
                 const photoPrincipale = photos[0] || null;
                 const prixAAfficher = isVoiture ? (ligne.acompte || 0) : (ligne.prix || 0);
                 const prixTotalLigne = prixAAfficher * (ligne.quantite || 1);
+                const prixTotalVoiture = isVoiture ? (ligne.prix || 0) : null;
 
                 return (
                   <article key={ligne._id} className="panier-article-card-porsche">
-                    <button
-                      className="panier-article-remove-porsche"
-                      onClick={() => handleSupprimerLigne(ligne._id)}
-                      aria-label="Retirer du panier"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </button>
-
                     <div className="panier-article-image-porsche">
                       {photoPrincipale && photoPrincipale.name ? (
                         <img
@@ -241,12 +245,20 @@ const Panier = () => {
                             </div>
                           )}
                           {isVoiture && (
-                            <div className="panier-attribute-item-porsche">
-                              <span className="panier-attribute-label-porsche">Acompte:</span>
-                              <span className="panier-attribute-value-porsche">
-                                {formatPrice(ligne.acompte || 0)} (10% du prix total)
-                              </span>
-                            </div>
+                            <>
+                              <div className="panier-attribute-item-porsche">
+                                <span className="panier-attribute-label-porsche">Prix total:</span>
+                                <span className="panier-attribute-value-porsche">
+                                  {formatPrice(prixTotalVoiture || 0)}
+                                </span>
+                              </div>
+                              <div className="panier-attribute-item-porsche">
+                                <span className="panier-attribute-label-porsche">Acompte:</span>
+                                <span className="panier-attribute-value-porsche">
+                                  {formatPrice(ligne.acompte || 0)} (10% du prix total)
+                                </span>
+                              </div>
+                            </>
                           )}
                         </div>
                       )}
@@ -271,8 +283,20 @@ const Panier = () => {
                       )}
                     </div>
 
-                    <div className="panier-article-price-porsche">
-                      {formatPrice(prixTotalLigne)}
+                    <div className="panier-article-actions-porsche">
+                      <div className="panier-article-price-porsche">
+                        {formatPrice(prixTotalLigne)}
+                      </div>
+                      <button
+                        className="panier-article-remove-porsche"
+                        onClick={() => handleSupprimerLigne(ligne._id)}
+                        aria-label="Retirer du panier"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
                     </div>
                   </article>
                 );
@@ -295,14 +319,6 @@ const Panier = () => {
                   <span className="panier-summary-ttc-porsche">T.T.C.</span>
                 </div>
 
-                {/* Utiliser un bon d'achat */}
-                <button className="panier-voucher-link-porsche">
-                  Utiliser un bon d'achat
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-
                 <button
                   className="panier-checkout-btn-porsche"
                   onClick={handlePasserCommande}
@@ -318,17 +334,6 @@ const Panier = () => {
                   <div className="panier-summary-detail-item-porsche">
                     <span>Emballage et expédition</span>
                     <span className="panier-shipping-free-porsche">gratuit</span>
-                  </div>
-                </div>
-
-                <div className="panier-security-porsche">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="panier-security-icon-porsche">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <div className="panier-security-text-porsche">
-                    <span className="panier-security-title-porsche">Cryptage SSL</span>
-                    <span className="panier-security-subtitle-porsche">Vos données sont sécurisées</span>
                   </div>
                 </div>
               </div>

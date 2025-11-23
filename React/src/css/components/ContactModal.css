@@ -1,0 +1,263 @@
+/* Modal Overlay */
+.contact-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.contact-modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close Button */
+.contact-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.contact-modal-close:hover {
+  color: #000;
+}
+
+/* Title & Subtitle */
+.contact-modal-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 10px 0;
+  font-family: "Porsche Next", -apple-system, sans-serif;
+}
+
+.contact-modal-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 30px 0;
+  line-height: 1.5;
+}
+
+/* Form */
+.contact-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.contact-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-modal-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.contact-modal-field input,
+.contact-modal-field textarea {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.contact-modal-field input:focus,
+.contact-modal-field textarea:focus {
+  outline: none;
+  border-color: #d5001c;
+}
+
+.contact-modal-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.contact-modal-readonly {
+  background: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Info Box */
+.contact-modal-info {
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 4px;
+  border-left: 3px solid #d5001c;
+}
+
+.contact-modal-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.contact-modal-info strong {
+  color: #000;
+}
+
+/* Actions */
+.contact-modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.contact-modal-btn-cancel,
+.contact-modal-btn-submit {
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: "Porsche Next", -apple-system, sans-serif;
+}
+
+.contact-modal-btn-cancel {
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.contact-modal-btn-cancel:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.contact-modal-btn-submit {
+  background: #d5001c;
+  color: white;
+}
+
+.contact-modal-btn-submit:hover {
+  background: #b00016;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+}
+
+/* Success State */
+.contact-modal-success {
+  text-align: center;
+  padding: 60px 40px;
+}
+
+.contact-modal-success-icon {
+  width: 80px;
+  height: 80px;
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin: 0 auto 20px;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.contact-modal-success-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 10px 0;
+}
+
+.contact-modal-success-text {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-modal-content {
+    padding: 30px 20px;
+    max-height: 95vh;
+  }
+
+  .contact-modal-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-modal-title {
+    font-size: 24px;
+  }
+
+  .contact-modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .contact-modal-btn-cancel,
+  .contact-modal-btn-submit {
+    width: 100%;
+  }
+}

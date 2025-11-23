@@ -47,6 +47,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const updateUser = useCallback((userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  }, []);
+
   const isAuthenticated = useCallback(() => !!user && authService.isAuthenticated(), [user]);
 
   const hasRole = useCallback((roleOrRoles) => {
@@ -61,12 +66,13 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    updateUser,
     isAuthenticated,
     hasRole,
     isAdmin: () => hasRole('admin'),
     isConseiller: () => hasRole(['conseiller', 'responsable']),
     isStaff: () => hasRole(['admin', 'conseiller', 'responsable']),
-  }), [user, loading, login, register, logout, updateProfile, isAuthenticated, hasRole]);
+  }), [user, loading, login, register, logout, updateProfile, updateUser, isAuthenticated, hasRole]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

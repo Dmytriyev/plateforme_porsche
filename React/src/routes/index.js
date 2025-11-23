@@ -92,9 +92,33 @@ export const routes = [
 
 export const protectedRoutes = [
   {
+    path: "/commande/checkout",
+    elementName: "Checkout",
+    title: "Finaliser commande",
+    hideFromMenu: true,
+  },
+  {
+    path: "/success",
+    elementName: "PaymentSuccess",
+    title: "Paiement réussi",
+    hideFromMenu: true,
+  },
+  {
+    path: "/cancel",
+    elementName: "PaymentCancel",
+    title: "Paiement annulé",
+    hideFromMenu: true,
+  },
+  {
     path: "/mon-compte",
     elementName: "MonCompte",
     title: "Mon compte",
+    hideFromMenu: true,
+  },
+  {
+    path: "/mon-compte/modifier",
+    elementName: "ModifierMonCompte",
+    title: "Modifier mon compte",
     hideFromMenu: true,
   },
   {

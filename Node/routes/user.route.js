@@ -19,6 +19,8 @@ import {
   updateUserPorsche,
   getUserDashboard,
   getAvailableUserRoles,
+  getCurrentUserProfile,
+  updateCurrentUserProfile,
 } from "../controllers/user.controller.js";
 import { body } from "express-validator";
 import validateRequest from "../middlewares/validateRequest.js";
@@ -73,12 +75,16 @@ router.get("/all", auth, isAdmin, getAllUsers);
 router.get("/roles", auth, isAdmin, getAvailableUserRoles);
 router.put("/role/:id", auth, isAdmin, validateObjectId("id"), updateUserRole);
 
-// Routes utilisateur
+// Routes utilisateur - Routes spécifiques AVANT les routes génériques avec :id
+// Profil de l'utilisateur connecté (sans ID)
+router.get("/profile", auth, getCurrentUserProfile);
+router.patch("/profile", auth, updateCurrentUserProfile);
+router.get("/profile/:id", auth, validateObjectId("id"), getUserProfile);
+
+// Routes génériques avec ID (doivent être APRÈS les routes spécifiques)
 router.get("/:id", auth, validateObjectId("id"), getUserById);
 router.put("/update/:id", auth, validateObjectId("id"), updateUser);
 router.delete("/delete/:id", auth, validateObjectId("id"), deleteUser);
-// Profil
-router.get("/profile/:id", auth, validateObjectId("id"), getUserProfile);
 router.get("/dashboard/:id", auth, validateObjectId("id"), getUserDashboard);
 // Gestion des réservations
 router.post(

@@ -1,3 +1,16 @@
+.mes-commandes-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem 0;
+}
+
+.mes-commandes-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* En-tête */
 .mes-commandes-header {
   display: flex;
   justify-content: space-between;
@@ -5,97 +18,390 @@
   margin-bottom: 2rem;
   gap: 1.5rem;
 }
+
 .mes-commandes-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: #000;
+  color: #1a1a1a;
   margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
 .mes-commandes-subtitle {
-  font-size: 1.125rem;
-  color: #6b7280;
+  font-size: 1rem;
+  color: #666;
   margin: 0;
 }
-@media (max-width: 768px) {
-  .mes-commandes-header {
-    flex-direction: column;
-    text-align: center;
+
+.mes-commandes-btn-panier {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mes-commandes-btn-panier:hover {
+  background: #d5001c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+}
+
+/* Messages */
+.mes-commandes-success {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #10b981;
+  animation: slideIn 0.5s ease;
+}
+
+.mes-commandes-success svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.mes-commandes-success p {
+  margin: 0;
+  font-weight: 600;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+
+.mes-commandes-error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #dc2626;
+}
+
+.mes-commandes-error-message p {
+  margin: 0;
+}
+
+/* État vide */
+.mes-commandes-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.mes-commandes-empty-text {
+  font-size: 1.2rem;
+  color: #666;
+  margin: 0 0 2rem 0;
+}
+
+.mes-commandes-empty-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mes-commandes-btn {
+  padding: 0.65rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.mes-commandes-btn-primary {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.mes-commandes-btn-primary:hover {
+  background: #333;
+}
+
+.mes-commandes-btn-secondary {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.mes-commandes-btn-secondary:hover {
+  background: #f5f5f5;
+}
+
+/* Liste des commandes */
 .mes-commandes-list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
+
+.commande-card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.commande-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.commande-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* En-tête de commande */
 .commande-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid #e5e5e5;
 }
+
 .commande-numero {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #000;
+  color: #1a1a1a;
   margin: 0 0 0.25rem 0;
 }
+
 .commande-date {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #666;
   margin: 0;
 }
+
+/* Badges de statut */
+.commande-status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pending {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* Détails de commande */
 .commande-details {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
+
 .commande-detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.5rem 0;
 }
+
 .commande-label {
   font-weight: 600;
-  color: #374151;
+  color: #1a1a1a;
 }
+
 .commande-value {
-  color: #6b7280;
-}
-.commande-price {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #000;
-}
-.commande-restant {
-  font-weight: 600;
-  color: #dc2626;
-}
-.commande-facture-link {
-  color: #2563eb;
-  text-decoration: none;
+  color: #666;
   font-weight: 500;
 }
+
+.commande-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #d5001c;
+}
+
+.commande-restant {
+  font-weight: 700;
+  color: #d5001c;
+}
+
+.commande-facture-link {
+  color: #d5001c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .commande-facture-link:hover {
+  color: #b50018;
   text-decoration: underline;
 }
+
+/* Informations */
 .mes-commandes-info {
-  background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  border-left: 4px solid #000;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border-left: 4px solid #d5001c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 .mes-commandes-info h3 {
   margin: 0 0 1rem 0;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
+  color: #1a1a1a;
 }
+
 .mes-commandes-info ul {
   margin: 0;
   padding-left: 1.5rem;
+  list-style: none;
 }
+
 .mes-commandes-info li {
-  margin-bottom: 0.5rem;
-  color: #6b7280;
+  margin-bottom: 0.75rem;
+  color: #666;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.mes-commandes-info li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #d5001c;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.mes-commandes-info li strong {
+  color: #1a1a1a;
+}
+
+/* Loading */
+.mes-commandes-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.mes-commandes-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #d5001c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.mes-commandes-loading p {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* Erreur */
+.mes-commandes-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.mes-commandes-error p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mes-commandes-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .mes-commandes-title {
+    font-size: 1.5rem;
+  }
+
+  .mes-commandes-btn-panier {
+    width: 100%;
+  }
+
+  .commande-card {
+    padding: 1.5rem;
+  }
+
+  .commande-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .commande-status {
+    align-self: flex-start;
+  }
 }

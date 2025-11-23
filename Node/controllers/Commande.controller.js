@@ -51,10 +51,35 @@ const createCommande = async (req, res) => {
 // Récupérer toutes les commandes
 const getAllCommandes = async (req, res) => {
   try {
-    const commandes = await Commande.find()
-      .populate("user", "nom prenom email")
+    const commandes = await Commande.find({ status: true })
+      .populate("user", "nom prenom email telephone")
       .sort({ date_commande: -1 });
-    return sendSuccess(res, commandes);
+
+    // Pour chaque commande, récupérer les lignes de commande
+    const commandesAvecLignes = await Promise.all(
+      commandes.map(async (commande) => {
+        const lignesCommande = await LigneCommande.find({
+          commande: commande._id,
+        })
+          .populate("accesoire", "nom_accesoire prix")
+          .populate("voiture", "nom_model type_voiture prix")
+          .populate({
+            path: "model_porsche_id",
+            select: "nom_model prix_base_variante",
+            populate: {
+              path: "voiture",
+              select: "nom_model",
+            },
+          });
+
+        return {
+          ...commande.toObject(),
+          lignesCommande,
+        };
+      })
+    );
+
+    return sendSuccess(res, commandesAvecLignes);
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }
@@ -73,13 +98,16 @@ const getCommandeById = async (req, res) => {
     const ligneCommandes = await LigneCommande.find({
       commande: req.params.id,
     })
-      .populate("accesoire", "prix nom_accesoire")
-      .populate("voiture", "prix nom_model type_voiture");
-
-    //  détails model_porsche pour chaque ligne de commande
-    const lignesEnrichies = await Promise.all(
-      ligneCommandes.map((line) => enrichirLigneAvecModelPorsche(line))
-    );
+      .populate("accesoire", "nom_accesoire prix")
+      .populate("voiture", "nom_model type_voiture prix")
+      .populate({
+        path: "model_porsche_id",
+        select: "nom_model prix_base_variante",
+        populate: {
+          path: "voiture",
+          select: "nom_model",
+        },
+      });
 
     // Calculer total à payer pour la commande
     const total = ligneCommandes.reduce(
@@ -89,7 +117,7 @@ const getCommandeById = async (req, res) => {
 
     return sendSuccess(res, {
       ...commande.toObject(),
-      ligneCommandes: lignesEnrichies,
+      lignesEnrichies: ligneCommandes,
       total,
       note: "Le total inclut les acomptes pour les voitures neuves.",
     });
@@ -196,7 +224,37 @@ const getMyCommandes = async (req, res) => {
       status: true,
     }).sort({ date_commande: -1 }); // Plus récentes d'abord
 
-    return sendSuccess(res, historique);
+    // Pour chaque commande, récupérer les lignes de commande avec les détails
+    const commandesAvecLignes = await Promise.all(
+      historique.map(async (commande) => {
+        const lignesCommande = await LigneCommande.find({
+          commande: commande._id,
+        })
+          .populate({
+            path: "accesoire",
+            select: "nom_accesoire prix description",
+          })
+          .populate({
+            path: "voiture",
+            select: "nom_model type_voiture",
+          })
+          .populate({
+            path: "model_porsche_id",
+            select: "nom_model prix_base_variante",
+            populate: {
+              path: "voiture",
+              select: "nom_model",
+            },
+          });
+
+        return {
+          ...commande.toObject(),
+          lignesCommande,
+        };
+      })
+    );
+
+    return sendSuccess(res, commandesAvecLignes);
   } catch (error) {
     return sendError(res, "Erreur serveur", 500, error);
   }

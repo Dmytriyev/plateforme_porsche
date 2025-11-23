@@ -1,4 +1,5 @@
 export { default as authService } from "./auth.service.js";
+export { default as userService } from "./user.service.js";
 export { default as voitureService } from "./voiture.service.js";
 export { default as modelPorscheService } from "./modelPorsche.service.js";
 export { default as accesoireService } from "./accesoire.service.js";

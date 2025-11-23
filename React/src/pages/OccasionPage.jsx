@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { modelPorscheService, voitureService } from '../services';
+import { modelPorscheService, voitureService, commandeService } from '../services';
 import { Loading, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import buildUrl from '../utils/buildUrl';
@@ -10,6 +10,7 @@ import '../css/CatalogueModeles.css';
 import '../css/components/Message.css';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
+import ContactModal from '../components/modals/ContactModal.jsx';
 
 const OccasionPage = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const OccasionPage = () => {
   const location = useLocation();
   const { isAuthenticated, isStaff, user } = useContext(AuthContext);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   const [isListeMode, setIsListeMode] = useState(false);
   const [modeleBase, setModeleBase] = useState(null);
@@ -37,6 +39,8 @@ const OccasionPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [reservationEnCours, setReservationEnCours] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -299,13 +303,41 @@ const OccasionPage = () => {
     };
   }, [id]);
 
-  const handleReservation = () => {
+  const handleReservation = async () => {
     if (!isAuthenticated()) {
       setShowLoginPrompt(true);
       return;
     }
 
-    navigate(`/mes-reservations?occasion=${id}`);
+    try {
+      setReservationEnCours(true);
+      setError('');
+      setSuccess('');
+
+      // Date de réservation : aujourd'hui + 1 jour à 10h00
+      const dateReservation = new Date();
+      dateReservation.setDate(dateReservation.getDate() + 1);
+      dateReservation.setHours(10, 0, 0, 0);
+
+      const reservationData = {
+        model_porsche: id,
+        date_reservation: dateReservation.toISOString()
+      };
+
+      await commandeService.createReservation(reservationData);
+
+      setSuccess('Réservation effectuée avec succès ! Redirection vers votre compte...');
+
+      // Rediriger vers mon compte après 2 secondes
+      setTimeout(() => {
+        navigate('/mon-compte');
+      }, 2000);
+    } catch (err) {
+      console.error('Erreur lors de la réservation:', err);
+      setError(err.message || 'Erreur lors de la création de la réservation');
+    } finally {
+      setReservationEnCours(false);
+    }
   };
 
   // Fonctions pour les filtres (similaires à ListeVariantes)
@@ -643,6 +675,7 @@ const OccasionPage = () => {
   const carburant = occasion.carburant || specifications?.moteur || 'Essence';
   const prixOccasion = prix?.prix_fixe || occasion.prix_base || occasion.prix_base_variante || 0;
   const disponibleDate = occasion.disponible_a_partir_de || null;
+  const concessionnaire = occasion.concessionnaire || 'Non spécifié';
 
   return (
     <div className="occasion-detail-container">
@@ -736,6 +769,18 @@ const OccasionPage = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Messages de succès et d'erreur */}
+      {success && (
+        <div className="message-success" style={{ margin: '20px auto', maxWidth: '1200px' }}>
+          {success}
+        </div>
+      )}
+      {error && (
+        <div className="message-error" style={{ margin: '20px auto', maxWidth: '1200px' }}>
+          {error}
+        </div>
       )}
 
       {/* Main Content */}
@@ -838,6 +883,12 @@ const OccasionPage = () => {
                 <span className="occasion-detail-spec-value">{specifications.acceleration_0_100} s</span>
               </div>
             )}
+
+            {/* Concessionnaire */}
+            <div className="occasion-detail-spec-item">
+              <span className="occasion-detail-spec-label">Concessionnaire</span>
+              <span className="occasion-detail-spec-value">{concessionnaire}</span>
+            </div>
           </div>
 
           {/* Description */}
@@ -862,13 +913,21 @@ const OccasionPage = () => {
 
               <div className="occasion-detail-actions">
                 <Button
+                  variant="secondary"
+                  onClick={() => setShowContactModal(true)}
+                  className="occasion-detail-action-btn occasion-detail-action-btn-secondary"
+                >
+                  NOUS CONTACTER
+                </Button>
+                <Button
                   variant="primary"
                   onClick={() => {
                     handleReservation();
                   }}
+                  disabled={reservationEnCours}
                   className="occasion-detail-action-btn occasion-detail-action-btn-primary"
                 >
-                  RÉSERVER EN LIGNE
+                  {reservationEnCours ? 'RÉSERVATION EN COURS...' : 'RÉSERVER EN LIGNE'}
                 </Button>
               </div>
             </div>
@@ -963,6 +1022,18 @@ const OccasionPage = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de contact */}
+      {showContactModal && (
+        <ContactModal
+          onClose={() => setShowContactModal(false)}
+          vehiculeInfo={occasion ? {
+            nom_model: occasion.nom_model,
+            variante: occasion.type_carrosserie,
+            prix: formatPrice(prixOccasion)
+          } : null}
+        />
+      )}
     </div>
   );
 };

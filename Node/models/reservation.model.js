@@ -6,7 +6,7 @@ const reservationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    // Status: true = réservation active/confirmée, false = annulée
+    // Status: true = réservation confirmée, false = annulée
     status: {
       type: Boolean,
       default: true,

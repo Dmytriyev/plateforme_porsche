@@ -107,10 +107,20 @@ const getAllReservations = async (req, res) => {
       .populate("user", "nom prenom email telephone")
       .populate({
         path: "model_porsche",
-        populate: {
-          path: "voiture",
-          select: "nom_model type_voiture description",
-        },
+        populate: [
+          {
+            path: "voiture",
+            select: "nom_model type_voiture description",
+            populate: {
+              path: "photo_voiture",
+              select: "name type_photo description ordre",
+            },
+          },
+          {
+            path: "photo_porsche",
+            select: "name type_photo description ordre",
+          },
+        ],
       })
       .sort({ date_reservation: -1 });
 
@@ -235,10 +245,20 @@ const getReservationsByUser = async (req, res) => {
     const reservations = await Reservation.find({ user: userId })
       .populate({
         path: "model_porsche",
-        populate: {
-          path: "voiture",
-          select: "nom_model type_voiture description",
-        },
+        populate: [
+          {
+            path: "voiture",
+            select: "nom_model type_voiture description",
+            populate: {
+              path: "photo_voiture",
+              select: "name type_photo description ordre",
+            },
+          },
+          {
+            path: "photo_porsche",
+            select: "name type_photo description ordre",
+          },
+        ],
       })
       .sort({ date_reservation: -1 });
     return sendSuccess(res, reservations);
@@ -319,16 +339,10 @@ const accepterReservation = async (req, res) => {
     }
     // Récupérer la réservation à accepter
     const { id } = req.params;
-    // Trouver la réservation par ID
-    const reservation = await Reservation.findById(id)
-      .populate("user", "nom prenom email telephone")
-      .populate({
-        path: "model_porsche",
-        populate: {
-          path: "voiture",
-          select: "nom_model type_voiture",
-        },
-      });
+
+    // Trouver la réservation par ID sans populate pour éviter les erreurs
+    const reservation = await Reservation.findById(id);
+
     // Vérifier que la réservation existe
     if (!reservation) {
       return sendNotFound(res, "Réservation");
@@ -339,8 +353,26 @@ const accepterReservation = async (req, res) => {
       return sendError(res, "Cette réservation a déjà été annulée", 400);
     }
 
-    return sendSuccess(res, reservation, "Réservation acceptée avec succès");
+    // Retourner la réservation (simple, sans populate)
+    const acceptedReservation = {
+      _id: reservation._id,
+      date_reservation: reservation.date_reservation,
+      status: reservation.status,
+      user: reservation.user,
+      model_porsche: reservation.model_porsche,
+      createdAt: reservation.createdAt,
+      updatedAt: reservation.updatedAt,
+    };
+
+    return sendSuccess(
+      res,
+      acceptedReservation,
+      "Réservation acceptée avec succès"
+    );
   } catch (error) {
+    console.error("Erreur acceptation réservation:", error);
+    console.error("Stack:", error.stack);
+    console.error("Error message:", error.message);
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
@@ -363,17 +395,9 @@ const refuserReservation = async (req, res) => {
     }
     // Récupérer la réservation à refuser
     const { id } = req.params;
-    const { motif } = req.body;
-    // Trouver la réservation par ID
-    const reservation = await Reservation.findById(id)
-      .populate("user", "nom prenom email telephone")
-      .populate({
-        path: "model_porsche",
-        populate: {
-          path: "voiture",
-          select: "nom_model type_voiture",
-        },
-      });
+
+    // Trouver la réservation par ID sans populate pour éviter les erreurs
+    const reservation = await Reservation.findById(id);
 
     if (!reservation) {
       return sendNotFound(res, "Réservation");
@@ -383,8 +407,26 @@ const refuserReservation = async (req, res) => {
     reservation.status = false;
     await reservation.save();
 
-    return sendSuccess(res, reservation, "Réservation refusée avec succès");
+    // Retourner la réservation mise à jour (simple, sans populate)
+    const updatedReservation = {
+      _id: reservation._id,
+      date_reservation: reservation.date_reservation,
+      status: reservation.status,
+      user: reservation.user,
+      model_porsche: reservation.model_porsche,
+      createdAt: reservation.createdAt,
+      updatedAt: reservation.updatedAt,
+    };
+
+    return sendSuccess(
+      res,
+      updatedReservation,
+      "Réservation refusée avec succès"
+    );
   } catch (error) {
+    console.error("Erreur refus réservation:", error);
+    console.error("Stack:", error.stack);
+    console.error("Error message:", error.message);
     return sendError(res, "Erreur serveur", 500, error);
   }
 };

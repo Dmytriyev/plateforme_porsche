@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, personnalisationService, commandeService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
+import ContactModal from '../components/modals/ContactModal.jsx';
 import { Loading, Button } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import { API_URL } from '../config/api.js';
@@ -47,6 +48,7 @@ const Configurateur = () => {
   const [acompte, setAcompte] = useState(0);
   const [ajoutEnCours, setAjoutEnCours] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   // États pour l'interface
   const [photoActive, setPhotoActive] = useState(0);
@@ -907,6 +909,12 @@ const Configurateur = () => {
             </div>
             <div className="configurateur-actions-buttons">
               <button
+                className="configurateur-btn-contact"
+                onClick={() => setShowContactModal(true)}
+              >
+                Nous contacter
+              </button>
+              <button
                 className="configurateur-btn-acheter"
                 onClick={handleAcheter}
                 disabled={ajoutEnCours || !config.variante}
@@ -925,6 +933,18 @@ const Configurateur = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de contact */}
+      {showContactModal && (
+        <ContactModal
+          onClose={() => setShowContactModal(false)}
+          vehiculeInfo={config.variante ? {
+            nom_model: config.variante.nom_model,
+            variante: config.variante.type_carrosserie,
+            prix: formatPrice(prixTotal)
+          } : null}
+        />
+      )}
     </div>
   );
 };

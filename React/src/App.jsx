@@ -18,6 +18,7 @@ import AjouterAccessoire from './pages/AjouterAccessoire.jsx';
 import ModifierAccessoire from './pages/ModifierAccessoire.jsx';
 import Panier from './pages/Panier.jsx';
 import MonCompte from './pages/MonCompte.jsx';
+import ModifierMonCompte from './pages/ModifierMonCompte.jsx';
 import MesVoitures from './pages/MesVoitures.jsx';
 import MaVoitureDetail from './pages/MaVoitureDetail.jsx';
 import ModifierMaVoiture from './pages/ModifierMaVoiture.jsx';
@@ -25,15 +26,19 @@ import AjouterMaVoiture from './pages/AjouterMaVoiture.jsx';
 import AjouterModelPorsche from './pages/AjouterModelPorsche.jsx';
 import ModifierModelPorsche from './pages/ModifierModelPorsche.jsx';
 import MesCommandes from './pages/MesCommandes.jsx';
+import Checkout from './pages/Checkout.jsx';
+import PaymentSuccess from './pages/PaymentSuccess.jsx';
+import PaymentCancel from './pages/PaymentCancel.jsx';
 import { routes, protectedRoutes } from './routes/index.js';
 import './css/App.css';
 
 const components = {
   Home, Login, Register, ChoixVoiture, CatalogueModeles, ListeVariantes,
   VariantePage, OccasionPage, Configurateur, Accessoires, AccessoireDetail,
-  AjouterAccessoire, ModifierAccessoire, Panier, MonCompte, MesVoitures,
-  MaVoitureDetail, ModifierMaVoiture, AjouterMaVoiture, AjouterModelPorsche,
-  ModifierModelPorsche, MesCommandes,
+  AjouterAccessoire, ModifierAccessoire, Panier, MonCompte, ModifierMonCompte,
+  MesVoitures, MaVoitureDetail, ModifierMaVoiture, AjouterMaVoiture,
+  AjouterModelPorsche, ModifierModelPorsche, MesCommandes, Checkout,
+  PaymentSuccess, PaymentCancel,
 };
 
 function App() {

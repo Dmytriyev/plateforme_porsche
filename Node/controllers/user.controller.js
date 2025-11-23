@@ -897,6 +897,101 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+// Obtenir le profil de l'utilisateur connecté
+const getCurrentUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors de la récupération du profil",
+      error: error.message,
+    });
+  }
+};
+
+// Mettre à jour le profil de l'utilisateur connecté
+const updateCurrentUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      nom,
+      prenom,
+      email,
+      telephone,
+      adresse,
+      code_postal,
+      ville,
+      currentPassword,
+      newPassword,
+    } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    // Si l'utilisateur veut changer son mot de passe
+    if (currentPassword && newPassword) {
+      const bcrypt = (await import("bcrypt")).default;
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+
+      if (!isPasswordValid) {
+        return res
+          .status(400)
+          .json({ message: "Mot de passe actuel incorrect" });
+      }
+
+      if (newPassword.length < 6) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Le nouveau mot de passe doit contenir au moins 6 caractères",
+          });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+    }
+
+    // Mettre à jour les autres champs
+    if (nom !== undefined) user.nom = nom;
+    if (prenom !== undefined) user.prenom = prenom;
+    if (email !== undefined) {
+      // Vérifier si l'email existe déjà pour un autre utilisateur
+      const emailExists = await User.findOne({ email, _id: { $ne: userId } });
+      if (emailExists) {
+        return res.status(400).json({ message: "Cet email est déjà utilisé" });
+      }
+      user.email = email;
+    }
+    if (telephone !== undefined) user.telephone = telephone;
+    if (adresse !== undefined) user.adresse = adresse;
+    if (code_postal !== undefined) user.code_postal = code_postal;
+    if (ville !== undefined) user.ville = ville;
+
+    await user.save();
+
+    const updatedUser = await User.findById(userId).select("-password");
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors de la mise à jour du profil",
+      error: error.message,
+    });
+  }
+};
+
 export {
   register,
   login,
@@ -916,4 +1011,6 @@ export {
   updateUserPorsche,
   getUserDashboard,
   getAvailableUserRoles,
+  getCurrentUserProfile,
+  updateCurrentUserProfile,
 };

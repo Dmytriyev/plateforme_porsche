@@ -671,6 +671,15 @@
 .occasion-detail-action-btn-primary:hover {
   background: #333;
 }
+.occasion-detail-action-btn-secondary {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+.occasion-detail-action-btn-secondary:hover {
+  background: #000;
+  color: #fff;
+}
 .occasion-detail-action-btn-outline {
   background: transparent;
   color: #000;
