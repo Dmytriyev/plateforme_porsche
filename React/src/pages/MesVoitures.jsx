@@ -291,11 +291,7 @@ const MesVoitures = () => {
                       <div className="mes-voitures-spec-item-finder">
                         <span className="mes-voitures-spec-label-finder">Transmission:</span>
                         <span className="mes-voitures-spec-value-finder">
-                          {voiture.info_transmission.includes('PDK') || voiture.info_transmission.includes('Automatique')
-                            ? 'Transmission intégrale • PDK (automatique)'
-                            : voiture.info_transmission.includes('Manuelle')
-                              ? 'Transmission intégrale • Manuelle'
-                              : voiture.info_transmission}
+                          {voiture.info_transmission}
                         </span>
                       </div>
                     )}

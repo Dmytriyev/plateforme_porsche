@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { modelPorscheService, personnalisationService, commandeService } from '../services';
 import { AuthContext } from '../context/AuthContext.jsx';
@@ -224,9 +224,12 @@ const Configurateur = () => {
     setAcompte(Math.round(total * 0.2));
   }, [config]);
 
+  // Fonction helper pour obtenir les photos de la variante
+  const getPhotosVariante = useCallback(() => {
+    return Array.isArray(config.variante?.photo_porsche) ? config.variante.photo_porsche : [];
+  }, [config.variante]);
 
-
-  const findPhotoIndexByCouleur = (couleur, type) => {
+  const findPhotoIndexByCouleur = useCallback((couleur, type) => {
     if (!couleur?._id || !type) {
       if (import.meta.env.DEV) {
       }
@@ -276,14 +279,14 @@ const Configurateur = () => {
 
     // Retourner l'index dans le tableau des photos visibles
     return foundIndex >= 0 ? foundIndex : null;
-  };
+  }, [getPhotosVariante]);
 
   /**
    *  Handler pour changement de couleur extérieure
    * Applique le principe DRY (Don't Repeat Yourself)
    */
-  const handleCouleurExtChange = (couleur) => {
-    setConfig({ ...config, couleur_exterieur: couleur });
+  const handleCouleurExtChange = useCallback((couleur) => {
+    setConfig(prev => ({ ...prev, couleur_exterieur: couleur }));
 
     // Trouver et afficher la photo correspondante
     const photoIndex = findPhotoIndexByCouleur(couleur, 'exterieur');
@@ -293,10 +296,10 @@ const Configurateur = () => {
       if (import.meta.env.DEV) {
       }
     }
-  };
+  }, [findPhotoIndexByCouleur]);
 
-  const handleCouleurIntChange = (couleur) => {
-    setConfig({ ...config, couleur_interieur: couleur });
+  const handleCouleurIntChange = useCallback((couleur) => {
+    setConfig(prev => ({ ...prev, couleur_interieur: couleur }));
 
     // Trouver et afficher la photo correspondante
     const photoIndex = findPhotoIndexByCouleur(couleur, 'interieur');
@@ -306,7 +309,7 @@ const Configurateur = () => {
       if (import.meta.env.DEV) {
       }
     }
-  };
+  }, [findPhotoIndexByCouleur]);
 
   const handleChangerModele = () => {
     //  Utiliser voitureIdActuel (state) qui peut être déduit de la variante
@@ -327,8 +330,6 @@ const Configurateur = () => {
   };
 
   const toggleSection = (section) => setSectionsOuvertes((prev) => ({ ...prev, [section]: !prev[section] }));
-
-  const getPhotosVariante = () => (Array.isArray(config.variante?.photo_porsche) ? config.variante.photo_porsche : []);
 
   // Photos et filtrage: retirer complètement les photos avec id_0 / id_1 (indices 0 et 1)
   const photos = getPhotosVariante();
@@ -393,17 +394,17 @@ const Configurateur = () => {
     return packagesFiltres;
   };
 
-  const handleJanteChange = (jante) => {
-    setConfig({ ...config, taille_jante: jante });
-  };
+  const handleJanteChange = useCallback((jante) => {
+    setConfig(prev => ({ ...prev, taille_jante: jante }));
+  }, []);
 
-  const handleSiegeChange = (siege) => {
-    setConfig({ ...config, siege });
-  };
+  const handleSiegeChange = useCallback((siege) => {
+    setConfig(prev => ({ ...prev, siege }));
+  }, []);
 
-  const _handlePackageChange = (pkg) => {
-    setConfig({ ...config, package: pkg });
-  };
+  const _handlePackageChange = useCallback((pkg) => {
+    setConfig(prev => ({ ...prev, package: pkg }));
+  }, []);
 
   const handleAcheter = async () => {
     if (!isAuthenticated()) {

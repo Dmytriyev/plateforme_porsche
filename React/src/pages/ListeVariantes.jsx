@@ -68,8 +68,33 @@ const ListeVariantes = () => {
         if (isNeuf) {
           // Pour les voitures neuves: afficher toutes les variantes sans filtrage
           // car le backend retourne déjà les configurations associées à la voiture
-          setVariantes(allVariantes);
-          setVariantesFiltrees(allVariantes);
+          if (allVariantes.length === 0 && modeleData) {
+            // Si aucune configuration n'existe, créer une variante virtuelle
+            const virtualVariante = {
+              _id: modeleData._id,
+              nom_model: modeleData.nom_model,
+              description: modeleData.description,
+              voiture: modeleData,
+              photo_voiture: modeleData.photo_voiture || [],
+              photo_porsche: [],
+              type_carrosserie: 'N/A',
+              prix_base: 0,
+              specifications: {
+                puissance: 0,
+                acceleration_0_100: 0,
+                vitesse_max: 0,
+                transmission: 'N/A',
+                consommation: 0
+              },
+              disponible: false,
+              message: 'Configurations non disponibles - Contactez le concessionnaire',
+            };
+            setVariantes([virtualVariante]);
+            setVariantesFiltrees([virtualVariante]);
+          } else {
+            setVariantes(allVariantes);
+            setVariantesFiltrees(allVariantes);
+          }
         } else {
           const filteredOccasions = allVariantes.filter(variante => {
             const typeVoiture = variante.voiture?.type_voiture;
@@ -508,10 +533,30 @@ const ListeVariantes = () => {
                       )}
                     </div>
 
+                    {/* Message pour variantes virtuelles */}
+                    {variante.message && (
+                      <div style={{
+                        padding: '10px',
+                        marginTop: '10px',
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '4px',
+                        fontSize: '0.9em',
+                        textAlign: 'center',
+                        color: '#666'
+                      }}>
+                        {variante.message}
+                      </div>
+                    )}
+
                     {/* Bouton */}
                     <button
                       className="catalogue-modele-btn-porsche"
                       onClick={() => navigate(isNeuf ? `/variante/${variante._id}` : `/occasion/${variante._id}`)}
+                      disabled={variante.disponible === false}
+                      style={variante.disponible === false ? {
+                        opacity: 0.6,
+                        cursor: 'not-allowed'
+                      } : {}}
                     >
                       {isNeuf ? 'Configurer' : 'Voir les détails'}
                     </button>

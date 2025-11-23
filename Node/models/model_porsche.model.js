@@ -72,6 +72,8 @@ const model_porscheSchema = new mongoose.Schema(
         required: true,
         trim: true,
         maxlength: 100,
+        enum: ["Manuelle", "PDK", "Tiptronic"],
+        default: "PDK",
       },
       // Accélération 0-100 km/h en secondes
       acceleration_0_100: {

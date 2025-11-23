@@ -18,12 +18,17 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      const response = await voitureService.getVoituresNeuves();
+      // Charger toutes les voitures
+      const response = await voitureService.getAllVoitures();
       const data = Array.isArray(response) ? response : [];
+
+      // Filtrer les 3 gammes principales et dédupliquer par nom_model
       const filtered = data.filter(v => ['911', 'Cayman', 'Cayenne'].includes(v.nom_model));
       const uniqueModeles = [...new Map(filtered.map(v => [v.nom_model, v])).values()];
+
       setModeles(uniqueModeles);
-    } catch {
+    } catch (error) {
+      console.error('Erreur chargement modèles:', error);
       setModeles([]);
     } finally {
       setLoading(false);

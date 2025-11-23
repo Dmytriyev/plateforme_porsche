@@ -26,7 +26,11 @@ export default function model_porscheValidation(body) {
         moteur: joi.string().required().max(150),
         puissance: joi.number().min(0).max(1500).required(),
         couple: joi.number().min(0).max(1500),
-        transmission: joi.string().required(),
+        transmission: joi
+          .string()
+          .required()
+          .max(100)
+          .valid("Manuelle", "PDK", "Tiptronic"),
         acceleration_0_100: joi.number().min(0).max(20).required(),
         vitesse_max: joi.number().min(0).max(500).required(),
         consommation: joi.number().min(0).max(50).required(),

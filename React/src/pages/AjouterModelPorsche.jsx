@@ -5,6 +5,20 @@ import { Loading } from '../components/common';
 import { formatPrice } from '../utils/format.js';
 import '../css/AjouterModelPorsche.css';
 
+// Variantes prédéfinies par modèle (synchronisées avec le backend)
+const VARIANTES_PAR_MODELE = {
+    '911': ['Carrera S', 'GTS', 'Turbo', 'GT3', 'GT3 RS', 'Targa GTS', 'Targa 4S'],
+    'Cayman': ['GTS', 'GT4 RS'],
+    'Cayenne': ['E-Hybrid', 'S', 'GTS']
+};
+
+// Carrosseries disponibles par modèle (synchronisées avec le backend)
+const CARROSSERIES_PAR_MODELE = {
+    '911': ['Coupe', 'Cabriolet', 'Targa'],
+    'Cayman': ['Coupe'],
+    'Cayenne': ['SUV']
+};
+
 const AjouterModelPorsche = () => {
     const navigate = useNavigate();
 
@@ -20,6 +34,8 @@ const AjouterModelPorsche = () => {
     const [jantes, setJantes] = useState([]);
     const [sieges, setSieges] = useState([]);
     const [packages, setPackages] = useState([]);
+    const [variantesDisponibles, setVariantesDisponibles] = useState([]);
+    const [carrosseriesDisponibles, setCarrosseriesDisponibles] = useState([]);
 
     // Photos
     const [photos, setPhotos] = useState([]);
@@ -30,13 +46,8 @@ const AjouterModelPorsche = () => {
         voiture: '',
         nom_model: '',
         type_carrosserie: '',
-        etat: 'occasion',
         prix_base: '',
-        kilometrage: '',
         annee: '',
-        carburant: 'Essence',
-        boite_vitesse: 'Automatique',
-        nb_proprietaires: '1',
         description: '',
         numero_vin: '',
         concessionnaire: '',
@@ -47,9 +58,10 @@ const AjouterModelPorsche = () => {
         siege: '',
         package: [],
         // Spécifications
+        moteur: '',
         puissance: '',
         couple: '',
-        transmission: '',
+        transmission: 'PDK',
         acceleration_0_100: '',
         vitesse_max: '',
         consommation: '',
@@ -65,7 +77,7 @@ const AjouterModelPorsche = () => {
 
                 const [voituresData, couleursExtData, couleursIntData, jantesData, siegesData, packagesData] =
                     await Promise.all([
-                        voitureService.getAllVoitures(),
+                        voitureService.getVoituresOccasion(),
                         personnalisationService.getCouleursExterieur(),
                         personnalisationService.getCouleursInterieur(),
                         personnalisationService.getJantes(),
@@ -73,7 +85,8 @@ const AjouterModelPorsche = () => {
                         personnalisationService.getPackages(),
                     ]);
 
-                setVoitures(Array.isArray(voituresData) ? voituresData : []);
+                // getVoituresOccasion() retourne déjà uniquement les voitures d'occasion
+                setVoitures(voituresData || []);
                 setCouleursExt(couleursExtData);
                 setCouleursInt(couleursIntData);
                 setJantes(jantesData);
@@ -95,10 +108,17 @@ const AjouterModelPorsche = () => {
         if (name === 'voiture' && value) {
             const voitureSelectionnee = voitures.find(v => v._id === value);
             if (voitureSelectionnee) {
+                const nomModele = voitureSelectionnee.nom_model || '';
+                const variantes = VARIANTES_PAR_MODELE[nomModele] || [];
+                const carrosseries = CARROSSERIES_PAR_MODELE[nomModele] || [];
+
+                setVariantesDisponibles(variantes);
+                setCarrosseriesDisponibles(carrosseries);
                 setFormData(prev => ({
                     ...prev,
                     voiture: value,
-                    nom_model: voitureSelectionnee.nom_model || ''
+                    nom_model: '', // Réinitialiser la variante
+                    type_carrosserie: '' // Réinitialiser la carrosserie
                 }));
                 return;
             }
@@ -163,22 +183,29 @@ const AjouterModelPorsche = () => {
             setError('');
             setSuccess('');
 
-            // Préparer les données
+            // Trouver la voiture sélectionnée pour obtenir son nom_model
+            const voitureSelectionnee = voitures.find(v => v._id === formData.voiture);
+            if (!voitureSelectionnee) {
+                throw new Error('Veuillez sélectionner une voiture');
+            }
+
+            // Créer une nouvelle Voiture occasion (type_voiture=false)
+            const nouvelleVoiture = await voitureService.createVoiture({
+                type_voiture: false, // Occasion
+                nom_model: voitureSelectionnee.nom_model,
+                description: formData.description || `${voitureSelectionnee.nom_model} d'occasion`,
+                photo_voiture: []
+            });
+
+            // Préparer les données avec l'ID de la nouvelle voiture occasion
             const dataToSend = {
-                voiture: formData.voiture,
+                voiture: nouvelleVoiture._id,
                 nom_model: formData.nom_model,
                 type_carrosserie: formData.type_carrosserie || undefined,
-                etat: formData.etat,
                 prix_base: parseFloat(formData.prix_base) || 0,
-                kilometrage: parseFloat(formData.kilometrage) || 0,
-                annee: parseInt(formData.annee) || new Date().getFullYear(),
-                carburant: formData.carburant,
-                boite_vitesse: formData.boite_vitesse,
-                nb_proprietaires: parseInt(formData.nb_proprietaires) || 1,
                 description: formData.description || undefined,
                 numero_vin: formData.numero_vin || undefined,
                 concessionnaire: formData.concessionnaire || undefined,
-                adresse: formData.adresse || undefined,
                 couleur_exterieur: formData.couleur_exterieur || undefined,
                 couleur_interieur: formData.couleur_interieur || undefined,
                 taille_jante: formData.taille_jante || undefined,
@@ -187,19 +214,17 @@ const AjouterModelPorsche = () => {
                 specifications: {}
             };
 
-            // Ajouter les spécifications
-            if (formData.puissance) dataToSend.specifications.puissance = formData.puissance;
-            if (formData.couple) dataToSend.specifications.couple = formData.couple;
+            // Ajouter les spécifications (obligatoires selon le modèle)
+            if (formData.moteur) dataToSend.specifications.moteur = formData.moteur;
+            if (formData.puissance) dataToSend.specifications.puissance = parseFloat(formData.puissance);
+            if (formData.couple) dataToSend.specifications.couple = parseFloat(formData.couple);
             if (formData.transmission) dataToSend.specifications.transmission = formData.transmission;
-            if (formData.acceleration_0_100) dataToSend.specifications.acceleration_0_100 = formData.acceleration_0_100;
-            if (formData.vitesse_max) dataToSend.specifications.vitesse_max = formData.vitesse_max;
-            if (formData.consommation) dataToSend.specifications.consommation = formData.consommation;
-            dataToSend.specifications.pack_sport_chrono = formData.pack_sport_chrono;
-            dataToSend.specifications.pack_weissach = formData.pack_weissach;
+            if (formData.acceleration_0_100) dataToSend.specifications.acceleration_0_100 = parseFloat(formData.acceleration_0_100);
+            if (formData.vitesse_max) dataToSend.specifications.vitesse_max = parseFloat(formData.vitesse_max);
+            if (formData.consommation) dataToSend.specifications.consommation = parseFloat(formData.consommation);
 
-            if (Object.keys(dataToSend.specifications).length === 2 &&
-                !dataToSend.specifications.pack_sport_chrono &&
-                !dataToSend.specifications.pack_weissach) {
+            // Si aucune spécification n'est fournie, supprimer l'objet
+            if (Object.keys(dataToSend.specifications).length === 0) {
                 delete dataToSend.specifications;
             }
 
@@ -284,28 +309,39 @@ const AjouterModelPorsche = () => {
                                     required
                                 >
                                     <option value="">-- Sélectionner --</option>
-                                    {voitures.map(voiture => (
-                                        <option key={voiture._id} value={voiture._id}>
-                                            {voiture.nom_model}
-                                        </option>
-                                    ))}
+                                    {voitures
+                                        .filter((voiture, index, self) =>
+                                            index === self.findIndex((v) => v.nom_model === voiture.nom_model)
+                                        )
+                                        .map(voiture => (
+                                            <option key={voiture._id} value={voiture._id}>
+                                                {voiture.nom_model}
+                                            </option>
+                                        ))
+                                    }
                                 </select>
                             </div>
 
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="nom_model" className="ajouter-model-porsche-label">
-                                    Variante * <span className="label-hint">(Ex: 911 Carrera S)</span>
+                                    Variante * <span className="label-hint">(Carrera S, GTS, Turbo, etc.)</span>
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="nom_model"
                                     name="nom_model"
                                     value={formData.nom_model}
                                     onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
+                                    className="ajouter-model-porsche-select"
                                     required
-                                    placeholder="911 Carrera S"
-                                />
+                                    disabled={!formData.voiture || variantesDisponibles.length === 0}
+                                >
+                                    <option value="">-- Sélectionner une variante --</option>
+                                    {variantesDisponibles.map((variante, index) => (
+                                        <option key={index} value={variante}>
+                                            {variante}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
@@ -320,147 +356,37 @@ const AjouterModelPorsche = () => {
                                     value={formData.type_carrosserie}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-select"
+                                    disabled={!formData.voiture || carrosseriesDisponibles.length === 0}
                                 >
                                     <option value="">-- Sélectionner --</option>
-                                    <option value="Coupé">Coupé</option>
-                                    <option value="Cabriolet">Cabriolet</option>
-                                    <option value="Targa">Targa</option>
-                                    <option value="SUV">SUV</option>
-                                    <option value="Berline">Berline</option>
-                                </select>
-                            </div>
-
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="etat" className="ajouter-model-porsche-label">
-                                    État *
-                                </label>
-                                <select
-                                    id="etat"
-                                    name="etat"
-                                    value={formData.etat}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-select"
-                                    required
-                                >
-                                    <option value="occasion">Occasion</option>
-                                    <option value="neuf">Neuf</option>
+                                    {carrosseriesDisponibles.map((carrosserie, index) => (
+                                        <option key={index} value={carrosserie}>
+                                            {carrosserie}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
 
-                        <div className="ajouter-model-porsche-form-row">
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="prix_base" className="ajouter-model-porsche-label">
-                                    Prix (€) *
-                                </label>
-                                <input
-                                    type="number"
-                                    id="prix_base"
-                                    name="prix_base"
-                                    value={formData.prix_base}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
-                                    required
-                                    placeholder="85000"
-                                    min="0"
-                                    step="1000"
-                                />
-                            </div>
-
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="annee" className="ajouter-model-porsche-label">
-                                    Année *
-                                </label>
-                                <input
-                                    type="number"
-                                    id="annee"
-                                    name="annee"
-                                    value={formData.annee}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
-                                    required
-                                    placeholder="2023"
-                                    min="1900"
-                                    max={new Date().getFullYear() + 1}
-                                />
-                            </div>
+                        <div className="ajouter-model-porsche-form-group">
+                            <label htmlFor="prix_base" className="ajouter-model-porsche-label">
+                                Prix (€) *
+                            </label>
+                            <input
+                                type="number"
+                                id="prix_base"
+                                name="prix_base"
+                                value={formData.prix_base}
+                                onChange={handleChange}
+                                className="ajouter-model-porsche-input"
+                                required
+                                placeholder="85000"
+                                min="0"
+                                step="1000"
+                            />
                         </div>
 
-                        <div className="ajouter-model-porsche-form-row">
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="kilometrage" className="ajouter-model-porsche-label">
-                                    Kilométrage (km) *
-                                </label>
-                                <input
-                                    type="number"
-                                    id="kilometrage"
-                                    name="kilometrage"
-                                    value={formData.kilometrage}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
-                                    required
-                                    placeholder="25000"
-                                    min="0"
-                                />
-                            </div>
 
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="nb_proprietaires" className="ajouter-model-porsche-label">
-                                    Nombre de propriétaires *
-                                </label>
-                                <input
-                                    type="number"
-                                    id="nb_proprietaires"
-                                    name="nb_proprietaires"
-                                    value={formData.nb_proprietaires}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
-                                    required
-                                    placeholder="1"
-                                    min="0"
-                                    max="10"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="ajouter-model-porsche-form-row">
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="carburant" className="ajouter-model-porsche-label">
-                                    Carburant *
-                                </label>
-                                <select
-                                    id="carburant"
-                                    name="carburant"
-                                    value={formData.carburant}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-select"
-                                    required
-                                >
-                                    <option value="Essence">Essence</option>
-                                    <option value="Diesel">Diesel</option>
-                                    <option value="Hybride">Hybride</option>
-                                    <option value="Électrique">Électrique</option>
-                                </select>
-                            </div>
-
-                            <div className="ajouter-model-porsche-form-group">
-                                <label htmlFor="boite_vitesse" className="ajouter-model-porsche-label">
-                                    Boîte de vitesse *
-                                </label>
-                                <select
-                                    id="boite_vitesse"
-                                    name="boite_vitesse"
-                                    value={formData.boite_vitesse}
-                                    onChange={handleChange}
-                                    className="ajouter-model-porsche-select"
-                                    required
-                                >
-                                    <option value="Automatique">Automatique</option>
-                                    <option value="Manuelle">Manuelle</option>
-                                    <option value="PDK">PDK</option>
-                                </select>
-                            </div>
-                        </div>
 
                         <div className="ajouter-model-porsche-form-group">
                             <label htmlFor="description" className="ajouter-model-porsche-label">
@@ -642,19 +568,37 @@ const AjouterModelPorsche = () => {
                     <div className="ajouter-model-porsche-section">
                         <h2 className="ajouter-model-porsche-section-title">Spécifications techniques</h2>
 
+                        <div className="ajouter-model-porsche-form-group">
+                            <label htmlFor="moteur" className="ajouter-model-porsche-label">
+                                Moteur *
+                            </label>
+                            <input
+                                type="text"
+                                id="moteur"
+                                name="moteur"
+                                value={formData.moteur}
+                                onChange={handleChange}
+                                className="ajouter-model-porsche-input"
+                                placeholder="Flat-6 4.0L bi-turbo"
+                                required
+                            />
+                        </div>
+
                         <div className="ajouter-model-porsche-form-row">
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="puissance" className="ajouter-model-porsche-label">
-                                    Puissance (ch)
+                                    Puissance (ch) *
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="puissance"
                                     name="puissance"
                                     value={formData.puissance}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-input"
-                                    placeholder="385 ch"
+                                    placeholder="385"
+                                    min="0"
+                                    required
                                 />
                             </div>
 
@@ -663,13 +607,14 @@ const AjouterModelPorsche = () => {
                                     Couple (Nm)
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="couple"
                                     name="couple"
                                     value={formData.couple}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-input"
-                                    placeholder="450 Nm"
+                                    placeholder="450"
+                                    min="0"
                                 />
                             </div>
                         </div>
@@ -677,31 +622,37 @@ const AjouterModelPorsche = () => {
                         <div className="ajouter-model-porsche-form-row">
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="transmission" className="ajouter-model-porsche-label">
-                                    Transmission
+                                    Transmission *
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="transmission"
                                     name="transmission"
                                     value={formData.transmission}
                                     onChange={handleChange}
-                                    className="ajouter-model-porsche-input"
-                                    placeholder="Propulsion"
-                                />
+                                    className="ajouter-model-porsche-select"
+                                    required
+                                >
+                                    <option value="PDK">PDK</option>
+                                    <option value="Manuelle">Manuelle</option>
+                                    <option value="Tiptronic">Tiptronic</option>
+                                </select>
                             </div>
 
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="acceleration_0_100" className="ajouter-model-porsche-label">
-                                    Accélération 0-100 km/h (s)
+                                    Accélération 0-100 km/h (s) *
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="acceleration_0_100"
                                     name="acceleration_0_100"
                                     value={formData.acceleration_0_100}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-input"
                                     placeholder="4.2"
+                                    step="0.1"
+                                    min="0"
+                                    required
                                 />
                             </div>
                         </div>
@@ -709,31 +660,36 @@ const AjouterModelPorsche = () => {
                         <div className="ajouter-model-porsche-form-row">
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="vitesse_max" className="ajouter-model-porsche-label">
-                                    Vitesse max (km/h)
+                                    Vitesse max (km/h) *
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="vitesse_max"
                                     name="vitesse_max"
                                     value={formData.vitesse_max}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-input"
                                     placeholder="293"
+                                    min="0"
+                                    required
                                 />
                             </div>
 
                             <div className="ajouter-model-porsche-form-group">
                                 <label htmlFor="consommation" className="ajouter-model-porsche-label">
-                                    Consommation (L/100km)
+                                    Consommation (L/100km) *
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     id="consommation"
                                     name="consommation"
                                     value={formData.consommation}
                                     onChange={handleChange}
                                     className="ajouter-model-porsche-input"
                                     placeholder="10.5"
+                                    step="0.1"
+                                    min="0"
+                                    required
                                 />
                             </div>
                         </div>
