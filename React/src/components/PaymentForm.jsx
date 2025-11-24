@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import Button from './common/Button.jsx';
+import '../css/components/PaymentForm.css';
 
-// PaymentForm confirme le paiement avec le clientSecret fourni par le backend.
-// Utilise le composant `Button` commun pour le style.
 export default function PaymentForm({ clientSecret, onSuccess, onError }) {
     const stripe = useStripe();
     const elements = useElements();
@@ -43,16 +42,16 @@ export default function PaymentForm({ clientSecret, onSuccess, onError }) {
 
     return (
         <form onSubmit={handleSubmit} className="payment-form">
-            <div className="form-group" style={{ marginBottom: 12 }}>
+            <div className="payment-form-group">
                 <label className="label">Carte</label>
-                <div className="card-element" style={{ padding: 8, border: '1px solid #ddd', borderRadius: 6 }}>
+                <div className="payment-card-element">
                     <CardElement />
                 </div>
             </div>
             <Button type="submit" variant="primary" disabled={!stripe || busy}>
                 {busy ? 'Traitement…' : 'Payer'}
             </Button>
-            {message && <div style={{ marginTop: 12 }}>{message}</div>}
+            {message && <div className="payment-message">{message}</div>}
         </form>
     );
 }

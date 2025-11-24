@@ -35,7 +35,7 @@ const createVoiture = async (req, res) => {
     }
     // Vérifier que les photos existent
     if (body.photo_voiture && Array.isArray(body.photo_voiture)) {
-      for (let photoId of body.photo_voiture) {
+      for (const photoId of body.photo_voiture) {
         const photo = await Photo.findById(photoId);
         if (!photo) {
           return sendNotFound(res, `La photo ${photoId} n'existe pas`);
@@ -108,7 +108,6 @@ const updateVoiture = async (req, res) => {
 
     // Isoler le champ d'images des autres données pour le traiter
     const { photo_voiture, ...otherData } = body;
-    let updateQuery = otherData;
 
     // Vérifier que les photos existent avant de les ajouter
     if (
@@ -116,18 +115,22 @@ const updateVoiture = async (req, res) => {
       Array.isArray(photo_voiture) &&
       photo_voiture.length > 0
     ) {
-      for (let photoId of photo_voiture) {
+      for (const photoId of photo_voiture) {
         const photo = await Photo.findById(photoId);
         if (!photo) {
           return sendNotFound(res, `La photo ${photoId} n'existe pas`);
         }
       }
-      // Ajouter les nouvelles photos sans dupliquer les existantes
-      updateQuery = {
-        ...otherData,
-        $addToSet: { photo_voiture: { $each: photo_voiture } },
-      };
     }
+
+    // Construire la requête de mise à jour
+    const updateQuery =
+      photo_voiture && Array.isArray(photo_voiture) && photo_voiture.length > 0
+        ? {
+            ...otherData,
+            $addToSet: { photo_voiture: { $each: photo_voiture } },
+          }
+        : otherData;
     // Mettre à jour la voiture avec les nouvelles données
     const updatedVoiture = await Voiture.findByIdAndUpdate(
       req.params.id,
@@ -428,9 +431,13 @@ const getVoituresOccasionFinder = async (req, res) => {
       voiture: { $in: voitures.map((v) => v._id) },
     };
 
-    // Appliquer les filtres de recherche
+    // Appliquer les filtres de recherche (échapper pour éviter ReDoS)
     if (carrosserie) {
-      filters.type_carrosserie = new RegExp(carrosserie, "i");
+      const escapedCarrosserie = carrosserie.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+      filters.type_carrosserie = new RegExp(escapedCarrosserie, "i");
     }
 
     // Appliquer les filtres d'année de production

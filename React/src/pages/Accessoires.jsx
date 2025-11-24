@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import accesoireService from '../services/accesoire.service.js';
 import commandeService from '../services/commande.service.js';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading } from '../components/common';
+import Loading from '../components/common/Loading.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import buildUrl from '../utils/buildUrl';
 import '../css/Accessoires.css';
@@ -93,7 +93,6 @@ const Accessoires = () => {
           </div>
         </div>
 
-        {/* Bloc Admin/Staff */}
         {isStaff && isStaff() && (
           <div className="accessoires-admin-box">
             <h3 className="accessoires-admin-title">Gestion des accessoires</h3>
@@ -241,7 +240,6 @@ const Accessoires = () => {
                       </button>
                     </div>
 
-                    {/* Boutons Admin/Staff */}
                     {isStaff && isStaff() && (
                       <div className="accessoire-card-admin-actions">
                         <button

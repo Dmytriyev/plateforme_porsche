@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { modelPorscheService, voitureService } from '../services';
-import { Loading, Button } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import voitureService from '../services/voiture.service.js';
+import Loading from '../components/common/Loading.jsx';
+import Button from '../components/common/Button.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/VariantePage.css';
 import '../css/components/Message.css';
 import { API_URL } from '../config/api.js';
@@ -87,31 +89,12 @@ const VariantePage = () => {
   const handleConfigurer = () => {
     if (type === 'neuf' && variante?._id && voiture_base?._id) {
       const targetUrl = `/configurateur/${voiture_base._id}/${variante._id}`;
-
-      if (import.meta.env.DEV) {
-        console.log('[VariantePage] Navigation vers configurateur:', {
-          voitureId: voiture_base._id,
-          varianteId: variante._id,
-          url: targetUrl
-        });
-      }
-
       navigate(targetUrl);
     } else {
-      if (import.meta.env.DEV) {
-        console.error('[VariantePage] Données manquantes pour configurer:', {
-          type,
-          varianteId: variante?._id,
-          voitureId: voiture_base?._id
-        });
-      }
       setError('Impossible de configurer cette variante. Données manquantes.');
     }
   };
 
-  /**
-   * Navigation vers le changement de modèle
-   */
   const handleChangerModele = () => {
     if (voiture_base?._id) {
       navigate(`/variantes/neuve/${voiture_base._id}`);
@@ -120,9 +103,6 @@ const VariantePage = () => {
     }
   };
 
-  /**
-   * Navigation vers l'achat de voitures neuves et d'occasion
-   */
   const handleAcheter = () => {
     navigate('/occasion');
   };

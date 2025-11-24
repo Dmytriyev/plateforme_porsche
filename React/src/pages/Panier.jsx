@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { commandeService } from '../services';
-import { Loading } from '../components/common';
+import commandeService from '../services/commande.service.js';
+import Loading from '../components/common/Loading.jsx';
 import buildUrl from '../utils/buildUrl';
-import { formatPrice } from '../utils/format.js';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/Panier.css';
 import '../css/components/Message.css';
 
@@ -49,10 +49,10 @@ const Panier = () => {
     const nouveauTotal = lignes.reduce((sum, ligne) => {
       const isVoiture = ligne.type_produit === true;
       // Pour les voitures : utiliser l'acompte
-      // Pour les accessoires : utiliser le prix * quantité
+      // Pour les accessoires : ligne.prix contient déjà le prix total (prix unitaire × quantité)
       const montantLigne = isVoiture
         ? (ligne.acompte || 0)
-        : (ligne.prix || 0) * (ligne.quantite || 1);
+        : (ligne.prix || 0);
       return sum + montantLigne;
     }, 0);
     setTotal(nouveauTotal);
@@ -159,8 +159,9 @@ const Panier = () => {
                   : ligne.accesoire?.photo_accesoire?.filter(p => p && (p.name || p._id)) || [];
 
                 const photoPrincipale = photos[0] || null;
-                const prixAAfficher = isVoiture ? (ligne.acompte || 0) : (ligne.prix || 0);
-                const prixTotalLigne = prixAAfficher * (ligne.quantite || 1);
+                // Pour les voitures : afficher l'acompte
+                // Pour les accessoires : ligne.prix contient déjà le prix total (prix unitaire × quantité)
+                const prixTotalLigne = isVoiture ? (ligne.acompte || 0) : (ligne.prix || 0);
                 const prixTotalVoiture = isVoiture ? (ligne.prix || 0) : null;
 
                 return (

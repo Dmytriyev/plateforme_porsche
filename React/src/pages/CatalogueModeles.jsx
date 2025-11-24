@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { voitureService, modelPorscheService } from '../services';
-import { Loading } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import voitureService from '../services/voiture.service.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import Loading from '../components/common/Loading.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import { API_URL } from '../config/api.js';
 import '../css/CatalogueModeles.css';
 import '../css/components/Message.css';

@@ -70,7 +70,7 @@ const register = async (req, res) => {
         // Transactions non supportées (pas de replica set).
         logger.warn(
           "Transaction non supportée ou a échoué, fallback sans transaction",
-          { error: txError && (txError.message || txError) }
+          { error: txError?.message ?? txError }
         );
         // Tentative sans transaction
         const user = new User(body);
@@ -952,12 +952,10 @@ const updateCurrentUserProfile = async (req, res) => {
       }
 
       if (newPassword.length < 6) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Le nouveau mot de passe doit contenir au moins 6 caractères",
-          });
+        return res.status(400).json({
+          message:
+            "Le nouveau mot de passe doit contenir au moins 6 caractères",
+        });
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);

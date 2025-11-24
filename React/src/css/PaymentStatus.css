@@ -3,13 +3,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  background: linear-gradient(135deg, var(--color-grey-light) 0%, var(--color-grey-border) 100%);
   padding: 2rem;
 }
 
 .payment-status-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--border-radius-lg);
   padding: 3rem;
   max-width: 600px;
   width: 100%;
@@ -68,7 +68,7 @@
 
 .payment-status-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #1a1a1a;
   margin-bottom: 1rem;
   animation: fadeIn 0.5s ease 0.3s backwards;
@@ -92,7 +92,7 @@
 
 .payment-status-info {
   font-size: 1rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin-bottom: 2rem;
   line-height: 1.6;
   animation: fadeIn 0.5s ease 0.5s backwards;
@@ -109,11 +109,11 @@
 .payment-status-btn {
   padding: 1rem 2rem;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 1px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -148,7 +148,7 @@
   animation: fadeIn 0.5s ease 0.7s backwards;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .payment-status-content {
     padding: 2rem;

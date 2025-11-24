@@ -14,48 +14,31 @@ if (!fs.existsSync(uploadDir)) {
 // Configuration du stockage des fichiers
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Déterminer le sous-dossier basé sur le chemin de la route
-    let subFolder = "";
+    // Mapper les chemins aux sous-dossiers (plus maintenable)
+    const routeToFolder = {
+      photo_accesoire: "accesoire",
+      photo_porsche: "model_porsche",
+      photo_voiture_actuel: "voiture_actuel",
+      photo_voiture: "voiture",
+      couleur_exterieur: "couleur_exterieur",
+      couleur_interieur: "couleur_interieur",
+      couleur_accesoire: "couleur_accesoire",
+      taille_jante: "taille_jante",
+      siege: "siege",
+      package: "package",
+    };
 
-    if (
-      // uploader pour accesoires
-      req.path.includes("photo_accesoire") ||
-      req.baseUrl.includes("photo_accesoire")
-    ) {
-      // ajouter sur ce sous-dossier
-      subFolder = "accesoire";
-    } else if (
-      req.path.includes("photo_porsche") ||
-      req.baseUrl.includes("photo_porsche")
-    ) {
-      subFolder = "model_porsche";
-    } else if (
-      req.path.includes("photo_voiture_actuel") ||
-      req.baseUrl.includes("photo_voiture_actuel")
-    ) {
-      subFolder = "voiture_actuel";
-    } else if (
-      req.path.includes("photo_voiture") ||
-      req.baseUrl.includes("photo_voiture")
-    ) {
-      subFolder = "voiture";
-    } else if (req.baseUrl.includes("couleur_exterieur")) {
-      subFolder = "couleur_exterieur";
-    } else if (req.baseUrl.includes("couleur_interieur")) {
-      subFolder = "couleur_interieur";
-    } else if (req.baseUrl.includes("couleur_accesoire")) {
-      subFolder = "couleur_accesoire";
-    } else if (req.baseUrl.includes("taille_jante")) {
-      subFolder = "taille_jante";
-    } else if (req.baseUrl.includes("siege")) {
-      subFolder = "siege";
-    } else if (req.baseUrl.includes("package")) {
-      subFolder = "package";
-    }
+    // Trouver le sous-dossier basé sur le baseUrl ou le path
+    const subFolder =
+      Object.keys(routeToFolder).find(
+        (key) => req.baseUrl.includes(key) || req.path.includes(key)
+      ) || "";
+
+    const destinationFolder = routeToFolder[subFolder] || "";
 
     // Créer le sous-dossier s'il n'existe pas
-    const destinationPath = subFolder
-      ? path.join(uploadDir, subFolder)
+    const destinationPath = destinationFolder
+      ? path.join(uploadDir, destinationFolder)
       : uploadDir;
     if (!fs.existsSync(destinationPath)) {
       fs.mkdirSync(destinationPath, { recursive: true });
@@ -67,18 +50,15 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const baseName = path.basename(file.originalname, ext);
-    // Sanitiser le nom de fichier pour éviter les caractères invalides sur macOS
-    let sanitizedName = baseName.replace(/[:/\\?*|"<>]/g, "-");
-    // Remplacer espaces et autres caractères problématiques
-    sanitizedName = sanitizedName.replace(/\s+/g, "-").replace(/\+/g, "-");
 
-    // Limiter la longueur pour éviter ENAMETOOLONG (max 50 caractères pour le nom de base)
+    // Sanitiser le nom de fichier (caractères invalides et espaces)
     const MAX_NAME_LENGTH = 50;
-    if (sanitizedName.length > MAX_NAME_LENGTH) {
-      sanitizedName = sanitizedName.substring(0, MAX_NAME_LENGTH);
-    }
+    const sanitizedName = baseName
+      .replace(/[:/\\?*|"<>\s+]/g, "-")
+      .substring(0, MAX_NAME_LENGTH);
 
-    cb(null, sanitizedName + "_" + Date.now() + ext);
+    // Générer un nom unique avec timestamp
+    cb(null, `${sanitizedName}_${Date.now()}${ext}`);
   },
 });
 // Filtrer les types de fichiers autorisés (images uniquement)

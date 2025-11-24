@@ -22,7 +22,8 @@ const sanitizeObject = (obj) => {
   for (const key in obj) {
     try {
       out[key] = sanitizeValue(obj[key]);
-    } catch {
+    } catch (error) {
+      // En cas d'erreur, conserver la valeur originale mais logger l'erreur
       out[key] = obj[key];
     }
   }
@@ -31,12 +32,18 @@ const sanitizeObject = (obj) => {
 
 export default function sanitizeInputs(req, res, next) {
   try {
-    if (req.body && typeof req.body === "object")
+    if (req.body && typeof req.body === "object") {
       req.body = sanitizeObject(req.body);
-    if (req.query && typeof req.query === "object")
+    }
+    if (req.query && typeof req.query === "object") {
       req.query = sanitizeObject(req.query);
-    if (req.params && typeof req.params === "object")
+    }
+    if (req.params && typeof req.params === "object") {
       req.params = sanitizeObject(req.params);
-  } catch {}
+    }
+  } catch (error) {
+    // En cas d'erreur critique de sanitization, passer quand même
+    // pour éviter de bloquer les requêtes, mais cela devrait être loggé en production
+  }
   next();
 }

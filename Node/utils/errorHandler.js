@@ -33,6 +33,11 @@ export const handleError = (res, error, context = "") => {
   return res.status(500).json({ message: "Erreur serveur" });
 };
 
+/**
+ * Vérifie si le corps de la requête est vide
+ * @param {Object} body - Corps de la requête
+ * @returns {boolean} true si vide, false sinon
+ */
 export const isEmptyBody = (body) => {
   return !body || Object.keys(body).length === 0;
 };

@@ -1,4 +1,4 @@
-/* Container principal */
+
 .accessoire-detail-container-porsche {
   min-height: 100vh;
   background: #fff;
@@ -11,7 +11,7 @@
   padding: 0 2rem;
 }
 
-/* Message de succès */
+
 .accessoire-success-message {
   position: fixed;
   top: 2rem;
@@ -20,7 +20,7 @@
   max-width: 400px;
 }
 
-/* Breadcrumb */
+
 .accessoire-breadcrumb {
   display: flex;
   align-items: center;
@@ -31,15 +31,15 @@
 }
 
 .breadcrumb-link {
-  color: #000;
+  color: var(--color-black);
   text-decoration: none;
   transition: color 0.2s ease;
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
 }
 
 .breadcrumb-link:hover {
-  color: #666;
+  color: var(--color-grey-text);
 }
 
 .breadcrumb-separator {
@@ -48,10 +48,10 @@
 
 .breadcrumb-current {
   color: #6b7280;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
 }
 
-/* Grid layout principal */
+
 .accessoire-detail-grid-porsche {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -92,12 +92,12 @@
 
 .gallery-placeholder-letter-porsche {
   font-size: 6rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #d1d5db;
   opacity: 0.5;
 }
 
-/* Boutons de navigation galerie */
+
 .gallery-nav-btn {
   position: absolute;
   top: 50%;
@@ -111,13 +111,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   z-index: 10;
 }
 
 .gallery-nav-btn:hover {
-  background: #f5f5f5;
-  border-color: #000;
+  background: var(--color-grey-light);
+  border-color: var(--color-black);
 }
 
 .gallery-nav-prev {
@@ -132,17 +132,17 @@
   stroke: #000;
 }
 
-/* Compteur de photos */
+
 .gallery-counter {
   position: absolute;
   bottom: 1rem;
   right: 1rem;
   background: rgba(0, 0, 0, 0.7);
-  color: #fff;
+  color: var(--color-white);
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  font-weight: 400;
-  border-radius: 4px;
+  font-weight: var(--font-weight-normal);
+  border-radius: var(--border-radius-sm);
 }
 .gallery-thumbs-porsche {
   display: grid;
@@ -154,7 +154,7 @@
   overflow: hidden;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   background-color: #f9fafb;
   padding: 0;
 }
@@ -164,7 +164,7 @@
 }
 
 .gallery-thumb-active-porsche {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 
 .gallery-thumb-porsche img {
@@ -173,14 +173,14 @@
   object-fit: cover;
 }
 
-/* Informations produit */
+
 .accessoire-info-porsche {
   display: flex;
   flex-direction: column;
   padding-top: 1rem;
 }
 
-/* Catégorie */
+
 .accessoire-category-porsche {
   font-size: 0.875rem;
   color: #6b7280;
@@ -189,24 +189,24 @@
   margin-bottom: 1rem;
 }
 
-/* Titre */
+
 .accessoire-title-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0 0 1.5rem 0;
   line-height: 1.2;
 }
 
-/* Prix */
+
 .accessoire-price-porsche {
   font-size: 1.5rem;
-  font-weight: 400;
-  color: #000;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
   margin-bottom: 1.5rem;
 }
 
-/* Description courte */
+
 .accessoire-short-description-porsche {
   font-size: 1rem;
   color: #374151;
@@ -214,7 +214,7 @@
   margin-bottom: 2rem;
 }
 
-/* Actions */
+
 .accessoire-actions-porsche {
   display: flex;
   flex-direction: column;
@@ -228,14 +228,14 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   width: 100%;
 }
 
@@ -249,7 +249,7 @@
   flex-shrink: 0;
 }
 
-/* Informations de livraison */
+
 .accessoire-delivery-info-porsche {
   display: flex;
   flex-direction: column;
@@ -269,7 +269,7 @@
   color: #374151;
   line-height: 1.6;
 }
-/* Sections d'informations */
+
 .accessoire-sections-porsche {
   display: flex;
   flex-direction: column;
@@ -287,8 +287,8 @@
 
 .accessoire-section-title-porsche {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 1rem 0;
   cursor: default;
 }
@@ -308,7 +308,7 @@
   margin: 0;
 }
 
-/* Caractéristiques */
+
 .accessoire-characteristic-item {
   display: flex;
   justify-content: space-between;
@@ -323,16 +323,16 @@
 .accessoire-characteristic-label {
   font-size: 0.875rem;
   color: #6b7280;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .accessoire-characteristic-value {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 400;
+  color: var(--color-black);
+  font-weight: var(--font-weight-normal);
 }
 
-/* Error container */
+
 .error-container {
   min-height: 60vh;
   display: flex;
@@ -342,7 +342,7 @@
   gap: 1.5rem;
   padding: 2rem;
 }
-/* Responsive */
+
 @media (max-width: 1024px) {
   .accessoire-detail-grid-porsche {
     grid-template-columns: 1fr;

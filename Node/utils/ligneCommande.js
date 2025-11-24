@@ -18,9 +18,6 @@
  */
 import Accesoire from "../models/accesoire.model.js";
 export const calculerPrixEtAcompte = async (body) => {
-  let prixTotal = 0;
-  let acompte = 0;
-
   // voiture neuve avec configuration Model_porsche
   if (body.type_produit === true && body.model_porsche_id) {
     // Import dynamique pour éviter dépendances circulaires
@@ -56,22 +53,18 @@ export const calculerPrixEtAcompte = async (body) => {
     const prixCouleurExterieur =
       Number(modelPorsche.couleur_exterieur?.prix) || 0;
 
-    // couleur_interieur peut être un tableau, un objet ou undefined.
-    let prixCouleursInterieur = 0;
+    // Calculer le prix des couleurs intérieures (tableau ou objet)
     const couleursInterieur = modelPorsche.couleur_interieur;
-    if (Array.isArray(couleursInterieur)) {
-      // Si plusieurs couleurs intérieures, on additionne leurs prix si non
-      prixCouleursInterieur =
-        couleursInterieur.reduce((sum, c) => sum + (Number(c?.prix) || 0), 0) ||
-        0;
-    } else if (couleursInterieur && typeof couleursInterieur === "object") {
-      prixCouleursInterieur = Number(couleursInterieur.prix) || 0;
-    }
+    const prixCouleursInterieur = Array.isArray(couleursInterieur)
+      ? couleursInterieur.reduce((sum, c) => sum + (Number(c?.prix) || 0), 0)
+      : Number(couleursInterieur?.prix) || 0;
+
     // Calcul des autres options
     const prixJante = Number(modelPorsche.taille_jante?.prix) || 0;
     const prixPackage = Number(modelPorsche.package?.prix) || 0;
     const prixSiege = Number(modelPorsche.siege?.prix) || 0;
-    prixTotal =
+
+    const prixTotal =
       prixBase +
       prixCouleurExterieur +
       prixCouleursInterieur +
@@ -80,13 +73,7 @@ export const calculerPrixEtAcompte = async (body) => {
       prixSiege;
 
     // Voiture neuve: acompte 10% du prix total par défaut
-    // Voiture d'occasion: acompte 0 (peut être que réservée)
-    const pourcentageAcompte =
-      modelPorsche.voiture?.type_voiture === true ? 0.1 : 0;
-    acompte =
-      body.acompte !== undefined
-        ? body.acompte
-        : prixTotal * pourcentageAcompte;
+    const acompte = body.acompte !== undefined ? body.acompte : prixTotal * 0.1;
 
     if (acompte > prixTotal) {
       return {
@@ -99,6 +86,7 @@ export const calculerPrixEtAcompte = async (body) => {
 
     // Stocker aussi l'ID de la voiture pour compatibilité
     body.voiture = modelPorsche.voiture._id;
+    return { prix: prixTotal, acompte, error: null };
   }
   // voiture sans model_porsche_id
   else if (body.type_produit === true && body.voiture) {
@@ -131,15 +119,13 @@ export const calculerPrixEtAcompte = async (body) => {
         },
       };
     }
-    prixTotal = accesoire.prix || 0;
-    acompte = 0;
+    const prixTotal = accesoire.prix || 0;
+    const acompte = 0;
+
+    return { prix: body.prix || prixTotal, acompte, error: null };
   }
 
-  return {
-    prix: body.prix || prixTotal,
-    acompte,
-    error: null,
-  };
+  return { prix: 0, acompte: 0, error: null };
 };
 
 //  populate (commande) pour accéder à commande.commande.user

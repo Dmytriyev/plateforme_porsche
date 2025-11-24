@@ -1,13 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { commandeService } from '../services';
+import commandeService from '../services/commande.service.js';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { formatPrice, formatDate } from '../utils/format.js';
+import { formatPrice, formatDate } from '../utils/helpers.js';
 import '../css/MesCommandes.css';
 
-/**
- * Page Mes Commandes - Historique des commandes
- */
 const MesCommandes = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -19,13 +16,10 @@ const MesCommandes = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    // Vérifier si on vient d'un paiement réussi
     const paymentSuccess = searchParams.get('payment');
     if (paymentSuccess === 'success') {
       setSuccessMessage('Paiement effectué avec succès ! Votre commande a été validée.');
-      // Supprimer le paramètre de l'URL
       window.history.replaceState({}, '', '/mes-commandes');
-      // Masquer le message après 5 secondes
       setTimeout(() => setSuccessMessage(''), 5000);
     }
     fetchCommandes();
@@ -77,7 +71,6 @@ const MesCommandes = () => {
   return (
     <div className="mes-commandes-container">
       <div className="mes-commandes-content">
-        {/* En-tête */}
         <div className="mes-commandes-header">
           <div>
             <h1 className="mes-commandes-title">Mes Commandes</h1>
@@ -90,7 +83,6 @@ const MesCommandes = () => {
           </button>
         </div>
 
-        {/* Messages */}
         {successMessage && (
           <div className="mes-commandes-success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -106,7 +98,6 @@ const MesCommandes = () => {
           </div>
         )}
 
-        {/* Liste des commandes */}
         {commandes.length === 0 ? (
           <div className="mes-commandes-empty">
             <p className="mes-commandes-empty-text">Vous n'avez aucune commande</p>
@@ -124,7 +115,6 @@ const MesCommandes = () => {
             {commandes.map((commande) => (
               <div key={commande._id} className="commande-card">
                 <div className="commande-item">
-                  {/* En-tête commande */}
                   <div className="commande-header">
                     <div>
                       <h3 className="commande-numero">
@@ -137,7 +127,6 @@ const MesCommandes = () => {
                     {getStatusBadge(commande.status, commande.acompte, commande.prix)}
                   </div>
 
-                  {/* Détails commande */}
                   <div className="commande-details">
                     <div className="commande-detail-item">
                       <span className="commande-label">Prix total:</span>
@@ -192,7 +181,6 @@ const MesCommandes = () => {
           </div>
         )}
 
-        {/* Information */}
         <div className="mes-commandes-info">
           <h3>Informations sur vos commandes</h3>
           <ul>

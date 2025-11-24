@@ -1,13 +1,13 @@
 .mes-voitures-container-finder {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--color-grey-light);
   width: 100%;
 }
 .mes-voitures-actions-header-finder {
   width: 100%;
-  background-color: #fff;
+  background-color: var(--color-white);
   padding: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-grey-border);
 }
 .mes-voitures-actions-container-finder {
   max-width: 1400px;
@@ -18,21 +18,21 @@
 }
 .mes-voitures-action-btn-finder {
   padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 .mes-voitures-action-btn-finder:hover {
   background-color: #1f2937;
 }
 .mes-voitures-action-btn-finder:last-child {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
   border: 1px solid #000;
 }
 .mes-voitures-action-btn-finder:last-child:hover {
@@ -44,8 +44,8 @@
   padding: 0 2rem;
 }
 .mes-voitures-empty-content-finder {
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-md);
   padding: 4rem 2rem;
   text-align: center;
 }
@@ -56,26 +56,26 @@
 }
 .mes-voitures-empty-btn-finder {
   padding: 1rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 .mes-voitures-empty-btn-finder:hover {
   background-color: #1f2937;
 }
 .mes-voitures-card-finder {
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-md);
   overflow: hidden;
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-grey-border);
 }
 .mes-voitures-info-finder {
   padding: 2rem;
@@ -90,8 +90,8 @@
 }
 .mes-voitures-name-finder {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
 }
@@ -102,8 +102,8 @@
 }
 .mes-voitures-approved-badge-finder {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 500;
+  color: var(--color-black);
+  font-weight: var(--font-weight-medium);
 }
 .mes-voitures-date-finder {
   font-size: 0.875rem;
@@ -117,28 +117,28 @@
 }
 .mes-voitures-btn-details-finder {
   padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 .mes-voitures-btn-details-finder:hover {
   background-color: #1f2937;
 }
 .mes-voitures-btn-compare-finder {
   padding: 0.75rem 1.5rem;
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
   border: 1px solid #000;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -148,11 +148,11 @@
 }
 .mes-voitures-btn-compare-finder.enregistre {
   background-color: #10b981;
-  color: #fff;
+  color: var(--color-white);
   border-color: #10b981;
 }
 .mes-voitures-btn-compare-finder.enregistre:hover {
-  background-color: #059669;
+  background-color: var(--color-green-success);
 }
 .mes-voitures-error {
   display: flex;
@@ -169,11 +169,11 @@
 }
 .mes-voitures-error button {
   padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }

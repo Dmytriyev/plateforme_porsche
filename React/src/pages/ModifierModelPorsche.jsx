@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { modelPorscheService, voitureService, personnalisationService } from '../services';
-import { Loading } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import voitureService from '../services/voiture.service.js';
+import personnalisationService from '../services/personnalisation.service.js';
+import Loading from '../components/common/Loading.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/ModifierModelPorsche.css';
 
@@ -272,7 +274,6 @@ const ModifierModelPorsche = () => {
         try {
           await modelPorscheService.supprimerPhotos(id, { photo_porsche: photosASupprimer });
         } catch (photoError) {
-          console.error('Erreur suppression photos:', photoError);
         }
       }
 
@@ -288,7 +289,6 @@ const ModifierModelPorsche = () => {
         try {
           await modelPorscheService.ajouterPhotos(id, photoFormData);
         } catch (photoError) {
-          console.error('Erreur upload photos:', photoError);
         }
       }
 

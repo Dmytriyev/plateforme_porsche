@@ -10,8 +10,8 @@ export default function accesoireValidation(body) {
       .required()
       // Liste des types d'accesoires disponibles
       .valid(...TYPES_ACCESOIRE)
-      .max(150),
-    nom_accesoire: joi.string().required().max(250),
+      .max(100),
+    nom_accesoire: joi.string().required().max(100),
     description: joi.string().required().max(1000),
     prix: joi.number().min(0).required().max(100000),
     couleur_accesoire: mongoIdSchema(),

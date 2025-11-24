@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { maVoitureService, personnalisationService } from '../services';
-import { Loading } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import maVoitureService from '../services/ma_voiture.service.js';
+import personnalisationService from '../services/personnalisation.service.js';
+import Loading from '../components/common/Loading.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/AjouterMaVoiture.css';
 
 const AjouterMaVoiture = () => {
@@ -13,17 +14,14 @@ const AjouterMaVoiture = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    // Options de personnalisation
     const [couleursExt, setCouleursExt] = useState([]);
     const [couleursInt, setCouleursInt] = useState([]);
     const [jantes, setJantes] = useState([]);
     const [sieges, setSieges] = useState([]);
 
-    // Fichiers photos
     const [photos, setPhotos] = useState([]);
     const [photoPreviews, setPhotoPreviews] = useState([]);
 
-    // Formulaire
     const [formData, setFormData] = useState({
         type_model: '',
         annee_production: '',
@@ -170,8 +168,6 @@ const AjouterMaVoiture = () => {
                 try {
                     await maVoitureService.ajouterPhoto(photoFormData);
                 } catch (photoError) {
-                    console.error('Erreur upload photos:', photoError);
-                    // Ne pas bloquer si l'upload des photos échoue
                 }
             }
 

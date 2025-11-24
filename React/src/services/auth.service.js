@@ -1,7 +1,7 @@
 import apiClient from "../config/api.js";
 import { extractData } from "./httpHelper";
 import TokenService from "./token.service.js";
-import { sanitizeObject } from "../utils/sanitize";
+import { sanitizeObject } from "../utils/helpers";
 
 const authService = {
   login: async (email, password) => {

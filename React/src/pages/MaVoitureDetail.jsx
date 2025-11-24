@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { maVoitureService, modelPorscheService, commandeService } from '../services';
-import { Loading } from '../components/common';
+import maVoitureService from '../services/ma_voiture.service.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import commandeService from '../services/commande.service.js';
+import Loading from '../components/common/Loading.jsx';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
-import { formatPrice, formatDate } from '../utils/format.js';
+import { formatPrice, formatDate } from '../utils/helpers.js';
 import '../css/MaVoitureDetail.css';
 
 const MaVoitureDetail = () => {

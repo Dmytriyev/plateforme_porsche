@@ -54,8 +54,12 @@ router.post(
   // validators
   body("email").isEmail().withMessage("Email invalide").normalizeEmail(),
   body("password")
-    .isLength({ min: 6 })
-    .withMessage("Le mot de passe doit contenir au moins 6 caractères"),
+    .isLength({ min: 8 })
+    .withMessage("Le mot de passe doit contenir au moins 8 caractères")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .withMessage(
+      "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial"
+    ),
   body("nom").optional().isString().trim().escape(),
   body("prenom").optional().isString().trim().escape(),
   validateRequest,

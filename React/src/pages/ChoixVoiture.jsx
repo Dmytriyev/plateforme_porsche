@@ -25,14 +25,11 @@ const ChoixVoiture = () => {
         </div>
 
         <div className="choix-grid-porsche">
-          {/* Carte Neuve - Style unifié */}
           <div className="catalogue-modele-card-neuf-porsche">
-            {/* Titre */}
             <h2 className="catalogue-modele-title-porsche">
               Voiture Neuve
             </h2>
 
-            {/* Image */}
             <div className="catalogue-modele-image-porsche">
               {imageNeuveUrl ? (
                 <img
@@ -64,14 +61,11 @@ const ChoixVoiture = () => {
             </button>
           </div>
 
-          {/* Carte Occasion - Style unifié */}
           <div className="catalogue-modele-card-neuf-porsche">
-            {/* Titre */}
             <h2 className="catalogue-modele-title-porsche">
               Voiture d'Occasion
             </h2>
 
-            {/* Image */}
             <div className="catalogue-modele-image-porsche">
               {imageOccasionUrl ? (
                 <img

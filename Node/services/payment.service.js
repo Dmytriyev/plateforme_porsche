@@ -11,17 +11,15 @@ const buildLineItems = (ligneCommandes) => {
     let unitPrice = 0;
     let productName = "Produit";
 
-    if (line.voiture && line.acompte && line.acompte > 0) {
+    if (line.voiture && line.acompte > 0) {
       unitPrice = line.acompte;
       productName = `${line.voiture.nom_model} (Acompte)`;
-    } else if (line.accesoire && line.accesoire.prix) {
+    } else if (line.accesoire?.prix) {
       unitPrice = line.accesoire.prix;
       productName = line.accesoire.nom_accesoire;
     } else if (line.prix) {
       unitPrice = line.prix;
-      productName = line.voiture
-        ? line.voiture.nom_model
-        : "Produit personnalisé";
+      productName = line.voiture?.nom_model ?? "Produit personnalisé";
     }
 
     // Normaliser la quantité et le prix
@@ -126,7 +124,7 @@ export const processWebhook = async ({ rawBody, signature }) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const commandeId = session.metadata && session.metadata.commandeId;
-    console.log("Webhook checkout.session.completed - commandeId:", commandeId);
+    logger.info("Webhook checkout.session.completed - commandeId:", commandeId);
 
     if (!commandeId) {
       throw Object.assign(new Error("commandeId manquant dans metadata"), {
@@ -136,11 +134,11 @@ export const processWebhook = async ({ rawBody, signature }) => {
 
     const commande = await Commande.findById(commandeId);
     if (!commande) {
-      console.error("Commande introuvable:", commandeId);
+      logger.error("Commande introuvable:", commandeId);
       throw Object.assign(new Error("Commande introuvable"), { status: 404 });
     }
 
-    console.log("Commande trouvée:", {
+    logger.info("Commande trouvée:", {
       id: commande._id,
       status: commande.status,
       user: commande.user,
@@ -148,24 +146,23 @@ export const processWebhook = async ({ rawBody, signature }) => {
 
     // Idempotence: si déjà traitée, ignorer
     if (commande.status === true && commande.factureUrl) {
-      console.log("Commande déjà traitée, ignorer");
+      logger.info("Commande déjà traitée, ignorer");
       return { handled: false, reason: "déjà traité" };
     }
 
     // Récupérer la facture si disponible
     let invoice = null;
-    try {
-      if (session.invoice)
+    if (session.invoice) {
+      try {
         invoice = await stripe.invoices.retrieve(session.invoice);
-    } catch (err) {
-      logger.warn("Impossible de récupérer la facture Stripe", err.message);
+      } catch (err) {
+        logger.warn("Impossible de récupérer la facture Stripe", err.message);
+      }
     }
 
     const lignesCommande = await LigneCommande.find({ commande: commandeId });
     const total = lignesCommande.reduce((sum, line) => {
-      let prix = 0;
-      if (line.acompte > 0) prix = line.acompte;
-      else if (line.prix) prix = line.prix;
+      const prix = line.acompte > 0 ? line.acompte : line.prix || 0;
       return sum + prix * line.quantite;
     }, 0);
 
@@ -176,7 +173,7 @@ export const processWebhook = async ({ rawBody, signature }) => {
     commande.date_commande = new Date();
     await commande.save();
 
-    console.log("Commande mise à jour:", {
+    logger.info("Commande mise à jour:", {
       id: commande._id,
       status: commande.status,
       prix: commande.prix,
@@ -193,7 +190,7 @@ export const processWebhook = async ({ rawBody, signature }) => {
     });
     await nouveauPanier.save();
 
-    console.log("Nouveau panier créé pour l'utilisateur:", nouveauPanier._id);
+    logger.info("Nouveau panier créé pour l'utilisateur:", nouveauPanier._id);
 
     // Ici on pourrait envoyer un email ou émettre un event socket
     logger.info(

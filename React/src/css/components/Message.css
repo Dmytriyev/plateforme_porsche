@@ -1,4 +1,4 @@
-/* Message styles for success and error messages */
+
 .message-box {
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -15,19 +15,19 @@
 .message-error {
   background-color: #fee;
   border-left: 4px solid #dc2626;
-  color: #000;
+  color: var(--color-black);
 }
 
 .message-success {
   background-color: #d1fae5;
   border-left: 4px solid #10b981;
-  color: #000;
+  color: var(--color-black);
 }
 
 .message-warning {
   background-color: #fef3c7;
   border-left: 4px solid #f59e0b;
-  color: #000;
+  color: var(--color-black);
 }
 
 .message-close {

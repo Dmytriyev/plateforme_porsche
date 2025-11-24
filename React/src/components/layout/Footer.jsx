@@ -1,9 +1,6 @@
 import { Link } from 'react-router-dom';
 import '../../css/Footer.css';
 
-/**
- * Composant Footer - Pied de page
- */
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -11,7 +8,6 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-grid">
-          {/* Logo et description */}
           <div className="footer-brand">
             <h3 className="footer-logo">PORSCHE</h3>
             <p className="footer-description">
@@ -19,7 +15,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Navigation */}
           <div>
             <h4 className="footer-section-title">Navigation</h4>
             <ul className="footer-list">
@@ -41,7 +36,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Informations */}
           <div>
             <h4 className="footer-section-title">Informations</h4>
             <ul className="footer-list">
@@ -68,7 +62,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h4 className="footer-section-title">Contact</h4>
             <ul className="footer-contact">
@@ -77,7 +70,6 @@ const Footer = () => {
               <li>Paris, France</li>
             </ul>
 
-            {/* Réseaux sociaux */}
             <div className="footer-social">
               <a href="https://facebook.com/porsche" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Facebook">
                 <svg className="footer-social-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -93,7 +85,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="footer-copyright">
           <p>&copy; {currentYear} Porsche. Tous droits réservés.</p>
         </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { accesoireService } from '../services';
-import { Loading } from '../components/common';
+import accesoireService from '../services/accesoire.service.js';
+import Loading from '../components/common/Loading.jsx';
 import '../css/AjouterAccessoire.css';
 
 const AjouterAccessoire = () => {
@@ -45,7 +45,6 @@ const AjouterAccessoire = () => {
             const couleursData = await accesoireService.getCouleurs();
             setCouleurs(Array.isArray(couleursData) ? couleursData : []);
         } catch (err) {
-            console.error('Erreur lors du chargement des options:', err);
             setCouleurs([]);
         } finally {
             setLoadingOptions(false);
@@ -163,7 +162,6 @@ const AjouterAccessoire = () => {
                         body: formDataPhotos
                     });
                 } catch (photoErr) {
-                    console.error('Erreur upload photos:', photoErr);
                 }
             }
 

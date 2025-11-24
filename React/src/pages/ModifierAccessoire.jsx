@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { accesoireService } from '../services';
-import { Loading } from '../components/common';
+import accesoireService from '../services/accesoire.service.js';
+import Loading from '../components/common/Loading.jsx';
 import buildUrl from '../utils/buildUrl';
 import '../css/ModifierAccessoire.css';
 
@@ -13,7 +13,6 @@ const ModifierAccessoire = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    // Options
     const [couleurs, setCouleurs] = useState([]);
     const [typesDisponibles] = useState([
         'porte-clés',
@@ -22,13 +21,11 @@ const ModifierAccessoire = () => {
         'life-style'
     ]);
 
-    // Photos
     const [photosExistantes, setPhotosExistantes] = useState([]);
     const [photosASupprimer, setPhotosASupprimer] = useState([]);
     const [nouvellesPhotos, setNouvellesPhotos] = useState([]);
     const [photosPreviews, setPhotosPreviews] = useState([]);
 
-    // Formulaire
     const [formData, setFormData] = useState({
         nom_accesoire: '',
         description: '',
@@ -56,12 +53,10 @@ const ModifierAccessoire = () => {
 
             setCouleurs(Array.isArray(couleursData) ? couleursData : []);
 
-            // Charger les photos existantes
             if (Array.isArray(accessoireData.photo_accesoire)) {
                 setPhotosExistantes(accessoireData.photo_accesoire);
             }
 
-            // Pré-remplir le formulaire
             setFormData({
                 nom_accesoire: accessoireData.nom_accesoire || '',
                 description: accessoireData.description || '',
@@ -136,7 +131,6 @@ const ModifierAccessoire = () => {
         setError('');
         setSuccess('');
 
-        // Validation
         if (!formData.nom_accesoire || !formData.description || !formData.type_accesoire || !formData.prix) {
             setError('Veuillez remplir tous les champs obligatoires');
             return;
@@ -155,7 +149,6 @@ const ModifierAccessoire = () => {
         try {
             setLoading(true);
 
-            // Préparer les données
             const dataToSend = {
                 nom_accesoire: formData.nom_accesoire.trim(),
                 description: formData.description.trim(),
@@ -171,15 +164,12 @@ const ModifierAccessoire = () => {
                 dataToSend.couleur_accesoire = formData.couleur_accesoire;
             }
 
-            // Mettre à jour l'accessoire
             await accesoireService.updateAccessoire(id, dataToSend);
 
-            // Supprimer les photos marquées
             if (photosASupprimer.length > 0) {
                 await accesoireService.removeImages(id, photosASupprimer);
             }
 
-            // Ajouter les nouvelles photos
             if (nouvellesPhotos.length > 0) {
                 const formDataPhotos = new FormData();
                 nouvellesPhotos.forEach(photo => {
@@ -240,7 +230,6 @@ const ModifierAccessoire = () => {
             )}
 
             <form onSubmit={handleSubmit} className="modifier-accessoire-form">
-                {/* Section: Informations de base */}
                 <div className="modifier-accessoire-section">
                     <h2 className="modifier-accessoire-section-title">Informations de base</h2>
 
@@ -293,7 +282,6 @@ const ModifierAccessoire = () => {
                     </div>
                 </div>
 
-                {/* Section: Prix et stock */}
                 <div className="modifier-accessoire-section">
                     <h2 className="modifier-accessoire-section-title">Prix et disponibilité</h2>
 

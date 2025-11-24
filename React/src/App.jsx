@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
-import { Navbar, Footer } from './components/layout';
+import Navbar from './components/layout/Navbar.jsx';
+import Footer from './components/layout/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import Home from './pages/Home.jsx';

@@ -1,11 +1,15 @@
 .occasion-page-container {
   min-height: 100vh;
   padding: 2rem 1rem;
-  background: #f5f5f5;
+  background: var(--color-grey-light);
 }
 .occasion-page-content {
   max-width: 1200px;
   margin: 0 auto;
+}
+.occasion-message {
+  margin: 20px auto;
+  max-width: 1200px;
 }
 .occasion-page-error {
   display: flex;
@@ -15,10 +19,10 @@
   min-height: 50vh;
   gap: 1rem;
 }
-/* Barre noire supérieure (style unifié avec configurateur) */
+
 .occasion-top-header {
   background-color: #1a1a1a;
-  color: #fff;
+  color: var(--color-white);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -39,7 +43,7 @@
 .occasion-header-link {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--color-white);
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -84,16 +88,16 @@
 
 .occasion-header-price-label {
   font-size: 0.75rem;
-  color: #ccc;
+  color: var(--color-grey-dark);
 }
 
 .occasion-header-price-total {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
 }
 
-/* Galerie principale - Grande photo à gauche + 4 petites à droite */
+
 .occasion-detail-gallery {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -121,7 +125,7 @@
   cursor: pointer;
 }
 
-/* Grille 2x2 à droite - 4 petites photos */
+
 .occasion-detail-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -136,17 +140,17 @@
   border: 2px solid transparent;
   overflow: hidden;
   cursor: pointer;
-  background: #e5e7eb;
+  background: var(--color-grey-border);
   padding: 0;
   transition: border-color 0.2s;
 }
 
 .occasion-detail-grid-thumbnail:hover {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 
 .occasion-detail-grid-thumbnail.active {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 
 .occasion-detail-grid-thumbnail img {
@@ -155,7 +159,7 @@
   object-fit: cover;
 }
 
-/* Galerie étendue en bas */
+
 .occasion-detail-gallery-extended {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -171,22 +175,22 @@
   border: 2px solid transparent;
   overflow: hidden;
   cursor: pointer;
-  background: #e5e7eb;
+  background: var(--color-grey-border);
   transition: border-color 0.2s;
   padding: 0;
 }
 .occasion-detail-gallery-extended-item:hover {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 .occasion-detail-gallery-extended-item.active {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 .occasion-detail-gallery-extended-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-/* Main Content Layout */
+
 .occasion-detail-content {
   display: grid;
   grid-template-columns: 1fr 400px;
@@ -215,8 +219,8 @@
 }
 .occasion-detail-title {
   font-size: 2rem;
-  font-weight: 400;
-  color: #000;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
   font-family: "Porsche Next", Arial, sans-serif;
@@ -226,18 +230,18 @@
   align-items: center;
   padding: 0.375rem 1rem;
   background: #b8860b;
-  color: #fff;
+  color: var(--color-white);
   border-radius: 50px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   height: 1rem;
   line-height: 1;
 }
 .occasion-detail-availability {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 400;
+  color: var(--color-black);
+  font-weight: var(--font-weight-normal);
 }
 .occasion-detail-specs-grid-four {
   display: grid;
@@ -260,14 +264,14 @@
 }
 .occasion-detail-spec-label {
   font-size: 0.75rem;
-  color: #666;
-  font-weight: 400;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-normal);
   line-height: 1.4;
 }
 .occasion-detail-spec-value {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 600;
+  color: var(--color-black);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.4;
 }
 .occasion-detail-spec-value-group {
@@ -285,12 +289,12 @@
 .occasion-detail-state-history {
   margin-top: 3rem;
   padding-top: 3rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-grey-border);
 }
 .occasion-detail-section-title {
   font-size: 2rem;
-  font-weight: 400;
-  color: #000;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
   margin: 0 0 2rem 0;
   font-family: "Porsche Next", Arial, sans-serif;
 }
@@ -323,13 +327,13 @@
 }
 .occasion-detail-verification-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 0.25rem 0;
 }
 .occasion-detail-verification-desc {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0;
 }
 .occasion-detail-info-icon {
@@ -340,14 +344,14 @@
   height: 24px;
   background: none;
   border: none;
-  color: #666;
+  color: var(--color-grey-text);
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
   transition: color 0.2s;
 }
 .occasion-detail-info-icon:hover {
-  color: #000;
+  color: var(--color-black);
 }
 .occasion-detail-history-list {
   display: flex;
@@ -357,15 +361,15 @@
 .occasion-detail-history-item {
   display: flex;
   padding: 1rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-grey-border);
 }
 .occasion-detail-history-item:last-child {
   border-bottom: none;
 }
 .occasion-detail-history-label {
   font-size: 0.875rem;
-  color: #666;
-  font-weight: 400;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-normal);
   min-width: 200px;
   flex-shrink: 0;
 }
@@ -377,12 +381,12 @@
 }
 .occasion-detail-history-value {
   font-size: 1rem;
-  color: #000;
-  font-weight: 600;
+  color: var(--color-black);
+  font-weight: var(--font-weight-semibold);
 }
 .occasion-detail-history-desc {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0;
   line-height: 1.5;
 }
@@ -391,13 +395,13 @@
 }
 .occasion-detail-description-title {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0 0 1rem 0;
 }
 .occasion-detail-description-text {
   font-size: 1rem;
-  color: #666;
+  color: var(--color-grey-text);
   line-height: 1.6;
   margin: 0;
 }
@@ -406,14 +410,14 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-text);
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-grey-border);
 }
 .occasion-detail-copy-btn {
   background: none;
   border: none;
-  color: #666;
+  color: var(--color-grey-text);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
@@ -421,22 +425,22 @@
   transition: color 0.2s;
 }
 .occasion-detail-copy-btn:hover {
-  color: #000;
+  color: var(--color-black);
 }
 
-/* Admin Actions */
+
 .occasion-detail-admin-box {
   background: #fff;
-  padding: 2rem;
-  border: 2px solid #000;
-  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 2px solid var(--color-grey-border);
+  border-radius: 4px;
   margin-top: 1.5rem;
 }
 
 .occasion-detail-admin-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 1rem 0;
 }
 
@@ -451,11 +455,11 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
-  font-size: 0.938rem;
-  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
   border: 2px solid;
-  border-radius: 1rem;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -466,8 +470,8 @@
 
 .occasion-detail-admin-btn-add {
   background: #000;
-  color: #fff;
-  border-color: #000;
+  color: var(--color-white);
+  border-color: var(--color-black);
 }
 
 .occasion-detail-admin-btn-add:hover {
@@ -477,15 +481,15 @@
 }
 
 .occasion-detail-admin-btn-edit {
-  background: #fff;
-  color: #2563eb;
-  border-color: #2563eb;
+  background: var(--color-grey-light);
+  color: var(--color-black);
+  border-color: var(--color-black);
 }
 
 .occasion-detail-admin-btn-edit:hover {
-  background: #eff6ff;
+  background: var(--color-grey-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .occasion-detail-admin-btn-delete {
@@ -500,7 +504,7 @@
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
 
-/* Responsive */
+
 @media (max-width: 1024px) {
   .occasion-detail-gallery {
     grid-template-columns: 1fr;
@@ -601,7 +605,7 @@
   }
 }
 
-/* Right Column - Price and Actions */
+
 .occasion-detail-right {
   position: sticky;
   top: 100px;
@@ -621,8 +625,8 @@
 }
 .occasion-detail-price-amount {
   font-size: 2.5rem;
-  font-weight: 400;
-  color: #000;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
   font-family: "Porsche Next", Arial, sans-serif;
 }
 .occasion-detail-financing {
@@ -633,18 +637,18 @@
 }
 .occasion-detail-financing-label {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 400;
+  color: var(--color-black);
+  font-weight: var(--font-weight-normal);
 }
 .occasion-detail-financing-link {
   font-size: 0.875rem;
-  color: #000;
-  font-weight: 400;
+  color: var(--color-black);
+  font-weight: var(--font-weight-normal);
   text-decoration: underline;
   cursor: pointer;
 }
 .occasion-detail-financing-link:hover {
-  color: #666;
+  color: var(--color-grey-text);
 }
 .occasion-detail-actions {
   display: flex;
@@ -655,41 +659,41 @@
   width: 100%;
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-align: center;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-duration) var(--transition-easing);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .occasion-detail-action-btn-primary {
   background: #000;
-  color: #fff;
+  color: var(--color-white);
 }
 .occasion-detail-action-btn-primary:hover {
   background: #333;
 }
 .occasion-detail-action-btn-secondary {
   background: #fff;
-  color: #000;
+  color: var(--color-black);
   border: 1px solid #000;
 }
 .occasion-detail-action-btn-secondary:hover {
   background: #000;
-  color: #fff;
+  color: var(--color-white);
 }
 .occasion-detail-action-btn-outline {
   background: transparent;
-  color: #000;
+  color: var(--color-black);
   border: 1px solid #e0e0e0;
 }
 .occasion-detail-action-btn-outline:hover {
-  background: #f5f5f5;
+  background: var(--color-grey-light);
 }
 
-/* Dealer Info */
+
 .occasion-detail-dealer {
   background: #fff;
   padding: 2rem;
@@ -697,13 +701,13 @@
 }
 .occasion-detail-dealer-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 0.5rem 0;
 }
 .occasion-detail-dealer-address {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-text);
   line-height: 1.6;
   margin: 0 0 1rem 0;
 }
@@ -712,14 +716,14 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #000;
+  color: var(--color-black);
   padding-top: 1rem;
   border-top: 1px solid #e0e0e0;
 }
 .occasion-detail-copy-btn {
   background: none;
   border: none;
-  color: #666;
+  color: var(--color-grey-text);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
@@ -727,5 +731,5 @@
   transition: color 0.2s;
 }
 .occasion-detail-copy-btn:hover {
-  color: #000;
+  color: var(--color-black);
 }

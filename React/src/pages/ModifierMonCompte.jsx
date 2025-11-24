@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { userService } from '../services';
-import { Loading } from '../components/common';
+import userService from '../services/user.service.js';
+import Loading from '../components/common/Loading.jsx';
 import '../css/ModifierMonCompte.css';
 
 const ModifierMonCompte = () => {

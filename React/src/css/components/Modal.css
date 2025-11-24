@@ -1,4 +1,4 @@
-/* Styles pour le composant Modal */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -9,13 +9,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999;
   animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
-  background-color: #fff;
-  border-radius: 4px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-sm);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   max-height: 90vh;
   overflow-y: auto;
@@ -42,13 +42,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-grey-border);
 }
 
 .modal-title {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
 }
 
@@ -57,7 +57,7 @@
   border: none;
   font-size: 2rem;
   line-height: 1;
-  color: #666;
+  color: var(--color-grey-text);
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -69,7 +69,7 @@
 }
 
 .modal-close:hover {
-  color: #000;
+  color: var(--color-black);
 }
 
 .modal-body {
@@ -93,5 +93,73 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+
+.modal-message-porsche {
+  margin: 0 0 2rem 0;
+  color: var(--color-black);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.modal-footer-porsche {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.modal-btn-primary-porsche {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-sm);
+}
+
+.modal-btn-primary-porsche:hover:not(:disabled) {
+  background-color: #333;
+}
+
+.modal-btn-primary-porsche:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-btn-secondary-porsche {
+  background-color: var(--color-white);
+  color: var(--color-black);
+  padding: 1rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--color-grey-border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius-sm);
+}
+
+.modal-btn-secondary-porsche:hover {
+  border-color: var(--color-black);
+}
+
+
+@media (max-width: 640px) {
+  .modal-footer-porsche {
+    flex-direction: column;
+  }
+
+  .modal-btn-primary-porsche,
+  .modal-btn-secondary-porsche {
+    width: 100%;
   }
 }

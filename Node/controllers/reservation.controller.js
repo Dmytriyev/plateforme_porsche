@@ -2,6 +2,7 @@ import Reservation from "../models/reservation.model.js";
 import reservationValidation from "../validations/reservation.validation.js";
 import Model_porsche from "../models/model_porsche.model.js";
 import User from "../models/user.model.js";
+import logger from "../utils/logger.js";
 import {
   sendSuccess,
   sendError,
@@ -370,9 +371,10 @@ const accepterReservation = async (req, res) => {
       "Réservation acceptée avec succès"
     );
   } catch (error) {
-    console.error("Erreur acceptation réservation:", error);
-    console.error("Stack:", error.stack);
-    console.error("Error message:", error.message);
+    logger.error("Erreur acceptation réservation:", {
+      error: error.message,
+      stack: error.stack,
+    });
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
@@ -424,9 +426,10 @@ const refuserReservation = async (req, res) => {
       "Réservation refusée avec succès"
     );
   } catch (error) {
-    console.error("Erreur refus réservation:", error);
-    console.error("Stack:", error.stack);
-    console.error("Error message:", error.message);
+    logger.error("Erreur refus réservation:", {
+      error: error.message,
+      stack: error.stack,
+    });
     return sendError(res, "Erreur serveur", 500, error);
   }
 };

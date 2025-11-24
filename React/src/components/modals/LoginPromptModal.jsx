@@ -1,14 +1,6 @@
-import React from 'react';
+import { useEffect } from 'react';
 import '../../css/components/Modal.css';
-import '../../css/Modal.css';
 
-// Composant modal réutilisable pour demander la connexion
-// Props:
-// - title: titre de la modal
-// - message: message principal
-// - primaryText: texte du bouton primaire
-// - secondaryText: texte du bouton secondaire
-// - onClose, onLogin, initialPath
 const LoginPromptModal = ({
     onClose,
     onLogin,
@@ -18,6 +10,27 @@ const LoginPromptModal = ({
     primaryText = 'SE CONNECTER / CRÉER UN COMPTE',
     secondaryText = 'ANNULER',
 }) => {
+    // Bloquer le scroll du body quand la modale est ouverte
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    // Fermer avec la touche Échap
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [onClose]);
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content modal-md" onClick={(e) => e.stopPropagation()}>

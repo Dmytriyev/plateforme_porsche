@@ -1,8 +1,9 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Input, Button } from '../components/common';
-import { validateLoginForm, handleFormChange } from '../utils/formHelpers.js';
+import Input from '../components/common/Input.jsx';
+import Button from '../components/common/Button.jsx';
+import { validateLoginForm, handleFormChange } from '../utils/helpers.js';
 import '../css/Login.css';
 
 const Login = () => {

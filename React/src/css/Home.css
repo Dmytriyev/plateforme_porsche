@@ -1,11 +1,11 @@
-/* Container principal */
+
 .home-container-porsche {
   min-height: 100vh;
-  background-color: #fff;
+  background-color: var(--color-white);
   width: 100%;
 }
 
-/* Section Hero */
+
 .home-hero-section {
   width: 100%;
   background-color: #f9fafb;
@@ -29,7 +29,7 @@
   width: 100%;
   aspect-ratio: 16/9;
   background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -46,8 +46,8 @@
 
 .home-hero-logo {
   font-size: 3rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   opacity: 0.3;
   letter-spacing: 0.2em;
 }
@@ -60,8 +60,8 @@
 
 .home-hero-title {
   font-size: 3rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -83,40 +83,40 @@
 .home-hero-btn {
   padding: 0.67rem 2rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: center;
 }
 
 .home-hero-btn-primary {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
 }
 
 .home-hero-btn-primary:hover {
   background-color: #333;
-  color: #fff;
+  color: var(--color-white);
 }
 
 .home-hero-btn-secondary {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
   border: 2px solid #000;
 }
 
 .home-hero-btn-secondary:hover {
-  background-color: #f5f5f5;
-  color: #000;
+  background-color: var(--color-grey-light);
+  color: var(--color-black);
 }
 
-/* Section modèles */
+
 .models-section-porsche {
   max-width: 1400px;
   margin: 0 auto;
   padding: 4rem 2rem;
-  background-color: #fff;
+  background-color: var(--color-white);
 }
 
 .models-header-porsche {
@@ -126,14 +126,14 @@
 
 .section-title-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
-/* Grid - identique au catalogue */
+
 .models-grid-porsche {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -142,10 +142,10 @@
   margin: 0 auto;
 }
 
-/* Bloc information de la carte */
+
 .home-model-info {
   padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-grey-border);
 }
 
 .home-model-description {
@@ -156,7 +156,7 @@
   min-height: 48px;
 }
 
-/* Loading et empty states */
+
 .models-loading,
 .models-empty {
   text-align: center;
@@ -165,7 +165,7 @@
   font-size: 1rem;
 }
 
-/* Section Accessoires */
+
 .home-accessoires-section {
   width: 100%;
   background-color: #f9fafb;
@@ -188,8 +188,8 @@
 
 .home-accessoires-title {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -210,21 +210,21 @@
 
 .home-accessoires-btn {
   padding: 0.67rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   text-decoration: none;
   font-size: 1rem;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: center;
 }
 
 .home-accessoires-btn:hover {
   background-color: #333;
-  color: #fff;
+  color: var(--color-white);
 }
-/* Responsive */
+
 @media (max-width: 1024px) {
   .home-hero-content {
     grid-template-columns: 1fr;
@@ -300,7 +300,7 @@
 }
 .home-approved-section {
   width: 100%;
-  background-color: #fff;
+  background-color: var(--color-white);
   padding: 4rem 2rem;
 }
 .home-approved-container {
@@ -309,7 +309,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
   border: 2px solid #000;
 }
@@ -331,14 +331,14 @@
 }
 .home-approved-image-text {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   opacity: 0.3;
   letter-spacing: 0.1em;
 }
 .home-approved-content {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 4rem;
   display: flex;
   flex-direction: column;
@@ -347,33 +347,33 @@
 }
 .home-approved-title {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 .home-approved-text {
   font-size: 1rem;
-  color: #fff;
+  color: var(--color-white);
   line-height: 1.6;
   margin: 0;
   opacity: 0.9;
 }
 .home-approved-btn {
   padding: 0.67rem 2rem;
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
   text-decoration: none;
   font-size: 1rem;
-  font-weight: 600;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: center;
   width: fit-content;
   margin-top: 1rem;
 }
 .home-approved-btn:hover {
-  background-color: #f5f5f5;
-  color: #000;
+  background-color: var(--color-grey-light);
+  color: var(--color-black);
 }

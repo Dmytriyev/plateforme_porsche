@@ -20,7 +20,6 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-content">
-          {/* Left: Menu */}
           <div className="navbar-left">
             <button
               onClick={toggleMobileMenu}
@@ -40,7 +39,6 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Center: Logo */}
           <div className="navbar-center">
             <Link to="/" className="navbar-logo">
               <img
@@ -48,18 +46,16 @@ const Navbar = () => {
                 alt="Porsche Logo"
                 className="navbar-logo-img"
                 onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'inline';
+                  e.target.classList.add('hidden');
+                  e.target.nextSibling.classList.remove('hidden');
                 }}
               />
-              <span className="navbar-logo-text" style={{ display: 'none' }}>PORSCHE</span>
+              <span className="navbar-logo-text hidden">PORSCHE</span>
             </Link>
           </div>
 
-          {/* Right: Actions (Panier + Mon compte) */}
           <div className="navbar-right">
             <div className="navbar-actions-desktop">
-              {/* Panier */}
               <Link to="/panier" className="navbar-cart">
                 <svg className="navbar-cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -71,7 +67,6 @@ const Navbar = () => {
                 )}
               </Link>
 
-              {/* Logo buste (Mon compte) - toujours visible; va vers /mon-compte si connecté, sinon /login */}
               <Link to={isAuthenticated() ? "/mon-compte" : "/login"} className="navbar-account" aria-label="Mon compte">
                 <svg className="navbar-account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -81,7 +76,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Menu (mobile dropdown or desktop dropdown depending on viewport) */}
         {mobileMenuOpen && (
           <>
             <div className="navbar-mobile">

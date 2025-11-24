@@ -1,4 +1,4 @@
-/* Container principal */
+
 .panier-container-porsche {
   min-height: 100vh;
   background: #fff;
@@ -11,7 +11,7 @@
   padding: 0 2rem;
 }
 
-/* Breadcrumb / Back link */
+
 .panier-back-link {
   margin-bottom: 2rem;
 }
@@ -20,40 +20,40 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #000;
+  color: var(--color-black);
   text-decoration: none;
   transition: color 0.2s ease;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   font-size: 0.875rem;
 }
 
 .panier-back-btn:hover {
-  color: #666;
+  color: var(--color-grey-text);
 }
 
-/* Titre */
+
 .panier-title-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0 0 2rem 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
-/* Messages */
+
 .panier-messages {
   margin-bottom: 2rem;
 }
 
-/* Panier vide */
+
 .panier-empty-porsche {
   text-align: center;
   padding: 4rem 2rem;
   background-color: #f9fafb;
   border-radius: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-grey-border);
 }
 
 .panier-empty-text {
@@ -71,13 +71,13 @@
 
 .panier-empty-btn {
   padding: 0.875rem 1.75rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.9375rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-duration) var(--transition-easing);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -86,7 +86,7 @@
   background-color: #1f2937;
   transform: translateY(-2px);
 }
-/* Layout principal */
+
 .panier-layout-porsche {
   display: grid;
   grid-template-columns: 1fr 420px;
@@ -94,17 +94,17 @@
   margin-top: 3rem;
 }
 
-/* Section articles */
+
 .panier-articles-porsche {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Carte article */
+
 .panier-article-card-porsche {
-  background-color: #fff;
-  border: 2px solid #e5e7eb;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-grey-border);
   border-radius: 1rem;
   padding: 1.5rem;
   display: grid;
@@ -120,7 +120,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Conteneur prix + bouton supprimer */
+
 .panier-article-actions-porsche {
   display: flex;
   flex-direction: column;
@@ -128,19 +128,19 @@
   gap: 1rem;
 }
 
-/* Bouton supprimer */
+
 .panier-article-remove-porsche {
   background: #d5001c;
   border: 1px solid #d5001c;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   padding: 0.5rem 1rem;
-  color: #fff;
-  transition: all 0.2s ease;
+  color: var(--color-white);
+  transition: all var(--transition-duration) var(--transition-easing);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   font-size: 0.875rem;
   letter-spacing: 0.05em;
@@ -153,7 +153,7 @@
   box-shadow: 0 4px 8px rgba(213, 0, 28, 0.3);
 }
 
-/* Image article */
+
 .panier-article-image-porsche {
   width: 100%;
   aspect-ratio: 1;
@@ -179,16 +179,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  background: linear-gradient(135deg, #f3f4f6 0%, var(--color-grey-border) 100%);
 }
 
 .panier-article-letter-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #d1d5db;
   opacity: 0.5;
 }
-/* Détails article */
+
 .panier-article-details-porsche {
   display: flex;
   flex-direction: column;
@@ -198,14 +198,14 @@
 
 .panier-article-name-porsche {
   font-size: 1.125rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.3;
   letter-spacing: -0.01em;
 }
 
-/* Attributs */
+
 .panier-article-attributes-porsche {
   display: flex;
   flex-direction: column;
@@ -221,26 +221,26 @@
 
 .panier-attribute-label-porsche {
   color: #6b7280;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   min-width: 100px;
 }
 
 .panier-attribute-value-porsche {
-  color: #000;
+  color: var(--color-black);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .panier-color-swatch-porsche {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-grey-border);
 }
 
-/* Quantité */
+
 .panier-quantity-porsche {
   display: flex;
   align-items: center;
@@ -251,23 +251,23 @@
 .panier-quantity-btn-porsche {
   width: 32px;
   height: 32px;
-  border: 1px solid #e5e7eb;
-  background-color: #fff;
-  color: #000;
+  border: 1px solid var(--color-grey-border);
+  background-color: var(--color-white);
+  color: var(--color-black);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
+  transition: all var(--transition-duration) var(--transition-easing);
+  border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .panier-quantity-btn-porsche:hover:not(:disabled) {
-  border-color: #000;
-  background-color: #000;
-  color: #fff;
+  border-color: var(--color-black);
+  background-color: var(--color-black);
+  color: var(--color-white);
 }
 
 .panier-quantity-btn-porsche:disabled {
@@ -277,23 +277,23 @@
 
 .panier-quantity-value-porsche {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   min-width: 32px;
   text-align: center;
 }
 
-/* Prix article */
+
 .panier-article-price-porsche {
   font-size: 1.375rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   text-align: right;
   white-space: nowrap;
   letter-spacing: -0.02em;
 }
 
-/* Info message */
+
 .panier-info-porsche {
   display: flex;
   align-items: center;
@@ -311,7 +311,7 @@
   flex-shrink: 0;
   color: #3b82f6;
 }
-/* Résumé (Summary) */
+
 .panier-summary-porsche {
   position: sticky;
   top: 2rem;
@@ -319,8 +319,8 @@
 }
 
 .panier-summary-card-porsche {
-  background-color: #fff;
-  border: 2px solid #e5e7eb;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-grey-border);
   border-radius: 1rem;
   padding: 2rem;
   display: flex;
@@ -330,16 +330,16 @@
 
 .panier-summary-title-porsche {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .panier-summary-total-porsche {
   font-size: 2.25rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -348,26 +348,26 @@
 
 .panier-summary-ttc-porsche {
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-/* Bon d'achat */
+
 .panier-voucher-link-porsche {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.875rem 1rem;
   background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  color: #000;
+  border: 1px solid var(--color-grey-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-black);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   width: 100%;
 }
 
@@ -376,17 +376,17 @@
   border-color: #d1d5db;
 }
 
-/* Bouton commander */
+
 .panier-checkout-btn-porsche {
   padding: 1.125rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   width: 100%;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -398,13 +398,13 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Détails du résumé */
+
 .panier-summary-details-porsche {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-grey-border);
 }
 
 .panier-summary-detail-item-porsche {
@@ -417,13 +417,13 @@
 
 .panier-shipping-free-porsche {
   color: #10b981;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   font-size: 0.875rem;
   letter-spacing: 0.05em;
 }
 
-/* Sécurité */
+
 .panier-security-porsche {
   display: flex;
   align-items: center;
@@ -446,8 +446,8 @@
 
 .panier-security-title-porsche {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 
 .panier-security-subtitle-porsche {
@@ -455,7 +455,7 @@
   color: #6b7280;
 }
 
-/* Message d'erreur */
+
 .panier-error {
   min-height: 60vh;
   display: flex;
@@ -474,14 +474,14 @@
 
 .panier-error button {
   padding: 0.875rem 1.75rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -490,7 +490,7 @@
   background-color: #1f2937;
   transform: translateY(-2px);
 }
-/* Responsive */
+
 @media (max-width: 1024px) {
   .panier-layout-porsche {
     grid-template-columns: 1fr;
@@ -527,7 +527,7 @@
     text-align: left;
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-grey-border);
   }
 
   .panier-summary-card-porsche {

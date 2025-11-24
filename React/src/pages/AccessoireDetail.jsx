@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
-import { accesoireService } from '../services';
+import accesoireService from '../services/accesoire.service.js';
 import { AuthContext } from '../context/AuthContext.jsx';
 import usePanierAPI from '../hooks/usePanierAPI.jsx';
-import { Loading, Button } from '../components/common';
+import Loading from '../components/common/Loading.jsx';
+import Button from '../components/common/Button.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
-import { formatPrice } from '../utils/format.js';
+import { formatPrice } from '../utils/helpers.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/AccessoireDetail.css';
 import '../css/components/Message.css';

@@ -98,17 +98,15 @@ const calculatePrix = (model) => {
   // Calcul du prix de base de la variante
   const prixBase = model.prix_base || 0;
   // Calcul du prix de la couleur extérieure
-  let prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
+  const prixCouleurExterieur = model.couleur_exterieur?.prix || 0;
   // Calcul du prix des couleurs intérieures
-  let prixCouleursInterieur = 0;
-  // Vérifier si couleur_interieur est défini et est un tableau
-  if (model.couleur_interieur && Array.isArray(model.couleur_interieur)) {
-    // Sommer les prix de chaque couleur intérieure sélectionnée
-    prixCouleursInterieur = model.couleur_interieur.reduce(
-      (total, couleur) => total + (couleur?.prix || 0),
-      0
-    );
-  }
+  const prixCouleursInterieur =
+    model.couleur_interieur && Array.isArray(model.couleur_interieur)
+      ? model.couleur_interieur.reduce(
+          (total, couleur) => total + (couleur?.prix || 0),
+          0
+        )
+      : 0;
 
   // Calcul du prix des autres options
   const prixJante = model.taille_jante?.prix || 0; // Calcul du prix des jantes

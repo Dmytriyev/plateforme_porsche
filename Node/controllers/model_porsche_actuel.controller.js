@@ -119,7 +119,7 @@ const getModel_porsche_actuelById = async (req, res) => {
     }
     return res.status(200).json(model_porsche_actuel);
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error });
+    return sendError(res, "Erreur serveur", 500, error);
   }
 };
 

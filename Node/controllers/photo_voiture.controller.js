@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 const createPhoto_voiture = async (req, res) => {
   try {
     // Assurer que body est un objet même si req.body est undefined
-    let body = req.body || {};
+    const body = req.body || {};
     // Si la requête ne contient ni body ni fichier, rejeter la requête
     if (Object.keys(body).length === 0 && !req.file) {
       return res
@@ -368,7 +368,7 @@ const getPhotosByCriteria = async (req, res) => {
   try {
     const { voiture, couleur_exterieur, couleur_interieur, taille_jante } =
       req.query;
-    let query = {};
+    const query = {};
     // Ajouter les critères fournis à la requête
     if (voiture) query.voiture = voiture;
     if (couleur_exterieur) query.couleur_exterieur = couleur_exterieur;

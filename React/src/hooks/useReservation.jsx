@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { sanitizeObject } from '../utils/sanitize';
+import { sanitizeObject } from '../utils/helpers';
 
 export default function useReservation() {
     const [loading, setLoading] = useState(false);
@@ -83,7 +83,6 @@ export default function useReservation() {
                     pollRef.current = null;
                 }
             } catch {
-                // Silent fail - le polling continuera au prochain intervalle
             }
         }, interval);
         return () => {
@@ -92,7 +91,6 @@ export default function useReservation() {
         };
     }, [getReservation]);
 
-    // Cleanup on unmount
     useEffect(() => {
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);

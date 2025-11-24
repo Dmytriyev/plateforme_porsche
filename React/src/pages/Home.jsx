@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { voitureService } from '../services';
+import voitureService from '../services/voiture.service.js';
 import buildUrl from '../utils/buildUrl';
-import { formatPrice } from '../utils/format.js';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/CatalogueModeles.css';
 import '../css/Home.css';
 
@@ -18,17 +18,14 @@ const Home = () => {
   const fetchModeles = async () => {
     try {
       setLoading(true);
-      // Charger toutes les voitures
       const response = await voitureService.getAllVoitures();
       const data = Array.isArray(response) ? response : [];
 
-      // Filtrer les 3 gammes principales et dédupliquer par nom_model
       const filtered = data.filter(v => ['911', 'Cayman', 'Cayenne'].includes(v.nom_model));
       const uniqueModeles = [...new Map(filtered.map(v => [v.nom_model, v])).values()];
 
       setModeles(uniqueModeles);
     } catch (error) {
-      console.error('Erreur chargement modèles:', error);
       setModeles([]);
     } finally {
       setLoading(false);
@@ -92,17 +89,14 @@ const Home = () => {
             {modeles.map((modele) => {
               const modeleInfo = getModeleInfo(modele);
               const photos = modele.photo_voiture?.filter(p => p?.name) || [];
-              // Utiliser la photo à l'index 1 comme demandé
               const photoPrincipale = photos.length > 1 ? photos[1] : (photos[0] || null);
 
               return (
                 <article key={modele._id} className="catalogue-modele-card-neuf-porsche">
-                  {/* Titre */}
                   <h2 className="catalogue-modele-title-porsche">
                     {modele.nom_model}
                   </h2>
 
-                  {/* Image */}
                   <div className="catalogue-modele-image-porsche">
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
@@ -127,14 +121,12 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Information (Description) */}
                   <div className="home-model-info">
                     <p className="home-model-description">
                       {modeleInfo.description}
                     </p>
                   </div>
 
-                  {/* Bouton */}
                   <button
                     className="catalogue-modele-btn-porsche"
                     onClick={() => handleModeleClick(modele)}

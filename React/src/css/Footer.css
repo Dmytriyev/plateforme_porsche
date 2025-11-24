@@ -26,7 +26,7 @@
 }
 .footer-section-title {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   margin-bottom: 1rem;
 }
 .footer-list {

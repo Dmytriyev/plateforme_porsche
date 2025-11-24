@@ -13,7 +13,7 @@
   background: #fff;
 }
 
-/* Navigation Top */
+
 .variante-nav-top-porsche {
   display: flex;
   justify-content: space-between;
@@ -31,26 +31,26 @@
 
 .variante-nav-model-name {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
 }
 
 .variante-nav-change-model {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   background: #fff;
-  color: #000;
+  color: var(--color-black);
   border: 2px solid #000;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 4px;
+  transition: all var(--transition-duration) var(--transition-easing);
+  border-radius: var(--border-radius-sm);
 }
 
 .variante-nav-change-model:hover {
-  background: #f5f5f5;
-  border-color: #000;
+  background: var(--color-grey-light);
+  border-color: var(--color-black);
 }
 
 .variante-nav-top-right {
@@ -61,23 +61,23 @@
 
 .variante-nav-link {
   font-size: 0.875rem;
-  font-weight: 400;
-  color: #000;
+  font-weight: var(--font-weight-normal);
+  color: var(--color-black);
   background: transparent;
   border: none;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   text-transform: uppercase;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
 }
 
 .variante-nav-link:hover {
-  color: #666;
+  color: var(--color-grey-text);
 }
 
-/* Bouton CONFIGURER - noir */
+
 .variante-btn-configurer {
   background: #000 !important;
   color: #fff !important;
@@ -90,15 +90,15 @@
   color: #fff !important;
 }
 
-/* Autres boutons - style par défaut */
+
 .variante-btn-acheter,
 .variante-btn-comparer {
   background: transparent;
-  color: #000;
+  color: var(--color-black);
   border: none;
 }
 
-/* Navigation Carrosserie */
+
 .variante-carrosserie-nav-porsche {
   display: flex;
   gap: 1.5rem;
@@ -109,23 +109,23 @@
 .variante-carrosserie-nav-item-porsche {
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   background: transparent;
-  color: #000;
+  color: var(--color-black);
   border: 1px solid #e0e0e0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 .variante-carrosserie-nav-item-porsche:hover {
-  background: #f5f5f5;
+  background: var(--color-grey-light);
 }
 
 .variante-carrosserie-nav-item-porsche.active {
   background: #000;
-  color: #fff;
-  border-color: #000;
+  color: var(--color-white);
+  border-color: var(--color-black);
 }
 
 .variante-hero-porsche {
@@ -160,28 +160,28 @@
 }
 .variante-name-porsche {
   font-size: 3rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 .variante-fuel-badge-porsche {
-  background-color: #e5e7eb;
-  color: #000;
+  background-color: var(--color-grey-border);
+  color: var(--color-black);
   padding: 0.375rem 0.75rem;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   text-transform: capitalize;
 }
 .variante-price-porsche {
   font-size: 1rem;
-  color: #000;
+  color: var(--color-black);
   text-align: center;
 }
 
-/* Layout du contenu */
+
 .variante-content-layout-porsche {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -225,31 +225,31 @@
 }
 .variante-performance-value-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   line-height: 1.2;
 }
 .variante-performance-label-porsche {
   font-size: 0.875rem;
   color: #6b7280;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 .variante-technical-details-btn-porsche {
   padding: 0.75rem 1.5rem;
   background: #fff;
   border: 1px solid #000;
-  color: #000;
+  color: var(--color-black);
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   width: fit-content;
   align-self: flex-start;
 }
 .variante-technical-details-btn-porsche:hover {
   background: #000;
-  color: #fff;
+  color: var(--color-white);
 }
 .variante-description-section-porsche {
   max-width: 1400px;
@@ -258,8 +258,8 @@
 }
 .variante-description-title-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0 0 1.5rem 0;
   line-height: 1.2;
 }
@@ -271,7 +271,7 @@
   max-width: 800px;
 }
 
-/* Actions boutons */
+
 .variante-actions-bottom-porsche {
   display: flex;
   gap: 1rem;
@@ -285,18 +285,18 @@
 .variante-action-btn-porsche {
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   text-transform: uppercase;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   min-width: 200px;
   white-space: nowrap;
 }
 
 .variante-action-btn-black {
   background: #000;
-  color: #fff;
+  color: var(--color-white);
 }
 
 .variante-action-btn-black:hover {
@@ -305,12 +305,12 @@
 
 .variante-action-btn-white {
   background: #fff;
-  color: #000;
+  color: var(--color-black);
   border: 1px solid #e0e0e0;
 }
 
 .variante-action-btn-white:hover {
-  background: #f5f5f5;
+  background: var(--color-grey-light);
 }
 
 @media (max-width: 968px) {

@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { maVoitureService } from '../services';
+import maVoitureService from '../services/ma_voiture.service.js';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading } from '../components/common';
+import Loading from '../components/common/Loading.jsx';
 import { API_URL } from '../config/api.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/MesVoitures.css';
@@ -47,19 +47,11 @@ const MesVoitures = () => {
     return d.toLocaleDateString('fr-FR', { month: '2-digit', year: 'numeric' });
   };
 
-  /**
-   * Formater la puissance
-   */
   const formatPower = (infoMoteur) => {
-    // Extraire la puissance depuis info_moteur si disponible
-    // Format attendu: "400 ch / 294 kW" ou similaire
     if (!infoMoteur) return null;
-    return infoMoteur; // Retourner tel quel pour l'instant
+    return infoMoteur;
   };
 
-  /**
-   * Toggle enregistrement d'une voiture
-   */
   const handleToggleEnregistrer = (voitureId) => {
     setVoituresEnregistrees(prev => {
       const isSelected = prev.includes(voitureId);
@@ -71,9 +63,6 @@ const MesVoitures = () => {
     });
   };
 
-  /**
-   * Supprimer une voiture
-   */
   const _handleSupprimer = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
       return;
@@ -102,14 +91,12 @@ const MesVoitures = () => {
     return <Loading fullScreen message="Chargement de vos voitures..." />;
   }
 
-  // Récupérer la première photo disponible pour l'image générale
   const photoGenerale = voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
     ? voitures[0].photo_voiture_actuel[0]
     : null;
 
   return (
     <div className="mes-voitures-container-finder">
-      {/* Image générale en haut */}
       <section className="mes-voitures-hero-finder">
         {photoGenerale ? (
           <div className="mes-voitures-hero-image-finder">
@@ -132,7 +119,6 @@ const MesVoitures = () => {
         )}
       </section>
 
-      {/* Boutons de gestion */}
       <section className="mes-voitures-actions-header-finder">
         <div className="mes-voitures-actions-container-finder">
           <button
@@ -150,7 +136,6 @@ const MesVoitures = () => {
         </div>
       </section>
 
-      {/* Messages */}
       {error && (
         <div className="mes-voitures-messages-finder">
           <div className="message-box message-error">
@@ -166,7 +151,6 @@ const MesVoitures = () => {
         </div>
       )}
 
-      {/* Liste des voitures */}
       {voitures.length === 0 ? (
         <section className="mes-voitures-empty-finder">
           <div className="mes-voitures-empty-content-finder">
@@ -184,21 +168,19 @@ const MesVoitures = () => {
       ) : (
         <section className="mes-voitures-list-finder">
           {voitures.map((voiture) => {
-            // Récupérer les photos
             const photos = voiture.photo_voiture_actuel && Array.isArray(voiture.photo_voiture_actuel)
               ? voiture.photo_voiture_actuel.filter(p => p && (p.name || p._id))
               : [];
 
             const photoPrincipale = photos.length > 0 ? photos[0] : null;
-            const thumbnails = photos.slice(1, 4); // Maximum 3 thumbnails
+            const thumbnails = photos.slice(1, 4);
 
             const isEnregistree = voituresEnregistrees.includes(voiture._id);
             const dateImmat = formatDateImmat(voiture.annee_production);
 
             return (
               <article key={voiture._id} className="mes-voitures-card-finder">
-                {/* Image principale et thumbnails */}
-                <div className="mes-voitures-images-finder">
+                <div className="mes-voitures-card-images-finder">
                   {/* Image principale */}
                   <div className="mes-voitures-main-image-finder">
                     {photoPrincipale && photoPrincipale.name ? (

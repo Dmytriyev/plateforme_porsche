@@ -1,0 +1,31 @@
+.reservation-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.reservation-config-display {
+  background: var(--color-grey-lighter);
+  padding: 10px;
+}
+
+.reservation-config-pre {
+  white-space: pre-wrap;
+  margin: 0;
+  font-family: monospace;
+}
+
+.reservation-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reservation-error {
+  color: var(--color-red-porsche);
+  margin-top: 8px;
+}
+
+.reservation-payment-section {
+  margin-top: 20px;
+}

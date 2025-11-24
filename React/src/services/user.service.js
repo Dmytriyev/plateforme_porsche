@@ -1,6 +1,6 @@
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
-import { sanitizeObject } from "../utils/sanitize";
+import { sanitizeObject } from "../utils/helpers";
 
 const userService = {
   getCurrentUser: async () => {
@@ -12,7 +12,6 @@ const userService = {
       apiClient.patch("/user/profile", userData)
     );
 
-    // Mettre à jour le localStorage avec les nouvelles données
     if (response) {
       const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
       const updatedUser = { ...currentUser, ...sanitizeObject(response) };

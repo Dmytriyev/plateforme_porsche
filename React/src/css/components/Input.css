@@ -1,4 +1,4 @@
-/* Styles pour le composant Input */
+
 .input-container {
   margin-bottom: 1rem;
 }
@@ -6,8 +6,8 @@
 .input-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin-bottom: 0.5rem;
 }
 
@@ -20,17 +20,17 @@
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  color: #000;
-  background-color: #fff;
-  border: 2px solid #e5e5e5;
-  border-radius: 4px;
+  color: var(--color-black);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-grey-border);
+  border-radius: var(--border-radius-sm);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: inherit;
 }
 
 .input-field:focus {
   outline: none;
-  border-color: #000;
+  border-color: var(--color-black);
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -43,7 +43,7 @@
 }
 
 .input-field:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--color-grey-light);
   color: #999;
   cursor: not-allowed;
 }
@@ -55,7 +55,7 @@
   margin-top: 0.25rem;
 }
 
-/* Support pour textarea */
+
 textarea.input-field {
   min-height: 100px;
   resize: vertical;

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { modelPorscheService, voitureService, personnalisationService } from '../services';
-import { Loading } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import voitureService from '../services/voiture.service.js';
+import personnalisationService from '../services/personnalisation.service.js';
+import Loading from '../components/common/Loading.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/AjouterModelPorsche.css';
 
 // Variantes prédéfinies par modèle (synchronisées avec le backend)
@@ -243,7 +245,6 @@ const AjouterModelPorsche = () => {
                 try {
                     await modelPorscheService.ajouterPhotos(nouveauModel._id, photoFormData);
                 } catch (photoError) {
-                    console.error('Erreur upload photos:', photoError);
                 }
             }
 

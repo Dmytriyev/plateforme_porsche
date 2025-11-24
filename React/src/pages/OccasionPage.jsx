@@ -1,8 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { modelPorscheService, voitureService, commandeService } from '../services';
-import { Loading, Button } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import voitureService from '../services/voiture.service.js';
+import commandeService from '../services/commande.service.js';
+import Loading from '../components/common/Loading.jsx';
+import Button from '../components/common/Button.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import buildUrl from '../utils/buildUrl';
 import '../css/OccasionPage.css';
 import '../css/ListeVariantes.css';
@@ -333,8 +336,7 @@ const OccasionPage = () => {
         navigate('/mon-compte');
       }, 2000);
     } catch (err) {
-      console.error('Erreur lors de la réservation:', err);
-      setError(err.message || 'Erreur lors de la création de la réservation');
+      setError(err.message || 'Erreur lors de la réservation');
     } finally {
       setReservationEnCours(false);
     }
@@ -773,12 +775,12 @@ const OccasionPage = () => {
 
       {/* Messages de succès et d'erreur */}
       {success && (
-        <div className="message-success" style={{ margin: '20px auto', maxWidth: '1200px' }}>
+        <div className="message-success occasion-message">
           {success}
         </div>
       )}
       {error && (
-        <div className="message-error" style={{ margin: '20px auto', maxWidth: '1200px' }}>
+        <div className="message-error occasion-message">
           {error}
         </div>
       )}
@@ -964,10 +966,10 @@ const OccasionPage = () => {
                     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ? Cette action est irréversible.')) {
                       try {
                         await modelPorscheService.deleteModelPorsche(id);
-                        alert('Voiture supprimée avec succès');
-                        navigate('/occasion');
+                        setSuccess('Voiture supprimée avec succès');
+                        setTimeout(() => navigate('/occasion'), 1500);
                       } catch (err) {
-                        alert(err.message || 'Erreur lors de la suppression');
+                        setError(err.message || 'Erreur lors de la suppression');
                       }
                     }
                   }}

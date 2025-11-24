@@ -54,14 +54,10 @@ const corsOptions = FRONTEND_URL
   : {};
 app.use(cors(corsOptions));
 
-// ============================================
-// RATE LIMITERS (Protection contre les abus)
-// ============================================
-
 // Limiteur global (protection DDoS)
 const globalLimiter = rateLimit({
-  windowMs: 20 * 60 * 1000, // 20 minutes
-  max: 10000,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // 500 requêtes max par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -70,7 +66,7 @@ const globalLimiter = rateLimit({
 // Limiteur pour les tentatives de login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000,
+  max: 15, // 15 tentatives max par IP
   message: "Trop de tentatives de connexion, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,
@@ -79,27 +75,29 @@ const loginLimiter = rateLimit({
 // Limiteur pour les inscriptions
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 50,
+  max: 10, // 10 inscriptions max par IP
   message: "Trop d'inscriptions, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Limiteur pour les paiements
 const paymentLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 200,
+  max: 50, // 50 paiements max par IP
   message: "Trop de tentatives de paiement, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Limiteur pour les uploads d'images
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 heure
-  max: 500,
+  max: 100, // 100 uploads max par IP
   message: "Trop d'uploads d'images, réessayez plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
-
-// ============================================
-// MIDDLEWARES GLOBAUX
-// ============================================
 
 // Webhook Stripe - DOIT être avant le parser JSON
 app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
@@ -122,10 +120,6 @@ app.use(
     etag: false,
   })
 );
-
-// ============================================
-// ROUTES
-// ============================================
 
 // Route racine (health check)
 app.get("/", (req, res) => {
@@ -159,21 +153,11 @@ app.use("/model_porsche", model_porscheRoutes);
 app.use("/voiture", voitureRoutes);
 app.use("/accesoire", accesoireRoutes);
 
-// ============================================
-// GESTION DES ERREURS
-// ============================================
 app.use(errorMiddleware);
-// ============================================
-// DÉMARRAGE DU SERVEUR
-// ============================================
 const server = app.listen(port, () => {
   logger.info(`Serveur démarré sur le port ${port}`);
 });
 
-/**
- * Arrêt gracieux du serveur
- * Permet de fermer proprement les connexions avant de quitter
- */
 const gracefulShutdown = (signal, err) => {
   logger.warn(`Signal ${signal} reçu. Arrêt gracieux...`);
 

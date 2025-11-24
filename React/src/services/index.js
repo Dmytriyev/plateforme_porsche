@@ -1,9 +1,0 @@
-export { default as authService } from "./auth.service.js";
-export { default as userService } from "./user.service.js";
-export { default as voitureService } from "./voiture.service.js";
-export { default as modelPorscheService } from "./modelPorsche.service.js";
-export { default as accesoireService } from "./accesoire.service.js";
-export { default as personnalisationService } from "./personnalisation.service.js";
-export { default as commandeService } from "./commande.service.js";
-export { default as maVoitureService } from "./ma_voiture.service.js";
-export { default as tokenService } from "./token.service.js";

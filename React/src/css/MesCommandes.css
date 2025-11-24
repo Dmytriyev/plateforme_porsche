@@ -1,6 +1,6 @@
 .mes-commandes-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--color-grey-light);
   padding: 2rem 0;
 }
 
@@ -10,7 +10,7 @@
   padding: 0 1rem;
 }
 
-/* En-tête */
+
 .mes-commandes-header {
   display: flex;
   justify-content: space-between;
@@ -21,7 +21,7 @@
 
 .mes-commandes-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #1a1a1a;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
@@ -30,20 +30,20 @@
 
 .mes-commandes-subtitle {
   font-size: 1rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0;
 }
 
 .mes-commandes-btn-panier {
   padding: 0.75rem 1.5rem;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 1px;
   background: #1a1a1a;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -54,7 +54,7 @@
   box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
 }
 
-/* Messages */
+
 .mes-commandes-success {
   display: flex;
   align-items: center;
@@ -62,7 +62,7 @@
   background: #d1fae5;
   color: #065f46;
   padding: 1rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   margin-bottom: 2rem;
   border-left: 4px solid #10b981;
   animation: slideIn 0.5s ease;
@@ -76,7 +76,7 @@
 
 .mes-commandes-success p {
   margin: 0;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 @keyframes slideIn {
@@ -94,7 +94,7 @@
   background: #fee2e2;
   color: #dc2626;
   padding: 1rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   margin-bottom: 2rem;
   border-left: 4px solid #dc2626;
 }
@@ -103,7 +103,7 @@
   margin: 0;
 }
 
-/* État vide */
+
 .mes-commandes-empty {
   display: flex;
   flex-direction: column;
@@ -111,13 +111,13 @@
   justify-content: center;
   padding: 4rem 2rem;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   text-align: center;
 }
 
 .mes-commandes-empty-text {
   font-size: 1.2rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0 0 2rem 0;
 }
 
@@ -131,11 +131,11 @@
 .mes-commandes-btn {
   padding: 0.65rem 2rem;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   border: 2px solid;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -143,8 +143,8 @@
 
 .mes-commandes-btn-primary {
   background: #000;
-  color: #fff;
-  border-color: #000;
+  color: var(--color-white);
+  border-color: var(--color-black);
 }
 
 .mes-commandes-btn-primary:hover {
@@ -153,15 +153,15 @@
 
 .mes-commandes-btn-secondary {
   background: #fff;
-  color: #000;
-  border-color: #000;
+  color: var(--color-black);
+  border-color: var(--color-black);
 }
 
 .mes-commandes-btn-secondary:hover {
-  background: #f5f5f5;
+  background: var(--color-grey-light);
 }
 
-/* Liste des commandes */
+
 .mes-commandes-list {
   display: flex;
   flex-direction: column;
@@ -171,7 +171,7 @@
 
 .commande-card {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -188,34 +188,34 @@
   gap: 1.5rem;
 }
 
-/* En-tête de commande */
+
 .commande-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e5e5;
+  border-bottom: 2px solid var(--color-grey-border);
 }
 
 .commande-numero {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #1a1a1a;
   margin: 0 0 0.25rem 0;
 }
 
 .commande-date {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0;
 }
 
-/* Badges de statut */
+
 .commande-status {
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -231,11 +231,11 @@
 }
 
 .status-pending {
-  background: #e5e7eb;
+  background: var(--color-grey-border);
   color: #374151;
 }
 
-/* Détails de commande */
+
 .commande-details {
   display: flex;
   flex-direction: column;
@@ -250,30 +250,30 @@
 }
 
 .commande-label {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: #1a1a1a;
 }
 
 .commande-value {
-  color: #666;
-  font-weight: 500;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-medium);
 }
 
 .commande-price {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #d5001c;
 }
 
 .commande-restant {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #d5001c;
 }
 
 .commande-facture-link {
   color: #d5001c;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
@@ -285,11 +285,11 @@
   text-decoration: underline;
 }
 
-/* Informations */
+
 .mes-commandes-info {
   background: white;
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   border-left: 4px solid #d5001c;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -297,7 +297,7 @@
 .mes-commandes-info h3 {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: #1a1a1a;
 }
 
@@ -309,7 +309,7 @@
 
 .mes-commandes-info li {
   margin-bottom: 0.75rem;
-  color: #666;
+  color: var(--color-grey-text);
   position: relative;
   padding-left: 1.5rem;
 }
@@ -327,7 +327,7 @@
   color: #1a1a1a;
 }
 
-/* Loading */
+
 .mes-commandes-loading {
   display: flex;
   flex-direction: column;
@@ -357,10 +357,10 @@
 .mes-commandes-loading p {
   margin-top: 1.5rem;
   font-size: 1.1rem;
-  color: #666;
+  color: var(--color-grey-text);
 }
 
-/* Erreur */
+
 .mes-commandes-error {
   display: flex;
   flex-direction: column;
@@ -373,11 +373,11 @@
 
 .mes-commandes-error p {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin-bottom: 2rem;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .mes-commandes-header {
     flex-direction: column;

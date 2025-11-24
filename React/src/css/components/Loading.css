@@ -1,4 +1,4 @@
-/* Styles pour le composant Loading */
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -52,8 +52,8 @@
 
 .loading-message {
   font-size: 0.875rem;
-  color: #666;
-  font-weight: 500;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-medium);
   text-align: center;
 }
 

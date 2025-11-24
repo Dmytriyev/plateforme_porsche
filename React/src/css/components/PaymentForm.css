@@ -1,0 +1,19 @@
+.payment-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.payment-form-group {
+  margin-bottom: 12px;
+}
+
+.payment-card-element {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-sm);
+}
+
+.payment-message {
+  margin-top: 12px;
+  text-align: center;
+}

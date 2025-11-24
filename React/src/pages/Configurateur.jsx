@@ -1,11 +1,14 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { modelPorscheService, personnalisationService, commandeService } from '../services';
+import modelPorscheService from '../services/modelPorsche.service.js';
+import personnalisationService from '../services/personnalisation.service.js';
+import commandeService from '../services/commande.service.js';
 import { AuthContext } from '../context/AuthContext.jsx';
 import LoginPromptModal from '../components/modals/LoginPromptModal.jsx';
 import ContactModal from '../components/modals/ContactModal.jsx';
-import { Loading, Button } from '../components/common';
-import { formatPrice } from '../utils/format.js';
+import Loading from '../components/common/Loading.jsx';
+import Button from '../components/common/Button.jsx';
+import { formatPrice } from '../utils/helpers.js';
 import { API_URL } from '../config/api.js';
 import '../css/Configurateur.css';
 import '../css/components/Message.css';
@@ -114,14 +117,6 @@ const Configurateur = () => {
           ? responseData
           : (responseData?.configurations || []);
 
-        if (import.meta.env.DEV) {
-          console.log('[Configurateur] Variantes chargées:', {
-            voitureId: voitureIdActuel,
-            totalVariantes: variantesData.length,
-            premiereVariante: variantesData[0]?.nom_model
-          });
-        }
-
         setVariantes(variantesData);
 
         // Charger les options de personnalisation
@@ -164,7 +159,6 @@ const Configurateur = () => {
           setConfig((prev) => ({ ...prev, variante: varianteSelectionnee }));
         }
       } catch (err) {
-        if (import.meta.env.DEV) console.error('[Configurateur] Erreur chargement:', err);
         setError(err.message || 'Erreur lors du chargement des options');
       } finally {
         setLoading(false);
@@ -176,8 +170,6 @@ const Configurateur = () => {
     } else {
       setLoading(false);
       setError('Paramètres manquants : voitureId ou varianteId requis');
-
-      if (import.meta.env.DEV) console.error('[Configurateur] Paramètres manquants:', { voitureId, varianteId });
     }
   }, [voitureId, varianteId]);
 
@@ -864,12 +856,12 @@ const Configurateur = () => {
                                 src={imageUrl}
                                 alt={pkg.nom_package}
                                 onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
+                                  e.target.classList.add('hidden');
+                                  e.target.nextSibling.classList.remove('hidden');
                                 }}
                               />
                             ) : null}
-                            <div className="configurateur-package-placeholder" style={{ display: imageUrl ? 'none' : 'flex' }}>
+                            <div className={`configurateur-package-placeholder ${imageUrl ? 'hidden' : ''}`}>
                               <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                                 <path d="M2 17l10 5 10-5" />
@@ -921,20 +913,20 @@ const Configurateur = () => {
               >
                 {ajoutEnCours ? 'Ajout en cours...' : 'Acheter'}
               </button>
-
-              {showLoginPrompt && (
-                <LoginPromptModal
-                  onClose={() => setShowLoginPrompt(false)}
-                  onLogin={() => navigate('/login', { state: { from: location.pathname } })}
-                  initialPath={location.pathname}
-                />
-              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de contact */}
+      {/* Modales */}
+      {showLoginPrompt && (
+        <LoginPromptModal
+          onClose={() => setShowLoginPrompt(false)}
+          onLogin={() => navigate('/login', { state: { from: location.pathname } })}
+          initialPath={location.pathname}
+        />
+      )}
+
       {showContactModal && (
         <ContactModal
           onClose={() => setShowContactModal(false)}

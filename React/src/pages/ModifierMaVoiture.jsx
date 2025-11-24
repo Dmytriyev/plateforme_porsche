@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { maVoitureService, personnalisationService } from '../services';
-import { Loading } from '../components/common';
+import maVoitureService from '../services/ma_voiture.service.js';
+import personnalisationService from '../services/personnalisation.service.js';
+import Loading from '../components/common/Loading.jsx';
 import buildUrl from '../utils/buildUrl';
-import { formatPrice } from '../utils/format.js';
+import { formatPrice } from '../utils/helpers.js';
 import '../css/ModifierMaVoiture.css';
 
 const ModifierMaVoiture = () => {
@@ -180,7 +181,7 @@ const ModifierMaVoiture = () => {
                 try {
                     await maVoitureService.supprimerPhotos(id, { photo_voiture_actuel: photosASupprimer });
                 } catch (photoError) {
-                    console.error('Erreur suppression photos:', photoError);
+                    setError('Erreur lors de la suppression des photos');
                 }
             }
 
@@ -196,7 +197,7 @@ const ModifierMaVoiture = () => {
                 try {
                     await maVoitureService.ajouterPhoto(photoFormData);
                 } catch (photoError) {
-                    console.error('Erreur ajout photos:', photoError);
+                    setError('Erreur lors de l\'ajout des photos');
                 }
             }
 

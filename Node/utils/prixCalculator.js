@@ -27,19 +27,14 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
     const prixCouleurExterieur =
       Number(modelPorsche.couleur_exterieur?.prix) || 0;
 
-    // couleur_interieur peut être un tableau, un objet ou undefined.
-    let prixCouleursInterieur = 0;
+    // Calculer le prix des couleurs intérieures (peut être tableau ou objet)
     const couleursInterieur = modelPorsche.couleur_interieur;
-    if (Array.isArray(couleursInterieur)) {
-      prixCouleursInterieur =
-        // Somme des prix des couleurs d'intérieur si c'est un tableau
-        couleursInterieur.reduce(
+    const prixCouleursInterieur = Array.isArray(couleursInterieur)
+      ? couleursInterieur.reduce(
           (sum, couleur) => sum + (Number(couleur?.prix) || 0),
           0
-        ) || 0;
-    } else if (couleursInterieur && typeof couleursInterieur === "object") {
-      prixCouleursInterieur = Number(couleursInterieur.prix) || 0;
-    }
+        )
+      : Number(couleursInterieur?.prix) || 0;
 
     const prixJante = Number(modelPorsche.taille_jante?.prix) || 0;
     const prixPackage = Number(modelPorsche.package?.prix) || 0;

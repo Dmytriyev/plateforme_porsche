@@ -4,6 +4,7 @@ import PaymentForm from './PaymentForm';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import Button from './common/Button.jsx';
+import '../css/components/ReservationForm.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -43,7 +44,9 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
                 onCompleted(reservation, paymentIntent);
             }
         } catch (e) {
-            if (import.meta.env.DEV) console.error('Erreur handlePaymentSuccess:', e);
+            if (import.meta.env.DEV) {
+                console.error('Erreur handlePaymentSuccess:', e);
+            }
         }
     };
 
@@ -52,19 +55,19 @@ export default function ReservationForm({ initialConfig = {}, onCompleted, vehic
     return (
         <div className="reservation-form card">
             <h3 className="card-title">Récapitulatif & Réservation</h3>
-            <div className="card-body" style={{ background: '#fafafa', padding: 10 }}>
-                <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(config, null, 2)}</pre>
+            <div className="card-body reservation-config-display">
+                <pre className="reservation-config-pre">{JSON.stringify(config, null, 2)}</pre>
             </div>
 
-            <div style={{ marginTop: 12, display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div className="reservation-actions">
                 <Button onClick={handleCreate} disabled={creating} variant="primary">
                     {creating ? 'Création…' : 'Réserver & Payer'}
                 </Button>
-                {error && <div className="alert" style={{ color: 'red', marginTop: 8 }}>{error}</div>}
+                {error && <div className="alert reservation-error">{error}</div>}
             </div>
 
             {clientSecret && (
-                <div style={{ marginTop: 20 }}>
+                <div className="reservation-payment-section">
                     <h4>Paiement</h4>
                     <Elements stripe={stripePromise} options={stripeOptions}>
                         <PaymentForm clientSecret={clientSecret} reservationToken={reservationToken} onSuccess={handlePaymentSuccess} />

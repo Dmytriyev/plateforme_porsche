@@ -20,7 +20,7 @@ body {
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-relaxed);
   color: var(--color-black);
-  background-color: #fff;
+  background-color: var(--color-white);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

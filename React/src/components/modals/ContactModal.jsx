@@ -15,8 +15,28 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
 
     const [submitted, setSubmitted] = useState(false);
 
+    // Bloquer le scroll du body quand la modale est ouverte
     useEffect(() => {
-        // Pré-remplir avec les données utilisateur si connecté
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    // Fermer avec la touche Échap
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [onClose]);
+
+    useEffect(() => {
         if (isAuthenticated && user) {
             setFormData(prev => ({
                 ...prev,
@@ -25,7 +45,6 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
             }));
         }
 
-        // Ajouter des informations sur le véhicule dans le message si disponible
         if (vehiculeInfo) {
             const messageAuto = `Je suis intéressé(e) par ${vehiculeInfo.nom_model}${vehiculeInfo.variante ? ` ${vehiculeInfo.variante}` : ''}${vehiculeInfo.prix ? ` (${vehiculeInfo.prix})` : ''}.\n\n`;
             setFormData(prev => ({
@@ -43,12 +62,8 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Pour l'instant, pas d'envoi réel
-        console.log('Formulaire de contact soumis:', formData);
-
         setSubmitted(true);
 
-        // Fermer après 2 secondes
         setTimeout(() => {
             onClose();
         }, 2000);

@@ -24,7 +24,7 @@
   font-size: 4rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #000;
+  color: var(--color-black);
 }
 
 .page-404-text {
@@ -34,8 +34,8 @@
 }
 
 .page-404-link {
-  color: #000;
-  font-weight: 600;
+  color: var(--color-black);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   transition: color 0.3s ease;
 }

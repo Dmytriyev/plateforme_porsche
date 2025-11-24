@@ -1,6 +1,6 @@
 .configurateur-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--color-grey-light);
   display: flex;
   flex-direction: column;
 }
@@ -14,7 +14,7 @@
 }
 
 .configurateur-options-panel {
-  background-color: #fff;
+  background-color: var(--color-white);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -22,8 +22,8 @@
 
 .configurateur-panel-header {
   padding: 2rem;
-  border-bottom: 1px solid #e5e5e5;
-  background-color: #fff;
+  border-bottom: 1px solid var(--color-grey-border);
+  background-color: var(--color-white);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -31,20 +31,20 @@
 
 .configurateur-panel-title {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0 0 0.5rem 0;
   line-height: 1.2;
 }
 
 .configurateur-panel-year {
   font-size: 0.875rem;
-  color: #666;
-  font-weight: 500;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-medium);
 }
 
 .configurateur-option-section {
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-grey-border);
 }
 
 .configurateur-option-section-header {
@@ -61,18 +61,18 @@
 }
 
 .configurateur-option-section-header:hover {
-  background-color: #f9f9f9;
+  background-color: var(--color-grey-hover);
 }
 
 .configurateur-option-section-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 
 .configurateur-option-section-subtitle {
   font-size: 0.813rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin-top: 0.25rem;
 }
 
@@ -116,10 +116,10 @@
   align-items: center;
   padding: 1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 4px;
-  background: #f9f9f9;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-grey-hover);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 .configurateur-jante-item:hover {
@@ -128,7 +128,7 @@
 }
 
 .configurateur-jante-item.selected {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
   background: #fff;
 }
 
@@ -159,7 +159,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  color: var(--color-white);
 }
 
 .configurateur-jante-info {
@@ -171,14 +171,14 @@
 
 .configurateur-jante-size {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 
 .configurateur-jante-price {
   font-size: 0.875rem;
-  color: #059669;
-  font-weight: 600;
+  color: var(--color-green-success);
+  font-weight: var(--font-weight-semibold);
 }
 
 .configurateur-sieges-list {
@@ -193,10 +193,10 @@
   align-items: flex-start;
   padding: 1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 4px;
-  background: #f9f9f9;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-grey-hover);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: left;
 }
 
@@ -206,7 +206,7 @@
 }
 
 .configurateur-siege-item.selected {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
   background: #fff;
 }
 
@@ -215,7 +215,7 @@
   width: 80px;
   height: 80px;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   overflow: hidden;
   background: #fff;
   display: flex;
@@ -237,7 +237,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  color: var(--color-white);
 }
 
 .configurateur-siege-info {
@@ -249,28 +249,28 @@
 
 .configurateur-siege-name {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 
 .configurateur-siege-description {
   font-size: 0.813rem;
-  color: #666;
+  color: var(--color-grey-text);
   line-height: 1.4;
   margin: 0;
 }
 
 .configurateur-siege-price {
   font-size: 0.875rem;
-  color: #059669;
-  font-weight: 600;
+  color: var(--color-green-success);
+  font-weight: var(--font-weight-semibold);
   margin-top: auto;
 }
 
 .configurateur-actions {
   padding: 2rem;
-  background-color: #fff;
-  border-top: 2px solid #e5e5e5;
+  background-color: var(--color-white);
+  border-top: 2px solid var(--color-grey-border);
   margin-top: auto;
 }
 
@@ -280,8 +280,8 @@
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 4px;
+  background-color: var(--color-grey-hover);
+  border-radius: var(--border-radius-sm);
 }
 
 .configurateur-acompte-info,
@@ -294,20 +294,20 @@
 .configurateur-acompte-label,
 .configurateur-reste-label {
   font-size: 0.875rem;
-  color: #666;
-  font-weight: 500;
+  color: var(--color-grey-text);
+  font-weight: var(--font-weight-medium);
 }
 
 .configurateur-acompte-montant {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #059669;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-green-success);
 }
 
 .configurateur-reste-montant {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 
 .configurateur-actions-buttons {
@@ -322,14 +322,14 @@
   border: none;
   border-radius: 0;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 .configurateur-btn-acheter {
   background-color: #d5001c;
-  color: #fff;
+  color: var(--color-white);
 }
 
 .configurateur-btn-acheter:hover:not(:disabled) {
@@ -337,23 +337,23 @@
 }
 
 .configurateur-btn-acheter:disabled {
-  background-color: #ccc;
+  background-color: var(--color-grey-dark);
   cursor: not-allowed;
 }
 
 .configurateur-btn-contact {
-  background-color: #fff;
-  color: #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
   border: 2px solid #000;
 }
 
 .configurateur-btn-contact:hover {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
 }
 .configurateur-top-header {
   background-color: #1a1a1a;
-  color: #fff;
+  color: var(--color-white);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -372,7 +372,7 @@
 .configurateur-header-link {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--color-white);
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -399,18 +399,18 @@
 }
 .configurateur-header-price-amount {
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white);
 }
 .configurateur-header-price-total {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
 }
 .configurateur-header-info-icon {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--color-white);
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
@@ -424,7 +424,7 @@
 .configurateur-header-link-small {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--color-white);
   font-size: 0.75rem;
   cursor: pointer;
   text-decoration: underline;
@@ -436,7 +436,7 @@
 }
 .configurateur-header-price-label {
   font-size: 0.75rem;
-  color: #ccc;
+  color: var(--color-grey-dark);
 }
 .configurateur-header-logo {
   height: 1.5rem;
@@ -449,7 +449,7 @@
   align-items: center;
 }
 .configurateur-visual-area {
-  background-color: #e5e5e5;
+  background-color: var(--color-grey-border);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -482,8 +482,8 @@
 }
 .configurateur-visual-letter {
   font-size: 8rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   opacity: 0.3;
 }
 .configurateur-360-btn {
@@ -493,10 +493,10 @@
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid #ddd;
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   transition: background 0.2s;
   z-index: 10;
 }
@@ -516,7 +516,7 @@
   width: 120px;
   height: 80px;
   border: 2px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   overflow: hidden;
   cursor: pointer;
   background: #fff;
@@ -527,7 +527,7 @@
   border-color: #999;
 }
 .configurateur-thumbnail-active {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
 }
 .configurateur-thumbnail img {
   width: 100%;
@@ -551,15 +551,15 @@
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
-  background-color: #f9f9f9;
+  background-color: var(--color-grey-hover);
   transition: border-color 0.2s, background-color 0.2s;
 }
 .configurateur-search-input:focus {
   outline: none;
-  border-color: #0066cc;
-  background-color: #fff;
+  border-color: var(--color-blue-link);
+  background-color: var(--color-white);
 }
 .configurateur-colors-list {
   display: flex;
@@ -572,10 +572,10 @@
   gap: 1rem;
   padding: 0.75rem;
   border: 2px solid transparent;
-  border-radius: 4px;
-  background: #f9f9f9;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-grey-hover);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-duration) var(--transition-easing);
   text-align: left;
 }
 .configurateur-color-item:hover {
@@ -583,7 +583,7 @@
   border-color: #ddd;
 }
 .configurateur-color-item.selected {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
   background: #fff;
 }
 .configurateur-color-item-image,
@@ -603,18 +603,18 @@
 }
 .configurateur-color-item-name {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #000;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black);
 }
 .configurateur-color-item-price {
   font-size: 0.75rem;
-  color: #059669;
-  font-weight: 600;
+  color: var(--color-green-success);
+  font-weight: var(--font-weight-semibold);
 }
 .configurateur-interior-standard {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-grey-border);
 }
 .configurateur-interior-standard-header {
   display: flex;
@@ -624,17 +624,17 @@
 }
 .configurateur-interior-standard-label {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
 }
 .configurateur-interior-standard-price {
   font-size: 0.875rem;
-  color: #000;
+  color: var(--color-black);
   margin-left: auto;
 }
 .configurateur-interior-standard-desc {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0.5rem 0;
   line-height: 1.4;
 }
@@ -647,8 +647,8 @@
 .configurateur-interior-category {
   display: block;
   font-size: 0.875rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin-bottom: 0.75rem;
 }
 .configurateur-interior-swatches {
@@ -660,18 +660,18 @@
   width: 60px;
   height: 60px;
   border: 2px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   overflow: hidden;
   padding: 0;
-  background: #f9f9f9;
-  transition: all 0.2s;
+  background: var(--color-grey-hover);
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 .configurateur-interior-swatch-item:hover {
   border-color: #ddd;
 }
 .configurateur-interior-swatch-item.selected {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
 }
 .configurateur-interior-swatch-item img,
 .configurateur-interior-swatch-item div {
@@ -691,8 +691,8 @@
   align-items: flex-start;
   padding: 1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: #f9f9f9;
+  border-radius: var(--border-radius-md);
+  background: var(--color-grey-hover);
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -705,7 +705,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .configurateur-package-item.selected {
-  border-color: #0066cc;
+  border-color: var(--color-blue-link);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
 }
@@ -737,7 +737,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  color: var(--color-white);
 }
 .configurateur-package-placeholder svg {
   opacity: 0.7;
@@ -750,13 +750,13 @@
 }
 .configurateur-package-name {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   line-height: 1.3;
 }
 .configurateur-package-description {
   font-size: 0.813rem;
-  color: #666;
+  color: var(--color-grey-text);
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
@@ -767,8 +767,8 @@
 }
 .configurateur-package-price {
   font-size: 0.875rem;
-  color: #059669;
-  font-weight: 700;
+  color: var(--color-green-success);
+  font-weight: var(--font-weight-bold);
   margin-top: auto;
 }
 @media (max-width: 1024px) {

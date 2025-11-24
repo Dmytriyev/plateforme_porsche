@@ -1,16 +1,17 @@
 .catalogue-modeles-header {
   margin-bottom: 3rem;
+  padding-left: 2rem;
 }
 .catalogue-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   background-color: var(--color-white);
-  border: var(--border-width) solid #e5e7eb;
-  border-radius: 0.75rem;
+  border: var(--border-width) solid var(--color-grey-border);
+  border-radius: 4px;
   color: #374151;
-  font-size: var(--font-size-body);
+  font-size: 0.875rem;
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-duration) var(--transition-easing);
@@ -31,7 +32,7 @@
   color: #6b7280;
   margin: 0;
 }
-/* Grid pour neuves et occasions - identique */
+
 .catalogue-modeles-grid,
 .catalogue-modeles-grid-neuf,
 .catalogue-modeles-grid-occasion {
@@ -43,8 +44,8 @@
 }
 .catalogue-modele-title-porsche {
   font-size: 2.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   margin: 0;
   padding: 1.5rem 1.5rem 1rem 1.5rem;
   line-height: 1.2;
@@ -55,25 +56,25 @@
   flex-direction: column;
   gap: 0.25rem;
   padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-grey-border);
 }
 .catalogue-prix-label {
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .catalogue-prix-montant {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #000;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black);
   letter-spacing: -0.02em;
 }
-/* Carte Porsche unifiée - pour neuves ET occasions */
+
 .catalogue-modele-card-neuf-porsche {
-  background-color: #fff;
-  border: 3px solid #e5e7eb;
+  background-color: var(--color-white);
+  border: 3px solid var(--color-grey-border);
   border-radius: 1rem;
   overflow: hidden;
   cursor: pointer;
@@ -83,7 +84,7 @@
 }
 
 .catalogue-modele-card-neuf-porsche:hover {
-  border-color: #000;
+  border-color: var(--color-black);
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
@@ -91,10 +92,9 @@
 .catalogue-modele-image-porsche {
   position: relative;
   width: 100%;
-  background-color: #f3f4f6;
+  height: 350px;
+  background-color: var(--color-white);
   overflow: hidden;
-  padding: 1rem 1.5rem;
-  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,7 +104,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  max-height: 100%;
+  display: block;
   transition: transform 0.3s ease;
 }
 
@@ -126,8 +126,8 @@
 
 .catalogue-modele-letter-porsche {
   font-size: 4rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   opacity: 0.3;
 }
 
@@ -137,15 +137,15 @@
   color: #6b7280;
 }
 
-/* Bouton commun pour toutes les cartes Porsche */
+
 .catalogue-modele-btn-porsche {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   border: none;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-align: center;
@@ -154,14 +154,14 @@
 
 .catalogue-modele-btn-porsche:hover {
   background-color: #333;
-  color: #fff;
+  color: var(--color-white);
 }
 
 .catalogue-modele-btn-porsche:active {
   transform: scale(0.98);
 }
 
-/* Responsive Design */
+
 @media (max-width: 1024px) {
   .catalogue-modeles-grid,
   .catalogue-modeles-grid-neuf,
@@ -171,15 +171,24 @@
 }
 
 @media (max-width: 768px) {
+  .catalogue-modeles-header {
+    padding-left: 1rem;
+  }
+
   .catalogue-modeles-title {
     font-size: 2rem;
   }
 
   .catalogue-modele-image-porsche {
-    min-height: 250px;
+    height: 280px;
   }
 
   .catalogue-modele-title-porsche {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    padding: 1rem 1rem 0.75rem 1rem;
+  }
+
+  .catalogue-prix-montant {
+    font-size: 1.25rem;
   }
 }

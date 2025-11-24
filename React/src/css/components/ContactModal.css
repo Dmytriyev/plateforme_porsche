@@ -1,4 +1,4 @@
-/* Modal Overlay */
+
 .contact-modal-overlay {
   position: fixed;
   top: 0;
@@ -23,10 +23,10 @@
   }
 }
 
-/* Modal Content */
+
 .contact-modal-content {
   background: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
@@ -48,7 +48,7 @@
   }
 }
 
-/* Close Button */
+
 .contact-modal-close {
   position: absolute;
   top: 15px;
@@ -57,31 +57,31 @@
   border: none;
   cursor: pointer;
   padding: 5px;
-  color: #666;
+  color: var(--color-grey-text);
   transition: color 0.2s;
 }
 
 .contact-modal-close:hover {
-  color: #000;
+  color: var(--color-black);
 }
 
-/* Title & Subtitle */
+
 .contact-modal-title {
   font-size: 28px;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 10px 0;
   font-family: "Porsche Next", -apple-system, sans-serif;
 }
 
 .contact-modal-subtitle {
   font-size: 14px;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0 0 30px 0;
   line-height: 1.5;
 }
 
-/* Form */
+
 .contact-modal-form {
   display: flex;
   flex-direction: column;
@@ -102,7 +102,7 @@
 
 .contact-modal-field label {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: #333;
 }
 
@@ -110,7 +110,7 @@
 .contact-modal-field textarea {
   padding: 12px 15px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.2s;
@@ -128,16 +128,16 @@
 }
 
 .contact-modal-readonly {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--color-grey-light);
+  color: var(--color-grey-text);
   cursor: not-allowed;
 }
 
-/* Info Box */
+
 .contact-modal-info {
   background: #f8f8f8;
   padding: 15px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   border-left: 3px solid #d5001c;
 }
 
@@ -149,10 +149,10 @@
 }
 
 .contact-modal-info strong {
-  color: #000;
+  color: var(--color-black);
 }
 
-/* Actions */
+
 .contact-modal-actions {
   display: flex;
   gap: 15px;
@@ -163,11 +163,11 @@
 .contact-modal-btn-cancel,
 .contact-modal-btn-submit {
   padding: 12px 30px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-duration) var(--transition-easing);
   border: none;
   font-family: "Porsche Next", -apple-system, sans-serif;
 }
@@ -179,7 +179,7 @@
 }
 
 .contact-modal-btn-cancel:hover {
-  background: #f5f5f5;
+  background: var(--color-grey-light);
   border-color: #999;
 }
 
@@ -194,7 +194,7 @@
   box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
 }
 
-/* Success State */
+
 .contact-modal-success {
   text-align: center;
   padding: 60px 40px;
@@ -225,18 +225,18 @@
 
 .contact-modal-success-title {
   font-size: 24px;
-  font-weight: 600;
-  color: #000;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
   margin: 0 0 10px 0;
 }
 
 .contact-modal-success-text {
   font-size: 14px;
-  color: #666;
+  color: var(--color-grey-text);
   margin: 0;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .contact-modal-content {
     padding: 30px 20px;

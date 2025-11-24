@@ -34,7 +34,7 @@ const createAccesoire = async (req, res) => {
 
     // Vérifier que les photos existent si fournies
     if (body.photo_accesoire && Array.isArray(body.photo_accesoire)) {
-      for (let photoId of body.photo_accesoire) {
+      for (const photoId of body.photo_accesoire) {
         const photo = await PhotoAccesoire.findById(photoId);
         if (!photo) {
           return sendNotFound(res, `Photo ${photoId} introuvable`);
@@ -164,7 +164,7 @@ const addImages = async (req, res) => {
       return sendNotFound(res, `Accesoire ${req.params.id} introuvable`);
     }
 
-    let photoIds = [];
+    const photoIds = [];
 
     // Cas 1: Upload direct de fichiers via multipart/form-data
     if (req.files && req.files.length > 0) {
@@ -190,7 +190,7 @@ const addImages = async (req, res) => {
       }
 
       // Vérifier que toutes les photos existent
-      for (let photo_accesoireId of req.body.photo_accesoire) {
+      for (const photo_accesoireId of req.body.photo_accesoire) {
         const photo_accesoire = await PhotoAccesoire.findById(
           photo_accesoireId
         );
@@ -344,7 +344,7 @@ const getAccesoiresByCriteria = async (req, res) => {
     // Extraire les critères de la requête query
     const { type_accesoire, couleur_accesoire, prix_min, prix_max } = req.query;
     // Construire la requête dynamique en fonction des critères fournis
-    let query = {};
+    const query = {};
     // Ajouter les critères à la requête si présents
     if (type_accesoire) query.type_accesoire = type_accesoire;
     if (couleur_accesoire) query.couleur_accesoire = couleur_accesoire;

@@ -4,16 +4,6 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import commandeService from '../services/commande.service.js';
 import '../css/Checkout.css';
 
-/**
- * Page Checkout - Paiement Stripe
- * 
- * NOTE IMPORTANTE sur les avertissements de la console :
- * Les avertissements "<link rel=preload>" et "passive event listener" 
- * proviennent de l'iframe Stripe Checkout et sont NORMAUX.
- * Ils n'affectent pas le fonctionnement du paiement.
- * Ces avertissements sont générés par le code interne de Stripe 
- * et ne peuvent pas être contrôlés depuis notre application.
- */
 const Checkout = () => {
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
@@ -23,7 +13,6 @@ const Checkout = () => {
     const [lignesCommande, setLignesCommande] = useState([]);
     const [processingPayment, setProcessingPayment] = useState(false);
 
-    // États pour les informations de livraison modifiables
     const [livraisonInfo, setLivraisonInfo] = useState({
         nom: '',
         prenom: '',
@@ -38,7 +27,6 @@ const Checkout = () => {
             navigate('/login');
             return;
         }
-        // Initialiser les informations de livraison avec les données de l'utilisateur
         setLivraisonInfo({
             nom: user.nom || '',
             prenom: user.prenom || '',
@@ -54,7 +42,6 @@ const Checkout = () => {
         try {
             setLoading(true);
             const data = await commandeService.getPanier();
-            console.log('Données panier reçues:', data);
 
             if (!data || !data.lignesCommande || data.lignesCommande.length === 0) {
                 setError('Votre panier est vide');
@@ -62,20 +49,16 @@ const Checkout = () => {
                 return;
             }
 
-            // Vérifier que le panier (commande) existe
-            if (!data.commande || !data.commande._id) {
-                console.error('Panier invalide:', data);
+            if (!data.commande?._id) {
                 setError('Impossible de charger le panier');
                 setLoading(false);
                 return;
             }
 
-            console.log('Panier chargé:', data.commande._id);
             setPanier(data.commande);
             setLignesCommande(data.lignesCommande);
             setLoading(false);
         } catch (err) {
-            console.error('Erreur lors du chargement du panier:', err);
             setError(err.message || 'Erreur lors du chargement du panier');
             setLoading(false);
         }
@@ -145,7 +128,6 @@ const Checkout = () => {
             return;
         }
 
-        // Valider les informations de livraison avant de continuer
         if (!validateLivraisonInfo()) {
             return;
         }
@@ -154,21 +136,14 @@ const Checkout = () => {
             setProcessingPayment(true);
             setError(null);
 
-            console.log('Création session de paiement pour panier:', panier._id);
-            console.log('Nombre d\'articles:', lignesCommande.length);
             const response = await commandeService.createPaymentSession(panier._id);
-            console.log('Réponse Stripe:', response);
 
-            if (response && response.url) {
-                console.log('Redirection vers Stripe:', response.url);
-                // Rediriger vers la page de paiement Stripe
+            if (response?.url) {
                 window.location.href = response.url;
             } else {
-                console.error('Réponse invalide:', response);
                 throw new Error('URL de paiement non reçue');
             }
         } catch (err) {
-            console.error('Erreur lors de la création de la session de paiement:', err);
             setError(err.message || 'Erreur lors de la création de la session de paiement');
             setProcessingPayment(false);
         }
@@ -218,7 +193,6 @@ const Checkout = () => {
                     </div>
                 )}
 
-                {/* Informations de livraison */}
                 <section className="checkout-section">
                     <h2 className="checkout-section-title">Informations de livraison</h2>
                     <div className="checkout-info-form">
@@ -310,7 +284,6 @@ const Checkout = () => {
                     </div>
                 </section>
 
-                {/* Récapitulatif de la commande */}
                 <section className="checkout-section">
                     <h2 className="checkout-section-title">Récapitulatif de votre commande</h2>
                     <div className="checkout-items">
@@ -346,7 +319,6 @@ const Checkout = () => {
                     </div>
                 </section>
 
-                {/* Résumé du paiement */}
                 <section className="checkout-section checkout-summary">
                     <h2 className="checkout-section-title">Résumé du paiement</h2>
                     <div className="checkout-summary-card">
