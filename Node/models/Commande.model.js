@@ -1,3 +1,8 @@
+/**
+ * Modèle Commande
+ * - Représente une commande ou un panier utilisateur (status false = panier)
+ * - Contient les montants, acomptes, références Stripe et métadonnées de livraison
+ */
 import mongoose from "mongoose";
 
 const CommandeSchema = new mongoose.Schema(

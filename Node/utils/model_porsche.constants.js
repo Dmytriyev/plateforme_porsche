@@ -1,3 +1,8 @@
+/**
+ * Constantes Model Porsche
+ * - Contient les variantes, carrosseries et helpers utilisés pour construire
+ *   le configurateur (variantes par modèle, listes affichables)
+ */
 // Types de carrosserie disponibles
 export const TYPES_CARROSSERIE = ["Coupe", "Cabriolet", "Targa", "SUV"];
 

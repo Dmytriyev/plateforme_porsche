@@ -1,15 +1,20 @@
+/**
+ * Contrôleur Utilisateur
+ * - Gère l'inscription, la connexion et les actions liées aux utilisateurs
+ *   (profil, panier, réservations, historique des commandes)
+ */
+import bcrypt from "bcrypt";
+import Commande from "../models/Commande.model.js";
+import { getAvailableRoles } from "../utils/roles.constants.js";
+import jwt from "jsonwebtoken";
+import LigneCommande from "../models/ligneCommande.model.js";
+import logger from "../utils/logger.js";
+import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
+import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
+import Reservation from "../models/reservation.model.js";
 import User from "../models/user.model.js";
 import userValidation from "../validations/user.validation.js";
-import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import Commande from "../models/Commande.model.js";
-import Reservation from "../models/reservation.model.js";
 import Voiture from "../models/voiture.model.js";
-import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
-import LigneCommande from "../models/ligneCommande.model.js";
-import { getAvailableRoles } from "../utils/roles.constants.js";
-import logger from "../utils/logger.js";
 
 // Enregistrer un nouvel utilisateur
 const register = async (req, res) => {

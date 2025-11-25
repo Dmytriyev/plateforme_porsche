@@ -1,13 +1,23 @@
-import { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import maVoitureService from '../services/ma_voiture.service.js';
-import { AuthContext } from '../context/AuthContext.jsx';
-import Loading from '../components/common/Loading.jsx';
-import { API_URL } from '../config/api.js';
-import buildUrl from '../utils/buildUrl';
-import '../css/MesVoitures.css';
-import '../css/components/Message.css';
+/**
+ * pages/MesVoitures.jsx — Affiche la liste des voitures liées à l'utilisateur.
+ *
+ * Notes pédagogiques :
+ * - Montre l'usage de `useEffect` dépendant du contexte `user` et l'appel à
+ *   `ma_voiture.service` pour récupérer les données.
+ * - Important : gérer les états `loading`/`error` pour une UX robuste.
+ *
+ * @file pages/MesVoitures.jsx
+ */
 
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import maVoitureService from "../services/ma_voiture.service.js";
+import { AuthContext } from "../context/AuthContext.jsx";
+import Loading from "../components/common/Loading.jsx";
+import { API_URL } from "../config/api.js";
+import buildUrl from "../utils/buildUrl";
+import "../css/MesVoitures.css";
+import "../css/components/Message.css";
 
 const MesVoitures = () => {
   const navigate = useNavigate();
@@ -15,8 +25,8 @@ const MesVoitures = () => {
 
   const [voitures, setVoitures] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [voituresEnregistrees, setVoituresEnregistrees] = useState([]);
 
   useEffect(() => {
@@ -28,11 +38,11 @@ const MesVoitures = () => {
   const fetchMesVoitures = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const data = await maVoitureService.getMesVoitures();
       setVoitures(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err.message || 'Erreur lors du chargement de vos voitures');
+      setError(err.message || "Erreur lors du chargement de vos voitures");
     } finally {
       setLoading(false);
     }
@@ -44,7 +54,7 @@ const MesVoitures = () => {
   const formatDateImmat = (date) => {
     if (!date) return null;
     const d = new Date(date);
-    return d.toLocaleDateString('fr-FR', { month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString("fr-FR", { month: "2-digit", year: "numeric" });
   };
 
   const formatPower = (infoMoteur) => {
@@ -53,10 +63,10 @@ const MesVoitures = () => {
   };
 
   const handleToggleEnregistrer = (voitureId) => {
-    setVoituresEnregistrees(prev => {
+    setVoituresEnregistrees((prev) => {
       const isSelected = prev.includes(voitureId);
       if (isSelected) {
-        return prev.filter(id => id !== voitureId);
+        return prev.filter((id) => id !== voitureId);
       } else {
         return [...prev, voitureId];
       }
@@ -64,17 +74,17 @@ const MesVoitures = () => {
   };
 
   const _handleSupprimer = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette voiture ?")) {
       return;
     }
 
     try {
       await maVoitureService.supprimerMaVoiture(id);
-      setSuccess('Voiture supprimée avec succès');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Voiture supprimée avec succès");
+      setTimeout(() => setSuccess(""), 3000);
       fetchMesVoitures();
     } catch (err) {
-      setError(err.message || 'Erreur lors de la suppression');
+      setError(err.message || "Erreur lors de la suppression");
     }
   };
 
@@ -82,7 +92,7 @@ const MesVoitures = () => {
     return (
       <div className="mes-voitures-error">
         <p>Vous devez être connecté pour accéder à cette page</p>
-        <button onClick={() => navigate('/login')}>Se connecter</button>
+        <button onClick={() => navigate("/login")}>Se connecter</button>
       </div>
     );
   }
@@ -91,9 +101,10 @@ const MesVoitures = () => {
     return <Loading fullScreen message="Chargement de vos voitures..." />;
   }
 
-  const photoGenerale = voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
-    ? voitures[0].photo_voiture_actuel[0]
-    : null;
+  const photoGenerale =
+    voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
+      ? voitures[0].photo_voiture_actuel[0]
+      : null;
 
   return (
     <div className="mes-voitures-container-finder">
@@ -105,9 +116,9 @@ const MesVoitures = () => {
               alt="Mes Porsche"
               className="mes-voitures-hero-img-finder"
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.target.style.display = "none";
                 if (e.target.nextSibling) {
-                  e.target.nextSibling.style.display = 'flex';
+                  e.target.nextSibling.style.display = "flex";
                 }
               }}
             />
@@ -123,13 +134,13 @@ const MesVoitures = () => {
         <div className="mes-voitures-actions-container-finder">
           <button
             className="mes-voitures-action-btn-finder"
-            onClick={() => navigate('/ajouter-ma-voiture')}
+            onClick={() => navigate("/ajouter-ma-voiture")}
           >
             + Ajouter ma Porsche
           </button>
           <button
             className="mes-voitures-action-btn-finder"
-            onClick={() => navigate('/occasion')}
+            onClick={() => navigate("/occasion")}
           >
             Parcourir les annonces et sauvegarder des véhicules
           </button>
@@ -159,7 +170,7 @@ const MesVoitures = () => {
             </p>
             <button
               className="mes-voitures-empty-btn-finder"
-              onClick={() => navigate('/ajouter-ma-voiture')}
+              onClick={() => navigate("/ajouter-ma-voiture")}
             >
               Ajouter ma première Porsche
             </button>
@@ -168,9 +179,13 @@ const MesVoitures = () => {
       ) : (
         <section className="mes-voitures-list-finder">
           {voitures.map((voiture) => {
-            const photos = voiture.photo_voiture_actuel && Array.isArray(voiture.photo_voiture_actuel)
-              ? voiture.photo_voiture_actuel.filter(p => p && (p.name || p._id))
-              : [];
+            const photos =
+              voiture.photo_voiture_actuel &&
+                Array.isArray(voiture.photo_voiture_actuel)
+                ? voiture.photo_voiture_actuel.filter(
+                  (p) => p && (p.name || p._id),
+                )
+                : [];
 
             const photoPrincipale = photos.length > 0 ? photos[0] : null;
             const thumbnails = photos.slice(1, 4);
@@ -186,22 +201,27 @@ const MesVoitures = () => {
                     {photoPrincipale && photoPrincipale.name ? (
                       <img
                         src={buildUrl(photoPrincipale.name)}
-                        alt={voiture.type_model || 'Porsche'}
+                        alt={voiture.type_model || "Porsche"}
                         className="mes-voitures-main-img-finder"
                         onError={(e) => {
-                          e.target.style.display = 'none';
+                          e.target.style.display = "none";
                           if (e.target.nextSibling) {
-                            e.target.nextSibling.style.display = 'flex';
+                            e.target.nextSibling.style.display = "flex";
                           }
                         }}
                       />
                     ) : null}
                     <div
                       className="mes-voitures-image-placeholder-finder"
-                      style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
+                      style={{
+                        display:
+                          photoPrincipale && photoPrincipale.name
+                            ? "none"
+                            : "flex",
+                      }}
                     >
                       <span className="mes-voitures-image-letter-finder">
-                        {voiture.type_model?.charAt(0) || 'P'}
+                        {voiture.type_model?.charAt(0) || "P"}
                       </span>
                     </div>
                   </div>
@@ -210,13 +230,16 @@ const MesVoitures = () => {
                   {thumbnails.length > 0 && (
                     <div className="mes-voitures-thumbnails-finder">
                       {thumbnails.map((thumb, index) => (
-                        <div key={thumb._id || `thumb-${index}`} className="mes-voitures-thumbnail-finder">
+                        <div
+                          key={thumb._id || `thumb-${index}`}
+                          className="mes-voitures-thumbnail-finder"
+                        >
                           <img
                             src={buildUrl(thumb.name)}
                             alt={`Vue ${index + 2}`}
                             className="mes-voitures-thumbnail-img-finder"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              e.target.style.display = "none";
                             }}
                           />
                         </div>
@@ -230,7 +253,7 @@ const MesVoitures = () => {
                   {/* Nom et statut */}
                   <div className="mes-voitures-header-card-finder">
                     <h3 className="mes-voitures-name-finder">
-                      {voiture.type_model || 'Porsche'}
+                      {voiture.type_model || "Porsche"}
                     </h3>
                     <div className="mes-voitures-status-finder">
                       <span className="mes-voitures-approved-badge-finder">
@@ -248,7 +271,9 @@ const MesVoitures = () => {
                   <div className="mes-voitures-specs-finder">
                     {voiture.couleur_exterieur && (
                       <div className="mes-voitures-spec-item-finder">
-                        <span className="mes-voitures-spec-label-finder">Couleur:</span>
+                        <span className="mes-voitures-spec-label-finder">
+                          Couleur:
+                        </span>
                         <span className="mes-voitures-spec-value-finder">
                           {voiture.couleur_exterieur.nom_couleur}
                         </span>
@@ -260,28 +285,42 @@ const MesVoitures = () => {
                       </div>
                     )}
                     <div className="mes-voitures-spec-item-finder">
-                      <span className="mes-voitures-spec-label-finder">Carburant:</span>
-                      <span className="mes-voitures-spec-value-finder">Essence</span>
+                      <span className="mes-voitures-spec-label-finder">
+                        Carburant:
+                      </span>
+                      <span className="mes-voitures-spec-value-finder">
+                        Essence
+                      </span>
                     </div>
                     {dateImmat && (
                       <div className="mes-voitures-spec-item-finder">
-                        <span className="mes-voitures-spec-label-finder">Première immatriculation:</span>
-                        <span className="mes-voitures-spec-value-finder">{dateImmat}</span>
-                      </div>
-                    )}
-                    {voiture.info_transmission && voiture.info_transmission !== 'N/A' && (
-                      <div className="mes-voitures-spec-item-finder">
-                        <span className="mes-voitures-spec-label-finder">Transmission:</span>
+                        <span className="mes-voitures-spec-label-finder">
+                          Première immatriculation:
+                        </span>
                         <span className="mes-voitures-spec-value-finder">
-                          {voiture.info_transmission}
+                          {dateImmat}
                         </span>
                       </div>
                     )}
-                    {voiture.info_moteur && voiture.info_moteur !== 'N/A' && (
+                    {voiture.info_transmission &&
+                      voiture.info_transmission !== "N/A" && (
+                        <div className="mes-voitures-spec-item-finder">
+                          <span className="mes-voitures-spec-label-finder">
+                            Transmission:
+                          </span>
+                          <span className="mes-voitures-spec-value-finder">
+                            {voiture.info_transmission}
+                          </span>
+                        </div>
+                      )}
+                    {voiture.info_moteur && voiture.info_moteur !== "N/A" && (
                       <div className="mes-voitures-spec-item-finder">
-                        <span className="mes-voitures-spec-label-finder">Puissance:</span>
+                        <span className="mes-voitures-spec-label-finder">
+                          Puissance:
+                        </span>
                         <span className="mes-voitures-spec-value-finder">
-                          {formatPower(voiture.info_moteur) || voiture.info_moteur}
+                          {formatPower(voiture.info_moteur) ||
+                            voiture.info_moteur}
                         </span>
                       </div>
                     )}
@@ -296,19 +335,31 @@ const MesVoitures = () => {
                       Détails du véhicule
                     </button>
                     <button
-                      className={`mes-voitures-btn-compare-finder ${isEnregistree ? 'enregistre' : ''}`}
+                      className={`mes-voitures-btn-compare-finder ${isEnregistree ? "enregistre" : ""}`}
                       onClick={() => handleToggleEnregistrer(voiture._id)}
                     >
                       {isEnregistree ? (
                         <>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
                             <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
                           </svg>
                           Enregistré
                         </>
                       ) : (
                         <>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
                             <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
                           </svg>
                           → Comparer
@@ -332,7 +383,7 @@ const MesVoitures = () => {
             </p>
             <button
               className="mes-voitures-add-more-btn-finder"
-              onClick={() => navigate('/occasion')}
+              onClick={() => navigate("/occasion")}
             >
               Parcourir les annonces et sauvegarder des véhicules
             </button>
@@ -344,5 +395,3 @@ const MesVoitures = () => {
 };
 
 export default MesVoitures;
-
-

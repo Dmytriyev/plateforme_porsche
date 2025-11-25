@@ -1,3 +1,8 @@
+/**
+ * Modèle Photo Voiture
+ * - Images liées aux modèles de voitures (peut contenir variations par couleur/jante)
+ * - Utilisé pour la galerie des modèles sur le site
+ */
 import mongoose from "mongoose";
 
 const photo_voitureSchema = new mongoose.Schema(

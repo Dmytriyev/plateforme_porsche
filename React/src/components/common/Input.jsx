@@ -1,23 +1,27 @@
-import '../../css/components/Input.css';
+/**
+ * components/common/Input.jsx — Champ contrôlé avec props `value`, `onChange`, `error`.
+ *
+ * @file components/common/Input.jsx
+ */
+
+import "../../css/components/Input.css";
 
 const Input = ({
   label,
-  type = 'text',
+  type = "text",
   name,
   value,
   onChange,
-  placeholder = '',
-  error = '',
+  placeholder = "",
+  error = "",
   required = false,
   disabled = false,
-  className = '',
+  className = "",
   ...props
 }) => {
-  const inputClasses = [
-    'input-field',
-    error && 'error',
-    className
-  ].filter(Boolean).join(' ');
+  const inputClasses = ["input-field", error && "error", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="input-container">

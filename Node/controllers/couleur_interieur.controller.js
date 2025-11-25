@@ -1,3 +1,7 @@
+/**
+ * Contrôleur Couleur Intérieure
+ * - Gère les couleurs intérieures : création, validation et listing
+ */
 import Couleur_interieur from "../models/couleur_interieur.model.js";
 import couleur_interieurValidation from "../validations/couleur_interieur.validation.js";
 import { getAvailableCouleursInterieur } from "../utils/couleur_interieur.constants.js";

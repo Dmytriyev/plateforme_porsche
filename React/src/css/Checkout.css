@@ -1,3 +1,8 @@
+/*
+ * css/Checkout.css — Styles pour le flux de paiement et résumé de commande.
+ * CSS file: css/Checkout.css
+ */
+
 .checkout-container {
   min-height: 100vh;
   background-color: var(--color-grey-light);
@@ -37,7 +42,6 @@
   border-bottom: 2px solid #d5001c;
 }
 
-
 .checkout-info-card {
   display: flex;
   flex-direction: column;
@@ -64,7 +68,6 @@
   color: #1a1a1a;
   text-align: right;
 }
-
 
 .checkout-info-form {
   display: flex;
@@ -111,7 +114,6 @@
 .checkout-form-input::placeholder {
   color: #999;
 }
-
 
 .checkout-items {
   display: flex;
@@ -167,7 +169,6 @@
   text-align: right;
 }
 
-
 .checkout-summary-card {
   background: var(--color-grey-hover);
   border-radius: var(--border-radius-md);
@@ -198,7 +199,6 @@
   color: #10b981;
   font-weight: var(--font-weight-semibold);
 }
-
 
 .checkout-actions {
   display: flex;
@@ -250,7 +250,6 @@
   transform: none;
 }
 
-
 .checkout-security-info {
   display: flex;
   align-items: center;
@@ -268,7 +267,6 @@
   height: 20px;
   color: #10b981;
 }
-
 
 .checkout-error-message {
   background: #fee2e2;
@@ -319,7 +317,6 @@
   transform: translateY(-2px);
 }
 
-
 .checkout-loading {
   display: flex;
   flex-direction: column;
@@ -351,7 +348,6 @@
   font-size: 1.1rem;
   color: var(--color-grey-text);
 }
-
 
 @media (max-width: 768px) {
   .checkout-title {

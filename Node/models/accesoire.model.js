@@ -1,3 +1,8 @@
+/**
+ * Modèle Accesoire
+ * - Décrit un accessoire (type, nom, description, prix, stock)
+ * - Utilisé par le catalogue frontend et pour calcul du panier
+ */
 import mongoose from "mongoose";
 import { TYPES_ACCESOIRE } from "../utils/accesoire.constants.js";
 

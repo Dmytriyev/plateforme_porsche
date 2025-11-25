@@ -1,3 +1,8 @@
+/*
+ * Login.css — Styles pour la page de connexion.
+ * Notes pédagogiques : règles centrées sur le formulaire/erreurs ; privilégiez la simplicité pour l'accessibilité.
+ */
+
 .login-container-porsche {
   min-height: 100vh;
   display: flex;
@@ -22,7 +27,6 @@
   margin: 0 0 2rem 0;
   text-align: left;
 }
-
 
 .login-error-message {
   margin-bottom: 1.5rem;

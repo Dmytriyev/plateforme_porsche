@@ -26,7 +26,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateCouleur_accesoire
+  updateCouleur_accesoire,
 );
 
 // Routes admin
@@ -35,7 +35,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteCouleur_accesoire
+  deleteCouleur_accesoire,
 );
 
 export default router;

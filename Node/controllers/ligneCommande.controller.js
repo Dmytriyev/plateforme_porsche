@@ -1,5 +1,10 @@
-import LigneCommande from "../models/ligneCommande.model.js";
+/**
+ * Contrôleur LigneCommande
+ * - Gère les lignes de commande (éléments du panier) : ajout, modification,
+ *   suppression et calcul des montants pour chaque ligne
+ */
 import Commande from "../models/Commande.model.js";
+import LigneCommande from "../models/ligneCommande.model.js";
 import ligneCommandeValidation from "../validations/ligneCommande.validation.js";
 import {
   enrichirLigneAvecModelPorsche,

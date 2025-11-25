@@ -35,7 +35,7 @@ router.get("/page/:id", validateObjectId("id"), getVoiturePage);
 router.get(
   "/modelsPorsche/:id",
   validateObjectId("id"),
-  getModelsPorscheByVoiture
+  getModelsPorscheByVoiture,
 );
 
 // Route générique (en dernier)
@@ -51,7 +51,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateVoiture
+  updateVoiture,
 );
 router.patch(
   "/addImages/:id",
@@ -59,7 +59,7 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  addImages
+  addImages,
 );
 router.patch(
   "/removeImages/:id",
@@ -67,7 +67,7 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  removeImages
+  removeImages,
 );
 
 // Routes admin
@@ -76,7 +76,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteVoiture
+  deleteVoiture,
 );
 
 export default router;

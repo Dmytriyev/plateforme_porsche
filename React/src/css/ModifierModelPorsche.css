@@ -1,10 +1,13 @@
+/*
+ * ModifierModelPorsche.css — Styles pour l'interface d'édition d'un modèle Porsche.
+ * Notes pédagogiques : styles de formulaire et prévisualisation ; privilégiez composants isolés.
+ */
 
 .modifier-model-porsche-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
 }
-
 
 .modifier-model-porsche-breadcrumb {
   margin-bottom: 2rem;
@@ -30,7 +33,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
 .modifier-model-porsche-header {
   margin-bottom: 2rem;
 }
@@ -48,7 +50,6 @@
   margin: 0;
 }
 
-
 .modifier-model-porsche-content {
   display: grid;
   grid-template-columns: 400px 1fr;
@@ -61,7 +62,6 @@
     grid-template-columns: 1fr;
   }
 }
-
 
 .modifier-model-porsche-preview {
   position: sticky;
@@ -94,14 +94,12 @@
   color: #999;
 }
 
-
 .modifier-model-porsche-form-wrapper {
   background: #fff;
   border: 2px solid var(--color-grey-border);
   border-radius: 1rem;
   padding: 2rem;
 }
-
 
 .message-box {
   margin-bottom: 1.5rem;
@@ -127,13 +125,11 @@
   font-weight: var(--font-weight-medium);
 }
 
-
 .modifier-model-porsche-form {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
-
 
 .modifier-model-porsche-section {
   display: flex;
@@ -154,7 +150,6 @@
   color: var(--color-black);
   margin: 0 0 0.5rem 0;
 }
-
 
 .modifier-model-porsche-form-group {
   display: flex;
@@ -191,7 +186,6 @@
   color: #999;
 }
 
-
 .modifier-model-porsche-checkbox-group {
   display: flex;
   align-items: center;
@@ -217,7 +211,6 @@
 .modifier-model-porsche-checkbox-label:hover {
   color: #333;
 }
-
 
 .modifier-model-porsche-subsection-title {
   font-size: 1rem;
@@ -348,7 +341,6 @@
   margin-top: 1rem;
 }
 
-
 .modifier-model-porsche-actions {
   display: flex;
   gap: 1rem;
@@ -398,7 +390,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-
 .modifier-model-porsche-error {
   display: flex;
   flex-direction: column;
@@ -432,7 +423,6 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-
 
 @media (max-width: 768px) {
   .modifier-model-porsche-container {

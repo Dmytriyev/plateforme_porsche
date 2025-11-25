@@ -1,3 +1,8 @@
+/**
+ * Modèle Package
+ * - Définit les packages/options (nom, description, prix) pour les variantes
+ * - Permet d'ajouter des bundles d'options sur la configuration d'une voiture
+ */
 import mongoose from "mongoose";
 import { TYPES_PACKAGE } from "../utils/package.constants.js";
 const packageSchema = new mongoose.Schema(

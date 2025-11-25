@@ -1,4 +1,9 @@
 /**
+ * Contrôleur Model_porsche
+ * - Gère les configurations de variantes Porsche : calculs de prix,
+ *   validation des options et fourniture des variantes par modèle
+ */
+/**
  * Schéma Mongoose pour les configurations de modèles Porsche.
  * 1. USER visite voiture une model-start(911)
  * 2. USER choisit model_porsche une VARIANTE (Carrera, Carrera S, GTS, Turbo)

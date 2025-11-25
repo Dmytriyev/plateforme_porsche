@@ -1,9 +1,18 @@
+/*
+ * PaymentStatus.css — Styles pour l'écran de statut de paiement (succès/annulation).
+ * Notes pédagogiques : usez de couleurs positives/négatives cohérentes pour le feedback utilisateur.
+ */
+
 .payment-status-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-grey-light) 0%, var(--color-grey-border) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-grey-light) 0%,
+    var(--color-grey-border) 100%
+  );
   padding: 2rem;
 }
 
@@ -147,7 +156,6 @@
   font-style: italic;
   animation: fadeIn 0.5s ease 0.7s backwards;
 }
-
 
 @media (max-width: 768px) {
   .payment-status-content {

@@ -1,5 +1,5 @@
-import { Router } from "express";
 import rateLimit from "express-rate-limit";
+import { Router } from "express";
 import {
   register,
   login,
@@ -58,12 +58,12 @@ router.post(
     .withMessage("Le mot de passe doit contenir au moins 8 caractères")
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
     .withMessage(
-      "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial"
+      "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
     ),
   body("nom").optional().isString().trim().escape(),
   body("prenom").optional().isString().trim().escape(),
   validateRequest,
-  register
+  register,
 );
 router.post(
   "/login",
@@ -71,7 +71,7 @@ router.post(
   body("email").isEmail().withMessage("Email invalide").normalizeEmail(),
   body("password").exists().withMessage("Mot de passe requis"),
   validateRequest,
-  login
+  login,
 );
 
 // Routes admin
@@ -95,27 +95,27 @@ router.post(
   "/reservations/new/:id",
   auth,
   validateObjectId("id"), //id utilisateur
-  createUserReservation
+  createUserReservation,
 );
 router.get(
   "/reservations/:id",
   auth,
   validateObjectId("id"), //id utilisateur
-  getUserReservations
+  getUserReservations,
 );
 router.patch(
   "/cancel/reservations/:id/:reservationId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("reservationId"), //id réservation
-  cancelUserReservation
+  cancelUserReservation,
 );
 router.delete(
   "/delete/reservations/:id/:reservationId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("reservationId"), //id réservation
-  deleteUserReservation
+  deleteUserReservation,
 );
 // Gestion des voitures actuellles
 router.post("/porsches/new/:id", auth, validateObjectId("id"), addUserPorsche);
@@ -125,14 +125,14 @@ router.patch(
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("porscheId"), //id porsche
-  updateUserPorsche
+  updateUserPorsche,
 );
 router.delete(
   "/delete/porsches/:id/:porscheId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("porscheId"), //id porsche
-  deleteUserPorsche
+  deleteUserPorsche,
 );
 
 export default router;

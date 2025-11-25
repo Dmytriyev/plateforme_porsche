@@ -1,3 +1,8 @@
+/**
+ * Constantes Jantes
+ * - Définit les tailles et couleurs de jantes disponibles
+ * - Fournit des helpers pour afficher ces options dans le configurateur
+ */
 // Tailles de jantes disponibles (en pouces)
 export const TAILLES_JANTE = ["16", "17", "18", "19", "21", "22", "23"];
 // Couleurs de jantes disponibles

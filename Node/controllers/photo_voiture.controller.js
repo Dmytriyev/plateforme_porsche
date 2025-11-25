@@ -1,13 +1,17 @@
-import Photo_voiture from "../models/photo_voiture.model.js";
-import photo_voitureValidation from "../validations/photo_voiture.validation.js";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import Voiture from "../models/voiture.model.js";
+/**
+ * Contrôleur Photo Voiture
+ * - Gère l'upload, la validation et la suppression des photos de voiture
+ */
 import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import Couleur_interieur from "../models/couleur_interieur.model.js";
-import Taille_jante from "../models/taille_jante.model.js";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
 import logger from "../utils/logger.js";
+import path from "node:path";
+import Photo_voiture from "../models/photo_voiture.model.js";
+import photo_voitureValidation from "../validations/photo_voiture.validation.js";
+import Taille_jante from "../models/taille_jante.model.js";
+import Voiture from "../models/voiture.model.js";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);

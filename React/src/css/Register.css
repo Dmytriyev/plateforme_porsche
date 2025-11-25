@@ -1,3 +1,7 @@
+/*
+ * Register.css — Styles pour la page d'inscription.
+ * Notes pédagogiques : prioriser la validation visuelle et les messages d'erreur clairs.
+ */
 
 .register-container-porsche {
   min-height: 100vh;
@@ -19,7 +23,6 @@
   width: 100%;
 }
 
-
 .register-title-porsche {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
@@ -27,7 +30,6 @@
   margin: 0 0 2rem 0;
   text-align: left;
 }
-
 
 .register-error-message {
   margin-bottom: 1.5rem;
@@ -55,13 +57,11 @@
   margin-left: 1rem;
 }
 
-
 .register-form-porsche {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
-
 
 .register-btn-primary-porsche {
   width: 100%;
@@ -87,7 +87,6 @@
   cursor: not-allowed;
 }
 
-
 .register-separator-porsche {
   position: relative;
   text-align: center;
@@ -112,7 +111,6 @@
   font-size: 0.875rem;
 }
 
-
 .register-btn-secondary-porsche {
   width: 100%;
   padding: 1rem 1.5rem;
@@ -136,7 +134,6 @@
 .register-btn-secondary-porsche:hover {
   border-color: var(--color-black);
 }
-
 
 @media (max-width: 640px) {
   .register-container-porsche {

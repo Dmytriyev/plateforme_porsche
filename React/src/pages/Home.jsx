@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import voitureService from '../services/voiture.service.js';
-import buildUrl from '../utils/buildUrl';
-import { formatPrice } from '../utils/helpers.js';
-import '../css/CatalogueModeles.css';
-import '../css/Home.css';
+/**
+ * pages/Home.jsx — Page d'accueil; sections promos et liens rapides.
+ *
+ * Notes pédagogiques courtes :
+ * - Montre l'usage d'un service (`voitureService`) pour récupérer des données
+ *   et de `useEffect` pour déclencher la récupération au montage.
+ * - Exemple pratique : filtrage et affichage conditionnel (loading / empty / data).
+ */
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import voitureService from "../services/voiture.service.js";
+import buildUrl from "../utils/buildUrl";
+import "../css/CatalogueModeles.css";
+import "../css/Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,8 +29,12 @@ const Home = () => {
       const response = await voitureService.getAllVoitures();
       const data = Array.isArray(response) ? response : [];
 
-      const filtered = data.filter(v => ['911', 'Cayman', 'Cayenne'].includes(v.nom_model));
-      const uniqueModeles = [...new Map(filtered.map(v => [v.nom_model, v])).values()];
+      const filtered = data.filter((v) =>
+        ["911", "Cayman", "Cayenne"].includes(v.nom_model),
+      );
+      const uniqueModeles = [
+        ...new Map(filtered.map((v) => [v.nom_model, v])).values(),
+      ];
 
       setModeles(uniqueModeles);
     } catch (error) {
@@ -32,17 +44,21 @@ const Home = () => {
     }
   };
 
-  const handleModeleClick = (modele) => navigate(`/variantes/neuve/${modele._id}`);
+  const handleModeleClick = (modele) =>
+    navigate(`/variantes/neuve/${modele._id}`);
 
   const DESCRIPTIONS = {
-    '911': 'L\'icône de génération en génération.',
-    '718': 'La sportive deux places au moteur central arrière.',
-    'Cayman': 'La sportive deux places au moteur central arrière.',
-    'Cayenne': 'Le SUV à l\'ADN sportif et familial.',
+    911: "L'icône de génération en génération.",
+    718: "La sportive deux places au moteur central arrière.",
+    Cayman: "La sportive deux places au moteur central arrière.",
+    Cayenne: "Le SUV à l'ADN sportif et familial.",
   };
 
   const getModeleInfo = (modele) => ({
-    description: modele.description || DESCRIPTIONS[modele.nom_model] || 'Découvrez ce modèle emblématique',
+    description:
+      modele.description ||
+      DESCRIPTIONS[modele.nom_model] ||
+      "Découvrez ce modèle emblématique",
   });
 
   return (
@@ -57,15 +73,24 @@ const Home = () => {
             </div>
           </div>
           <div className="home-hero-text">
-            <h1 className="home-hero-title">Votre voyage Porsche commence ici.</h1>
+            <h1 className="home-hero-title">
+              Votre voyage Porsche commence ici.
+            </h1>
             <p className="home-hero-slogan">
-              Découvrez l'excellence automobile. Choisissez votre expérience Porsche.
+              Découvrez l'excellence automobile. Choisissez votre expérience
+              Porsche.
             </p>
             <div className="home-hero-buttons">
-              <Link to="/catalogue/neuve" className="home-hero-btn home-hero-btn-primary">
+              <Link
+                to="/catalogue/neuve"
+                className="home-hero-btn home-hero-btn-primary"
+              >
                 Voitures Neuves
               </Link>
-              <Link to="/catalogue/occasion" className="home-hero-btn home-hero-btn-secondary">
+              <Link
+                to="/catalogue/occasion"
+                className="home-hero-btn home-hero-btn-secondary"
+              >
                 Voitures d'Occasion
               </Link>
             </div>
@@ -88,11 +113,15 @@ const Home = () => {
           <div className="models-grid-porsche">
             {modeles.map((modele) => {
               const modeleInfo = getModeleInfo(modele);
-              const photos = modele.photo_voiture?.filter(p => p?.name) || [];
-              const photoPrincipale = photos.length > 1 ? photos[1] : (photos[0] || null);
+              const photos = modele.photo_voiture?.filter((p) => p?.name) || [];
+              const photoPrincipale =
+                photos.length > 1 ? photos[1] : photos[0] || null;
 
               return (
-                <article key={modele._id} className="catalogue-modele-card-neuf-porsche">
+                <article
+                  key={modele._id}
+                  className="catalogue-modele-card-neuf-porsche"
+                >
                   <h2 className="catalogue-modele-title-porsche">
                     {modele.nom_model}
                   </h2>
@@ -104,19 +133,24 @@ const Home = () => {
                         alt={`Porsche ${modele.nom_model}`}
                         className="catalogue-modele-img-porsche"
                         onError={(e) => {
-                          e.target.style.display = 'none';
+                          e.target.style.display = "none";
                           if (e.target.nextSibling) {
-                            e.target.nextSibling.style.display = 'flex';
+                            e.target.nextSibling.style.display = "flex";
                           }
                         }}
                       />
                     ) : null}
                     <div
                       className="catalogue-modele-placeholder-porsche"
-                      style={{ display: photoPrincipale && photoPrincipale.name ? 'none' : 'flex' }}
+                      style={{
+                        display:
+                          photoPrincipale && photoPrincipale.name
+                            ? "none"
+                            : "flex",
+                      }}
                     >
                       <span className="catalogue-modele-letter-porsche">
-                        {modele.nom_model?.charAt(0) || '?'}
+                        {modele.nom_model?.charAt(0) || "?"}
                       </span>
                     </div>
                   </div>
@@ -143,10 +177,13 @@ const Home = () => {
       <section className="home-accessoires-section">
         <div className="home-accessoires-content">
           <div className="home-accessoires-text">
-            <h2 className="home-accessoires-title">Découvrez la boutique Porsche Lifestyle</h2>
+            <h2 className="home-accessoires-title">
+              Découvrez la boutique Porsche Lifestyle
+            </h2>
             <p className="home-accessoires-description">
-              Personnalisez votre expérience avec notre collection exclusive d'accessoires premium.
-              Du lifestyle aux pièces de performance, découvrez tout ce qui fait l'excellence Porsche.
+              Personnalisez votre expérience avec notre collection exclusive
+              d'accessoires premium. Du lifestyle aux pièces de performance,
+              découvrez tout ce qui fait l'excellence Porsche.
             </p>
             <div className="home-accessoires-buttons">
               <Link to="/accessoires" className="home-accessoires-btn">
@@ -167,11 +204,17 @@ const Home = () => {
 
           <div className="home-approved-content">
             <h2 className="home-approved-title">
-              Véhicules d'occasion<br />
+              Véhicules d'occasion
+              <br />
               Porsche Approved.
             </h2>
             <p className="home-approved-text">
-              Une Porsche reste une Porsche. Nos véhicules d'occasion Porsche Approved sont vecteurs d'émotion, comme au premier jour. Ils témoignent de la passion avec laquelle nous les avons contrôlés sur 111 points. Ils font battre votre cœur, car nous avons mis tout le nôtre dans leur préparation. Et votre sérénité est assurée grâce à notre garantie Porsche Approved.
+              Une Porsche reste une Porsche. Nos véhicules d'occasion Porsche
+              Approved sont vecteurs d'émotion, comme au premier jour. Ils
+              témoignent de la passion avec laquelle nous les avons contrôlés
+              sur 111 points. Ils font battre votre cœur, car nous avons mis
+              tout le nôtre dans leur préparation. Et votre sérénité est assurée
+              grâce à notre garantie Porsche Approved.
             </p>
             <Link to="/occasion" className="home-approved-btn">
               En savoir plus

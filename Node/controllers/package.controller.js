@@ -1,6 +1,10 @@
+/**
+ * Contrôleur Package
+ * - Gère les packages/options : CRUD, validation des données et gestion des images
+ */
+import { getAvailablePackages } from "../utils/package.constants.js";
 import Package from "../models/package.model.js";
 import packageValidation from "../validations/package.validation.js";
-import { getAvailablePackages } from "../utils/package.constants.js";
 import {
   handleError,
   isEmptyBody,

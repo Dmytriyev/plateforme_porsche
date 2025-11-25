@@ -1,3 +1,13 @@
+/**
+ * services/httpHelper.js — Petit wrapper pour appels HTTP (axios)
+ *
+ * Notes pédagogiques :
+ * - `apiRequest` centralise la gestion des erreurs et l'extraction des données.
+ * - `returnArray` permet de normaliser les réponses paginées/imbriquées en tableau.
+ * - `ignoreErrors` autorise à retourner une valeur par défaut pour certains codes HTTP.
+ * - Avantage pour les étudiants : gardez la logique de gestion d'erreur en un point.
+ */
+
 const extractData = (response) => {
   if (!response?.data) return null;
   const { data } = response;

@@ -1,3 +1,12 @@
+/**
+ * db/db.js — Connexion à MongoDB avec options robustes.
+ *
+ * Notes pédagogiques :
+ * - Vérifie la présence de `DB_URI` et applique des options de pool pour un
+ *   bon compromis performance/stabilité.
+ * - En développement, on choisit d'arrêter le process si la DB est indisponible
+ *   afin de détecter rapidement les erreurs de configuration.
+ */
 import { connect } from "mongoose";
 import logger from "../utils/logger.js";
 

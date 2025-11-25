@@ -1,3 +1,8 @@
+/**
+ * Modèle Photo Porsche
+ * - Image associée à une configuration/model_porsche (couleur ext/int)
+ * - Sert à illustrer les variantes et les options sur le frontend
+ */
 import mongoose from "mongoose";
 
 const photo_porscheSchema = new mongoose.Schema(

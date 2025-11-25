@@ -1,3 +1,8 @@
+/**
+ * Constantes Couleurs Extérieures
+ * - Définit les couleurs extérieures disponibles et helper pour les récupérer
+ * - Utilisé par le configurateur pour valider et afficher les options couleurs
+ */
 // Liste des couleurs extérieures disponibles
 export const COULEURS_EXTERIEUR = [
   "white",

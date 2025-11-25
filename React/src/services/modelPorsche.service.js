@@ -1,3 +1,12 @@
+/**
+ * services/modelPorsche.service.js — Services pour modèles Porsche et variantes
+ *
+ * Notes pédagogiques courtes :
+ * - Fournit des fonctions spécifiques au domaine (configurations, variantes, prix).
+ * - Illustre le pattern : séparation entre logique réseau (service) et UI (composants/pages).
+ * - Les erreurs spécifiques (404/400) sont manipulées pour fournir des messages clairs.
+ */
+
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 

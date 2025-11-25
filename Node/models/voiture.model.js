@@ -40,7 +40,7 @@ const voitureSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 // Indexes pour optimiser les requêtes fréquentes
 voitureSchema.index({ type_voiture: 1 });

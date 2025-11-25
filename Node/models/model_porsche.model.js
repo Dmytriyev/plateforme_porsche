@@ -177,7 +177,7 @@ const model_porscheSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Index pour accélérer les recherches
@@ -223,7 +223,7 @@ model_porscheSchema.methods.calculerPrixTotal = async function () {
 };
 
 model_porscheSchema.methods.calculerAcompte = async function (
-  pourcentage = 0.1
+  pourcentage = 0.1,
 ) {
   const prixTotal = await this.calculerPrixTotal();
   return prixTotal * pourcentage;
@@ -266,7 +266,7 @@ model_porscheSchema.methods.obtenirResume = async function () {
 
 // toutes les variantes disponibles pour un modèle de voiture
 model_porscheSchema.statics.obtenirVariantesDisponibles = async function (
-  voitureId
+  voitureId,
 ) {
   return await this.find({
     voiture: voitureId,
@@ -279,7 +279,7 @@ model_porscheSchema.statics.obtenirVariantesDisponibles = async function (
 
 // rechercher par spécifications
 model_porscheSchema.statics.rechercherParSpecifications = async function (
-  criteres
+  criteres,
 ) {
   const query = { disponible: true };
 

@@ -1,3 +1,8 @@
+/**
+ * Contrôleur Voiture
+ * - Gère les gammes de voitures : création, lecture, validation des photos
+ *   et gestion des options par modèle
+ */
 // Gère les gammes de voitures ( 911, Cayenne, Cayman)
 /**
  * Schéma Mongoose pour les configurations de modèles Porsche.

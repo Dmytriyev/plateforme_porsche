@@ -1,13 +1,19 @@
-import { useEffect } from 'react';
-import '../../css/components/Modal.css';
+/**
+ * components/common/Modal.jsx — Wrapper modal accessible (ESC, focus trap si implémenté).
+ *
+ * @file components/common/Modal.jsx
+ */
 
-const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
+import { useEffect } from "react";
+import "../../css/components/Modal.css";
+
+const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   // Bloquer le scroll du body quand la modale est ouverte
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = 'unset';
+        document.body.style.overflow = "unset";
       };
     }
   }, [isOpen]);
@@ -16,13 +22,13 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   useEffect(() => {
     if (isOpen) {
       const handleEscape = (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           onClose();
         }
       };
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
       return () => {
-        document.removeEventListener('keydown', handleEscape);
+        document.removeEventListener("keydown", handleEscape);
       };
     }
   }, [isOpen, onClose]);

@@ -1,5 +1,10 @@
-import mongoose from "mongoose";
+/**
+ * Modèle Couleur Extérieure
+ * - Représente une couleur extérieure possible pour un modèle Porsche
+ * - Contient nom, image et prix éventuel
+ */
 import { COULEURS_EXTERIEUR } from "../utils/couleur_exterieur.constants.js";
+import mongoose from "mongoose";
 
 const couleur_exterieurSchema = new mongoose.Schema(
   {

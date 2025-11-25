@@ -1,8 +1,12 @@
+/**
+ * Contrôleur Accesoire
+ * - Gère les accessoires du catalogue : création, lecture et validation
+ */
 import Accesoire from "../models/accesoire.model.js";
 import accesoireValidation from "../validations/accesoire.validation.js";
-import PhotoAccesoire from "../models/photo_accesoire.model.js";
 import Couleur_accesoire from "../models/couleur_accesoire.model.js";
 import { getAvailableTypesAccesoire } from "../utils/accesoire.constants.js";
+import PhotoAccesoire from "../models/photo_accesoire.model.js";
 import {
   sendSuccess,
   sendError,

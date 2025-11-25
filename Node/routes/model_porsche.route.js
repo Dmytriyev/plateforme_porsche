@@ -52,7 +52,7 @@ router.get("/prixTotal/:id", validateObjectId("id"), calculatePrixTotal); // Cal
 router.get(
   "/voiture/:voiture_id",
   validateObjectId("voiture_id"),
-  getConfigurationsByVoiture
+  getConfigurationsByVoiture,
 ); // Configurations d'une voiture
 router.get("/page/:id", validateObjectId("id"), getModelPorschePage); // Page complète variante
 router.get("/occasion/page/:id", validateObjectId("id"), getOccasionPage); // Page complète occasion
@@ -68,7 +68,7 @@ router.patch(
   isStaff,
   validateObjectId("id"), // id du modèle Porsche
   optionalUpload,
-  updateModel_porsche
+  updateModel_porsche,
 );
 router.patch(
   "/addImages/:id",
@@ -76,7 +76,7 @@ router.patch(
   isStaff,
   validateObjectId("id"), // id du modèle Porsche
   optionalUpload,
-  addImages
+  addImages,
 );
 router.patch(
   "/removeImages/:id",
@@ -84,7 +84,7 @@ router.patch(
   isStaff,
   validateObjectId("id"), // id du modèle Porsche
   optionalUpload,
-  removeImages
+  removeImages,
 );
 
 router.patch(
@@ -92,14 +92,14 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"), // id du modèle Porsche
-  addCouleurExterieur
+  addCouleurExterieur,
 );
 router.patch(
   "/removeCouleurExterieur/:id",
   auth,
   isStaff,
   validateObjectId("id"), // id du modèle Porsche
-  removeCouleurExterieur
+  removeCouleurExterieur,
 );
 
 router.patch(
@@ -107,14 +107,14 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"),
-  addCouleursInterieur
+  addCouleursInterieur,
 );
 router.patch(
   "/removeCouleursInterieur/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  removeCouleursInterieur
+  removeCouleursInterieur,
 );
 
 router.patch(
@@ -122,14 +122,14 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"),
-  addTailleJante
+  addTailleJante,
 );
 router.patch(
   "/removeTailleJante/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  removeTailleJante
+  removeTailleJante,
 );
 
 // Suppression admin uniquement
@@ -138,7 +138,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteModel_porsche
+  deleteModel_porsche,
 );
 
 export default router;

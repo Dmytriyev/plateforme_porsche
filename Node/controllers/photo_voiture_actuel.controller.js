@@ -1,10 +1,15 @@
+/**
+ * Contrôleur Photo Voiture Actuel
+ * - Gère les photos pour les annonces de voitures actuelles : upload, validation
+ *   et association avec l'annonce
+ */
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+import logger from "../utils/logger.js";
+import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
+import path from "node:path";
 import Photo_voiture_actuel from "../models/photo_voiture_actuel.model.js";
 import photo_voiture_actuelValidation from "../validations/photo_voiture_actuel.validation.js";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
-import logger from "../utils/logger.js";
 
 // Obtenir le répertoire courant
 const __filename = fileURLToPath(import.meta.url);

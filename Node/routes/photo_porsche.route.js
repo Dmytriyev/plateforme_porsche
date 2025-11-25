@@ -22,7 +22,7 @@ router.put(
   isStaff,
   validateObjectId("id"), // id de la photo Porsche
   optionalUpload,
-  updatePhoto_porsche
+  updatePhoto_porsche,
 );
 
 // Routes publiques
@@ -31,7 +31,7 @@ router.get("/:id", validateObjectId("id"), getPhoto_porscheById);
 router.get(
   "/all/model_porsche/:modelId",
   getAllPhoto_porsches,
-  validateObjectId("modelId")
+  validateObjectId("modelId"),
 );
 
 // Routes admin
@@ -40,7 +40,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deletePhoto_porsche
+  deletePhoto_porsche,
 );
 
 export default router;

@@ -1,3 +1,8 @@
+/**
+ * Modèle Photo Voiture Actuel
+ * - Images pour les annonces de voitures actuelles (voitures d'occasion)
+ * - Associées à `Model_porsche_actuel` et utilisées dans les fiches annonces
+ */
 import mongoose from "mongoose";
 
 const photo_voiture_actuelSchema = new mongoose.Schema(

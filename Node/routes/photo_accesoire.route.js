@@ -22,7 +22,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updatePhoto_accesoire
+  updatePhoto_accesoire,
 );
 
 // Routes publiques
@@ -30,7 +30,7 @@ router.get("/all", getAllPhoto_accesoires);
 router.get(
   "/accesoire/:accesoireId",
   validateObjectId("accesoireId"),
-  getAllPhoto_accesoires
+  getAllPhoto_accesoires,
 );
 router.get("/:id", validateObjectId("id"), getPhoto_accesoireById);
 
@@ -40,7 +40,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deletePhoto_accesoire
+  deletePhoto_accesoire,
 );
 
 export default router;

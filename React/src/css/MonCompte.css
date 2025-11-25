@@ -1,3 +1,8 @@
+/*
+ * MonCompte.css — Styles pour la page de gestion du compte utilisateur.
+ * Notes pédagogiques : regrouper les sections (profil, mot de passe, préférences) pour la lisibilité.
+ */
+
 .mon-compte-container {
   min-height: 100vh;
   background-color: var(--color-white);
@@ -223,7 +228,6 @@
   gap: 1.5rem;
 }
 
-
 .mon-compte-reservation-card {
   background-color: var(--color-white);
   border: 2px solid #000;
@@ -392,7 +396,6 @@
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-
 .mon-compte-reservation-user-info {
   margin-top: 0.5rem;
   padding: 0.75rem;
@@ -465,7 +468,6 @@
 .mon-compte-reservation-card-staff {
   border-color: var(--color-black);
 }
-
 
 .mon-compte-commande-card {
   background-color: var(--color-white);
@@ -731,7 +733,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
 .mon-compte-settings {
   display: flex;
   flex-direction: column;
@@ -807,11 +808,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
 .mon-compte-messages {
   margin-bottom: 2rem;
 }
-
 
 .mon-compte-error {
   min-height: 100vh;
@@ -847,7 +846,6 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-
 
 @media (max-width: 968px) {
   .mon-compte-container {
@@ -1189,7 +1187,6 @@
   margin-top: 0.1rem;
 }
 
-
 .gestion-achat-produits {
   padding: 0.75rem;
   background: var(--color-grey-hover);
@@ -1419,7 +1416,6 @@
   height: 16px;
 }
 
-
 .gestion-achat-prix {
   padding: 0.75rem;
   background: var(--color-grey-hover);
@@ -1447,7 +1443,6 @@
   color: var(--color-grey-text);
   margin: 0;
 }
-
 
 .gestion-achat-facture {
   grid-column: 1 / -1;
@@ -1479,7 +1474,6 @@
 .gestion-achat-btn-facture svg {
   flex-shrink: 0;
 }
-
 
 @media (max-width: 768px) {
   .mon-compte-admin-actions {

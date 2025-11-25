@@ -1,5 +1,14 @@
-import DOMPurify from "dompurify";
+/**
+ * utils/helpers.js — Fonctions utilitaires partagées (formatage, validation, sanitisation)
+ *
+ * Notes pédagogiques :
+ * - Centraliser helpers évite la duplication et facilite les tests unitaires.
+ * - Sanitize côté client pour prévenir les XSS dans l'UI, mais faites aussi la sanitisation côté serveur.
+ * - Fournir des helpers prédictibles (formatDate, formatPrice) améliore la cohérence UX.
+ */
 
+import DOMPurify from "dompurify";
+// Importation de la bibliothèque pour la sanitisation HTML
 export const ERROR_MESSAGES = {
   NETWORK_ERROR: "Erreur de connexion au serveur",
   UNAUTHORIZED: "Vous devez être connecté pour accéder à cette page",
@@ -8,27 +17,27 @@ export const ERROR_MESSAGES = {
   SERVER_ERROR: "Erreur serveur, veuillez réessayer plus tard",
   VALIDATION_ERROR: "Erreur de validation des données",
 };
-
+// Messages d'erreur standardisés pour les erreurs API
 const priceFormatter = new Intl.NumberFormat("fr-FR", {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-
+// Formatteur pour les prix en euros sans décimales
 const priceMonthlyFormatter = new Intl.NumberFormat("fr-FR", {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
-
+// Formatteur pour les prix mensuels en euros avec 2 décimales
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
-
+// Formatteur pour les dates au format français
 const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   month: "long",
@@ -36,16 +45,16 @@ const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
   hour: "2-digit",
   minute: "2-digit",
 });
-
+// Formatteur pour les dates et heures au format français
 const numberFormatter = new Intl.NumberFormat("fr-FR");
-
+// Formatteur pour les nombres au format français
 export const formatPrice = (prix) => priceFormatter.format(prix);
 export const formatPriceMonthly = (prix) => priceMonthlyFormatter.format(prix);
 export const formatDate = (date) => dateFormatter.format(new Date(date));
 export const formatDateTime = (date) =>
   dateTimeFormatter.format(new Date(date));
 export const formatKilometrage = (km) => `${numberFormatter.format(km)} km`;
-
+// Fonctions d'exportation pour le formatage des prix, dates et kilométrages
 export const formatTelephone = (tel) => {
   if (!tel) return "";
   const cleaned = tel.replace(/\D/g, "");
@@ -54,7 +63,7 @@ export const formatTelephone = (tel) => {
     ? `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}`
     : tel;
 };
-
+// Fonction pour formater les numéros de téléphone français
 export const validateEmail = (email) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -63,7 +72,7 @@ export const validatePassword = (password) =>
 
 export const validateTelephone = (telephone) =>
   /^0[1-9](?:[\s.-]?\d{2}){4}$/.test(telephone);
-
+// Fonctions de validation pour email, mot de passe, téléphone et code postal
 export const validateCodePostal = (codePostal) => /^\d{5}$/.test(codePostal);
 
 export const getPasswordErrors = (password) => {
@@ -84,7 +93,7 @@ export const getPasswordErrors = (password) => {
 
   return errors;
 };
-
+// Fonction pour obtenir les erreurs de validation du mot de passe
 const errorMap = {
   400: ERROR_MESSAGES.VALIDATION_ERROR,
   401: ERROR_MESSAGES.UNAUTHORIZED,
@@ -94,13 +103,13 @@ const errorMap = {
   502: ERROR_MESSAGES.SERVER_ERROR,
   503: ERROR_MESSAGES.SERVER_ERROR,
 };
-
+// Mapping des codes d'erreur HTTP aux messages d'erreur standardisés
 export const handleApiError = (error) => {
   if (!error.response) return ERROR_MESSAGES.NETWORK_ERROR;
   const { status, data } = error.response;
   return data?.message || errorMap[status] || "Une erreur est survenue";
 };
-
+// Fonction pour gérer les erreurs API et retourner des messages appropriés
 export const getErrorMessage = (error) =>
   typeof error === "string"
     ? error

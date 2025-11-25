@@ -1,3 +1,8 @@
+/**
+ * Utilitaires de gestion des erreurs
+ * - Centralise la conversion d'erreurs (Mongo, validation, duplication)
+ * - Retourne des réponses HTTP appropriées et logge le contexte pour debug
+ */
 import logger from "./logger.js";
 export const handleError = (res, error, context = "") => {
   // Logger l'erreur

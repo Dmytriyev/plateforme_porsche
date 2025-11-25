@@ -1,8 +1,13 @@
+/**
+ * Contrôleur Réservation
+ * - Gère les réservations de voitures d'occasion : création, validation
+ *   et consultation des réservations par utilisateur et date
+ */
+import logger from "../utils/logger.js";
+import Model_porsche from "../models/model_porsche.model.js";
 import Reservation from "../models/reservation.model.js";
 import reservationValidation from "../validations/reservation.validation.js";
-import Model_porsche from "../models/model_porsche.model.js";
 import User from "../models/user.model.js";
-import logger from "../utils/logger.js";
 import {
   sendSuccess,
   sendError,

@@ -1,3 +1,12 @@
+/**
+ * services/voiture.service.js — Client HTTP pour le catalogue de voitures
+ *
+ * Notes pédagogiques courtes :
+ * - Centralise les appels API pour les voitures (liste, détails, CRUD).
+ * - Les services rendent les composants plus simples et faciles à tester.
+ * - Utiliser `apiRequest` permet de normaliser les erreurs et les formats de réponse.
+ */
+
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 

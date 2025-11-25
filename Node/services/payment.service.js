@@ -1,10 +1,21 @@
-import Stripe from "stripe";
-import LigneCommande from "../models/ligneCommande.model.js";
 import Commande from "../models/Commande.model.js";
 import { default as logger } from "../utils/logger.js";
+import LigneCommande from "../models/ligneCommande.model.js";
+import Stripe from "stripe";
 
+/**
+ * services/payment.service.js — Intégration Stripe côté serveur.
+ *
+ * Notes pédagogiques :
+ * - Instancie Stripe avec la clé secrète serveur (NE JAMAIS exposer côté client).
+ * - Fournit : construction des `line_items` pour Checkout et traitement des webhooks
+ *   (vérification de signature + idempotence).
+ */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// buildLineItems : transforme les lignes de commande en structure attendue par Stripe
+// - gère acompte vs prix d'accessoire vs prix personnalisé
+// - renvoie un tableau `line_items` prêt pour `stripe.checkout.sessions.create`
 const buildLineItems = (ligneCommandes) => {
   const items = [];
   ligneCommandes.forEach((line) => {
@@ -46,6 +57,10 @@ const buildLineItems = (ligneCommandes) => {
   return items;
 };
 
+// createCheckoutSession : crée une session Stripe Checkout
+// - Crée un client Stripe `customer` facultatif (stocke email/phone)
+// - Construit `line_items` via `buildLineItems`
+// - Retourne l'objet session (id, url, status)
 export const createCheckoutSession = async ({ commandeId, user }) => {
   const commande = await Commande.findById(commandeId).populate(
     "user",
@@ -107,6 +122,9 @@ export const createCheckoutSession = async ({ commandeId, user }) => {
   return session;
 };
 
+// processWebhook : vérifie la signature du webhook (sécurité) puis met à jour la commande
+// - rawBody doit être la payload brute (express.raw) pour que la vérification fonctionne
+// - Faire attention à l'idempotence : ne pas re-traiter une commande déjà marquée payée
 export const processWebhook = async ({ rawBody, signature }) => {
   let event;
   try {

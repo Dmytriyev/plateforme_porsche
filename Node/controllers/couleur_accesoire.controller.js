@@ -1,3 +1,7 @@
+/**
+ * Contrôleur Couleur Accesoire
+ * - Gère les couleurs applicables aux accessoires : CRUD et gestion des fichiers
+ */
 import Couleur_accesoire from "../models/couleur_accesoire.model.js";
 import couleur_accesoireValidation from "../validations/couleur_accesoire.validation.js";
 import {

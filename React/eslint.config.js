@@ -1,12 +1,19 @@
-import js from "@eslint/js";
+// - Utilisation de `defineConfig` pour une configuration claire et typée.
+// - Inclusion de plugins pour React Hooks et React Refresh (Vite).
+// - `globalIgnores` exclut les dossiers de build et dépendances.
+// - Configuration spécifique pour les fichiers de config JS (Node).
+// - Règles spécifiques pour les fichiers React JS/JSX.
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
+import js from "@eslint/js";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
+  // Configuration globale ESLint pour le projet React.
   globalIgnores(["dist", "node_modules", "build"]),
   {
+    // Settings spécifiques aux fichiers de configuration JS.
     files: ["*.config.js"],
     languageOptions: {
       globals: {
@@ -18,12 +25,14 @@ export default defineConfig([
     },
   },
   {
+    // Règles ESLint pour les fichiers JS/JSX de l'application React.
     files: ["**/*.{js,jsx}"],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    // Configuration des options de langage pour React.
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -33,6 +42,7 @@ export default defineConfig([
         sourceType: "module",
       },
     },
+    // Règles personnalisées pour le projet React.
     rules: {
       "no-unused-vars": [
         "error",

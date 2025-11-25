@@ -75,7 +75,7 @@ const userSchema = new mongoose.Schema(
       ref: "Commande",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 // Indexes pour optimiser les recherches courantes
 userSchema.index({ isAdmin: 1 });

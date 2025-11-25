@@ -1,3 +1,7 @@
+/*
+ * components/ContactModal.css — Styles pour le modal de contact/support.
+ * Notes pédagogiques : garder le contenu lisible et accessible sur petits écrans.
+ */
 
 .contact-modal-overlay {
   position: fixed;
@@ -23,7 +27,6 @@
   }
 }
 
-
 .contact-modal-content {
   background: white;
   border-radius: var(--border-radius-md);
@@ -48,7 +51,6 @@
   }
 }
 
-
 .contact-modal-close {
   position: absolute;
   top: 15px;
@@ -65,7 +67,6 @@
   color: var(--color-black);
 }
 
-
 .contact-modal-title {
   font-size: 28px;
   font-weight: var(--font-weight-semibold);
@@ -80,7 +81,6 @@
   margin: 0 0 30px 0;
   line-height: 1.5;
 }
-
 
 .contact-modal-form {
   display: flex;
@@ -133,7 +133,6 @@
   cursor: not-allowed;
 }
 
-
 .contact-modal-info {
   background: #f8f8f8;
   padding: 15px;
@@ -151,7 +150,6 @@
 .contact-modal-info strong {
   color: var(--color-black);
 }
-
 
 .contact-modal-actions {
   display: flex;
@@ -194,7 +192,6 @@
   box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
 }
 
-
 .contact-modal-success {
   text-align: center;
   padding: 60px 40px;
@@ -235,7 +232,6 @@
   color: var(--color-grey-text);
   margin: 0;
 }
-
 
 @media (max-width: 768px) {
   .contact-modal-content {

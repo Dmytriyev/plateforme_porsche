@@ -1,8 +1,13 @@
+/**
+ * Contrôleur Modèle Porsche Actuel
+ * - Gère les annonces/configurations actuelles de voitures (photos, couleurs,
+ *   options) et les opérations CRUD associées
+ */
+import Couleur_exterieur from "../models/couleur_exterieur.model.js";
+import Couleur_interieur from "../models/couleur_interieur.model.js";
 import Model_porsche_actuel from "../models/model_porsche_actuel.model.js";
 import model_porsche_actuelValidation from "../validations/model_porsche_actuel.validation.js";
 import Photo from "../models/photo_voiture_actuel.model.js";
-import Couleur_exterieur from "../models/couleur_exterieur.model.js";
-import Couleur_interieur from "../models/couleur_interieur.model.js";
 import Taille_jante from "../models/taille_jante.model.js";
 import {
   sendError,

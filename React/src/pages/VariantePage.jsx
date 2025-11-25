@@ -1,38 +1,48 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import modelPorscheService from '../services/modelPorsche.service.js';
-import voitureService from '../services/voiture.service.js';
-import Loading from '../components/common/Loading.jsx';
-import Button from '../components/common/Button.jsx';
-import { formatPrice } from '../utils/helpers.js';
-import '../css/VariantePage.css';
-import '../css/components/Message.css';
-import { API_URL } from '../config/api.js';
-import buildUrl from '../utils/buildUrl';
+/**
+ * pages/VariantePage.jsx — Détail variante: images, options, disponibilité.
+ *
+ * @file pages/VariantePage.jsx
+ */
+
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import modelPorscheService from "../services/modelPorsche.service.js";
+import voitureService from "../services/voiture.service.js";
+import Loading from "../components/common/Loading.jsx";
+import Button from "../components/common/Button.jsx";
+import { formatPrice } from "../utils/helpers.js";
+import "../css/VariantePage.css";
+import "../css/components/Message.css";
+import { API_URL } from "../config/api.js";
+import buildUrl from "../utils/buildUrl";
+import { warn } from "../utils/logger.js";
 
 const VariantePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [carrosseriesNav, setCarrosseriesNav] = useState([]);
-  const [selectedCarrosserie, setSelectedCarrosserie] = useState('');
+  const [selectedCarrosserie, setSelectedCarrosserie] = useState("");
 
   useEffect(() => {
     const fetchPageData = async () => {
       try {
         setLoading(true);
-        setError('');
+        setError("");
         const data = await modelPorscheService.getVariantePage(id);
         setPageData(data);
 
         // Récupérer les carrosseries disponibles pour ce modèle de base
         if (data.voiture_base?._id) {
           try {
-            const voitureData = await voitureService.getVoiturePage(data.voiture_base._id);
+            const voitureData = await voitureService.getVoiturePage(
+              data.voiture_base._id,
+            );
             if (voitureData?.statistiques?.carrosseries_disponibles) {
-              const carrosseries = voitureData.statistiques.carrosseries_disponibles;
+              const carrosseries =
+                voitureData.statistiques.carrosseries_disponibles;
               setCarrosseriesNav(carrosseries);
               // Définir la carrosserie actuelle comme sélectionnée
               if (data.variante?.type_carrosserie) {
@@ -40,10 +50,11 @@ const VariantePage = () => {
               }
             }
           } catch (err) {
+            warn("Erreur lors de la récupération des données voiture pour la variante :", err);
           }
         }
       } catch (err) {
-        setError(err.message || 'Erreur lors du chargement de la page');
+        setError(err.message || "Erreur lors du chargement de la page");
       } finally {
         setLoading(false);
       }
@@ -64,7 +75,7 @@ const VariantePage = () => {
         <div className="message-box message-error">
           <p>{error}</p>
         </div>
-        <Button onClick={() => navigate('/choix-voiture')}>
+        <Button onClick={() => navigate("/choix-voiture")}>
           Retour au choix
         </Button>
       </div>
@@ -77,21 +88,29 @@ const VariantePage = () => {
         <div className="message-box message-warning">
           <p>Variante non trouvée</p>
         </div>
-        <Button onClick={() => navigate('/choix-voiture')}>
+        <Button onClick={() => navigate("/choix-voiture")}>
           Retour au choix
         </Button>
       </div>
     );
   }
 
-  const { variante, voiture_base, specifications, options: _options, photos, prix, type } = pageData;
+  const {
+    variante,
+    voiture_base,
+    specifications,
+    options: _options,
+    photos,
+    prix,
+    type,
+  } = pageData;
 
   const handleConfigurer = () => {
-    if (type === 'neuf' && variante?._id && voiture_base?._id) {
+    if (type === "neuf" && variante?._id && voiture_base?._id) {
       const targetUrl = `/configurateur/${voiture_base._id}/${variante._id}`;
       navigate(targetUrl);
     } else {
-      setError('Impossible de configurer cette variante. Données manquantes.');
+      setError("Impossible de configurer cette variante. Données manquantes.");
     }
   };
 
@@ -99,12 +118,12 @@ const VariantePage = () => {
     if (voiture_base?._id) {
       navigate(`/variantes/neuve/${voiture_base._id}`);
     } else {
-      navigate('/choix-voiture');
+      navigate("/choix-voiture");
     }
   };
 
   const handleAcheter = () => {
-    navigate('/occasion');
+    navigate("/occasion");
   };
 
   /**
@@ -133,7 +152,7 @@ const VariantePage = () => {
           >
             CONFIGURER
           </button>
-          {type !== 'neuf' && (
+          {type !== "neuf" && (
             <button
               className="variante-nav-link variante-btn-acheter"
               onClick={handleAcheter}
@@ -141,8 +160,10 @@ const VariantePage = () => {
               ACHETER DES VOITURES NEUVES ET D'OCCASION
             </button>
           )}
-          {type !== 'neuf' && (
-            <button className="variante-nav-link variante-btn-comparer">COMPARER</button>
+          {type !== "neuf" && (
+            <button className="variante-nav-link variante-btn-comparer">
+              COMPARER
+            </button>
           )}
         </div>
       </nav>
@@ -156,7 +177,7 @@ const VariantePage = () => {
               alt={variante.nom_model}
               className="variante-hero-img-porsche"
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.target.style.display = "none";
               }}
             />
           </div>
@@ -168,22 +189,24 @@ const VariantePage = () => {
             {carrosseriesNav.map((carrosserie) => (
               <button
                 key={carrosserie}
-                className={`variante-carrosserie-nav-item-porsche ${selectedCarrosserie === carrosserie ? 'active' : ''}`}
+                className={`variante-carrosserie-nav-item-porsche ${selectedCarrosserie === carrosserie ? "active" : ""}`}
                 onClick={() => setSelectedCarrosserie(carrosserie)}
               >
                 {carrosserie}
               </button>
             ))}
           </nav>
-
         )}
 
         {/* Informations variante */}
         <div className="variante-info-header-porsche">
-          <h1 className="variante-name-porsche">Porsche {variante.nom_model}</h1>
+          <h1 className="variante-name-porsche">
+            Porsche {variante.nom_model}
+          </h1>
           {prix && (prix.prix_base_variante || prix.prix_total) > 0 && (
             <div className="variante-price-porsche">
-              à partir de {formatPrice(prix.prix_base_variante || prix.prix_total)} TTC
+              à partir de{" "}
+              {formatPrice(prix.prix_base_variante || prix.prix_total)} TTC
             </div>
           )}
         </div>
@@ -228,7 +251,7 @@ const VariantePage = () => {
             </div>
           )}
 
-          {type !== 'neuf' && (
+          {type !== "neuf" && (
             <button className="variante-technical-details-btn-porsche">
               TOUS LES DÉTAILS TECHNIQUES
             </button>
@@ -244,7 +267,7 @@ const VariantePage = () => {
                 alt={`${variante.nom_model} - Vue secondaire`}
                 className="variante-secondary-img-porsche"
                 onError={(e) => {
-                  e.target.style.display = 'none';
+                  e.target.style.display = "none";
                 }}
               />
             </div>
@@ -255,7 +278,9 @@ const VariantePage = () => {
       {/* Section Description */}
       {variante.description && (
         <section className="variante-description-section-porsche">
-          <h2 className="variante-description-title-porsche">Icône éternelle.</h2>
+          <h2 className="variante-description-title-porsche">
+            Icône éternelle.
+          </h2>
           <p className="variante-description-text-porsche">
             {variante.description}
           </p>
@@ -276,7 +301,7 @@ const VariantePage = () => {
         >
           CONFIGURER
         </button>
-        {type !== 'neuf' && (
+        {type !== "neuf" && (
           <button
             className="variante-action-btn-porsche variante-action-btn-white"
             onClick={handleAcheter}
@@ -290,4 +315,3 @@ const VariantePage = () => {
 };
 
 export default VariantePage;
-

@@ -1,3 +1,8 @@
+/**
+ * Constantes Rôles Utilisateur
+ * - Définit les rôles disponibles et helpers pour vérifier les permissions
+ * - Utilisé par l'auth et les middlewares d'autorisation
+ */
 // Définition des rôles utilisateur et des permissions associées.
 export const USER_ROLES = {
   USER: "user",

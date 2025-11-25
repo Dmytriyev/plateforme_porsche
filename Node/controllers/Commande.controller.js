@@ -1,3 +1,8 @@
+/**
+ * Contrôleur Commande
+ * - Gère la création, la lecture et la gestion des commandes
+ *   (panier, finalisation d'achat, historisation)
+ */
 import Commande from "../models/Commande.model.js";
 import commandeValidation from "../validations/Commande.validation.js";
 import LigneCommande from "../models/ligneCommande.model.js";

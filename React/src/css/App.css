@@ -1,3 +1,13 @@
+/*
+  App.css — Styles spécifiques au layout global de l'application.
+  Notes pédagogiques : Contient la structure de la page (container/main) ; privilégiez les classes utilitaires.
+*/
+
+/*
+ * css/App.css — Styles globaux de l'application; conteneur principal, typographie de base.
+ * CSS file: css/App.css
+ */
+
 .app-container {
   display: flex;
   flex-direction: column;

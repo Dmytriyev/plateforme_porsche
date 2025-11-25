@@ -1,3 +1,8 @@
+/*
+ * css/Navbar.css — Styles spécifiques au `Navbar` (position sticky, responsive menu).
+ * CSS file: css/Navbar.css
+ */
+
 .navbar {
   background-color: var(--color-white);
   color: var(--color-black);

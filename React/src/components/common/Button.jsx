@@ -1,23 +1,31 @@
-import '../../css/components/Button.css';
+/**
+ * components/common/Button.jsx — Bouton standardisé; props: `variant`, `loading`.
+ *
+ * @file components/common/Button.jsx
+ */
+
+import "../../css/components/Button.css";
 
 const Button = ({
   children,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   onClick,
   disabled = false,
   fullWidth = false,
-  type = 'button',
-  className = '',
+  type = "button",
+  className = "",
   ...props
 }) => {
   const classes = [
-    'btn',
+    "btn",
     `btn-${variant}`,
     `btn-${size}`,
-    fullWidth && 'btn-full',
-    className
-  ].filter(Boolean).join(' ');
+    fullWidth && "btn-full",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button

@@ -1,3 +1,7 @@
+/**
+ * Contrôleur Taille Jante
+ * - Gère les tailles de jantes : création, validation, images et listing
+ */
 import Taille_jante from "../models/taille_jante.model.js";
 import taille_janteValidation from "../validations/taille_jante.validation.js";
 import {

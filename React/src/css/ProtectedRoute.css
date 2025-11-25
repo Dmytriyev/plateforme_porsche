@@ -1,3 +1,7 @@
+/*
+ * ProtectedRoute.css — Styles pour l'affichage en cas d'accès refusé (protected routes).
+ * Notes pédagogiques : fournir un message clair et une action de redirection pour l'utilisateur.
+ */
 
 .protected-route-container {
   min-height: 100vh;

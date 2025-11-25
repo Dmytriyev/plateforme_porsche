@@ -1,6 +1,12 @@
-import '../../css/components/Loading.css';
+/**
+ * components/common/Loading.jsx — Indicateur de chargement centralisé.
+ *
+ * @file components/common/Loading.jsx
+ */
 
-const Loading = ({ size = 'md', fullScreen = false, message = '' }) => {
+import "../../css/components/Loading.css";
+
+const Loading = ({ size = "md", fullScreen = false, message = "" }) => {
   const spinner = (
     <div className="loading-content">
       <div className={`loading-spinner loading-spinner-${size}`} />

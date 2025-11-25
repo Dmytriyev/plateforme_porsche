@@ -1,3 +1,8 @@
+/**
+ * Helpers de réponses HTTP
+ * - Fournit des wrappers `sendSuccess`, `sendError`, `sendValidationError`,
+ *   pour standardiser les réponses JSON de l'API.
+ */
 export const sendSuccess = (res, data, message, statusCode = 200) => {
   const response = { success: true };
   if (message) response.message = message;

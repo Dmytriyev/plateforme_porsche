@@ -1,3 +1,7 @@
+/*
+ * Accessoires.css — Styles pour la liste et la fiche d'accessoires.
+ * Notes pédagogiques : maintenez une séparation claire entre liste et détail.
+ */
 
 .accessoires-container {
   min-height: 100vh;
@@ -10,7 +14,6 @@
   margin: 0 auto;
   padding: 0 2rem;
 }
-
 
 .accessoires-header {
   margin-bottom: 3rem;
@@ -28,7 +31,6 @@
   color: #6b7280;
   margin: 0;
 }
-
 
 .accessoires-filtres {
   display: flex;
@@ -64,14 +66,12 @@
   font-weight: var(--font-weight-medium);
 }
 
-
 .accessoires-grid-porsche {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
-
 
 .accessoire-card-porsche {
   background: #fff;
@@ -88,7 +88,6 @@
   border-color: #e0e0e0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-
 
 .accessoire-card-image-container {
   position: relative;
@@ -129,7 +128,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-
 .accessoire-card-badge {
   position: absolute;
   top: 1rem;
@@ -158,7 +156,6 @@
   z-index: 10;
 }
 
-
 .accessoire-card-limited {
   position: absolute;
   top: 1rem;
@@ -171,7 +168,6 @@
   border: 1px solid #e0e0e0;
   z-index: 10;
 }
-
 
 .accessoire-card-content {
   padding: 1rem;
@@ -193,7 +189,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 
 .accessoire-card-price {
   display: flex;
@@ -220,7 +215,6 @@
   font-weight: var(--font-weight-medium);
   color: #e74c3c;
 }
-
 
 .accessoire-card-actions {
   display: flex;
@@ -266,7 +260,6 @@
   background: var(--color-grey-light);
 }
 
-
 .accessoires-empty {
   text-align: center;
   padding: 4rem 2rem;
@@ -286,7 +279,6 @@
   color: #6b7280;
   margin: 0;
 }
-
 
 @media (max-width: 1200px) {
   .accessoires-grid-porsche {
@@ -408,7 +400,6 @@
   transform: translateY(0);
 }
 
-
 .accessoire-card-admin-actions {
   display: flex;
   gap: 0.5rem;
@@ -465,7 +456,6 @@
 .accessoire-card-admin-btn:active {
   transform: translateY(0);
 }
-
 
 @media (max-width: 768px) {
   .accessoires-admin-actions {

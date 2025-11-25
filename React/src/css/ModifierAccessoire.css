@@ -1,3 +1,7 @@
+/*
+ * ModifierAccessoire.css — Styles pour le formulaire d'édition d'accessoire.
+ * Notes pédagogiques : garder les règles spécifiques au composant pour éviter les fuites de styles.
+ */
 
 .modifier-accessoire-container {
   max-width: 1200px;
@@ -6,7 +10,6 @@
   background: #fff;
   min-height: 100vh;
 }
-
 
 .modifier-accessoire-header {
   margin-bottom: 2rem;
@@ -48,7 +51,6 @@
   font-weight: var(--font-weight-normal);
 }
 
-
 .modifier-accessoire-message {
   padding: 1rem 1.5rem;
   border-radius: 1rem;
@@ -70,13 +72,11 @@
   color: #16a34a;
 }
 
-
 .modifier-accessoire-form {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
-
 
 .modifier-accessoire-section {
   display: flex;
@@ -105,7 +105,6 @@
   font-style: italic;
 }
 
-
 .modifier-accessoire-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -117,7 +116,6 @@
     grid-template-columns: 1fr;
   }
 }
-
 
 .modifier-accessoire-field {
   display: flex;
@@ -179,7 +177,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-
 .modifier-accessoire-checkbox-label {
   display: flex;
   align-items: center;
@@ -205,7 +202,6 @@
 .modifier-accessoire-checkbox-label span {
   user-select: none;
 }
-
 
 .modifier-accessoire-upload-area {
   position: relative;
@@ -253,7 +249,6 @@
   color: var(--color-grey-text);
 }
 
-
 .modifier-accessoire-photos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -297,7 +292,6 @@
   background: #dc2626;
   transform: scale(1.1);
 }
-
 
 .modifier-accessoire-actions {
   display: flex;
@@ -350,7 +344,6 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-
 @media (max-width: 768px) {
   .modifier-accessoire-container {
     padding: 1rem;
@@ -381,9 +374,6 @@
   }
 }
 
-
-
-
 .modifier-accessoire-photo-item.marked-delete {
   opacity: 0.4;
   position: relative;
@@ -396,7 +386,6 @@
   background: rgba(220, 38, 38, 0.2);
   pointer-events: none;
 }
-
 
 .modifier-accessoire-photo-restore {
   position: absolute;

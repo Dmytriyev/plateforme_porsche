@@ -1,3 +1,12 @@
+/**
+ * services/personnalisation.service.js — Options de personnalisation (couleurs, jantes, sièges)
+ *
+ * Notes pédagogiques :
+ * - Ce service montre comment regrouper les endpoints liés aux options de configuration.
+ * - Retourne généralement des tableaux (`returnArray`) pour alimenter les sélecteurs UI.
+ * - Gardez les requêtes légères et cachez/réutilisez les résultats côté client si nécessaire.
+ */
+
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 

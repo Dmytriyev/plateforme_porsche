@@ -1,8 +1,8 @@
+import auth from "../middlewares/auth.js";
 import express from "express";
 import panierController from "../controllers/panier.controller.js";
-import auth from "../middlewares/auth.js";
-import validateRequest from "../middlewares/validateRequest.js";
 import sanitizeInputs from "../middlewares/sanitizeInputs.js";
+import validateRequest from "../middlewares/validateRequest.js";
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post(
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.ajouterVoitureNeuveAuPanier
+  panierController.ajouterVoitureNeuveAuPanier,
 );
 
 /**
@@ -29,7 +29,7 @@ router.post(
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.ajouterAccessoireAuPanier
+  panierController.ajouterAccessoireAuPanier,
 );
 
 /**
@@ -49,7 +49,7 @@ router.patch(
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.modifierQuantiteLigne
+  panierController.modifierQuantiteLigne,
 );
 
 /**

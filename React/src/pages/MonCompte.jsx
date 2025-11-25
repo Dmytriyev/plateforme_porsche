@@ -1,22 +1,27 @@
-import { useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext.jsx';
-import commandeService from '../services/commande.service.js';
-import maVoitureService from '../services/ma_voiture.service.js';
-import Loading from '../components/common/Loading.jsx';
-import { API_URL } from '../config/api.js';
-import buildUrl from '../utils/buildUrl';
-import { formatPrice, formatDate } from '../utils/helpers.js';
-import '../css/MonCompte.css';
-import '../css/components/Message.css';
+/**
+ * pages/MonCompte.jsx — Dashboard utilisateur (infos, liens rapides).
+ *
+ * @file pages/MonCompte.jsx
+ */
+
+import { useState, useEffect, useCallback, useContext, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext.jsx";
+import commandeService from "../services/commande.service.js";
+import maVoitureService from "../services/ma_voiture.service.js";
+import Loading from "../components/common/Loading.jsx";
+import { API_URL } from "../config/api.js";
+import buildUrl from "../utils/buildUrl";
+import { formatPrice, formatDate } from "../utils/helpers.js";
+import "../css/MonCompte.css";
+import "../css/components/Message.css";
 
 const GestionAchatsBlock = ({ commandes }) => {
-  const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState('date'); // date, user
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy, setSortBy] = useState("date"); // date, user
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const achats = useMemo(() => {
-    return commandes.filter(cmd => cmd.status === true);
+    return commandes.filter((cmd) => cmd.status === true);
   }, [commandes]);
 
   const achatsTries = useMemo(() => {
@@ -26,19 +31,22 @@ const GestionAchatsBlock = ({ commandes }) => {
       let comparison = 0;
 
       switch (sortBy) {
-        case 'date':
+        case "date":
           comparison = new Date(b.date_commande) - new Date(a.date_commande);
           break;
-        case 'user':
-          const nameA = `${a.user?.nom || ''} ${a.user?.prenom || ''}`.toLowerCase();
-          const nameB = `${b.user?.nom || ''} ${b.user?.prenom || ''}`.toLowerCase();
+        case "user": {
+          const nameA =
+            `${a.user?.nom || ""} ${a.user?.prenom || ""}`.toLowerCase();
+          const nameB =
+            `${b.user?.nom || ""} ${b.user?.prenom || ""}`.toLowerCase();
           comparison = nameA.localeCompare(nameB);
           break;
+        }
         default:
           comparison = 0;
       }
 
-      return sortOrder === 'asc' ? -comparison : comparison;
+      return sortOrder === "asc" ? -comparison : comparison;
     });
 
     return sorted;
@@ -46,10 +54,10 @@ const GestionAchatsBlock = ({ commandes }) => {
 
   const toggleSort = (type) => {
     if (sortBy === type) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(type);
-      setSortOrder('desc');
+      setSortOrder("desc");
     }
   };
 
@@ -58,34 +66,41 @@ const GestionAchatsBlock = ({ commandes }) => {
       <div className="mon-compte-block-header">
         <h2 className="mon-compte-block-title">Gestion des achats</h2>
         <p className="mon-compte-admin-subtitle">
-          Tous les achats effectués par les utilisateurs ({achats.length} commande{achats.length > 1 ? 's' : ''})
+          Tous les achats effectués par les utilisateurs ({achats.length}{" "}
+          commande{achats.length > 1 ? "s" : ""})
         </p>
       </div>
 
       <div className="gestion-achats-filters">
         <button
-          className={`gestion-achats-filter-btn ${sortBy === 'date' ? 'active' : ''}`}
-          onClick={() => toggleSort('date')}
+          className={`gestion-achats-filter-btn ${sortBy === "date" ? "active" : ""}`}
+          onClick={() => toggleSort("date")}
         >
           Par date
-          {sortBy === 'date' && (
-            <span className="sort-arrow">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+          {sortBy === "date" && (
+            <span className="sort-arrow">
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </span>
           )}
         </button>
         <button
-          className={`gestion-achats-filter-btn ${sortBy === 'user' ? 'active' : ''}`}
-          onClick={() => toggleSort('user')}
+          className={`gestion-achats-filter-btn ${sortBy === "user" ? "active" : ""}`}
+          onClick={() => toggleSort("user")}
         >
           Par utilisateur
-          {sortBy === 'user' && (
-            <span className="sort-arrow">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+          {sortBy === "user" && (
+            <span className="sort-arrow">
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </span>
           )}
         </button>
       </div>
 
       {achatsTries.length === 0 ? (
         <div className="mon-compte-block-empty">
-          <p className="mon-compte-block-empty-text">Aucun achat effectué pour le moment</p>
+          <p className="mon-compte-block-empty-text">
+            Aucun achat effectué pour le moment
+          </p>
         </div>
       ) : (
         <div className="gestion-achats-list">
@@ -94,10 +109,19 @@ const GestionAchatsBlock = ({ commandes }) => {
               <div className="gestion-achat-header">
                 <div className="gestion-achat-numero">
                   <span className="gestion-achat-label">Commande</span>
-                  <span className="gestion-achat-value">#{achat._id.slice(-8)}</span>
+                  <span className="gestion-achat-value">
+                    #{achat._id.slice(-8)}
+                  </span>
                 </div>
                 <div className="gestion-achat-date">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
@@ -108,7 +132,14 @@ const GestionAchatsBlock = ({ commandes }) => {
               <div className="gestion-achat-body">
                 <div className="gestion-achat-user">
                   <div className="gestion-achat-user-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                       <circle cx="12" cy="7" r="4" />
                     </svg>
@@ -118,10 +149,14 @@ const GestionAchatsBlock = ({ commandes }) => {
                       {achat.user?.prenom} {achat.user?.nom}
                     </p>
                     {achat.user?.email && (
-                      <p className="gestion-achat-user-email">{achat.user.email}</p>
+                      <p className="gestion-achat-user-email">
+                        {achat.user.email}
+                      </p>
                     )}
                     {achat.user?.telephone && (
-                      <p className="gestion-achat-user-phone">{achat.user.telephone}</p>
+                      <p className="gestion-achat-user-phone">
+                        {achat.user.telephone}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -134,12 +169,16 @@ const GestionAchatsBlock = ({ commandes }) => {
                         <li key={index} className="gestion-achat-produit-item">
                           {ligne.model_porsche_id && (
                             <span className="gestion-achat-produit-nom">
-                              🚗 {ligne.model_porsche_id.voiture?.nom_model || ligne.model_porsche_id.nom_model || 'Voiture neuve'}
+                              🚗{" "}
+                              {ligne.model_porsche_id.voiture?.nom_model ||
+                                ligne.model_porsche_id.nom_model ||
+                                "Voiture neuve"}
                             </span>
                           )}
                           {ligne.voiture && !ligne.model_porsche_id && (
                             <span className="gestion-achat-produit-nom">
-                              🚗 {ligne.voiture.nom_model} ({ligne.voiture.type_voiture || 'Occasion'})
+                              🚗 {ligne.voiture.nom_model} (
+                              {ligne.voiture.type_voiture || "Occasion"})
                             </span>
                           )}
                           {ligne.accesoire && (
@@ -168,7 +207,14 @@ const GestionAchatsBlock = ({ commandes }) => {
                       rel="noopener noreferrer"
                       className="gestion-achat-btn-facture"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                         <polyline points="14 2 14 8 20 8" />
                         <line x1="16" y1="13" x2="8" y2="13" />
@@ -192,10 +238,10 @@ const MonCompte = () => {
   const navigate = useNavigate();
   const { user, logout, isStaff } = useContext(AuthContext);
 
-  const [activeSection, setActiveSection] = useState('mes-produits');
+  const [activeSection, setActiveSection] = useState("mes-produits");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [reservations, setReservations] = useState([]);
   const [commandes, setCommandes] = useState([]);
@@ -205,32 +251,35 @@ const MonCompte = () => {
   const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
 
       const userId = user?._id || user?.id;
 
       const promises = [
         isStaff()
           ? commandeService.getAllReservations().catch(() => [])
-          : userId ? commandeService.getMyReservations(userId).catch(() => []) : Promise.resolve([]),
+          : userId
+            ? commandeService.getMyReservations(userId).catch(() => [])
+            : Promise.resolve([]),
         isStaff()
           ? commandeService.getAllCommandes().catch(() => [])
           : commandeService.getMyCommandes().catch(() => []),
         maVoitureService.getMesVoitures().catch(() => []),
       ];
 
-      const [reservationsData, commandesData, mesVoituresData] = await Promise.all(promises);
+      const [reservationsData, commandesData, mesVoituresData] =
+        await Promise.all(promises);
 
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       setCommandes(Array.isArray(commandesData) ? commandesData : []);
       setMesVoitures(Array.isArray(mesVoituresData) ? mesVoituresData : []);
       setUserData(user);
     } catch (err) {
-      setError(err.message || 'Erreur lors du chargement des données');
+      setError(err.message || "Erreur lors du chargement des données");
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, isStaff]);
 
   useEffect(() => {
     if (user) {
@@ -239,54 +288,60 @@ const MonCompte = () => {
   }, [user, fetchAllData]);
 
   const handleLogout = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+    if (window.confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
       logout();
-      navigate('/login');
+      navigate("/login");
     }
   };
 
   const handleAnnulerReservation = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+    if (
+      !window.confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")
+    ) {
       return;
     }
 
     try {
       await commandeService.cancelReservation(id);
-      setSuccess('Réservation annulée avec succès');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Réservation annulée avec succès");
+      setTimeout(() => setSuccess(""), 3000);
       fetchAllData();
     } catch (err) {
-      setError(err.message || 'Erreur lors de l\'annulation');
+      setError(err.message || "Erreur lors de l'annulation");
     }
   };
 
   const handleAccepterReservation = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir accepter cette réservation ?')) {
+    if (
+      !window.confirm("Êtes-vous sûr de vouloir accepter cette réservation ?")
+    ) {
       return;
     }
 
     try {
       await commandeService.acceptReservation(id);
-      setSuccess('Réservation acceptée avec succès');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Réservation acceptée avec succès");
+      setTimeout(() => setSuccess(""), 3000);
       fetchAllData();
     } catch (err) {
-      setError(err.message || 'Erreur lors de l\'acceptation');
+      setError(err.message || "Erreur lors de l'acceptation");
     }
   };
 
   const handleRefuserReservation = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir refuser cette réservation ?')) {
+    if (
+      !window.confirm("Êtes-vous sûr de vouloir refuser cette réservation ?")
+    ) {
       return;
     }
 
     try {
       await commandeService.refuseReservation(id);
-      setSuccess('Réservation refusée avec succès');
-      setTimeout(() => setSuccess(''), 3000);
+      setSuccess("Réservation refusée avec succès");
+      setTimeout(() => setSuccess(""), 3000);
       fetchAllData();
     } catch (err) {
-      setError(err.message || 'Erreur lors du refus');
+      setError(err.message || "Erreur lors du refus");
     }
   };
 
@@ -294,7 +349,7 @@ const MonCompte = () => {
     return (
       <div className="mon-compte-error">
         <p>Vous devez être connecté pour accéder à cette page</p>
-        <button onClick={() => navigate('/login')}>Se connecter</button>
+        <button onClick={() => navigate("/login")}>Se connecter</button>
       </div>
     );
   }
@@ -302,8 +357,6 @@ const MonCompte = () => {
   if (loading) {
     return <Loading fullScreen message="Chargement de votre compte..." />;
   }
-
-
 
   return (
     <div className="mon-compte-container">
@@ -313,16 +366,23 @@ const MonCompte = () => {
         {userData && (
           <div className="mon-compte-welcome">
             <p className="mon-compte-welcome-text">
-              Bonjour, {userData.prenom || userData.nom || 'Utilisateur'}
+              Bonjour, {userData.prenom || userData.nom || "Utilisateur"}
             </p>
           </div>
         )}
         <nav className="mon-compte-nav">
           <button
-            className={`mon-compte-nav-item ${activeSection === 'mes-produits' ? 'active' : ''}`}
-            onClick={() => setActiveSection('mes-produits')}
+            className={`mon-compte-nav-item ${activeSection === "mes-produits" ? "active" : ""}`}
+            onClick={() => setActiveSection("mes-produits")}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
@@ -331,9 +391,16 @@ const MonCompte = () => {
 
           <button
             className="mon-compte-nav-item"
-            onClick={() => navigate('/mes-commandes')}
+            onClick={() => navigate("/mes-commandes")}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
               <line x1="3" y1="6" x2="21" y2="6" />
               <path d="M16 10a4 4 0 0 1-8 0" />
@@ -342,10 +409,17 @@ const MonCompte = () => {
           </button>
 
           <button
-            className={`mon-compte-nav-item ${activeSection === 'parametres' ? 'active' : ''}`}
-            onClick={() => setActiveSection('parametres')}
+            className={`mon-compte-nav-item ${activeSection === "parametres" ? "active" : ""}`}
+            onClick={() => setActiveSection("parametres")}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -353,10 +427,17 @@ const MonCompte = () => {
           </button>
 
           <button
-            className={`mon-compte-nav-item ${activeSection === 'paiement' ? 'active' : ''}`}
-            onClick={() => setActiveSection('paiement')}
+            className={`mon-compte-nav-item ${activeSection === "paiement" ? "active" : ""}`}
+            onClick={() => setActiveSection("paiement")}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
               <line x1="1" y1="10" x2="23" y2="10" />
             </svg>
@@ -367,7 +448,14 @@ const MonCompte = () => {
             className="mon-compte-nav-item mon-compte-nav-logout"
             onClick={handleLogout}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -393,17 +481,19 @@ const MonCompte = () => {
           </div>
         )}
 
-        {activeSection === 'mes-produits' && (
+        {activeSection === "mes-produits" && (
           <div className="mon-compte-section">
             <h1 className="mon-compte-title">Mes produits</h1>
 
             <div className="mon-compte-block">
               <div className="mon-compte-block-header">
-                <h2 className="mon-compte-block-title">Mes réservations de voitures d'occasion</h2>
+                <h2 className="mon-compte-block-title">
+                  Mes réservations de voitures d'occasion
+                </h2>
                 <div className="mon-compte-block-actions">
                   <button
                     className="mon-compte-block-btn mon-compte-block-btn-primary"
-                    onClick={() => navigate('/catalogue/occasion')}
+                    onClick={() => navigate("/catalogue/occasion")}
                   >
                     Choisir une voiture d'occasion
                   </button>
@@ -412,7 +502,9 @@ const MonCompte = () => {
 
               {reservations.length === 0 ? (
                 <div className="mon-compte-block-empty">
-                  <p className="mon-compte-block-empty-text">Aucune réservation pour le moment</p>
+                  <p className="mon-compte-block-empty-text">
+                    Aucune réservation pour le moment
+                  </p>
                 </div>
               ) : (
                 <div className="mon-compte-reservations-list">
@@ -420,16 +512,23 @@ const MonCompte = () => {
                     const modelPorsche = reservation.model_porsche;
                     const voitureBase = modelPorsche?.voiture;
 
-                    const nomModele = voitureBase?.nom_model || '';
-                    const nomVariante = modelPorsche?.nom_model || '';
-                    const nomComplet = `Porsche ${nomModele} ${nomVariante}`.trim();
+                    const nomModele = voitureBase?.nom_model || "";
+                    const nomVariante = modelPorsche?.nom_model || "";
+                    const nomComplet =
+                      `Porsche ${nomModele} ${nomVariante}`.trim();
 
-                    const prix = modelPorsche?.prix_base_variante || modelPorsche?.prix_base || 0;
+                    const prix =
+                      modelPorsche?.prix_base_variante ||
+                      modelPorsche?.prix_base ||
+                      0;
 
                     let photoPrincipale = null;
-                    const photos = modelPorsche?.photo_porsche || voitureBase?.photo_voiture;
+                    const photos =
+                      modelPorsche?.photo_porsche || voitureBase?.photo_voiture;
                     if (Array.isArray(photos) && photos.length > 0) {
-                      const validPhotos = photos.filter(p => p && (p.name || p._id));
+                      const validPhotos = photos.filter(
+                        (p) => p && (p.name || p._id),
+                      );
                       if (validPhotos.length > 2) {
                         photoPrincipale = validPhotos[2];
                       } else if (validPhotos.length > 0) {
@@ -440,27 +539,39 @@ const MonCompte = () => {
                     const modelPorscheId = modelPorsche?._id;
 
                     const reservationUser = reservation.user;
-                    const concessionnaire = modelPorsche?.concessionnaire || 'Non spécifié';
+                    const concessionnaire =
+                      modelPorsche?.concessionnaire || "Non spécifié";
 
-                    const dateReservation = reservation.date_reservation ? new Date(reservation.date_reservation) : null;
-                    const dateFormatted = dateReservation ? dateReservation.toLocaleDateString('fr-FR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    }) : 'N/A';
-                    const heureFormatted = dateReservation ? dateReservation.toLocaleTimeString('fr-FR', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'N/A';
+                    const dateReservation = reservation.date_reservation
+                      ? new Date(reservation.date_reservation)
+                      : null;
+                    const dateFormatted = dateReservation
+                      ? dateReservation.toLocaleDateString("fr-FR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })
+                      : "N/A";
+                    const heureFormatted = dateReservation
+                      ? dateReservation.toLocaleTimeString("fr-FR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                      : "N/A";
 
                     return (
-                      <div key={reservation._id} className={`mon-compte-reservation-card ${isStaff() ? 'mon-compte-reservation-card-staff' : ''}`}>
+                      <div
+                        key={reservation._id}
+                        className={`mon-compte-reservation-card ${isStaff() ? "mon-compte-reservation-card-staff" : ""}`}
+                      >
                         {photoPrincipale && photoPrincipale.name ? (
                           <img
                             src={buildUrl(photoPrincipale.name)}
                             alt={nomComplet}
                             className="mon-compte-reservation-img"
-                            onError={(e) => { e.target.style.display = 'none'; }}
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
                           />
                         ) : (
                           <div className="mon-compte-reservation-placeholder">
@@ -474,19 +585,25 @@ const MonCompte = () => {
 
                           {isStaff() && reservationUser && (
                             <div className="mon-compte-reservation-user-info">
-                              <p className="mon-compte-reservation-user-label">Client :</p>
+                              <p className="mon-compte-reservation-user-label">
+                                Client :
+                              </p>
                               <p className="mon-compte-reservation-user-details">
                                 {reservationUser.nom} {reservationUser.prenom}
                               </p>
                               <p className="mon-compte-reservation-user-contact">
-                                {reservationUser.email} {reservationUser.telephone && `• ${reservationUser.telephone}`}
+                                {reservationUser.email}{" "}
+                                {reservationUser.telephone &&
+                                  `• ${reservationUser.telephone}`}
                               </p>
                             </div>
                           )}
 
                           {reservation.date_reservation && (
                             <p className="mon-compte-reservation-date">
-                              {isStaff() ? `Réservation : ${dateFormatted} à ${heureFormatted}` : `Date : ${dateFormatted} à ${heureFormatted}`}
+                              {isStaff()
+                                ? `Réservation : ${dateFormatted} à ${heureFormatted}`
+                                : `Date : ${dateFormatted} à ${heureFormatted}`}
                             </p>
                           )}
 
@@ -495,9 +612,13 @@ const MonCompte = () => {
                           </p>
 
                           <div className="mon-compte-reservation-status-container">
-                            <span className="mon-compte-reservation-status-label">Statut :</span>
-                            <span className={`mon-compte-reservation-status-badge ${reservation.status ? 'status-confirmed' : 'status-cancelled'}`}>
-                              {reservation.status ? 'Confirmée' : 'Annulée'}
+                            <span className="mon-compte-reservation-status-label">
+                              Statut :
+                            </span>
+                            <span
+                              className={`mon-compte-reservation-status-badge ${reservation.status ? "status-confirmed" : "status-cancelled"}`}
+                            >
+                              {reservation.status ? "Confirmée" : "Annulée"}
                             </span>
                           </div>
 
@@ -523,13 +644,17 @@ const MonCompte = () => {
                             <>
                               <button
                                 className="mon-compte-reservation-btn mon-compte-reservation-btn-accept"
-                                onClick={() => handleAccepterReservation(reservation._id)}
+                                onClick={() =>
+                                  handleAccepterReservation(reservation._id)
+                                }
                               >
                                 Accepter
                               </button>
                               <button
                                 className="mon-compte-reservation-btn mon-compte-reservation-btn-refuse"
-                                onClick={() => handleRefuserReservation(reservation._id)}
+                                onClick={() =>
+                                  handleRefuserReservation(reservation._id)
+                                }
                               >
                                 Refuser
                               </button>
@@ -537,7 +662,9 @@ const MonCompte = () => {
                           ) : (
                             <button
                               className="mon-compte-reservation-btn mon-compte-reservation-btn-delete"
-                              onClick={() => handleAnnulerReservation(reservation._id)}
+                              onClick={() =>
+                                handleAnnulerReservation(reservation._id)
+                              }
                             >
                               Supprimer
                             </button>
@@ -557,7 +684,7 @@ const MonCompte = () => {
                 <div className="mon-compte-block-actions">
                   <button
                     className="mon-compte-block-btn mon-compte-block-btn-primary"
-                    onClick={() => navigate('/ajouter-ma-voiture')}
+                    onClick={() => navigate("/ajouter-ma-voiture")}
                   >
                     Ajouter ma voiture
                   </button>
@@ -566,33 +693,47 @@ const MonCompte = () => {
 
               {mesVoitures.length === 0 ? (
                 <div className="mon-compte-block-empty">
-                  <p className="mon-compte-block-empty-text">Aucune voiture ajoutée pour le moment</p>
+                  <p className="mon-compte-block-empty-text">
+                    Aucune voiture ajoutée pour le moment
+                  </p>
                 </div>
               ) : (
                 <div className="mon-compte-reservations-list">
                   {mesVoitures.map((voiture) => {
                     const modelPorsche = voiture.model_porsche;
-                    const nomModele = modelPorsche?.nom_model || voiture.nom_model || '';
-                    const typeCarrosserie = modelPorsche?.type_carrosserie || voiture.type_carrosserie || '';
-                    const nomComplet = `Porsche ${nomModele} ${typeCarrosserie}`.trim();
+                    const nomModele =
+                      modelPorsche?.nom_model || voiture.nom_model || "";
+                    const typeCarrosserie =
+                      modelPorsche?.type_carrosserie ||
+                      voiture.type_carrosserie ||
+                      "";
+                    const nomComplet =
+                      `Porsche ${nomModele} ${typeCarrosserie}`.trim();
 
                     let photoPrincipale = null;
                     const photos = voiture.photo_voiture_actuel;
                     if (Array.isArray(photos) && photos.length > 0) {
-                      const validPhotos = photos.filter(p => p && (p.name || p._id));
+                      const validPhotos = photos.filter(
+                        (p) => p && (p.name || p._id),
+                      );
                       if (validPhotos.length > 0) {
                         photoPrincipale = validPhotos[0];
                       }
                     }
 
                     return (
-                      <div key={voiture._id} className="mon-compte-reservation-card">
+                      <div
+                        key={voiture._id}
+                        className="mon-compte-reservation-card"
+                      >
                         {photoPrincipale && photoPrincipale.name ? (
                           <img
                             src={buildUrl(photoPrincipale.name)}
                             alt={nomComplet}
                             className="mon-compte-reservation-img"
-                            onError={(e) => { e.target.style.display = 'none'; }}
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
                           />
                         ) : (
                           <div className="mon-compte-reservation-placeholder">
@@ -612,7 +753,8 @@ const MonCompte = () => {
 
                           {voiture.kilometrage && (
                             <p className="mon-compte-reservation-concessionnaire">
-                              Kilométrage : {voiture.kilometrage.toLocaleString()} km
+                              Kilométrage :{" "}
+                              {voiture.kilometrage.toLocaleString()} km
                             </p>
                           )}
 
@@ -627,27 +769,40 @@ const MonCompte = () => {
                         <div className="mon-compte-reservation-actions">
                           <button
                             className="mon-compte-reservation-btn mon-compte-reservation-btn-view"
-                            onClick={() => navigate(`/mes-voitures/${voiture._id}`)}
+                            onClick={() =>
+                              navigate(`/mes-voitures/${voiture._id}`)
+                            }
                           >
                             Voir
                           </button>
                           <button
                             className="mon-compte-reservation-btn mon-compte-reservation-btn-view"
-                            onClick={() => navigate(`/mes-voitures/${voiture._id}/modifier`)}
+                            onClick={() =>
+                              navigate(`/mes-voitures/${voiture._id}/modifier`)
+                            }
                           >
                             Modifier
                           </button>
                           <button
                             className="mon-compte-reservation-btn mon-compte-reservation-btn-delete"
                             onClick={async () => {
-                              if (window.confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
+                              if (
+                                window.confirm(
+                                  "Êtes-vous sûr de vouloir supprimer cette voiture ?",
+                                )
+                              ) {
                                 try {
-                                  await maVoitureService.supprimerMaVoiture(voiture._id);
-                                  setSuccess('Voiture supprimée avec succès');
-                                  setTimeout(() => setSuccess(''), 3000);
+                                  await maVoitureService.supprimerMaVoiture(
+                                    voiture._id,
+                                  );
+                                  setSuccess("Voiture supprimée avec succès");
+                                  setTimeout(() => setSuccess(""), 3000);
                                   fetchAllData();
                                 } catch (err) {
-                                  setError(err.message || 'Erreur lors de la suppression');
+                                  setError(
+                                    err.message ||
+                                    "Erreur lors de la suppression",
+                                  );
                                 }
                               }
                             }}
@@ -678,19 +833,41 @@ const MonCompte = () => {
                 <div className="mon-compte-admin-actions">
                   <button
                     className="mon-compte-admin-btn mon-compte-admin-btn-add"
-                    onClick={() => navigate('/occasion/ajouter')}
+                    onClick={() => navigate("/occasion/ajouter")}
                   >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10 4V16M4 10H16"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
                     </svg>
                     Ajouter une voiture Occasion
                   </button>
                   <button
                     className="mon-compte-admin-btn mon-compte-admin-btn-manage"
-                    onClick={() => navigate('/accessoires/ajouter')}
+                    onClick={() => navigate("/accessoires/ajouter")}
                   >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10 4V16M4 10H16"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
                     </svg>
                     Ajouter un accessoire
                   </button>
@@ -700,17 +877,21 @@ const MonCompte = () => {
           </div>
         )}
 
-        {activeSection === 'parametres' && (
+        {activeSection === "parametres" && (
           <div className="mon-compte-section">
             <h1 className="mon-compte-title">Paramètres de votre compte</h1>
 
             <div className="mon-compte-settings">
               {userData && (
                 <div className="mon-compte-settings-group">
-                  <h2 className="mon-compte-settings-title">Informations personnelles</h2>
+                  <h2 className="mon-compte-settings-title">
+                    Informations personnelles
+                  </h2>
 
                   <div className="mon-compte-settings-item">
-                    <span className="mon-compte-settings-label">Nom complet</span>
+                    <span className="mon-compte-settings-label">
+                      Nom complet
+                    </span>
                     <p className="mon-compte-settings-value">
                       {userData.prenom} {userData.nom}
                     </p>
@@ -718,13 +899,19 @@ const MonCompte = () => {
 
                   <div className="mon-compte-settings-item">
                     <span className="mon-compte-settings-label">Email</span>
-                    <p className="mon-compte-settings-value">{userData.email}</p>
+                    <p className="mon-compte-settings-value">
+                      {userData.email}
+                    </p>
                   </div>
 
                   {userData.telephone && (
                     <div className="mon-compte-settings-item">
-                      <span className="mon-compte-settings-label">Téléphone</span>
-                      <p className="mon-compte-settings-value">{userData.telephone}</p>
+                      <span className="mon-compte-settings-label">
+                        Téléphone
+                      </span>
+                      <p className="mon-compte-settings-value">
+                        {userData.telephone}
+                      </p>
                     </div>
                   )}
 
@@ -743,7 +930,7 @@ const MonCompte = () => {
               <div className="mon-compte-settings-actions">
                 <button
                   className="mon-compte-settings-btn"
-                  onClick={() => navigate('/mon-compte/modifier')}
+                  onClick={() => navigate("/mon-compte/modifier")}
                 >
                   Modifier mes informations
                 </button>
@@ -752,13 +939,21 @@ const MonCompte = () => {
           </div>
         )}
 
-        {activeSection === 'paiement' && (
+        {activeSection === "paiement" && (
           <div className="mon-compte-section">
             <h1 className="mon-compte-title">Mode de paiement</h1>
 
             <div className="mon-compte-payment">
               <div className="mon-compte-payment-empty">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mon-compte-payment-icon">
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="mon-compte-payment-icon"
+                >
                   <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                   <line x1="1" y1="10" x2="23" y2="10" />
                 </svg>
@@ -767,7 +962,7 @@ const MonCompte = () => {
                 </p>
                 <button
                   className="mon-compte-payment-btn"
-                  onClick={() => navigate('/paiement/ajouter')}
+                  onClick={() => navigate("/paiement/ajouter")}
                 >
                   Ajouter un mode de paiement
                 </button>
@@ -775,7 +970,6 @@ const MonCompte = () => {
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

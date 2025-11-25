@@ -1,3 +1,8 @@
+/**
+ * Modèle Photo Accesoire
+ * - Représente une image liée à un accessoire (chemin, alt, couleur associée)
+ * - Utilisé pour afficher les images dans le catalogue frontend
+ */
 import mongoose from "mongoose";
 
 const photo_accesoireSchema = new mongoose.Schema(

@@ -1,3 +1,8 @@
+/**
+ * Modèle Siège
+ * - Définit les types de sièges et leurs options (ventilation, chauffage, prix)
+ * - Utilisé pour personnaliser l'intérieur d'une configuration Porsche
+ */
 import mongoose from "mongoose";
 import { TYPES_SIEGE } from "../utils/siege.constants.js";
 

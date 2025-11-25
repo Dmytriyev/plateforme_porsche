@@ -17,7 +17,7 @@ router.post(
   "/checkout/:id",
   auth,
   validateObjectId("id"), // id de la commande
-  createCheckoutSession
+  createCheckoutSession,
 );
 
 export default router;

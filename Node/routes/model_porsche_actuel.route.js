@@ -31,7 +31,7 @@ router.put(
   auth,
   validateObjectId("id"),
   optionalUpload,
-  updateModel_porsche_actuel
+  updateModel_porsche_actuel,
 );
 router.patch("/addImages/:id", auth, validateObjectId("id"), addImages);
 router.patch("/removeImages/:id", auth, validateObjectId("id"), removeImages);
@@ -39,26 +39,26 @@ router.patch(
   "/setCouleurExterieur/:id",
   auth,
   validateObjectId("id"),
-  setCouleurExterieur
+  setCouleurExterieur,
 );
 router.patch(
   "/setCouleurInterieur/:id",
   auth,
   validateObjectId("id"),
-  setCouleurInterieur
+  setCouleurInterieur,
 );
 router.patch(
   "/setTailleJante/:id",
   auth,
   validateObjectId("id"),
-  setTailleJante
+  setTailleJante,
 );
 
 router.delete(
   "/delete/:id",
   auth,
   validateObjectId("id"),
-  deleteModel_porsche_actuel
+  deleteModel_porsche_actuel,
 );
 
 export default router;

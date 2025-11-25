@@ -1,3 +1,7 @@
+/**
+ * Contrôleur Couleur Exterieure
+ * - Gère les couleurs extérieures des modèles : CRUD et validation des photos
+ */
 import Couleur_exterieur from "../models/couleur_exterieur.model.js";
 import couleur_exterieurValidation from "../validations/couleur_exterieur.validation.js";
 import { getAvailableCouleursExterieur } from "../utils/couleur_exterieur.constants.js";

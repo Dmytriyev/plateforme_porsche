@@ -1,3 +1,8 @@
+/*
+ * css/components/Button.css — Classe pour les boutons standardisés.
+ * CSS file: css/components/Button.css
+ */
+
 .btn-primary {
   padding: var(--spacing-sm) var(--spacing-lg);
   font-size: var(--font-size-button);
@@ -53,7 +58,9 @@
   box-shadow: var(--shadow-md);
 }
 
-.btn-secondary:active { transform: translateY(0); }
+.btn-secondary:active {
+  transform: translateY(0);
+}
 
 .btn-secondary:disabled {
   border-color: var(--color-grey-disabled);

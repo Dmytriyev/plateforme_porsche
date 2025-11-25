@@ -31,14 +31,14 @@ router.put(
   isAdmin,
   validateObjectId("id"),
   optionalUpload,
-  updatePackage
+  updatePackage,
 );
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),
-  deletePackage
+  deletePackage,
 );
 
 export default router;

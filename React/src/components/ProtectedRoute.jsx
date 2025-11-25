@@ -1,8 +1,18 @@
-import { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext.jsx';
-import { Loading } from './common';
-import '../css/ProtectedRoute.css';
+/**
+ * ProtectedRoute.jsx — Route protégée par authentification et rôles
+ *
+ * Notes pédagogiques :
+ * - Vérifie d'abord l'état `loading` pour ne pas rediriger prématurément.
+ * - `isAuthenticated()` contrôle si l'utilisateur est connecté.
+ * - `roles` permet d'illustrer la séparation responsabilités :
+ *   la route déclare l'accès, le composant gère l'UI (refus/redirect).
+ */
+
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext.jsx";
+import { Loading } from "./common";
+import "../css/ProtectedRoute.css";
 
 const ProtectedRoute = ({ children, roles }) => {
   const { loading, isAuthenticated, hasRole } = useContext(AuthContext);
@@ -16,9 +26,12 @@ const ProtectedRoute = ({ children, roles }) => {
         <div className="protected-route-content">
           <h1 className="protected-route-title">Accès refusé</h1>
           <p className="protected-route-message">
-            Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+            Vous n'avez pas les permissions nécessaires pour accéder à cette
+            page.
           </p>
-          <a href="/" className="protected-route-link">Retour à l'accueil</a>
+          <a href="/" className="protected-route-link">
+            Retour à l'accueil
+          </a>
         </div>
       </div>
     );

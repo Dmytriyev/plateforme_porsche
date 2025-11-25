@@ -1,3 +1,8 @@
+/**
+ * Middleware Optional Upload
+ * - Permet d'accepter une requête multipart/form-data seulement si nécessaire
+ * - Transforme `req.files` en `req.file` quand un seul fichier est fourni
+ */
 import { upload } from "./multer.js";
 
 const optionalUpload = (req, res, next) => {

@@ -38,7 +38,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateAccesoire
+  updateAccesoire,
 );
 
 // Gestion des images
@@ -48,14 +48,14 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  addImages
+  addImages,
 );
 router.patch(
   "/removeImages/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  removeImages
+  removeImages,
 );
 
 // Gestion des couleurs (Many-to-One)
@@ -64,21 +64,21 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"), // id accesoire
-  setCouleur
+  setCouleur,
 );
 router.patch(
   "/removeCouleur/:id",
   auth,
   isStaff,
   validateObjectId("id"), // id accesoire
-  removeCouleur
+  removeCouleur,
 );
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"), // id accesoire
-  deleteAccesoire
+  deleteAccesoire,
 );
 
 export default router;

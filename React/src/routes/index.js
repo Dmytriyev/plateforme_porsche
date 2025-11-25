@@ -1,3 +1,14 @@
+/**
+ * routes/index.js — Définition des routes React Router
+ *
+ * Notes pédagogiques :
+ * - `routes` contient les chemins publics et `protectedRoutes` les chemins
+ *   nécessitant authentification. Le routage est configuré dynamiquement dans `App.jsx`.
+ * - `getMenuItems` filtre les routes pour construire la navigation principale.
+ * - Avantage pédagogique : séparer la déclaration des routes de leur rendu facilite
+ *   la maintenance et la génération automatique du menu.
+ */
+
 export const routes = [
   { path: "/", elementName: "Home", title: "Accueil" },
   { path: "/login", elementName: "Login", title: "Login", hideFromMenu: true },

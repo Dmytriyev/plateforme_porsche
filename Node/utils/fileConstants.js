@@ -1,8 +1,13 @@
+/**
+ * Utilitaires fichiers
+ * - Fonctions pour manipuler et supprimer en toute sécurité les fichiers
+ *   uploadés (chemins, suppression, sécurité côté serveur)
+ */
 // Constantes et utilitaires pour la gestion sécurisée des fichiers uploadés
-import fs from "node:fs";
-import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fs from "node:fs";
 import logger from "./logger.js";
+import path from "node:path";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);

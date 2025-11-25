@@ -1,3 +1,14 @@
+/**
+ * services/token.service.js — Gestion simple du token d'authentification
+ *
+ * Notes pédagogiques :
+ * - Stocker le token en `sessionStorage` (plutôt que localStorage) ici pour limiter
+ *   la persistance entre onglets de navigation; dépend des besoins de l'app.
+ * - `MEMORY` évite des lectures répétées depuis sessionStorage (optimisation).
+ * - Ne jamais mettre de logique sensible côté client ; le token permet juste
+ *   d'authentifier les appels API côté serveur.
+ */
+
 const MEMORY = { token: null };
 
 const TokenService = {
@@ -9,7 +20,10 @@ const TokenService = {
       } else {
         sessionStorage.removeItem("auth_token");
       }
-    } catch {}
+    } catch (err) {
+      // sessionStorage may be unavailable (privacy mode) — silently ignore
+      // console.debug('token.setToken sessionStorage unavailable', err);
+    }
   },
 
   getToken() {
@@ -18,7 +32,8 @@ const TokenService = {
       const token = sessionStorage.getItem("auth_token");
       if (token) MEMORY.token = token;
       return token;
-    } catch {
+    } catch (err) {
+      // sessionStorage unavailable or access denied
       return null;
     }
   },
@@ -27,7 +42,10 @@ const TokenService = {
     MEMORY.token = null;
     try {
       sessionStorage.removeItem("auth_token");
-    } catch {}
+    } catch (err) {
+      // ignore sessionStorage errors during clear
+      // console.debug('token.clear sessionStorage unavailable', err);
+    }
   },
 };
 

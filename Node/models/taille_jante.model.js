@@ -1,3 +1,8 @@
+/**
+ * Modèle Taille Jante
+ * - Définit les options de jantes (taille, couleur, prix)
+ * - Sert à calculer l'impact prix d'une configuration
+ */
 import mongoose from "mongoose";
 import { TAILLES_JANTE, COULEURS_JANTE } from "../utils/jante.constants.js";
 

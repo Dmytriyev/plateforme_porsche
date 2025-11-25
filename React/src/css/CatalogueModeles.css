@@ -1,3 +1,8 @@
+/*
+ * CatalogueModeles.css — Styles pour le catalogue de modèles (grille / filtres).
+ * Notes pédagogiques : séparer la grille des contrôles de filtre pour faciliter la maintenance.
+ */
+
 .catalogue-modeles-header {
   margin-bottom: 3rem;
   padding-left: 2rem;
@@ -137,7 +142,6 @@
   color: #6b7280;
 }
 
-
 .catalogue-modele-btn-porsche {
   width: 100%;
   padding: 1rem 1.5rem;
@@ -160,7 +164,6 @@
 .catalogue-modele-btn-porsche:active {
   transform: scale(0.98);
 }
-
 
 @media (max-width: 1024px) {
   .catalogue-modeles-grid,

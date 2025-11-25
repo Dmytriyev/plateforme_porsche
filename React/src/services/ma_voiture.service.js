@@ -1,3 +1,9 @@
+/**
+ * services/ma_voiture.service.js — Endpoints pour voitures utilisateur.
+ *
+ * @file services/ma_voiture.service.js
+ */
+
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 
@@ -24,7 +30,7 @@ const maVoitureService = {
     apiRequest(() =>
       apiClient.post("/photo-voiture-actuel/new", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      })
+      }),
     ),
 
   supprimerPhoto: (id) =>
@@ -32,7 +38,7 @@ const maVoitureService = {
 
   supprimerPhotos: (id, data) =>
     apiRequest(() =>
-      apiClient.patch(`/model_porsche_actuel/removeImages/${id}`, data)
+      apiClient.patch(`/model_porsche_actuel/removeImages/${id}`, data),
     ),
 };
 

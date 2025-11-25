@@ -1,3 +1,8 @@
+/**
+ * Middleware de validation d'ObjectId
+ * - Vérifie que le paramètre d'URL fourni est un ObjectId MongoDB valide
+ * - Protège contre les injections NoSQL et erreurs de conversion
+ */
 import mongoose from "mongoose";
 // Protège contre les injections NoSQL en validant les IDs MongoDB
 const validateObjectId = (paramName = "id") => {

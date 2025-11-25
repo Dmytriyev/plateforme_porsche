@@ -1,10 +1,14 @@
+/**
+ * Contrôleur Photo Porsche
+ * - Gère les images des configurations Porsche : upload, association et nettoyage
+ */
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+import logger from "../utils/logger.js";
+import Model_porsche from "../models/model_porsche.model.js";
+import path from "node:path";
 import Photo_porsche from "../models/photo_porsche.model.js";
 import photo_porscheValidation from "../validations/photo_porsche.validation.js";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import Model_porsche from "../models/model_porsche.model.js";
-import logger from "../utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

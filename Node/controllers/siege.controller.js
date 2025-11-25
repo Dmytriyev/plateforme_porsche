@@ -1,3 +1,8 @@
+/**
+ * Contrôleur Siège
+ * - Gère les types de sièges disponibles : création, validation,
+ *   upload d'images et lecture des options
+ */
 import Siege from "../models/siege.model.js";
 import siegeValidation from "../validations/siege.validation.js";
 import {

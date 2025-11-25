@@ -1,7 +1,14 @@
-// - createCheckoutSession construit les line_items depuis les lignes de commande (acompte ou prix)
-// - webhookHandler vérifie la signature (raw body) et met à jour la commande après paiement
-import * as paymentService from "../services/payment.service.js";
+/**
+ * controllers/payment.controller.js — Routes liées à Stripe (checkout + webhook).
+ *
+ * Notes pédagogiques :
+ * - `createCheckoutSession` construit les `line_items` à partir des lignes de commande
+ *   et retourne la session Stripe (id/url) pour le frontend.
+ * - `webhookHandler` doit être reçu via `express.raw` pour vérifier la signature
+ *   et doit être idempotent (ne pas retraiter une commande déjà marquée payée).
+ */
 import logger from "../utils/logger.js";
+import * as paymentService from "../services/payment.service.js";
 
 export const createCheckoutSession = async (req, res) => {
   try {

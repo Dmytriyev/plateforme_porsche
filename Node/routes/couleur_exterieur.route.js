@@ -32,7 +32,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateCouleurExterieur
+  updateCouleurExterieur,
 );
 
 // ============================================
@@ -43,7 +43,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteCouleurExterieur
+  deleteCouleurExterieur,
 );
 
 export default router;

@@ -1,3 +1,8 @@
+/**
+ * Modèle Model_porsche_actuel
+ * - Représente une annonce/voiture actuelle (occasion) avec ses options
+ * - Utilisé pour les annonces côté utilisateur et gestion par le propriétaire
+ */
 import mongoose from "mongoose";
 import {
   TYPES_CARROSSERIE_ACTUEL,

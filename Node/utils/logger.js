@@ -1,7 +1,21 @@
+/**
+ * Logger simple
+ * - Wrapper minimal autour de console pour centraliser les niveaux de logs
+ * - En production on peut remplacer par pino/winston sans changer l'API
+ */
+/**
+ * Logger simple
+ * - Wrapper minimal autour de console pour uniformiser les niveaux
+ * - En production on peut remplacer par Winston/ pino pour log structuré
+ */
+const isProduction = process.env.NODE_ENV === "production";
+
+const noop = () => {};
+
 const logger = {
-  info: (...args) => console.log("[INFO]", ...args),
-  warn: (...args) => console.warn("[WARN]", ...args),
-  error: (...args) => console.error("[ERROR]", ...args),
+  info: isProduction ? noop : (...args) => console.log("[INFO]", ...args),
+  warn: isProduction ? noop : (...args) => console.warn("[WARN]", ...args),
+  error: isProduction ? noop : (...args) => console.error("[ERROR]", ...args),
 };
 
 export default logger;

@@ -1,9 +1,13 @@
+/**
+ * Contrôleur Photo Accesoire
+ * - Gère l'upload et la gestion des images d'accessoires
+ */
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+import logger from "../utils/logger.js";
+import path from "node:path";
 import Photo_accesoire from "../models/photo_accesoire.model.js";
 import photo_accesoireValidation from "../validations/photo_accesoire.validation.js";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import logger from "../utils/logger.js";
 
 // Pour obtenir le nom du fichier courant
 const __filename = fileURLToPath(import.meta.url);

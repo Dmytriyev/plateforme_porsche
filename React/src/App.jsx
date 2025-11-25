@@ -1,45 +1,66 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.jsx';
-import Navbar from './components/layout/Navbar.jsx';
-import Footer from './components/layout/Footer.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
-import ErrorBoundary from './components/ErrorBoundary.jsx';
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import ChoixVoiture from './pages/ChoixVoiture.jsx';
-import CatalogueModeles from './pages/CatalogueModeles.jsx';
-import ListeVariantes from './pages/ListeVariantes.jsx';
-import VariantePage from './pages/VariantePage.jsx';
-import OccasionPage from './pages/OccasionPage.jsx';
-import Configurateur from './pages/Configurateur.jsx';
-import Accessoires from './pages/Accessoires.jsx';
-import AccessoireDetail from './pages/AccessoireDetail.jsx';
-import AjouterAccessoire from './pages/AjouterAccessoire.jsx';
-import ModifierAccessoire from './pages/ModifierAccessoire.jsx';
-import Panier from './pages/Panier.jsx';
-import MonCompte from './pages/MonCompte.jsx';
-import ModifierMonCompte from './pages/ModifierMonCompte.jsx';
-import MesVoitures from './pages/MesVoitures.jsx';
-import MaVoitureDetail from './pages/MaVoitureDetail.jsx';
-import ModifierMaVoiture from './pages/ModifierMaVoiture.jsx';
-import AjouterMaVoiture from './pages/AjouterMaVoiture.jsx';
-import AjouterModelPorsche from './pages/AjouterModelPorsche.jsx';
-import ModifierModelPorsche from './pages/ModifierModelPorsche.jsx';
-import MesCommandes from './pages/MesCommandes.jsx';
-import Checkout from './pages/Checkout.jsx';
-import PaymentSuccess from './pages/PaymentSuccess.jsx';
-import PaymentCancel from './pages/PaymentCancel.jsx';
-import { routes, protectedRoutes } from './routes/index.js';
-import './css/App.css';
+// App.jsx — Composant racine de l'application React
+import AccessoireDetail from "./pages/AccessoireDetail.jsx";
+import Accessoires from "./pages/Accessoires.jsx";
+import AjouterAccessoire from "./pages/AjouterAccessoire.jsx";
+import AjouterMaVoiture from "./pages/AjouterMaVoiture.jsx";
+import AjouterModelPorsche from "./pages/AjouterModelPorsche.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import CatalogueModeles from "./pages/CatalogueModeles.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import ChoixVoiture from "./pages/ChoixVoiture.jsx";
+import Configurateur from "./pages/Configurateur.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import Footer from "./components/layout/Footer.jsx";
+import Home from "./pages/Home.jsx";
+import ListeVariantes from "./pages/ListeVariantes.jsx";
+import Login from "./pages/Login.jsx";
+import MaVoitureDetail from "./pages/MaVoitureDetail.jsx";
+import MesCommandes from "./pages/MesCommandes.jsx";
+import MesVoitures from "./pages/MesVoitures.jsx";
+import ModifierAccessoire from "./pages/ModifierAccessoire.jsx";
+import ModifierMaVoiture from "./pages/ModifierMaVoiture.jsx";
+import ModifierModelPorsche from "./pages/ModifierModelPorsche.jsx";
+import ModifierMonCompte from "./pages/ModifierMonCompte.jsx";
+import MonCompte from "./pages/MonCompte.jsx";
+import Navbar from "./components/layout/Navbar.jsx";
+import OccasionPage from "./pages/OccasionPage.jsx";
+import Panier from "./pages/Panier.jsx";
+import PaymentCancel from "./pages/PaymentCancel.jsx";
+import PaymentSuccess from "./pages/PaymentSuccess.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Register from "./pages/Register.jsx";
+import { routes, protectedRoutes } from "./routes/index.js";
+import VariantePage from "./pages/VariantePage.jsx";
+import "./css/App.css";
 
 const components = {
-  Home, Login, Register, ChoixVoiture, CatalogueModeles, ListeVariantes,
-  VariantePage, OccasionPage, Configurateur, Accessoires, AccessoireDetail,
-  AjouterAccessoire, ModifierAccessoire, Panier, MonCompte, ModifierMonCompte,
-  MesVoitures, MaVoitureDetail, ModifierMaVoiture, AjouterMaVoiture,
-  AjouterModelPorsche, ModifierModelPorsche, MesCommandes, Checkout,
-  PaymentSuccess, PaymentCancel,
+  AccessoireDetail,
+  Accessoires,
+  AjouterAccessoire,
+  AjouterMaVoiture,
+  AjouterModelPorsche,
+  CatalogueModeles,
+  Checkout,
+  ChoixVoiture,
+  Configurateur,
+  Home,
+  ListeVariantes,
+  Login,
+  MaVoitureDetail,
+  MesCommandes,
+  MesVoitures,
+  ModifierAccessoire,
+  ModifierMaVoiture,
+  ModifierModelPorsche,
+  ModifierMonCompte,
+  MonCompte,
+  OccasionPage,
+  Panier,
+  PaymentCancel,
+  PaymentSuccess,
+  Register,
+  VariantePage,
 };
 
 function App() {
@@ -50,21 +71,30 @@ function App() {
           <div className="app-container">
             <Navbar />
             <main className="app-main">
+
               <Routes>
                 {routes.map(({ path, elementName }) => {
                   const Component = components[elementName];
-                  return <Route key={path} path={path} element={<Component />} />;
+                  return (
+                    <Route key={path} path={path} element={<Component />} />
+                  );
                 })}
+
                 {protectedRoutes.map(({ path, elementName, roles }) => {
                   const Component = components[elementName];
                   return (
                     <Route
                       key={path}
                       path={path}
-                      element={<ProtectedRoute roles={roles}><Component /></ProtectedRoute>}
+                      element={
+                        <ProtectedRoute roles={roles}>
+                          <Component />
+                        </ProtectedRoute>
+                      }
                     />
                   );
                 })}
+
                 <Route
                   path="*"
                   element={
@@ -72,7 +102,9 @@ function App() {
                       <div className="page-404-content">
                         <h1 className="page-404-title">404</h1>
                         <p className="page-404-text">Page non trouvée</p>
-                        <Link to="/" className="page-404-link">Retour à l'accueil</Link>
+                        <Link to="/" className="page-404-link">
+                          Retour à l'accueil
+                        </Link>
                       </div>
                     </div>
                   }

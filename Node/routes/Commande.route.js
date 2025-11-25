@@ -39,13 +39,13 @@ router.delete(
   "/delete/ligne/:ligne_id",
   auth,
   validateObjectId("ligne_id"),
-  supprimerLignePanier
+  supprimerLignePanier,
 );
 router.patch(
   "/updateQuantite/ligne/:ligne_id",
   auth,
   validateObjectId("ligne_id"),
-  modifierQuantitePanier
+  modifierQuantitePanier,
 );
 
 // ============================================

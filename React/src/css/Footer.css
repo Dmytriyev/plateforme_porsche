@@ -1,3 +1,8 @@
+/*
+ * css/Footer.css — Styles du footer (grille, typographie réduite).
+ * CSS file: css/Footer.css
+ */
+
 .footer {
   background-color: var(--color-black);
   color: var(--color-white);

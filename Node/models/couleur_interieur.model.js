@@ -1,5 +1,10 @@
-import mongoose from "mongoose";
+/**
+ * Modèle Couleur Intérieure
+ * - Liste des couleurs intérieures disponibles (nom, image, prix)
+ * - Référencé par les configurations de variantes Porsche
+ */
 import { COULEURS_INTERIEUR } from "../utils/couleur_interieur.constants.js";
+import mongoose from "mongoose";
 
 const couleur_interieurSchema = new mongoose.Schema(
   {

@@ -32,7 +32,7 @@ export const calculerPrixTotalModelPorsche = async (modelPorscheId) => {
     const prixCouleursInterieur = Array.isArray(couleursInterieur)
       ? couleursInterieur.reduce(
           (sum, couleur) => sum + (Number(couleur?.prix) || 0),
-          0
+          0,
         )
       : Number(couleursInterieur?.prix) || 0;
 
@@ -86,7 +86,7 @@ export const enrichirLigneAvecModelPorsche = async (ligne) => {
     try {
       // Récupère les détails de prix (prix de base + options)
       const prixDetails = await calculerPrixTotalModelPorsche(
-        ligneObj.model_porsche_id
+        ligneObj.model_porsche_id,
       );
       ligneObj.model_porsche_details = prixDetails;
     } catch (error) {

@@ -1,17 +1,27 @@
-import { useNavigate } from 'react-router-dom';
-import '../css/CatalogueModeles.css';
-import '../css/ChoixVoiture.css';
+/**
+ * pages/ChoixVoiture.jsx — Page simple pour choisir 'neuve' ou 'occasion'.
+ *
+ * Notes pédagogiques :
+ * - Montre une page minimale qui gère uniquement la navigation (séparation UI/logic).
+ * - Utile pour apprendre quand extraire logique vers des services/hooks.
+ *
+ * @file pages/ChoixVoiture.jsx
+ */
+
+import { useNavigate } from "react-router-dom";
+import "../css/CatalogueModeles.css";
+import "../css/ChoixVoiture.css";
 
 const ChoixVoiture = () => {
   const navigate = useNavigate();
-  const imageStatic = '/Logo/Logo_porsche_black.jpg';
+  const imageStatic = "/Logo/Logo_porsche_black.jpg";
 
   const handleConfigurer = () => {
-    navigate('/catalogue/neuve');
+    navigate("/catalogue/neuve");
   };
 
   const handleReserver = () => {
-    navigate('/catalogue/occasion');
+    navigate("/catalogue/occasion");
   };
 
   const imageNeuveUrl = imageStatic;
@@ -26,9 +36,7 @@ const ChoixVoiture = () => {
 
         <div className="choix-grid-porsche">
           <div className="catalogue-modele-card-neuf-porsche">
-            <h2 className="catalogue-modele-title-porsche">
-              Voiture Neuve
-            </h2>
+            <h2 className="catalogue-modele-title-porsche">Voiture Neuve</h2>
 
             <div className="catalogue-modele-image-porsche">
               {imageNeuveUrl ? (
@@ -37,16 +45,16 @@ const ChoixVoiture = () => {
                   alt="Porsche Neuve"
                   className="catalogue-modele-img-porsche"
                   onError={(e) => {
-                    e.target.style.display = 'none';
+                    e.target.style.display = "none";
                     if (e.target.nextSibling) {
-                      e.target.nextSibling.style.display = 'flex';
+                      e.target.nextSibling.style.display = "flex";
                     }
                   }}
                 />
               ) : null}
               <div
                 className="catalogue-modele-placeholder-porsche"
-                style={{ display: imageNeuveUrl ? 'none' : 'flex' }}
+                style={{ display: imageNeuveUrl ? "none" : "flex" }}
               >
                 <span className="catalogue-modele-letter-porsche">N</span>
               </div>
@@ -73,16 +81,16 @@ const ChoixVoiture = () => {
                   alt="Porsche Occasion"
                   className="catalogue-modele-img-porsche"
                   onError={(e) => {
-                    e.target.style.display = 'none';
+                    e.target.style.display = "none";
                     if (e.target.nextSibling) {
-                      e.target.nextSibling.style.display = 'flex';
+                      e.target.nextSibling.style.display = "flex";
                     }
                   }}
                 />
               ) : null}
               <div
                 className="catalogue-modele-placeholder-porsche"
-                style={{ display: imageOccasionUrl ? 'none' : 'flex' }}
+                style={{ display: imageOccasionUrl ? "none" : "flex" }}
               >
                 <span className="catalogue-modele-letter-porsche">O</span>
               </div>
@@ -103,4 +111,3 @@ const ChoixVoiture = () => {
 };
 
 export default ChoixVoiture;
-

@@ -1,5 +1,5 @@
-import joi from "joi";
 import { COULEURS_EXTERIEUR } from "../utils/couleur_exterieur.constants.js";
+import joi from "joi";
 
 export default function couleur_exterieurValidation(body) {
   const couleur_exterieurCreate = joi.object({

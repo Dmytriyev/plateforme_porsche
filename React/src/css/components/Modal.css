@@ -1,3 +1,7 @@
+/*
+ * components/Modal.css — Styles pour modals/dialogues réutilisables.
+ * Notes pédagogiques : assurez l'accessibilité (focus trap, contraste) dans ces styles.
+ */
 
 .modal-overlay {
   position: fixed;
@@ -96,7 +100,6 @@
   }
 }
 
-
 .modal-message-porsche {
   margin: 0 0 2rem 0;
   color: var(--color-black);
@@ -151,7 +154,6 @@
 .modal-btn-secondary-porsche:hover {
   border-color: var(--color-black);
 }
-
 
 @media (max-width: 640px) {
   .modal-footer-porsche {

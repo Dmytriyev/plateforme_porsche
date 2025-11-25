@@ -1,29 +1,40 @@
-import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext.jsx';
-import Input from '../components/common/Input.jsx';
-import Button from '../components/common/Button.jsx';
-import { validateRegisterForm, handleFormChange } from '../utils/helpers.js';
-import '../css/Register.css';
+/**
+ * pages/Register.jsx — Formulaire d'inscription et gestion d'erreurs.
+ *
+ * Notes pédagogiques :
+ * - Illustre la validation locale (`validateRegisterForm`) avant envoi au backend.
+ * - Conseils : fournir un retour utilisateur clair sur les erreurs et empêcher
+ *   les soumissions multiples pendant le loading.
+ *
+ * @file pages/Register.jsx
+ */
+
+import { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext.jsx";
+import Input from "../components/common/Input.jsx";
+import Button from "../components/common/Button.jsx";
+import { validateRegisterForm, handleFormChange } from "../utils/helpers.js";
+import "../css/Register.css";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-    prenom: '',
-    nom: '',
-    email: '',
-    telephone: '',
-    password: '',
-    confirmPassword: '',
-    adresse: '',
-    codePostal: '',
+    prenom: "",
+    nom: "",
+    email: "",
+    telephone: "",
+    password: "",
+    confirmPassword: "",
+    adresse: "",
+    codePostal: "",
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = handleFormChange(setFormData, setErrors);
 
@@ -35,7 +46,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
+    setErrorMessage("");
 
     if (!validateForm()) {
       return;
@@ -49,7 +60,7 @@ const Register = () => {
         prenom: formData.prenom,
         email: formData.email,
         password: formData.password,
-        telephone: formData.telephone || '0000000000',
+        telephone: formData.telephone || "0000000000",
         adresse: formData.adresse,
         code_postal: formData.codePostal,
       };
@@ -57,13 +68,13 @@ const Register = () => {
       const result = await register(userData);
 
       if (result.success) {
-        navigate('/', { replace: true });
+        navigate("/", { replace: true });
       } else {
-        setErrorMessage(result.error || 'Erreur d\'inscription');
+        setErrorMessage(result.error || "Erreur d'inscription");
         setLoading(false);
       }
     } catch (err) {
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+      setErrorMessage("Une erreur est survenue. Veuillez réessayer.");
       setLoading(false);
     }
   };
@@ -77,7 +88,12 @@ const Register = () => {
           {errorMessage && (
             <div className="register-error-message">
               <p>{errorMessage}</p>
-              <button onClick={() => setErrorMessage('')} className="error-close">×</button>
+              <button
+                onClick={() => setErrorMessage("")}
+                className="error-close"
+              >
+                ×
+              </button>
             </div>
           )}
 
@@ -178,7 +194,7 @@ const Register = () => {
               className="register-btn-primary-porsche"
               disabled={loading}
             >
-              {loading ? 'CRÉATION...' : 'CRÉER MON COMPTE'}
+              {loading ? "CRÉATION..." : "CRÉER MON COMPTE"}
             </button>
           </form>
 

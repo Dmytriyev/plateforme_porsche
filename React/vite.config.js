@@ -1,23 +1,23 @@
+// Fichier de configuration Vite pour une application React.
+// Notes pédagogiques courtes :
+// - `server.proxy` redirige les appels d'API en dev vers le backend (évite CORS en dev).
+// - `manualChunks` permet d'isoler les dépendances lourdes (React, UI, Stripe)
+//   pour améliorer le caching et réduire la taille des bundles initiaux.
 import { defineConfig, loadEnv } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
 import { fileURLToPath } from "url";
+import path from "path";
+import react from "@vitejs/plugin-react";
 
 // Créer __dirname pour les modules ES
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load environment variables for the current mode (dev, production, etc.)
+  // Charger les variables d'environnement selon le mode
   const env = loadEnv(mode, process.cwd(), "");
-  const BACKEND_URL =
-    env.VITE_BACKEND_URL ||
-    env.BACKEND_URL ||
-    process.env.BACKEND_URL ||
-    "http://localhost:3000";
+  const BACKEND_URL = env.VITE_API_URL;
 
-  // Liste des préfixes d'API utilisés par l'application
+  // Liste des préfixes d'API utilisés par l'application React.
   const apiPrefixes = [
     "/voiture",
     "/accesoire",
@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
     ])
   );
 
+  // Configuration principale de Vite pour React.
   return {
     plugins: [react()],
     resolve: {
@@ -49,13 +50,14 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    // Configuration du serveur de développement Vite
     server: {
       port: 5173,
       open: true,
       // Proxy des routes API vers le backend de développement.
       proxy,
     },
-    // Build optimisation: split vendor and large libs into separate chunks
+    // Configuration de build avec optimisation
     build: {
       chunkSizeWarningLimit: 700,
       rollupOptions: {

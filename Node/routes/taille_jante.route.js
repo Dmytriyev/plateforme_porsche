@@ -31,14 +31,14 @@ router.put(
   isAdmin,
   validateObjectId("id"),
   optionalUpload,
-  updateTaille_jante
+  updateTaille_jante,
 );
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteTaille_jante
+  deleteTaille_jante,
 );
 
 export default router;

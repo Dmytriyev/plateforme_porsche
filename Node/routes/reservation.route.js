@@ -24,7 +24,7 @@ const router = Router();
 router.get(
   "/check/:voitureId",
   validateObjectId("voitureId"),
-  checkReservations
+  checkReservations,
 );
 
 // ============================================
@@ -36,7 +36,7 @@ router.get(
   auth,
   isAdmin,
   validateObjectId("voitureId"),
-  getReservationsByVoiture
+  getReservationsByVoiture,
 );
 
 // ============================================
@@ -46,7 +46,7 @@ router.get(
   "/user/:userId",
   auth,
   validateObjectId("userId"),
-  getReservationsByUser
+  getReservationsByUser,
 );
 router.post("/new", auth, createReservation);
 router.get("/:id", auth, validateObjectId("id"), getReservationById);
@@ -59,14 +59,14 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"),
-  accepterReservation
+  accepterReservation,
 );
 router.patch(
   "/:id/refuser",
   auth,
   isStaff,
   validateObjectId("id"),
-  refuserReservation
+  refuserReservation,
 );
 
 export default router;

@@ -1,5 +1,5 @@
-import joi from "joi";
 import { AVAILABLE_ROLES } from "../utils/roles.constants.js";
+import joi from "joi";
 
 export default function userValidation(body) {
   const mongoIdSchema = () => joi.string().hex().length(24);
@@ -12,7 +12,7 @@ export default function userValidation(body) {
       .max(100)
       // une majuscule, une minuscule, un chiffre et un caractère spécial
       .pattern(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       )
       .required(),
     nom: joi.string().required().max(50).min(2),
@@ -36,7 +36,7 @@ export default function userValidation(body) {
       .string()
       .min(8)
       .pattern(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       ),
     nom: joi.string().max(50).min(2),
     prenom: joi.string().max(100).min(2),

@@ -1,40 +1,45 @@
+/**
+ * server.js — Point d'entrée Express : configuration des middlewares, routes et sécurité.
+ *
+ * Notes pédagogiques :
+ * - L'ordre des middlewares est critique (ex. le webhook Stripe nécessite le raw body
+ *   avant le parser JSON, sinon la vérification de signature échoue).
+ * - Charger `dotenv` tôt garantit que les modules lisant `process.env` obtiennent
+ *   les variables (clé Stripe, URI Mongo, etc.).
+ */
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import db from "./db/db.js";
-import path from "node:path";
-import rateLimit from "express-rate-limit";
-import hpp from "hpp"; // HTTP Parameter Pollution protection middleware
-import cookieParser from "cookie-parser"; // Cookie parser middleware
-import sanitizeInputs from "./middlewares/sanitizeInputs.js";
-import logger from "./utils/logger.js";
-import errorMiddleware from "./middlewares/error.js";
-import { fileURLToPath } from "node:url";
-import { webhookHandler } from "./controllers/payment.controller.js";
-
-import userRoutes from "./routes/user.route.js";
-import reservationRoutes from "./routes/reservation.route.js";
+import accesoireRoutes from "./routes/accesoire.route.js";
 import commandeRoutes from "./routes/Commande.route.js";
+import cookieParser from "cookie-parser"; // Cookie parser middleware
+import cors from "cors";
+import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
+import couleur_exterieurRoutes from "./routes/couleur_exterieur.route.js";
+import couleur_interieurRoutes from "./routes/couleur_interieur.route.js";
+import db from "./db/db.js";
+import errorMiddleware from "./middlewares/error.js";
+import express from "express";
+import { fileURLToPath } from "node:url";
+import hpp from "hpp"; // HTTP Parameter Pollution protection middleware
 import ligneCommandeRoutes from "./routes/ligneCommande.route.js";
-import paymentRoutes from "./routes/payment.route.js";
-import panierRoutes from "./routes/panier.route.js";
-
-import model_porsche_actuelRoutes from "./routes/model_porsche_actuel.route.js";
-import photo_voiture_actuelRoutes from "./routes/photo_voiture_actuel.route.js";
-
-import voitureRoutes from "./routes/voiture.route.js";
+import logger from "./utils/logger.js";
 import model_porscheRoutes from "./routes/model_porsche.route.js";
+import model_porsche_actuelRoutes from "./routes/model_porsche_actuel.route.js";
+import packageRoutes from "./routes/package.route.js";
+import panierRoutes from "./routes/panier.route.js";
+import path from "node:path";
+import paymentRoutes from "./routes/payment.route.js";
+import photo_accesoireRoutes from "./routes/photo_accesoire.route.js";
 import photo_porscheRoutes from "./routes/photo_porsche.route.js";
 import photo_voitureRoutes from "./routes/photo_voiture.route.js";
-import couleur_interieurRoutes from "./routes/couleur_interieur.route.js";
-import couleur_exterieurRoutes from "./routes/couleur_exterieur.route.js";
-import taille_janteRoutes from "./routes/taille_jante.route.js";
+import photo_voiture_actuelRoutes from "./routes/photo_voiture_actuel.route.js";
+import rateLimit from "express-rate-limit";
+import reservationRoutes from "./routes/reservation.route.js";
+import sanitizeInputs from "./middlewares/sanitizeInputs.js";
 import siegeRoutes from "./routes/siege.route.js";
-import packageRoutes from "./routes/package.route.js";
-
-import accesoireRoutes from "./routes/accesoire.route.js";
-import photo_accesoireRoutes from "./routes/photo_accesoire.route.js";
-import couleur_accesoireRoutes from "./routes/couleur_accesoire.route.js";
+import taille_janteRoutes from "./routes/taille_jante.route.js";
+import userRoutes from "./routes/user.route.js";
+import voitureRoutes from "./routes/voiture.route.js";
+import { webhookHandler } from "./controllers/payment.controller.js";
 
 // __dirname pour retrouver le dossier courant
 const __filename = fileURLToPath(import.meta.url);

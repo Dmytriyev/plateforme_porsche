@@ -1,3 +1,8 @@
+/*
+ * VariantePage.css — Styles pour l'affichage d'une variante de véhicule.
+ * Notes pédagogiques : présente la grille et les détails produit ; garder présentation séparée de la logique.
+ */
+
 .variante-page-error {
   min-height: 60vh;
   display: flex;
@@ -12,7 +17,6 @@
   min-height: 100vh;
   background: #fff;
 }
-
 
 .variante-nav-top-porsche {
   display: flex;
@@ -77,7 +81,6 @@
   color: var(--color-grey-text);
 }
 
-
 .variante-btn-configurer {
   background: #000 !important;
   color: #fff !important;
@@ -90,14 +93,12 @@
   color: #fff !important;
 }
 
-
 .variante-btn-acheter,
 .variante-btn-comparer {
   background: transparent;
   color: var(--color-black);
   border: none;
 }
-
 
 .variante-carrosserie-nav-porsche {
   display: flex;
@@ -180,7 +181,6 @@
   color: var(--color-black);
   text-align: center;
 }
-
 
 .variante-content-layout-porsche {
   display: grid;
@@ -270,7 +270,6 @@
   margin: 0;
   max-width: 800px;
 }
-
 
 .variante-actions-bottom-porsche {
   display: flex;

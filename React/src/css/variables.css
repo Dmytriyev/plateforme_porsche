@@ -1,3 +1,13 @@
+/*
+  variables.css — Variables CSS (couleurs, espacements, typographie).
+  Notes pédagogiques : Centralisez ici les variables pour maintenir la cohérence visuelle.
+*/
+
+/*
+ * css/variables.css — Variables CSS personnalisées (couleurs, espacements).
+ * CSS file: css/variables.css
+ */
+
 :root {
   --color-black: #000000;
   --color-white: #ffffff;

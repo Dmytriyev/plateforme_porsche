@@ -1,79 +1,102 @@
-import React, { useState, useMemo } from 'react';
-import useReservation from '../hooks/useReservation';
-import PaymentForm from './PaymentForm';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import Button from './common/Button.jsx';
-import '../css/components/ReservationForm.css';
+/**
+ * ReservationForm.jsx — Formulaire de réservation réutilisable; validation locale avant envoi.
+ *
+ * @file components/ReservationForm.jsx
+ */
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+import React, { useState, useMemo } from "react";
+import useReservation from "../hooks/useReservation";
+import PaymentForm from "./PaymentForm";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import Button from "./common/Button.jsx";
+import "../css/components/ReservationForm.css";
+import { error as logError } from "../utils/logger.js";
 
-export default function ReservationForm({ initialConfig = {}, onCompleted, vehiculeId }) {
-    const { createReservation, reservation, getReservation, pollReservationStatus } = useReservation();
-    const [config] = useState(initialConfig);
-    const [creating, setCreating] = useState(false);
-    const [error, setError] = useState(null);
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
+);
 
-    const clientSecret = reservation?.clientSecret;
-    const reservationToken = reservation?.reservationToken || reservation?.token;
+export default function ReservationForm({
+  initialConfig = {},
+  onCompleted,
+}) {
+  const {
+    createReservation,
+    reservation,
+    getReservation,
+    pollReservationStatus,
+  } = useReservation();
+  const [config] = useState(initialConfig);
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState(null);
 
-    const handleCreate = async () => {
-        setError(null);
-        setCreating(true);
-        try {
-            const data = await createReservation({ config });
-            if (data?.reservationToken) {
-                pollReservationStatus(data.reservationToken, { interval: 3000 });
-            } else if (data?.token) {
-                pollReservationStatus(data.token, { interval: 3000 });
-            }
-        } catch (err) {
-            setError(err.message || String(err));
-        } finally {
-            setCreating(false);
-        }
-    };
+  const clientSecret = reservation?.clientSecret;
+  const reservationToken = reservation?.reservationToken || reservation?.token;
 
-    const handlePaymentSuccess = async (paymentIntent) => {
-        try {
-            const token = reservationToken;
-            if (token) {
-                const final = await getReservation(token);
-                if (onCompleted) onCompleted(final, paymentIntent);
-            } else if (onCompleted) {
-                onCompleted(reservation, paymentIntent);
-            }
-        } catch (e) {
-            if (import.meta.env.DEV) {
-                console.error('Erreur handlePaymentSuccess:', e);
-            }
-        }
-    };
+  const handleCreate = async () => {
+    setError(null);
+    setCreating(true);
+    try {
+      const data = await createReservation({ config });
+      if (data?.reservationToken) {
+        pollReservationStatus(data.reservationToken, { interval: 3000 });
+      } else if (data?.token) {
+        pollReservationStatus(data.token, { interval: 3000 });
+      }
+    } catch (err) {
+      setError(err.message || String(err));
+    } finally {
+      setCreating(false);
+    }
+  };
 
-    const stripeOptions = useMemo(() => ({ clientSecret }), [clientSecret]);
+  const handlePaymentSuccess = async (paymentIntent) => {
+    try {
+      const token = reservationToken;
+      if (token) {
+        const final = await getReservation(token);
+        if (onCompleted) onCompleted(final, paymentIntent);
+      } else if (onCompleted) {
+        onCompleted(reservation, paymentIntent);
+      }
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        logError("Erreur handlePaymentSuccess:", e);
+      }
+    }
+  };
 
-    return (
-        <div className="reservation-form card">
-            <h3 className="card-title">Récapitulatif & Réservation</h3>
-            <div className="card-body reservation-config-display">
-                <pre className="reservation-config-pre">{JSON.stringify(config, null, 2)}</pre>
-            </div>
+  const stripeOptions = useMemo(() => ({ clientSecret }), [clientSecret]);
 
-            <div className="reservation-actions">
-                <Button onClick={handleCreate} disabled={creating} variant="primary">
-                    {creating ? 'Création…' : 'Réserver & Payer'}
-                </Button>
-                {error && <div className="alert reservation-error">{error}</div>}
-            </div>
+  return (
+    <div className="reservation-form card">
+      <h3 className="card-title">Récapitulatif & Réservation</h3>
+      <div className="card-body reservation-config-display">
+        <pre className="reservation-config-pre">
+          {JSON.stringify(config, null, 2)}
+        </pre>
+      </div>
 
-            {clientSecret && (
-                <div className="reservation-payment-section">
-                    <h4>Paiement</h4>
-                    <Elements stripe={stripePromise} options={stripeOptions}>
-                        <PaymentForm clientSecret={clientSecret} reservationToken={reservationToken} onSuccess={handlePaymentSuccess} />
-                    </Elements>
-                </div>
-            )}
+      <div className="reservation-actions">
+        <Button onClick={handleCreate} disabled={creating} variant="primary">
+          {creating ? "Création…" : "Réserver & Payer"}
+        </Button>
+        {error && <div className="alert reservation-error">{error}</div>}
+      </div>
+
+      {clientSecret && (
+        <div className="reservation-payment-section">
+          <h4>Paiement</h4>
+          <Elements stripe={stripePromise} options={stripeOptions}>
+            <PaymentForm
+              clientSecret={clientSecret}
+              reservationToken={reservationToken}
+              onSuccess={handlePaymentSuccess}
+            />
+          </Elements>
         </div>
-    );
+      )}
+    </div>
+  );
 }

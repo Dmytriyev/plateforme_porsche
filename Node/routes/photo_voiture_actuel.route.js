@@ -18,7 +18,7 @@ router.get("/:id", auth, validateObjectId("id"), getPhoto_voiture_actuelById);
 router.get(
   "/all/model_porsche_actuel/:modelId",
   getAllPhoto_voiture_actuels,
-  validateObjectId("modelId")
+  validateObjectId("modelId"),
 );
 
 router.post("/new", auth, optionalUpload, createPhoto_voiture_actuel);
@@ -27,13 +27,13 @@ router.put(
   auth,
   validateObjectId("id"),
   optionalUpload,
-  updatePhoto_voiture_actuel
+  updatePhoto_voiture_actuel,
 );
 router.delete(
   "/delete/:id",
   auth,
   validateObjectId("id"),
-  deletePhoto_voiture_actuel
+  deletePhoto_voiture_actuel,
 );
 
 export default router;

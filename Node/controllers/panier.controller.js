@@ -1,9 +1,14 @@
+/**
+ * Contrôleur Panier
+ * - Opérations sur le panier utilisateur : ajout/suppression d'articles,
+ *   calcul des prix et préparation pour le paiement
+ */
+import Accesoire from "../models/accesoire.model.js";
+import { calculerPrixTotalModelPorsche } from "../utils/prixCalculator.js";
 import Commande from "../models/Commande.model.js";
 import LigneCommande from "../models/ligneCommande.model.js";
 import Model_porsche from "../models/model_porsche.model.js";
-import Accesoire from "../models/accesoire.model.js";
 import Voiture from "../models/voiture.model.js";
-import { calculerPrixTotalModelPorsche } from "../utils/prixCalculator.js";
 import {
   sendSuccess,
   sendError,

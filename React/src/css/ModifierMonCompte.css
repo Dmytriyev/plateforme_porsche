@@ -1,3 +1,7 @@
+/*
+ * ModifierMonCompte.css — Styles pour la page de modification du profil utilisateur.
+ * Notes pédagogiques : règles ciblées au formulaire de compte ; évitez les sélecteurs globaux.
+ */
 
 .modifier-compte-container {
   min-height: 100vh;
@@ -13,7 +17,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-
 
 .modifier-compte-header {
   background: #fff;
@@ -53,7 +56,6 @@
   margin: 0;
 }
 
-
 .modifier-compte-message {
   padding: 1rem 2.5rem;
   margin: 0;
@@ -72,11 +74,9 @@
   border-bottom: 1px solid #cfc;
 }
 
-
 .modifier-compte-form {
   padding: 2.5rem;
 }
-
 
 .modifier-compte-section {
   margin-bottom: 2.5rem;
@@ -102,7 +102,6 @@
   align-items: center;
   margin-bottom: 1.5rem;
 }
-
 
 .modifier-compte-field {
   display: flex;
@@ -142,14 +141,12 @@
   cursor: not-allowed;
 }
 
-
 .modifier-compte-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
 }
-
 
 .modifier-compte-toggle-password {
   background: transparent;
@@ -182,7 +179,6 @@
     transform: translateY(0);
   }
 }
-
 
 .modifier-compte-actions {
   display: flex;
@@ -232,7 +228,6 @@
   cursor: not-allowed;
   transform: none;
 }
-
 
 @media (max-width: 768px) {
   .modifier-compte-container {
@@ -285,7 +280,6 @@
     width: 100%;
   }
 }
-
 
 button:focus-visible,
 input:focus-visible {

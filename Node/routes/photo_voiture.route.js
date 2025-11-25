@@ -23,7 +23,7 @@ router.put(
   isStaff,
   validateObjectId("id"), //id photo voiture
   optionalUpload,
-  updatePhoto_voiture
+  updatePhoto_voiture,
 );
 
 // Routes publiques
@@ -33,7 +33,7 @@ router.get("/:id", validateObjectId("id"), getPhoto_voitureById);
 router.get(
   "/all/voiture/:modelId",
   getAllPhoto_voitures,
-  validateObjectId("modelId")
+  validateObjectId("modelId"),
 );
 
 // Routes admin
@@ -42,7 +42,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"), //id photo voiture
-  deletePhoto_voiture
+  deletePhoto_voiture,
 );
 
 export default router;

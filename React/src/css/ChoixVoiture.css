@@ -1,3 +1,7 @@
+/*
+ * ChoixVoiture.css — Styles pour la page de sélection du type de véhicule.
+ * Notes pédagogiques : règles pour cartes de sélection et responsive grid.
+ */
 
 .choix-container {
   min-height: calc(100vh - 64px);
@@ -10,7 +14,6 @@
   margin: 0 auto;
   padding: 2rem 1rem;
 }
-
 
 .choix-header {
   text-align: left;
@@ -26,7 +29,6 @@
   letter-spacing: -0.02em;
 }
 
-
 .choix-grid-porsche {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -34,7 +36,6 @@
   margin: 0 auto;
   gap: 2rem;
 }
-
 
 @media (max-width: 768px) {
   .choix-container {

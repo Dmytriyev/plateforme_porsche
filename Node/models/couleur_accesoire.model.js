@@ -1,3 +1,8 @@
+/**
+ * Modèle Couleur Accessoire
+ * - Définit les couleurs disponibles pour les accessoires (nom + image)
+ * - Utilisé pour proposer des variantes couleur dans le catalogue
+ */
 import mongoose from "mongoose";
 
 const couleur_accesoireSchema = new mongoose.Schema(

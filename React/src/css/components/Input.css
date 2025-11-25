@@ -1,3 +1,7 @@
+/*
+ * components/Input.css — Styles pour champs de formulaire réutilisables.
+ * Notes pédagogiques : styles neutres et focus visible pour l'accessibilité.
+ */
 
 .input-container {
   margin-bottom: 1rem;
@@ -54,7 +58,6 @@
   color: var(--color-red-porsche, #d5001c);
   margin-top: 0.25rem;
 }
-
 
 textarea.input-field {
   min-height: 100px;

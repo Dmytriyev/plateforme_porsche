@@ -1,3 +1,7 @@
+/*
+ * AccessoireDetail.css — Styles pour la page détail d'un accessoire.
+ * Notes pédagogiques : séparer visuel produit et métadonnées (prix, description).
+ */
 
 .accessoire-detail-container-porsche {
   min-height: 100vh;
@@ -11,7 +15,6 @@
   padding: 0 2rem;
 }
 
-
 .accessoire-success-message {
   position: fixed;
   top: 2rem;
@@ -19,7 +22,6 @@
   z-index: 1000;
   max-width: 400px;
 }
-
 
 .accessoire-breadcrumb {
   display: flex;
@@ -50,7 +52,6 @@
   color: #6b7280;
   font-weight: var(--font-weight-normal);
 }
-
 
 .accessoire-detail-grid-porsche {
   display: grid;
@@ -97,7 +98,6 @@
   opacity: 0.5;
 }
 
-
 .gallery-nav-btn {
   position: absolute;
   top: 50%;
@@ -131,7 +131,6 @@
 .gallery-nav-btn svg {
   stroke: #000;
 }
-
 
 .gallery-counter {
   position: absolute;
@@ -173,13 +172,11 @@
   object-fit: cover;
 }
 
-
 .accessoire-info-porsche {
   display: flex;
   flex-direction: column;
   padding-top: 1rem;
 }
-
 
 .accessoire-category-porsche {
   font-size: 0.875rem;
@@ -189,7 +186,6 @@
   margin-bottom: 1rem;
 }
 
-
 .accessoire-title-porsche {
   font-size: 2.5rem;
   font-weight: var(--font-weight-bold);
@@ -198,7 +194,6 @@
   line-height: 1.2;
 }
 
-
 .accessoire-price-porsche {
   font-size: 1.5rem;
   font-weight: var(--font-weight-normal);
@@ -206,14 +201,12 @@
   margin-bottom: 1.5rem;
 }
 
-
 .accessoire-short-description-porsche {
   font-size: 1rem;
   color: #374151;
   line-height: 1.6;
   margin-bottom: 2rem;
 }
-
 
 .accessoire-actions-porsche {
   display: flex;
@@ -248,7 +241,6 @@
   height: 20px;
   flex-shrink: 0;
 }
-
 
 .accessoire-delivery-info-porsche {
   display: flex;
@@ -308,7 +300,6 @@
   margin: 0;
 }
 
-
 .accessoire-characteristic-item {
   display: flex;
   justify-content: space-between;
@@ -331,7 +322,6 @@
   color: var(--color-black);
   font-weight: var(--font-weight-normal);
 }
-
 
 .error-container {
   min-height: 60vh;

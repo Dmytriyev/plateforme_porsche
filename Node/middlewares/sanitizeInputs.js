@@ -1,3 +1,8 @@
+/**
+ * Middleware de sanitation des entrées
+ * - Échappe les caractères HTML dans `req.body`, `req.query` et `req.params`
+ * - Protège contre XSS basique en nettoyant les valeurs de chaîne
+ */
 const htmlEntities = {
   "&": "&amp;",
   "<": "&lt;",

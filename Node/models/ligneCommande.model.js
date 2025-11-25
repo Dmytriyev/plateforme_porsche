@@ -1,3 +1,8 @@
+/**
+ * Modèle LigneCommande
+ * - Représente un élément du panier (voiture ou accessoire)
+ * - Contient quantité, prix, acompte et références vers la commande et le produit
+ */
 import mongoose from "mongoose";
 
 const ligneCommandeSchema = new mongoose.Schema(

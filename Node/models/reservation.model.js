@@ -1,3 +1,8 @@
+/**
+ * Modèle Réservation
+ * - Représente une réservation pour une voiture d'occasion (date, user, status)
+ * - Utilisé pour bloquer une voiture sur une date spécifique
+ */
 import mongoose from "mongoose";
 
 const reservationSchema = new mongoose.Schema(
