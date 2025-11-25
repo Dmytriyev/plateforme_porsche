@@ -1,7 +1,6 @@
 /**
  * services/commande.service.js — Client HTTP pour les commandes & panier
  *
- * Notes pédagogiques courtes :
  * - Ce service centralise tous les appels liés aux commandes, réservations et panier.
  * - Utiliser un service dédié facilite le test unitaire et la réutilisation dans les composants.
  * - `apiRequest` gère les erreurs et normalise les réponses (voir `httpHelper`).

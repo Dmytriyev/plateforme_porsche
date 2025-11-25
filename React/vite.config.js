@@ -1,5 +1,4 @@
 // Fichier de configuration Vite pour une application React.
-// Notes pédagogiques courtes :
 // - `server.proxy` redirige les appels d'API en dev vers le backend (évite CORS en dev).
 // - `manualChunks` permet d'isoler les dépendances lourdes (React, UI, Stripe)
 //   pour améliorer le caching et réduire la taille des bundles initiaux.

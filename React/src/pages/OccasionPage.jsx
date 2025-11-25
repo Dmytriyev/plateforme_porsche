@@ -651,6 +651,13 @@ const OccasionPage = () => {
             src="/Logo/Logo_Porsche.png"
             alt="Porsche"
             className="occasion-header-logo"
+            onError={(e) => {
+              try {
+                e.currentTarget.src = "/Logo/Logo_red.svg.png";
+              } catch (err) {
+                // fallback silent
+              }
+            }}
           />
         </div>
 

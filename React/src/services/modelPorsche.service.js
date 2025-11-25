@@ -1,7 +1,6 @@
 /**
  * services/modelPorsche.service.js — Services pour modèles Porsche et variantes
  *
- * Notes pédagogiques courtes :
  * - Fournit des fonctions spécifiques au domaine (configurations, variantes, prix).
  * - Illustre le pattern : séparation entre logique réseau (service) et UI (composants/pages).
  * - Les erreurs spécifiques (404/400) sont manipulées pour fournir des messages clairs.
@@ -9,6 +8,10 @@
 
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
+
+// Cache simple en mémoire pour les configurations par voiture
+// Clé = voitureId -> { ts: number, data: any }
+const _configByVoitureCache = new Map();
 
 const modelPorscheService = {
   getAllModels: () =>
@@ -37,11 +40,36 @@ const modelPorscheService = {
   getAllCarrosseries: () =>
     apiRequest(() => apiClient.get("/model_porsche/carrosseries")),
 
-  getConfigurationsByVoiture: (voitureId) =>
-    apiRequest(() => apiClient.get(`/model_porsche/voiture/${voitureId}`), {
-      returnArray: true,
-      defaultValue: [],
-    }),
+  getConfigurationsByVoiture: async (
+    voitureId,
+    { forceRefresh = false } = {}
+  ) => {
+    const TTL = 5000; // 5s
+    if (!forceRefresh) {
+      const cached = _configByVoitureCache.get(voitureId);
+      if (cached && Date.now() - cached.ts < TTL) {
+        return cached.data;
+      }
+    }
+
+    const result = await apiRequest(
+      () => apiClient.get(`/model_porsche/voiture/${voitureId}`),
+      {
+        returnArray: true,
+        defaultValue: [],
+      }
+    );
+
+    try {
+      _configByVoitureCache.set(voitureId, { ts: Date.now(), data: result });
+      // purge automatique au bout de twice TTL (prévenir fuite mémoire)
+      setTimeout(() => _configByVoitureCache.delete(voitureId), TTL * 2);
+    } catch (e) {
+      // ignore cache errors
+    }
+
+    return result;
+  },
 
   calculatePrixTotal: (modelId) =>
     apiRequest(() => apiClient.get(`/model_porsche/prixTotal/${modelId}`)),

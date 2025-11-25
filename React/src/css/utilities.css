@@ -33,6 +33,31 @@
   justify-content: space-between;
 }
 
+/* Styles unifiés pour les boutons "Retour" utilisés dans plusieurs pages
+   cible toutes les classes se terminant par "-back-btn" (ex: "ma-voiture-detail-back-btn")
+   et fournit une classe réutilisable `.btn-back` pour de futurs cas. */
+[class$="-back-btn"],
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: var(--color-black);
+  border: 2px solid var(--color-black);
+  border-radius: var(--border-radius-md);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-duration) var(--transition-easing);
+}
+
+[class$="-back-btn"]:hover,
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,6 @@
 /**
  * config/api.js — Client HTTP centralisé (axios)
  *
- * Notes pédagogiques courtes :
  * - `API_URL` est lu depuis les variables d'environnement Vite (ex: VITE_BACKEND_URL).
  * - Utiliser `baseURL` permet d'appeler l'API avec des chemins relatifs (ex: `/voiture/all`).
  * - `withCredentials: true` permet d'envoyer les cookies si l'API utilise des sessions.

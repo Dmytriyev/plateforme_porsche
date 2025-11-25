@@ -1,7 +1,6 @@
 /**
  * services/user.service.js — Gestion du profil utilisateur côté client
  *
- * Notes pédagogiques courtes :
  * - Centralise la lecture/mise à jour du profil et la synchronisation du `localStorage`.
  * - Après modification, met à jour le `localStorage` pour garder l'UI cohérente.
  * - Evitez d'y mettre de la logique métier complexe ; déléguez au backend.

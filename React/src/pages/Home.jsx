@@ -1,7 +1,6 @@
 /**
  * pages/Home.jsx — Page d'accueil; sections promos et liens rapides.
  *
- * Notes pédagogiques courtes :
  * - Montre l'usage d'un service (`voitureService`) pour récupérer des données
  *   et de `useEffect` pour déclencher la récupération au montage.
  * - Exemple pratique : filtrage et affichage conditionnel (loading / empty / data).

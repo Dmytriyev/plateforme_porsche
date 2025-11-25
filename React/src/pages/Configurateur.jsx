@@ -553,6 +553,13 @@ const Configurateur = () => {
             src="/Logo/Logo_Porsche.png"
             alt="Porsche"
             className="configurateur-header-logo"
+            onError={(e) => {
+              try {
+                e.currentTarget.src = "/Logo/Logo_red.svg.png";
+              } catch (err) {
+                // fallback silent
+              }
+            }}
           />
         </div>
 
