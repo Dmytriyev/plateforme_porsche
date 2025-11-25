@@ -49,13 +49,14 @@ Authorization: Bearer TOKEN
 
 ## Endpoints principaux.
 
-- Auth : `/api/users/register`, `/api/users/login`, `/api/users/profile`
-- Accesoires : `/api/accesoire`, `/api/couleur-accesoire`, `/api/photo-accesoire`
-- Voitures : `/api/voiture`, `/api/model-porsche`, `/api/photo-voiture`, `/api/photo-porsche`
-- Options : `/api/couleur-exterieur`, `/api/couleur-interieur`, `/api/taille-jante`
-- Voiture user : `/api/model-porsche-actuel`, `/api/photo-voiture-actuel`
-- Réservations : `/api/reservation`
-- Commandes : `/api/commande`
+- Auth : `/user/register`, `/user/login`, `/user/me`
+- Accesoires : `/accesoire`, `/couleur_accesoire`, `/photo_accesoire`
+- Voitures : `/voiture`, `/model_porsche`, `/photo_voiture`, `/photo_porsche`
+- Options : `/couleur_exterieur`, `/couleur_interieur`, `/taille_jante`, `/siege`, `/package`
+- Voiture user : `/model_porsche_actuel`, `/photo_voiture_actuel`
+- Réservations : `/reservation`
+- Commandes : `/commande`
+- Panier : `/api/panier`
 - Paiement : `/api/payment`
 
 ## Paiement — Checkout Stripe (multi-étapes)
@@ -189,8 +190,8 @@ Cette API REST permet de gérer le catalogue (voitures neuves & d'occasion), une
 ### Authentification
 
 ```javascript
-POST / api / users / register; // Créer un compte admin
-POST / api / users / login; // Se connecter
+POST / user / register; // Créer un compte admin
+POST / user / login; // Se connecter
 ```
 
 ### Gestion des Accesoires
@@ -200,26 +201,26 @@ L'admin peut gérer la boutique d'accesoires en 3 étapes :
 #### Étape 1 Créer les couleurs d'accesoires
 
 ```javascript
-POST   /api/couleur-accesoire     // Créer une couleur (ex: noir, rouge)
-GET    /api/couleur-accesoire     // Voir toutes les couleurs
-PUT    /api/couleur-accesoire/:id // Modifier une couleur
-DELETE /api/couleur-accesoire/:id // Supprimer une couleur
+POST   /couleur_accesoire     // Créer une couleur (ex: noir, rouge)
+GET    /couleur_accesoire     // Voir toutes les couleurs
+PUT    /couleur_accesoire/:id // Modifier une couleur
+DELETE /couleur_accesoire/:id // Supprimer une couleur
 ```
 
 #### Étape 2 : Créer l'accesoire
 
 ```javascript
-POST   /api/accesoire     // Créer un accessoire
-GET    /api/accesoire     // Voir tous les accesoires
-PUT    /api/accesoire/:id // Modifier un accessoire
-DELETE /api/accesoire/:id // Supprimer un accessoire
+POST   /accesoire     // Créer un accessoire
+GET    /accesoire     // Voir tous les accesoires
+PUT    /accesoire/:id // Modifier un accessoire
+DELETE /accesoire/:id // Supprimer un accessoire
 ```
 
 #### Étape 3 : Ajouter des photos à l'accesoire
 
 ```javascript
-POST   /api/photo-accesoire     // Ajouter une photo (liée à l'accessoire et sa couleur)
-DELETE /api/photo-accesoire/:id // Supprimer une photo
+POST   /photo_accesoire     // Ajouter une photo (liée à l'accessoire et sa couleur)
+DELETE /photo_accesoire/:id // Supprimer une photo
 ```
 
 ### Gestion des Voitures
@@ -230,22 +231,22 @@ Avant de créer des voitures, l'admin doit créer les options :
 
 ```javascript
 // Couleurs extérieures
-POST   /api/couleur-exterieur     // Créer (ex: bleu, noir, rouge)
-GET    /api/couleur-exterieur     // Lister
-PUT    /api/couleur-exterieur/:id // Modifier
-DELETE /api/couleur-exterieur/:id // Supprimer
+POST   /couleur_exterieur     // Créer (ex: bleu, noir, rouge)
+GET    /couleur_exterieur     // Lister
+PUT    /couleur_exterieur/:id // Modifier
+DELETE /couleur_exterieur/:id // Supprimer
 
 // Couleurs intérieures
-POST   /api/couleur-interieur     // Créer (ex: cuir noir, caramel)
-GET    /api/couleur-interieur     // Lister
-PUT    /api/couleur-interieur/:id // Modifier
-DELETE /api/couleur-interieur/:id // Supprimer
+POST   /couleur_interieur     // Créer (ex: cuir noir, caramel)
+GET    /couleur_interieur     // Lister
+PUT    /couleur_interieur/:id // Modifier
+DELETE /couleur_interieur/:id // Supprimer
 
 // Tailles de jantes
-POST   /api/taille-jante     // Créer (ex: 19", 20", 21")
-GET    /api/taille-jante     // Lister
-PUT    /api/taille-jante/:id // Modifier
-DELETE /api/taille-jante/:id // Supprimer
+POST   /taille_jante     // Créer (ex: 19", 20", 21")
+GET    /taille_jante     // Lister
+PUT    /taille_jante/:id // Modifier
+DELETE /taille_jante/:id // Supprimer
 ```
 
 #### B. Gestion des Voitures Neuves
@@ -255,27 +256,27 @@ Pour les voitures **neuves**, l'admin gère le catalogue en 3 étapes :
 Étape 1 : Créer la voiture de base
 
 ```javascript
-POST   /api/voiture     // Créer (ex: 911, Cayenne)
-GET    /api/voiture     // Voir toutes
-PUT    /api/voiture/:id // Modifier
-DELETE /api/voiture/:id // Supprimer
+POST   /voiture     // Créer (ex: 911, Cayenne)
+GET    /voiture     // Voir toutes
+PUT    /voiture/:id // Modifier
+DELETE /voiture/:id // Supprimer
 ```
 
 Étape 2 : Créer les variantes (Model Porsche)
 
 ```javascript
-POST   /api/model-porsche     // Créer variante (ex: 911 Carrera S)
-GET    /api/model-porsche     // Voir toutes
-PUT    /api/model-porsche/:id // Modifier
-DELETE /api/model-porsche/:id // Supprimer
+POST   /model_porsche     // Créer variante (ex: 911 Carrera S)
+GET    /model_porsche     // Voir toutes
+PUT    /model_porsche/:id // Modifier
+DELETE /model_porsche/:id // Supprimer
 ```
 
 Étape 3 : Ajouter des photos
 
 ```javascript
-POST   /api/photo-voiture     // Photo générale de la voiture
-POST   /api/photo-porsche     // Photo de la variante avec options
-DELETE /api/photo-voiture/:id // Supprimer photo
+POST   /photo_voiture     // Photo générale de la voiture
+POST   /photo_porsche     // Photo de la variante avec options
+DELETE /photo_voiture/:id // Supprimer photo
 ```
 
 Exemple : Ajouter une 911 neuve
@@ -298,10 +299,10 @@ Pour les voitures **d'occasion**, c'est plus simple :
 Étape 1 : Créer le model porsche d'occasion
 
 ```javascript
-POST   /api/model-porsche     // Créer (avec toutes les infos)
-GET    /api/model-porsche     // Voir toutes
-PUT    /api/model-porsche/:id // Modifier
-DELETE /api/model-porsche/:id // Supprimer
+POST   /model_porsche     // Créer (avec toutes les infos)
+GET    /model_porsche     // Voir toutes
+PUT    /model_porsche/:id // Modifier
+DELETE /model_porsche/:id // Supprimer
 ```
 
 Étape 2 : Sélectionner les options
@@ -313,8 +314,8 @@ DELETE /api/model-porsche/:id // Supprimer
 Étape 3 : Ajouter des photos
 
 ```javascript
-POST   /api/photo-porsche     // Photo du véhicule d'occasion
-DELETE /api/photo-porsche/:id // Supprimer photo
+POST   /photo_porsche     // Photo du véhicule d'occasion
+DELETE /photo_porsche/:id // Supprimer photo
 ```
 
 Exemple : Ajouter une 911 Targa d'occasion
@@ -332,10 +333,10 @@ Exemple : Ajouter une 911 Targa d'occasion
 ### Compte Utilisateur
 
 ```javascript
-POST / api / users / register; // Créer son compte
-POST / api / users / login; // Se connecter
-GET / api / users / profile; // Voir son profil
-PUT / api / users / profile; // Modifier son profil
+POST / user / register; // Créer son compte
+POST / user / login; // Se connecter
+GET / user / me; // Voir son profil
+PUT / user / me; // Modifier son profil
 ```
 
 ### Ma Voiture Actuelle
@@ -345,10 +346,10 @@ L'utilisateur peut ajouter sa propre Porsche :
 Étape 1 : Créer sa voiture
 
 ```javascript
-POST   /api/model-porsche-actuel     // Ajouter ma Porsche
-GET    /api/model-porsche-actuel     // Voir mes voitures
-PUT    /api/model-porsche-actuel/:id // Modifier
-DELETE /api/model-porsche-actuel/:id // Supprimer
+POST   /model_porsche_actuel     // Ajouter ma Porsche
+GET    /model_porsche_actuel     // Voir mes voitures
+PUT    /model_porsche_actuel/:id // Modifier
+DELETE /model_porsche_actuel/:id // Supprimer
 ```
 
 Étape 2 : Choisir les options
@@ -360,8 +361,8 @@ DELETE /api/model-porsche-actuel/:id // Supprimer
 Étape 3 : Ajouter des photos
 
 ```javascript
-POST   /api/photo-voiture-actuel     // Ajouter photo de ma voiture
-DELETE /api/photo-voiture-actuel/:id // Supprimer photo
+POST   /photo_voiture_actuel     // Ajouter photo de ma voiture
+DELETE /photo_voiture_actuel/:id // Supprimer photo
 ```
 
 Exemple : Ajouter ma 911 Turbo 1975
@@ -377,8 +378,8 @@ Exemple : Ajouter ma 911 Turbo 1975
 ### Proposer Ma Voiture en Vente
 
 ```javascript
-POST / api / proposition - vente; // Proposer ma voiture
-GET / api / proposition - vente; // Voir mes propositions
+POST / proposition - vente; // Proposer ma voiture
+GET / proposition - vente; // Voir mes propositions
 ```
 
 Note : Pas de vente directe. Un conseiller doit valider.
@@ -386,9 +387,9 @@ Note : Pas de vente directe. Un conseiller doit valider.
 ### Réserver une Voiture d'Occasion
 
 ```javascript
-POST   /api/reservation     // Réserver une voiture d'occasion
-GET    /api/reservation     // Voir mes réservations
-DELETE /api/reservation/:id // Annuler une réservation
+POST   /reservation     // Réserver une voiture d'occasion
+GET    /reservation     // Voir mes réservations
+DELETE /reservation/:id // Annuler une réservation
 ```
 
 Comment ça marche
@@ -404,16 +405,20 @@ L'utilisateur peut commander de 2 façons :
 #### A. Commander une Voiture Neuve (avec acompte)
 
 ```javascript
-POST / api / commande; // Commander avec acompte (500€)
-GET / api / commande; // Voir mes commandes
+POST /
+  commande /
+  new // Commander avec acompte (500€)
+  GET() /
+  commande /
+  historique; // Voir mes commandes
 ```
 
 #### B. Acheter des Accessoires
 
 ```javascript
-POST   /api/commande     // Créer une commande d'accessoires
-GET    /api/commande     // Voir mes commandes
-DELETE /api/commande/:id // Annuler (avant paiement uniquement)
+POST   /commande/new          // Créer une commande d'accessoires
+GET    /commande/historique   // Voir mes commandes
+DELETE /commande/delete/:id   // Annuler (avant paiement uniquement)
 ```
 
 Panier d'accessoires :
@@ -430,8 +435,8 @@ Panier d'accessoires :
 ### Annulation
 
 ```javascript
-DELETE /api/reservation/:id     // Annuler une réservation
-DELETE /api/commande/:id        // Annuler une commande (avant paiement)
+DELETE /reservation/:id        // Annuler une réservation
+DELETE /commande/delete/:id    // Annuler une commande (avant paiement)
 ```
 
 Important :
@@ -442,9 +447,9 @@ Important :
 ## Fonctionnalités CONSEILLER
 
 ```javascript
-GET /api/reservation              // Voir toutes les réservations
-GET /api/proposition-vente        // Voir propositions de vente
-PUT /api/proposition-vente/:id    // Valider/Refuser proposition
+GET /reservation              // Voir toutes les réservations
+GET /proposition-vente        // Voir propositions de vente
+PUT /proposition-vente/:id    // Valider/Refuser proposition
 ```
 
 ## Structure des Données
