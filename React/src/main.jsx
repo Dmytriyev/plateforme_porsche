@@ -1,5 +1,5 @@
 /**
- * main.jsx — Point d'entrée de l'application React
+ * — Point d'entrée de l'application React
  * - C'est ici que l'application React est montée dans le DOM (`createRoot`).
  * - `StrictMode` active des vérifications supplémentaires en dev pour détecter
  *   les effets secondaires non sécurisés.

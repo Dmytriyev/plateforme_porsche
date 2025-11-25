@@ -146,19 +146,41 @@ const login = async (req, res) => {
       isAdmin: user.isAdmin,
     };
     // Retourner le token JWT et les informations utilisateur
+    // Création d'un access token et d'un refresh token (cookie httpOnly)
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        role: user.role,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "24h" }
+    );
+
+    const refreshSecret = process.env.REFRESH_SECRET || process.env.SECRET_KEY;
+    const refreshToken = jwt.sign({ id: user._id }, refreshSecret, {
+      expiresIn: "7d",
+    });
+
+    // Envoyer le refresh token en cookie httpOnly
+    try {
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      });
+    } catch (cookieErr) {
+      logger.warn("Impossible de définir le cookie refresh_token", {
+        error: cookieErr?.message || cookieErr,
+      });
+    }
+
     res.status(200).json({
       message: user.email + " est connecté",
       user: userForToken,
-      token: jwt.sign(
-        {
-          id: user._id,
-          email: user.email,
-          isAdmin: user.isAdmin,
-          role: user.role,
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: "24h" }
-      ),
+      token: accessToken,
     });
   } catch (error) {
     logger.error("Erreur lors de la connexion", {

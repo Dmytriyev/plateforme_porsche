@@ -13,9 +13,9 @@ const isProduction = process.env.NODE_ENV === "production";
 const noop = () => {};
 
 const logger = {
-  info: isProduction ? noop : (...args) => console.log("[INFO]", ...args),
-  warn: isProduction ? noop : (...args) => console.warn("[WARN]", ...args),
-  error: isProduction ? noop : (...args) => console.error("[ERROR]", ...args),
+  info: noop,
+  warn: noop,
+  error: (...args) => console.error("[ERROR]", ...args),
 };
 
 export default logger;

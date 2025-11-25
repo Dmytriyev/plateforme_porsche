@@ -9,6 +9,7 @@
 import { createContext, useState, useMemo, useCallback, useEffect } from "react";
 import authService from "../services/auth.service.js";
 import userService from "../services/user.service.js";
+import TokenService from "../services/token.service.js";
 
 export const AuthContext = createContext(null);
 
@@ -27,7 +28,15 @@ export function AuthProvider({ children }) {
           return;
         }
 
-        // Sinon, on tente de charger depuis l'API (via cookie)
+        // If there is no access token, avoid calling protected API (prevents noisy 401s)
+        const token = TokenService.getToken();
+        if (!token) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        // Sinon, on tente de charger depuis l'API (via token / cookie)
         const userData = await userService.getCurrentUser();
         if (userData) {
           setUser(userData);
@@ -128,4 +137,4 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export default AuthProvider;
+// Named exports only to keep exports stable for Fast Refresh

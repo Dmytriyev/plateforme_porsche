@@ -37,6 +37,7 @@ import sanitizeInputs from "./middlewares/sanitizeInputs.js";
 import siegeRoutes from "./routes/siege.route.js";
 import taille_janteRoutes from "./routes/taille_jante.route.js";
 import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
 import voitureRoutes from "./routes/voiture.route.js";
 import { webhookHandler } from "./controllers/payment.controller.js";
 
@@ -147,6 +148,7 @@ app.use("/package", uploadLimiter, packageRoutes);
 
 // Routes principales
 app.use("/user", userRoutes);
+app.use("/auth", authRoutes);
 app.use("/api/payment", paymentLimiter, paymentRoutes);
 app.use("/api/panier", panierRoutes);
 app.use("/reservation", reservationRoutes);

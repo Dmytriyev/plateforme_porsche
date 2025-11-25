@@ -4,8 +4,8 @@
  * - Sanitize côté client et côté serveur.
  * - Fournir des helpers prédictibles (formatDate, formatPrice)
  */
-
 import DOMPurify from "dompurify";
+
 // Importation de la bibliothèque pour la sanitisation HTML
 const ERROR_MESSAGES = {
   NETWORK_ERROR: "Erreur de connexion au serveur",
@@ -34,15 +34,16 @@ const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
 export const formatPrice = (prix) => priceFormatter.format(prix);
 export const formatDate = (date) => dateFormatter.format(new Date(date));
 
-// Fonction pour formater les numéros de téléphone français
+// Fonctions pour formater email
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
+// Fonction de validation pour password
 const validatePassword = (password) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
-
+// Fonction de validation pour téléphone
 const validateTelephone = (telephone) =>
   /^0[1-9](?:[\s.-]?\d{2}){4}$/.test(telephone);
-// Fonctions de validation pour email, mot de passe, téléphone et code postal
+
+// Fonction pour obtenir les erreurs de validation du mot de passe
 const getPasswordErrors = (password) => {
   const errors = [];
   // Vérifie les critères du mot de passe et retourne les messages d'erreur correspondants
@@ -58,7 +59,6 @@ const getPasswordErrors = (password) => {
   if (!/\d/.test(password)) {
     errors.push("Le mot de passe doit contenir au moins un chiffre");
   }
-
   return errors;
 };
 
@@ -97,6 +97,7 @@ export const setupConsoleFilter = () => {
   }
 };
 // Configurer le filtrage de la console pour ignorer certains warnings non critiques
+// DOMPurify : une bibliothèque JavaScript qui nettoie (sanitize) du HTML pour prévenir les failles XSS
 const sanitizeText = (text) =>
   text === null || text === undefined
     ? ""

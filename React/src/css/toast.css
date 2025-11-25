@@ -1,0 +1,40 @@
+/* Custom toast styles to match site design */
+.app-toast {
+  background: linear-gradient(180deg, #0b1220, #0f1724); /* dark gradient */
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 8px 12px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
+  min-width: 320px;
+}
+
+.app-toast-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* color variants */
+.app-toast--success {
+  background: linear-gradient(180deg, #0f3a2a, #0b2e23);
+}
+.app-toast--error {
+  background: linear-gradient(180deg, #3a0f1a, #2e0b14);
+}
+.app-toast--info {
+  background: linear-gradient(180deg, #0f2843, #071a2b);
+}
+.app-toast--warning {
+  background: linear-gradient(180deg, #3a2a0f, #2e230b);
+}
+
+/* small responsive tweak */
+@media (max-width: 420px) {
+  .app-toast {
+    min-width: 260px;
+  }
+}

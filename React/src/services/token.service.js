@@ -5,32 +5,26 @@
  */
 
 // Token stocké en mémoire pour éviter les accès répétitifs à sessionStorage
-const MEMORY = { token: null };
+const MEMORY = { token: null, refreshToken: null };
 
-// Service de gestion des tokens
+// Clés utilisées dans sessionStorage
+const KEY_ACCESS = "auth_token";
+const KEY_REFRESH = "refresh_token";
+
+// Service de gestion des tokens (access + refresh)
 const TokenService = {
   setToken(token) {
-    // Met à jour le token en mémoire et dans sessionStorage
     MEMORY.token = token || null;
-    // Met à jour sessionStorage
     try {
-      if (token) {
-        // Stocke le token
-        sessionStorage.setItem("auth_token", token);
-      } else {
-        // Supprime si token est null/undefined
-        sessionStorage.removeItem("auth_token");
-      }
+      if (token) sessionStorage.setItem(KEY_ACCESS, token);
+      else sessionStorage.removeItem(KEY_ACCESS);
     } catch (err) {}
   },
 
-  // Récupère le token depuis la mémoire ou sessionStorage
   getToken() {
     if (MEMORY.token) return MEMORY.token;
     try {
-      // Récupère depuis sessionStorage
-      const token = sessionStorage.getItem("auth_token");
-      // Met à jour la mémoire
+      const token = sessionStorage.getItem(KEY_ACCESS);
       if (token) MEMORY.token = token;
       return token;
     } catch (err) {
@@ -38,12 +32,38 @@ const TokenService = {
     }
   },
 
-  // Supprime le token de la mémoire et de sessionStorage
+  setRefreshToken(refreshToken) {
+    MEMORY.refreshToken = refreshToken || null;
+    try {
+      if (refreshToken) sessionStorage.setItem(KEY_REFRESH, refreshToken);
+      else sessionStorage.removeItem(KEY_REFRESH);
+    } catch (err) {}
+  },
+
+  getRefreshToken() {
+    if (MEMORY.refreshToken) return MEMORY.refreshToken;
+    try {
+      const token = sessionStorage.getItem(KEY_REFRESH);
+      if (token) MEMORY.refreshToken = token;
+      return token;
+    } catch (err) {
+      return null;
+    }
+  },
+
+  // Met à jour access + refresh ensemble
+  setTokens({ accessToken, refreshToken }) {
+    this.setToken(accessToken);
+    this.setRefreshToken(refreshToken);
+  },
+
+  // Supprime les tokens de la mémoire et du sessionStorage
   clear() {
     MEMORY.token = null;
+    MEMORY.refreshToken = null;
     try {
-      // Supprime de sessionStorage
-      sessionStorage.removeItem("auth_token");
+      sessionStorage.removeItem(KEY_ACCESS);
+      sessionStorage.removeItem(KEY_REFRESH);
     } catch (err) {}
   },
 };

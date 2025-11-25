@@ -1,4 +1,4 @@
-// App.jsx — Composant racine de l'application React
+//— Composant racine de l'application React
 import AccessoireDetail from "./pages/AccessoireDetail.jsx";
 import Accessoires from "./pages/Accessoires.jsx";
 import AjouterAccessoire from "./pages/AjouterAccessoire.jsx";
@@ -6,6 +6,11 @@ import AjouterMaVoiture from "./pages/AjouterMaVoiture.jsx";
 import AjouterModelPorsche from "./pages/AjouterModelPorsche.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { setNavigate } from "./utils/navigate.js";
+import ToastifyProvider from "./components/ToastifyProvider.jsx";
+import notify from "./utils/notify.js";
 import CatalogueModeles from "./pages/CatalogueModeles.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import ChoixVoiture from "./pages/ChoixVoiture.jsx";
@@ -69,6 +74,9 @@ function App() {
     <AuthProvider>
       {/*Gère la navigation entre les pages  */}
       <BrowserRouter>
+        {/* Hook pour exposer `navigate` aux utilitaires non-React (ex: api client) */}
+        <RouterBridge />
+        <ToastifyProvider />
         {/*  Capture les erreurs dans l'arborescence des composants */}
         <ErrorBoundary>
           <div className="app-container">
@@ -78,7 +86,20 @@ function App() {
                 {routes.map(({ path, elementName }) => {
                   const Component = components[elementName];
                   return (
-                    <Route key={path} path={path} element={<Component />} />
+                    <Route
+                      key={path}
+                      path={path}
+                      element={
+                        Component ? (
+                          <Component />
+                        ) : (
+                          <div className="page-missing-component">
+                            <h2>Composant introuvable</h2>
+                            <p>Le composant &quot;{elementName}&quot; est introuvable.</p>
+                          </div>
+                        )
+                      }
+                    />
                   );
                 })}
                 {protectedRoutes.map(({ path, elementName, roles }) => {
@@ -89,9 +110,16 @@ function App() {
                       key={path}
                       path={path}
                       element={
-                        <ProtectedRoute roles={roles}>
-                          <Component />
-                        </ProtectedRoute>
+                        Component ? (
+                          <ProtectedRoute roles={roles}>
+                            <Component />
+                          </ProtectedRoute>
+                        ) : (
+                          <div className="page-missing-component">
+                            <h2>Composant introuvable</h2>
+                            <p>Le composant &quot;{elementName}&quot; est introuvable.</p>
+                          </div>
+                        )
                       }
                     />
                   );
@@ -122,3 +150,25 @@ function App() {
 }
 
 export default App;
+
+function RouterBridge() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigate(navigate);
+
+    // écouteur pour notifications provenant d'autres utilitaires (fallback)
+    const handler = (e) => {
+      try {
+        const { message, type = "error" } = e.detail || {};
+        if (message) notify.show(message, { type });
+      } catch (err) {
+        console.warn("notification error", err);
+      }
+    };
+    window.addEventListener("app:notify", handler);
+    return () => window.removeEventListener("app:notify", handler);
+  }, [navigate]);
+
+  return null;
+}

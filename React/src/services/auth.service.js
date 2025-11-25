@@ -7,6 +7,7 @@
 import apiClient from "../config/api.js";
 import { extractData } from "./httpHelper";
 import TokenService from "./token.service.js";
+import { navigate } from "../utils/navigate.js";
 import { sanitizeObject } from "../utils/helpers";
 import storage from "../utils/storage.js";
 
@@ -18,6 +19,8 @@ const authService = {
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token);
+        // si le backend retourne également un refresh token
+        if (data.refreshToken) TokenService.setRefreshToken(data.refreshToken);
         // Cache temporaire pour la session (optionnel)
         if (data.user) {
           storage.set("user", sanitizeObject(data.user));
@@ -36,6 +39,7 @@ const authService = {
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token);
+        if (data.refreshToken) TokenService.setRefreshToken(data.refreshToken);
         // Cache temporaire pour la session (optionnel)
         if (data.user) {
           storage.set("user", sanitizeObject(data.user));
@@ -51,7 +55,7 @@ const authService = {
   logout: () => {
     TokenService.clear();
     storage.remove("user");
-    window.location.href = "/login";
+    navigate("/login", { replace: true });
   },
 
   // Récupère le profil d'un utilisateur par ID et le met en cache local.
