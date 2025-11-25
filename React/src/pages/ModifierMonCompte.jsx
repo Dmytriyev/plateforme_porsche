@@ -1,12 +1,7 @@
 /**
- * pages/ModifierMonCompte.jsx — Page pour modifier le profil utilisateur.
+ * ModifierMonCompte.jsx — Page de modification du compte
  *
- * Notes pédagogiques :
- * - Montre le pattern de récupération / mise à jour du profil via
- *   `user.service` et le contexte `AuthContext`.
- * - Astuce : valider les changements de mot de passe côté client avant l'envoi.
- *
- * @file pages/ModifierMonCompte.jsx
+ * - Formulaire de profil et sécurité.
  */
 
 import { useState, useEffect, useContext } from "react";

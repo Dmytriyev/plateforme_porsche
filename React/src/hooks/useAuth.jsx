@@ -1,7 +1,6 @@
 /**
  * hooks/useAuth.jsx — Hook consommant `AuthContext`
  *
- * Notes pédagogiques :
  * - Fournit un accès centralisé au contexte d'authentification (user, token,
  *   méthodes login/logout) sans prop-drilling.
  * - Lancer une erreur si le hook est utilisé hors du provider aide à détecter

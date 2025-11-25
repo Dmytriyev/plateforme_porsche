@@ -1,7 +1,6 @@
 /**
- * pages/PaymentCancel.jsx — Affiche annulation de paiement et actions possibles.
- *
- * @file pages/PaymentCancel.jsx
+ * PaymentCancel.jsx — Page d'annulation de paiement
+ * - Affiche annulation de paiement et actions possibles.
  */
 
 import { useNavigate } from "react-router-dom";

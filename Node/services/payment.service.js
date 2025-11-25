@@ -5,11 +5,10 @@ import Stripe from "stripe";
 
 /**
  * services/payment.service.js — Intégration Stripe côté serveur.
+/**
+ * payment.service.js — Service de paiement
  *
- * Notes pédagogiques :
- * - Instancie Stripe avec la clé secrète serveur (NE JAMAIS exposer côté client).
- * - Fournit : construction des `line_items` pour Checkout et traitement des webhooks
- *   (vérification de signature + idempotence).
+ * - Explique l'intégration avec Stripe et la gestion des webhooks.
  */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

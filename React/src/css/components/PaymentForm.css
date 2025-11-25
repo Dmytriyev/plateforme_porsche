@@ -1,6 +1,5 @@
 /*
  * components/PaymentForm.css — Styles pour l'interface de paiement Stripe (formulaire CardElement).
- * Notes pédagogiques : garder un contraste fort et feedback clair pour les erreurs de saisie.
  */
 
 .payment-form {

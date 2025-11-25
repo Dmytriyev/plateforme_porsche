@@ -1,7 +1,6 @@
 /**
  * ProtectedRoute.jsx — Route protégée par authentification et rôles
  *
- * Notes pédagogiques :
  * - Vérifie d'abord l'état `loading` pour ne pas rediriger prématurément.
  * - `isAuthenticated()` contrôle si l'utilisateur est connecté.
  * - `roles` permet d'illustrer la séparation responsabilités :

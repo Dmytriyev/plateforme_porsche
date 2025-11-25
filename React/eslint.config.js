@@ -1,8 +1,6 @@
 // - Utilisation de `defineConfig` pour une configuration claire et typée.
 // - Inclusion de plugins pour React Hooks et React Refresh (Vite).
 // - `globalIgnores` exclut les dossiers de build et dépendances.
-// - Configuration spécifique pour les fichiers de config JS (Node).
-// - Règles spécifiques pour les fichiers React JS/JSX.
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import js from "@eslint/js";

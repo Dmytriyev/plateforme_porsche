@@ -1,13 +1,7 @@
 /**
- * pages/MaVoitureDetail.jsx — Détail d'une voiture (mes voitures / réservation).
+ * MaVoitureDetail.jsx — Détail d'une voiture
  *
- * Notes pédagogiques :
- * - Illustre la gestion conditionnelle des sources de données
- *   (ma_voiture, model_porsche, commande) selon `location.state`.
- * - Bon exemple d'affichage conditionnel et d'utilisation des helpers
- *   `formatPrice` / `formatDate` pour une UI claire.
- *
- * @file pages/MaVoitureDetail.jsx
+ * - Affichage détaillé et actions possibles.
  */
 
 import { useState, useEffect } from "react";

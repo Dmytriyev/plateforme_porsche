@@ -1,7 +1,6 @@
 /**
  * hooks/usePanierAPI.jsx — Hook pour actions liées au panier
  *
- * Notes pédagogiques :
  * - Encapsule la logique du panier : lecture du nombre d'articles et actions d'ajout.
  * - Exemple d'un patron utile pour étudiants : garder la logique métier hors des composants UI.
  * - Le hook utilise le contexte `AuthContext` pour protéger les actions nécessitant l'auth.

@@ -1,11 +1,6 @@
 /**
- * pages/AjouterAccessoire.jsx — Formulaire admin pour créer un accessoire.
- *
- * Notes pédagogiques :
- * - Illustre l'upload d'images, la gestion d'options et la soumission multipart.
- * - Point d'apprentissage : valider les champs et prévisualiser les images avant envoi.
- *
- * @file pages/AjouterAccessoire.jsx
+ * AjouterAccessoire.jsx — Page d'ajout d'accessoire
+ * - Formulaire et upload d'images.
  */
 
 import { useState, useEffect } from "react";

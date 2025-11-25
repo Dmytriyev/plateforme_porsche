@@ -1,11 +1,6 @@
 /**
- * services/auth.service.js — Authentification client (login / register / profile)
- *
- * Notes pédagogiques :
- * - Gère stockage local du token (via `TokenService`) et mise à jour du profil en `localStorage`.
- * - Côté étudiant : garder la logique réseau dans un service rend le code des composants plus simple.
- * - Attention : stocker des informations sensibles côté client doit rester limité ; le serveur
- *   est l'autorité pour l'authentification.
+ * auth.service.js — Service d'authentification
+ * - Gestion des tokens et login.
  */
 
 import apiClient from "../config/api.js";

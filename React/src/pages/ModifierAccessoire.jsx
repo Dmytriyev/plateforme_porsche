@@ -1,12 +1,7 @@
 /**
- * pages/ModifierAccessoire.jsx — Admin : modification d'un accessoire.
+ * ModifierAccessoire.jsx — Modification d'un accessoire
  *
- * Notes pédagogiques :
- * - Expose la gestion d'images (prévisualisation, suppression) et la mise à jour
- *   via `accesoire.service`.
- * - Utile pour pratiquer la gestion des formulaires complexes et des médias.
- *
- * @file pages/ModifierAccessoire.jsx
+ * - Edition et gestion des images.
  */
 
 import { useState, useEffect, useCallback } from "react";

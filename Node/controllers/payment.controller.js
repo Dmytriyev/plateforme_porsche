@@ -1,7 +1,6 @@
 /**
  * controllers/payment.controller.js — Routes liées à Stripe (checkout + webhook).
  *
- * Notes pédagogiques :
  * - `createCheckoutSession` construit les `line_items` à partir des lignes de commande
  *   et retourne la session Stripe (id/url) pour le frontend.
  * - `webhookHandler` doit être reçu via `express.raw` pour vérifier la signature

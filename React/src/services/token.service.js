@@ -1,12 +1,7 @@
 /**
- * services/token.service.js — Gestion simple du token d'authentification
- *
- * Notes pédagogiques :
- * - Stocker le token en `sessionStorage` (plutôt que localStorage) ici pour limiter
- *   la persistance entre onglets de navigation; dépend des besoins de l'app.
- * - `MEMORY` évite des lectures répétées depuis sessionStorage (optimisation).
- * - Ne jamais mettre de logique sensible côté client ; le token permet juste
- *   d'authentifier les appels API côté serveur.
+ * token.service.js — Gestion des tokens
+ * - Lecture/écriture des tokens côté client.
+ * - Permet d'authentifier les appels API côté serveur.
  */
 
 const MEMORY = { token: null };

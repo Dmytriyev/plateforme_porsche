@@ -1,7 +1,6 @@
 /**
  * utils/buildUrl.js — Construction d'URLs pour les ressources (images, API)
  *
- * Notes pédagogiques :
  * - Construit une URL absolue si `API_URL` est défini, sinon retourne un chemin relatif.
  * - Utile pour gérer les environnements (dev vs prod) sans disperser la logique partout.
  */

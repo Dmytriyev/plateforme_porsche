@@ -1,7 +1,6 @@
 /**
  * components/layout/Navbar.jsx — Barre de navigation principale
  *
- * Notes pédagogiques :
  * - Utilise `usePanierAPI` pour afficher le badge du panier (séparation UI/logique).
  * - Montre un pattern courant : afficher des liens différents selon `isAuthenticated()`.
  * - Pensez accessibilité : `aria-*` et gestion clavier pour le menu mobile.

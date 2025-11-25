@@ -1,13 +1,9 @@
 /**
  * pages/ModifierMaVoiture.jsx — Édition d'une voiture personnelle enregistrée.
+/**
+ * ModifierMaVoiture.jsx — Page de modification d'une voiture
  *
- * Notes pédagogiques :
- * - Charge les données existantes, gère upload/suppression d'images et enregistre
- *   avec `ma_voiture.service`.
- * - Exemple utile pour apprendre la gestion d'états complexes (`saving`,
- *   `photosASupprimer`) et la sauvegarde optimiste.
- *
- * @file pages/ModifierMaVoiture.jsx
+ * - Comportement du formulaire et sauvegarde.
  */
 
 import { useState, useEffect } from "react";

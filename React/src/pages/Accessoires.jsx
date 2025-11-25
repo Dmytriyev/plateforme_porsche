@@ -45,8 +45,8 @@ const Accessoires = () => {
     } catch (err) {
       setError(
         err?.message ||
-          err?.response?.data?.message ||
-          "Erreur lors du chargement des accessoires",
+        err?.response?.data?.message ||
+        "Erreur lors du chargement des accessoires",
       );
       setAccessoires([]);
     } finally {
@@ -353,7 +353,7 @@ const Accessoires = () => {
                               } catch (err) {
                                 setError(
                                   err.message ||
-                                    "Erreur lors de la suppression",
+                                  "Erreur lors de la suppression",
                                 );
                                 setTimeout(() => setError(""), 3000);
                               }

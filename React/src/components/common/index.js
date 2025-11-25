@@ -1,7 +1,6 @@
 /**
  * components/common/index.js — Regroupe les composants UI réutilisables.
  *
- * Notes pédagogiques :
  * - Sert d'interface centrale pour importer les composants `common`.
  * - Pratique pour les étudiants : facilite les imports courts (`from 'components/common'`).
  *

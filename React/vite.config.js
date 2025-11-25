@@ -1,7 +1,6 @@
 // Fichier de configuration Vite pour une application React.
 // - `server.proxy` redirige les appels d'API en dev vers le backend (évite CORS en dev).
 // - `manualChunks` permet d'isoler les dépendances lourdes (React, UI, Stripe)
-//   pour améliorer le caching et réduire la taille des bundles initiaux.
 import { defineConfig, loadEnv } from "vite";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -61,6 +60,7 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 700,
       rollupOptions: {
         output: {
+          // Séparation des dépendances en chunks distincts pour optimiser le caching.
           manualChunks(id) {
             if (id.includes("node_modules")) {
               if (id.includes("react") || id.includes("react-dom"))

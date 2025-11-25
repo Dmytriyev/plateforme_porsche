@@ -1,7 +1,6 @@
 /**
  * components/layout/Footer.jsx — Pied de page global
  *
- * Notes pédagogiques :
  * - Contient des liens de navigation et des informations de contact statiques.
  * - Utile pour illustrer la composition : composants petits et réutilisables pour
  *   la structure globale d'une page (header / main / footer).

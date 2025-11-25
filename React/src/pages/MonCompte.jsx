@@ -1,7 +1,6 @@
 /**
- * pages/MonCompte.jsx — Dashboard utilisateur (infos, liens rapides).
- *
- * @file pages/MonCompte.jsx
+ * MonCompte.jsx — Page de gestion du compte utilisateur
+ * - Dashboard utilisateur (infos, liens rapides).
  */
 
 import { useState, useEffect, useCallback, useContext, useMemo } from "react";

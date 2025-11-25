@@ -1,12 +1,7 @@
 /**
- * pages/MesVoitures.jsx — Affiche la liste des voitures liées à l'utilisateur.
+ * MesVoitures.jsx — Liste des voitures de l'utilisateur
  *
- * Notes pédagogiques :
- * - Montre l'usage de `useEffect` dépendant du contexte `user` et l'appel à
- *   `ma_voiture.service` pour récupérer les données.
- * - Important : gérer les états `loading`/`error` pour une UX robuste.
- *
- * @file pages/MesVoitures.jsx
+ * - Gestion de la liste, pagination et actions.
  */
 
 import { useState, useEffect, useContext } from "react";

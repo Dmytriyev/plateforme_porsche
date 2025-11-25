@@ -1,11 +1,6 @@
 /**
- * pages/ChoixVoiture.jsx — Page simple pour choisir 'neuve' ou 'occasion'.
- *
- * Notes pédagogiques :
- * - Montre une page minimale qui gère uniquement la navigation (séparation UI/logic).
- * - Utile pour apprendre quand extraire logique vers des services/hooks.
- *
- * @file pages/ChoixVoiture.jsx
+ * ChoixVoiture.jsx — Page de sélection de voiture
+ * - Description de la page et du comportement attendu.
  */
 
 import { useNavigate } from "react-router-dom";

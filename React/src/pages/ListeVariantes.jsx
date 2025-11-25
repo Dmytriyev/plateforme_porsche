@@ -1,11 +1,6 @@
 /**
- * pages/ListeVariantes.jsx — Liste des variantes d'un modèle sélectionné.
- *
- * Notes pédagogiques :
- * - Montre comment récupérer et filtrer des collections liées (variantes par modèle).
- * - Bon exercice pour apprendre tri/filtrage côté client et gestion des états `loading`/`error`.
- *
- * @file pages/ListeVariantes.jsx
+ * ListeVariantes.jsx — Liste des variantes de modèle
+ * - Présentation des variantes et filtering.
  */
 
 import { useState, useEffect } from "react";

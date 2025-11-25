@@ -1,12 +1,7 @@
 /**
- * pages/Register.jsx — Formulaire d'inscription et gestion d'erreurs.
+ * Register.jsx — Page d'inscription
  *
- * Notes pédagogiques :
- * - Illustre la validation locale (`validateRegisterForm`) avant envoi au backend.
- * - Conseils : fournir un retour utilisateur clair sur les erreurs et empêcher
- *   les soumissions multiples pendant le loading.
- *
- * @file pages/Register.jsx
+ * - Formulaire d'inscription et validation côté client.
  */
 
 import { useState, useContext } from "react";

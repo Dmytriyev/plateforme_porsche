@@ -1,12 +1,3 @@
-/**n+ * pages/AccessoireDetail.jsx — Détail d'accessoire avec galerie et bouton add-to-cart.
- *
- * Notes pédagogiques :
- * - Montre la récupération d'un ressource par `id` et l'affichage d'une galerie.
- * - Exemple pratique : séparer appels réseau (`accesoire.service`) et UI pour tests.
- *
- * @file pages/AccessoireDetail.jsx
- */
-
 import { useState, useEffect, useCallback, useContext } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import accesoireService from "../services/accesoire.service.js";

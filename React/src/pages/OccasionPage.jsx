@@ -1,12 +1,7 @@
 /**
- * pages/OccasionPage.jsx — Page listant les occasions d'un modèle.
+ * OccasionPage.jsx — Page des voitures d'occasion
  *
- * Notes pédagogiques :
- * - Montre filtres, recherche et pagination côté client; appelle
- *   `modelPorsche.service` et `voiture.service` pour récupérer les données.
- * - Exemple pratique : séparer logique de filtrage et UI pour testabilité.
- *
- * @file pages/OccasionPage.jsx
+ * - Liste et filtres pour les annonces d'occasion.
  */
 
 import { useState, useEffect, useContext } from "react";

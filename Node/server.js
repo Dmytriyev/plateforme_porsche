@@ -1,7 +1,6 @@
 /**
  * server.js — Point d'entrée Express : configuration des middlewares, routes et sécurité.
  *
- * Notes pédagogiques :
  * - L'ordre des middlewares est critique (ex. le webhook Stripe nécessite le raw body
  *   avant le parser JSON, sinon la vérification de signature échoue).
  * - Charger `dotenv` tôt garantit que les modules lisant `process.env` obtiennent

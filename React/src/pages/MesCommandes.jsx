@@ -1,7 +1,6 @@
 /**
- * pages/MesCommandes.jsx — Historique commandes; récupère via `commande.service`.
- *
- * @file pages/MesCommandes.jsx
+ * MesCommandes.jsx — Liste des commandes utilisateur
+ * - Historique commandes; récupère via `commande.service`.
  */
 
 import { useState, useEffect, useContext } from "react";

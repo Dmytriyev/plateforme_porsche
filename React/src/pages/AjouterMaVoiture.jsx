@@ -1,12 +1,7 @@
 /**
- * pages/AjouterMaVoiture.jsx — Formulaire pour enregistrer une voiture personnelle.
+ * AjouterMaVoiture.jsx — Page d'ajout d'une voiture
  *
- * Notes pédagogiques :
- * - Illustre l'upload d'images, la validation locale et l'envoi multipart vers le
- *   backend via `ma_voiture.service`.
- * - Pensez à valider taille/fichier côté client avant l'envoi pour une bonne UX.
- *
- * @file pages/AjouterMaVoiture.jsx
+ * - Collecte des informations et validation.
  */
 
 import { useState, useEffect } from "react";

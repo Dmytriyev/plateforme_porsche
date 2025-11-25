@@ -1,12 +1,6 @@
 /**
- * pages/Checkout.jsx — Wrapper affichant résumé commande et `PaymentForm`.
- *
- * Notes pédagogiques :
- * - Exemple d'orchestration : lecture du panier, affichage des lignes et appel
- *   du composant de paiement (`PaymentForm`).
- * - Important : vérifier l'authentification avant d'autoriser l'accès au checkout.
- *
- * @file pages/Checkout.jsx
+ * Checkout.jsx — Page de paiement
+ * - Intégration Stripe et récapitulatif de commande.
  */
 
 import { useState, useEffect, useContext } from "react";

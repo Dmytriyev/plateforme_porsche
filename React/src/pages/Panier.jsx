@@ -1,7 +1,6 @@
 /**
- * pages/Panier.jsx — Gère affichage panier, totaux et navigation vers checkout.
- *
- * @file pages/Panier.jsx
+ * Panier.jsx — Page du panier
+ * - Gère affichage panier, totaux et navigation vers checkout.
  */
 
 import { useState, useEffect, useContext } from "react";
@@ -50,7 +49,7 @@ const Panier = () => {
     if (user) {
       fetchPanier();
     }
-     
+
   }, [user]);
 
   // Recalculer le total : acompte pour voitures neuves, prix complet pour accessoires
@@ -180,11 +179,11 @@ const Panier = () => {
 
                 const photos = isVoiture
                   ? ligne.model_porsche_id?.photo_porsche?.filter(
-                      (p) => p && (p.name || p._id),
-                    ) || []
+                    (p) => p && (p.name || p._id),
+                  ) || []
                   : ligne.accesoire?.photo_accesoire?.filter(
-                      (p) => p && (p.name || p._id),
-                    ) || [];
+                    (p) => p && (p.name || p._id),
+                  ) || [];
 
                 const photoPrincipale = photos[0] || null;
                 // Pour les voitures : afficher l'acompte

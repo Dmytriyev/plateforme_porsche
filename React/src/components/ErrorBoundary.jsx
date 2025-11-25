@@ -1,7 +1,6 @@
 /**
  * ErrorBoundary.jsx — Catcher React pour erreurs runtime UI
  *
- * Notes pédagogiques :
  * - Un ErrorBoundary capture les erreurs dans le rendu/les lifecycles des composants enfants.
  * - Il n'attrape PAS les erreurs d'événements asynchrones (promises); prévoir un handling global.
  * - En dev, afficher la stack aide à apprendre où l'erreur est survenue; en prod, masquer les détails.

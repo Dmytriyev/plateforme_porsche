@@ -1,13 +1,7 @@
 /**
- * pages/ModifierModelPorsche.jsx — Interface admin pour modifier un modèle Porsche.
+ * ModifierModelPorsche.jsx — Modification d'un modèle
  *
- * Notes pédagogiques :
- * - Montre comment synchroniser la logique métier (variantes, carrosseries)
- *   entre frontend et backend via `modelPorsche.service`.
- * - Bon exemple pour apprendre à organiser formulaires longs et règles de
- *   validation côté client avant soumission.
- *
- * @file pages/ModifierModelPorsche.jsx
+ * - Formulaire d'édition du modèle.
  */
 
 import { useState, useEffect } from "react";

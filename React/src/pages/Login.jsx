@@ -1,12 +1,7 @@
 /**
- * pages/Login.jsx — Formulaire login; met à jour `AuthContext`.
+ * Login.jsx — Page de connexion
  *
- * Notes pédagogiques :
- * - Montre comment centraliser l'authentification via le contexte `AuthContext`.
- * - Astuce : n'affichez pas de messages trop détaillés sur l'échec d'authentification
- *   pour des raisons de sécurité (éviter d'indiquer si l'email existe).
- *
- * @file pages/Login.jsx
+ * - Authentification et gestion des erreurs.
  */
 
 import { useState, useContext } from "react";

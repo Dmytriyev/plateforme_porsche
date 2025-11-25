@@ -1,7 +1,6 @@
 /**
  * utils/helpers.js — Fonctions utilitaires partagées (formatage, validation, sanitisation)
  *
- * Notes pédagogiques :
  * - Centraliser helpers évite la duplication et facilite les tests unitaires.
  * - Sanitize côté client pour prévenir les XSS dans l'UI, mais faites aussi la sanitisation côté serveur.
  * - Fournir des helpers prédictibles (formatDate, formatPrice) améliore la cohérence UX.

@@ -1,6 +1,5 @@
 /*
  * ErrorBoundary.css — Styles pour l'affichage des erreurs UI capturées.
- * Notes pédagogiques : utiliser un style clair pour indiquer l'erreur sans divulguer d'informations sensibles.
  */
 
 .error-boundary-container {
