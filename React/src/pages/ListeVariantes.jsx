@@ -16,6 +16,7 @@ import "../css/CatalogueModeles.css";
 import "../css/components/Message.css";
 import { debug } from "../utils/logger.js";
 
+// Page : affiche les variantes d'un modèle (neuf/occasion). Nécessite `modeleId` param.
 const ListeVariantes = () => {
   const { type, modeleId } = useParams();
   const navigate = useNavigate();

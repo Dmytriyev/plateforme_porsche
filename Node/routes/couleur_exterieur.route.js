@@ -15,16 +15,10 @@ import isStaff from "../middlewares/isStaff.js";
 
 const router = Router();
 
-// ============================================
-// ROUTES PUBLIQUES
-// ============================================
 router.get("/couleurs", getAvailableCouleursExterieurOptions);
 router.get("/all", getAllCouleurExterieur);
 router.get("/:id", validateObjectId("id"), getCouleurExterieurById);
 
-// ============================================
-// ROUTES STAFF
-// ============================================
 router.post("/new", auth, isStaff, optionalUpload, createCouleurExterieur);
 router.put(
   "/update/:id",
@@ -32,18 +26,15 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateCouleurExterieur,
+  updateCouleurExterieur
 );
 
-// ============================================
-// ROUTES ADMIN
-// ============================================
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteCouleurExterieur,
+  deleteCouleurExterieur
 );
 
 export default router;

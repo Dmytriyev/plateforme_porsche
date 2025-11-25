@@ -30,7 +30,7 @@ router.get(
   "/commande/:commandeId",
   auth,
   validateObjectId("commandeId"), // id commande
-  getLignesByCommande,
+  getLignesByCommande
 );
 
 // ligne de commande
@@ -41,7 +41,7 @@ router.patch(
   "/updateQuantite/:id",
   auth,
   validateObjectId("id"), // id ligne commande
-  updateQuantite,
+  updateQuantite
 );
 
 router.delete("/delete/:id", auth, validateObjectId("id"), deleteLigneCommande);

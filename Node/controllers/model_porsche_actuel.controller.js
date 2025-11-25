@@ -17,7 +17,7 @@ import {
 } from "../utils/responses.js";
 import { isOwnerOrAdmin } from "../utils/errorHandler.js";
 
-// Créer un nouveau modèle_Porsche_actuel
+// Crée une annonce/voiture actuelle pour l'utilisateur (validation + save).
 const createModel_porsche_actuel = async (req, res) => {
   try {
     const { body } = req;
@@ -84,7 +84,7 @@ const createModel_porsche_actuel = async (req, res) => {
   }
 };
 
-// Récupérer tous les modèles_Porsche_actuels
+// Récupère toutes les annonces voitures (liste, triée).
 const getAllModel_porsche_actuels = async (req, res) => {
   try {
     const model_porsche_actuels = await Model_porsche_actuel.find()
@@ -105,7 +105,7 @@ const getAllModel_porsche_actuels = async (req, res) => {
   }
 };
 
-// Récupérer un modèle_Porsche_actuel par ID
+// Récupère une annonce voiture par son ID (détails enrichis).
 const getModel_porsche_actuelById = async (req, res) => {
   try {
     const model_porsche_actuel = await Model_porsche_actuel.findById(
@@ -128,7 +128,7 @@ const getModel_porsche_actuelById = async (req, res) => {
   }
 };
 
-// Mettre à jour un modèle_Porsche_actuel par ID
+// Met à jour une annonce voiture (vérifie propriétaire / validation).
 const updateModel_porsche_actuel = async (req, res) => {
   try {
     const { body } = req;
@@ -209,7 +209,7 @@ const updateModel_porsche_actuel = async (req, res) => {
   }
 };
 
-// Supprimer un modèle_Porsche_actuel par ID
+// Supprime une annonce voiture et ses photos associées.
 const deleteModel_porsche_actuel = async (req, res) => {
   try {
     if (!req.user) {
@@ -253,7 +253,7 @@ const deleteModel_porsche_actuel = async (req, res) => {
   }
 };
 
-// Ajouter des images à un modèle_Porsche_actuel
+// Ajoute des images à une annonce (vérifie existences + permissions).
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -323,7 +323,7 @@ const addImages = async (req, res) => {
   }
 };
 
-// Supprimer des images d'un modèle_Porsche_actuel
+// Retire des images d'une annonce (vérifie existences + permissions).
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -384,7 +384,7 @@ const removeImages = async (req, res) => {
   }
 };
 
-// Récupérer les Porsches de l'utilisateur connecté
+// Récupère les annonces du user connecté (liste + total).
 const getMesPorsches = async (req, res) => {
   try {
     if (!req.user) {
@@ -406,7 +406,7 @@ const getMesPorsches = async (req, res) => {
   }
 };
 
-// Mettre à jour la couleur extérieure d'un modèle_Porsche_actuel
+// Modifie la couleur extérieure d'une annonce (vérifie droits).
 const setCouleurExterieur = async (req, res) => {
   try {
     if (!req.user) {
@@ -451,7 +451,7 @@ const setCouleurExterieur = async (req, res) => {
   }
 };
 
-// Mettre à jour la couleur intérieure d'un modèle_Porsche_actuel
+// Modifie la couleur intérieure d'une annonce (vérifie droits).
 const setCouleurInterieur = async (req, res) => {
   try {
     if (!req.user) {
@@ -496,7 +496,7 @@ const setCouleurInterieur = async (req, res) => {
   }
 };
 
-// Mettre à jour la taille de jante d'un modèle_Porsche_actuel
+// Met à jour la taille de jante d'une annonce (vérifie existence jante).
 const setTailleJante = async (req, res) => {
   try {
     if (!req.user) {
@@ -539,7 +539,7 @@ const setTailleJante = async (req, res) => {
   }
 };
 
-// Rechercher des Porsches par critères
+// Recherche des annonces selon critères (filtrage et pagination simple).
 const searchPorschesByCriteria = async (req, res) => {
   try {
     const {

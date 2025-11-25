@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/PaymentStatus.css";
 
+// Page : affiche le succès du paiement; redirige automatiquement vers l'historique des commandes.
 const PaymentSuccess = () => {
   const navigate = useNavigate();
 

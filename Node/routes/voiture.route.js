@@ -20,25 +20,24 @@ import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
 
-// ============================================
-// ROUTES PUBLIQUES
-// ============================================
-// IMPORTANT: Routes spécifiques avant la route générique /:id
-
-// Routes de liste et filtres
+// Routes pour `voiture` (préfixe: /api/voiture)
+// GET  /all                  : public — Récupère toutes les voitures
 router.get("/all", getAllVoitures);
+// GET  /neuve                : public — Récupère les voitures neuves
 router.get("/neuve", getVoituresNeuves);
+// GET  /occasion             : public — Recherche de voitures d'occasion
 router.get("/occasion", getVoituresOccasionFinder);
 
-// Routes avec paramètres spécifiques (avant /:id)
+// GET  /page/:id             : public — Page paginée / détails public (param id)
 router.get("/page/:id", validateObjectId("id"), getVoiturePage);
+// GET  /modelsPorsche/:id    : public — Récupère les configurations modèles Porsche pour une voiture
 router.get(
   "/modelsPorsche/:id",
   validateObjectId("id"),
-  getModelsPorscheByVoiture,
+  getModelsPorscheByVoiture
 );
 
-// Route générique (en dernier)
+// GET  /:id                  : public — Récupère une voiture par son id (doit être en dernier)
 router.get("/:id", validateObjectId("id"), getVoitureById);
 
 // ============================================
@@ -51,7 +50,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateVoiture,
+  updateVoiture
 );
 router.patch(
   "/addImages/:id",
@@ -59,7 +58,7 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  addImages,
+  addImages
 );
 router.patch(
   "/removeImages/:id",
@@ -67,7 +66,7 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  removeImages,
+  removeImages
 );
 
 // Routes admin
@@ -76,7 +75,7 @@ router.delete(
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteVoiture,
+  deleteVoiture
 );
 
 export default router;

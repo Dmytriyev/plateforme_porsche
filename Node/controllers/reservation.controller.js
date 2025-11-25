@@ -15,7 +15,7 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-// Créer une réservation d'une voiture d'occasion
+// Crée une réservation pour une voiture d'occasion (valide date et disponibilité).
 const createReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -106,7 +106,7 @@ const createReservation = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Récupérer toutes les réservations avec les détails utilisateur et voiture
+// Récupère toutes les réservations (détails utilisateur et voiture).
 const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find()
@@ -135,7 +135,7 @@ const getAllReservations = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Récupérer une réservation par ID avec les détails utilisateur et voiture
+// Récupère une réservation par ID (avec population des relations).
 const getReservationById = async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
@@ -157,7 +157,7 @@ const getReservationById = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Mettre à jour une réservation existante
+// Met à jour une réservation (contrôle droits et conflits de date).
 const updateReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -227,7 +227,7 @@ const updateReservation = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Supprimer une réservation par ID
+// Supprime une réservation par ID.
 const deleteReservation = async (req, res) => {
   try {
     const reservation = await Reservation.findByIdAndDelete(req.params.id);
@@ -239,7 +239,7 @@ const deleteReservation = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Récupérer toutes les réservations d'un utilisateur spécifique
+// Récupère les réservations d'un utilisateur donné.
 const getReservationsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -272,7 +272,7 @@ const getReservationsByUser = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Récupérer toutes les réservations pour une voiture spécifique
+// Récupère toutes les réservations pour une voiture spécifique.
 const getReservationsByVoiture = async (req, res) => {
   try {
     const { voitureId } = req.params;
@@ -290,7 +290,7 @@ const getReservationsByVoiture = async (req, res) => {
     return sendError(res, "Erreur serveur", 500, error);
   }
 };
-// Vérifier la disponibilité d'une voiture pour une date donnée
+// Vérifie la disponibilité d'une voiture pour une date (true/false).
 const checkReservations = async (req, res) => {
   try {
     const { voitureId } = req.params;
@@ -327,7 +327,7 @@ const checkReservations = async (req, res) => {
   }
 };
 
-// Accepter une réservation
+// Accepte une réservation (action réservée au staff).
 const accepterReservation = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff
@@ -384,7 +384,7 @@ const accepterReservation = async (req, res) => {
   }
 };
 
-// Refuser une réservation
+// Refuse/annule une réservation (action réservée au staff).
 const refuserReservation = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff

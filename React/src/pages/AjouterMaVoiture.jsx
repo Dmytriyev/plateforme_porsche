@@ -13,6 +13,7 @@ import { formatPrice } from "../utils/helpers.js";
 import "../css/AjouterMaVoiture.css";
 import { warn } from "../utils/logger.js";
 
+// Page : formulaire pour créer une nouvelle voiture. Requiert authentification ; permet l'upload de photos.
 const AjouterMaVoiture = () => {
   const navigate = useNavigate();
 

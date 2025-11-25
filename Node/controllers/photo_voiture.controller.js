@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 // Pour obtenir le répertoire du fichier courant
 const __dirname = path.dirname(__filename);
 
-// Créer une photo de voiture
+// Crée une photo pour une voiture (gère upload, validation et relations).
 const createPhoto_voiture = async (req, res) => {
   try {
     // Assurer que body est un objet même si req.body est undefined
@@ -151,7 +151,7 @@ const createPhoto_voiture = async (req, res) => {
   }
 };
 
-// Récupérer toutes les photos de voitures avec les détails associés
+// Récupère toutes les photos de voitures (avec détails associés).
 const getAllPhoto_voitures = async (req, res) => {
   try {
     const photo_voitures = await Photo_voiture.find()
@@ -166,7 +166,7 @@ const getAllPhoto_voitures = async (req, res) => {
   }
 };
 
-// Récupérer une photo de voiture par ID avec les détails associés
+// Récupère une photo de voiture par ID.
 const getPhoto_voitureById = async (req, res) => {
   try {
     const photo_voiture = await Photo_voiture.findById(req.params.id)
@@ -183,7 +183,7 @@ const getPhoto_voitureById = async (req, res) => {
   }
 };
 
-// Mettre à jour une photo de voiture existante
+// Met à jour une photo de voiture (remplace fichier si upload).
 const updatePhoto_voiture = async (req, res) => {
   try {
     // Vérification auth/staff gérée par les middlewares (auth + isStaff)
@@ -311,7 +311,7 @@ const updatePhoto_voiture = async (req, res) => {
   }
 };
 
-// Supprimer un fichier uploadé
+// Supprime un fichier uploadé du dossier `uploads/voiture`.
 const removeUploadedFile = (FilenameOrPath) => {
   try {
     // Accepte soit un chemin absolu, soit juste le nom de fichier
@@ -327,7 +327,7 @@ const removeUploadedFile = (FilenameOrPath) => {
   }
 };
 
-// Supprimer une photo de voiture par ID
+// Supprime une photo de voiture (vérifie permissions et dépendances).
 const deletePhoto_voiture = async (req, res) => {
   try {
     if (!req.user) {
@@ -367,7 +367,7 @@ const deletePhoto_voiture = async (req, res) => {
   }
 };
 
-// Recherche de photos par critères
+// Recherche des photos selon critères (voiture, couleur, jante).
 const getPhotosByCriteria = async (req, res) => {
   try {
     const { voiture, couleur_exterieur, couleur_interieur, taille_jante } =

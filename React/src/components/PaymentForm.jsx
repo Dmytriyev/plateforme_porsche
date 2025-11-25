@@ -9,6 +9,7 @@ import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import Button from "./common/Button.jsx";
 import "../css/components/PaymentForm.css";
 
+// Composant : PaymentForm — intègre Stripe Elements et confirme un paiement via `clientSecret`.
 export default function PaymentForm({ clientSecret, onSuccess, onError }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -64,3 +65,5 @@ export default function PaymentForm({ clientSecret, onSuccess, onError }) {
     </form>
   );
 }
+
+// PaymentForm : intègre Stripe Elements, confirme le paiement via `clientSecret`.

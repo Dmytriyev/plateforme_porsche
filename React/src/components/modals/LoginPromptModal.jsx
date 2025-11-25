@@ -76,3 +76,5 @@ const LoginPromptModal = ({
 };
 
 export default LoginPromptModal;
+
+// LoginPromptModal : invite l'utilisateur à se connecter avant actions protégées.

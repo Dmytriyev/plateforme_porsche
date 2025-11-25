@@ -11,6 +11,7 @@ import { Button } from "./common";
 import "../css/ErrorBoundary.css";
 import { error as logError } from "../utils/logger.js";
 
+// Composant : ErrorBoundary — capture les erreurs runtime UI et propose actions (recharger/accueil).
 class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
 
@@ -70,3 +71,5 @@ class ErrorBoundary extends Component {
 }
 
 export default ErrorBoundary;
+
+// ErrorBoundary : capture les erreurs runtime UI et propose actions (recharger/accueil)

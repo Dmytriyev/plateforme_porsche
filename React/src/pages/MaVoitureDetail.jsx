@@ -15,6 +15,7 @@ import buildUrl from "../utils/buildUrl";
 import { formatPrice } from "../utils/helpers.js";
 import "../css/MaVoitureDetail.css";
 
+// Page : affiche le détail d'une voiture personnelle; actions possible (retour, modifier, supprimer).
 const MaVoitureDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();

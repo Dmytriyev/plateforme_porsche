@@ -7,6 +7,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { sanitizeObject } from "../utils/helpers";
 
+// Hook métier : créer/consulter/annuler une réservation côté client
 export default function useReservation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

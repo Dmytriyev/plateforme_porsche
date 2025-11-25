@@ -15,6 +15,7 @@ import buildUrl from "../utils/buildUrl";
 import { formatPrice } from "../utils/helpers.js";
 import "../css/ModifierMaVoiture.css";
 
+// Page : modifier une voiture personnelle (édition des infos et gestion des photos). Requiert connexion.
 const ModifierMaVoiture = () => {
   const { id } = useParams();
   const navigate = useNavigate();

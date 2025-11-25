@@ -9,6 +9,7 @@
 import { Link } from "react-router-dom";
 import "../../css/Footer.css";
 
+// Composant : Footer global — liens de navigation et contacts (présent sur toutes les pages).
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 

@@ -61,7 +61,7 @@ app.use(cors(corsOptions));
 // Limiteur global (protection DDoS)
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // 500 requêtes max par IP
+  max: 1000, // 1000 requêtes max par IP
   message: "Trop de requêtes depuis cette adresse IP, réessayez plus tard",
   standardHeaders: true,
   legacyHeaders: false,

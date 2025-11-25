@@ -1,14 +1,13 @@
 /**
- * utils/helpers.js — Fonctions utilitaires partagées (formatage, validation, sanitisation)
- *
- * - Centraliser helpers évite la duplication et facilite les tests unitaires.
- * - Sanitize côté client pour prévenir les XSS dans l'UI, mais faites aussi la sanitisation côté serveur.
- * - Fournir des helpers prédictibles (formatDate, formatPrice) améliore la cohérence UX.
+ * — Fonctions utilitaires partagées (formatage, validation, sanitisation)
+ * - Centraliser helpers évite la duplication les tests unitaires.
+ * - Sanitize côté client et côté serveur.
+ * - Fournir des helpers prédictibles (formatDate, formatPrice)
  */
 
 import DOMPurify from "dompurify";
 // Importation de la bibliothèque pour la sanitisation HTML
-export const ERROR_MESSAGES = {
+const ERROR_MESSAGES = {
   NETWORK_ERROR: "Erreur de connexion au serveur",
   UNAUTHORIZED: "Vous devez être connecté pour accéder à cette page",
   FORBIDDEN: "Vous n'avez pas les permissions nécessaires",
@@ -23,60 +22,30 @@ const priceFormatter = new Intl.NumberFormat("fr-FR", {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-// Formatteur pour les prix en euros sans décimales
-const priceMonthlyFormatter = new Intl.NumberFormat("fr-FR", {
-  style: "currency",
-  currency: "EUR",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-// Formatteur pour les prix mensuels en euros avec 2 décimales
+
+// Formatteur pour les prix en euros avec 2 décimales
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
-// Formatteur pour les dates au format français
-const dateTimeFormatter = new Intl.DateTimeFormat("fr-FR", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-// Formatteur pour les dates et heures au format français
-const numberFormatter = new Intl.NumberFormat("fr-FR");
-// Formatteur pour les nombres au format français
-export const formatPrice = (prix) => priceFormatter.format(prix);
-export const formatPriceMonthly = (prix) => priceMonthlyFormatter.format(prix);
-export const formatDate = (date) => dateFormatter.format(new Date(date));
-export const formatDateTime = (date) =>
-  dateTimeFormatter.format(new Date(date));
-export const formatKilometrage = (km) => `${numberFormatter.format(km)} km`;
-// Fonctions d'exportation pour le formatage des prix, dates et kilométrages
-export const formatTelephone = (tel) => {
-  if (!tel) return "";
-  const cleaned = tel.replace(/\D/g, "");
-  const match = cleaned.match(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/);
-  return match
-    ? `${match[1]} ${match[2]} ${match[3]} ${match[4]} ${match[5]}`
-    : tel;
-};
-// Fonction pour formater les numéros de téléphone français
-export const validateEmail = (email) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-export const validatePassword = (password) =>
+// Formatteur pour les dates au format français
+export const formatPrice = (prix) => priceFormatter.format(prix);
+export const formatDate = (date) => dateFormatter.format(new Date(date));
+
+// Fonction pour formater les numéros de téléphone français
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const validatePassword = (password) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
 
-export const validateTelephone = (telephone) =>
+const validateTelephone = (telephone) =>
   /^0[1-9](?:[\s.-]?\d{2}){4}$/.test(telephone);
 // Fonctions de validation pour email, mot de passe, téléphone et code postal
-export const validateCodePostal = (codePostal) => /^\d{5}$/.test(codePostal);
-
-export const getPasswordErrors = (password) => {
+const getPasswordErrors = (password) => {
   const errors = [];
-
+  // Vérifie les critères du mot de passe et retourne les messages d'erreur correspondants
   if (password.length < 8) {
     errors.push("Le mot de passe doit contenir au moins 8 caractères");
   }
@@ -92,54 +61,14 @@ export const getPasswordErrors = (password) => {
 
   return errors;
 };
+
 // Fonction pour obtenir les erreurs de validation du mot de passe
-const errorMap = {
-  400: ERROR_MESSAGES.VALIDATION_ERROR,
-  401: ERROR_MESSAGES.UNAUTHORIZED,
-  403: ERROR_MESSAGES.FORBIDDEN,
-  404: ERROR_MESSAGES.NOT_FOUND,
-  500: ERROR_MESSAGES.SERVER_ERROR,
-  502: ERROR_MESSAGES.SERVER_ERROR,
-  503: ERROR_MESSAGES.SERVER_ERROR,
-};
-// Mapping des codes d'erreur HTTP aux messages d'erreur standardisés
-export const handleApiError = (error) => {
-  if (!error.response) return ERROR_MESSAGES.NETWORK_ERROR;
-  const { status, data } = error.response;
-  return data?.message || errorMap[status] || "Une erreur est survenue";
-};
-// Fonction pour gérer les erreurs API et retourner des messages appropriés
-export const getErrorMessage = (error) =>
-  typeof error === "string"
-    ? error
-    : error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      "Une erreur est survenue";
-
-export const isAuthError = (error) => error?.response?.status === 401;
-
-export const isValidationError = (error) => error?.response?.status === 400;
-
-export const getValidationErrors = (error) => {
-  const validationErrors = error?.response?.data?.errors;
-  if (!validationErrors) return {};
-
-  if (Array.isArray(validationErrors)) {
-    return validationErrors.reduce((acc, err) => {
-      if (err.param) acc[err.param] = err.msg;
-      return acc;
-    }, {});
-  }
-
-  return typeof validationErrors === "object" ? { ...validationErrors } : {};
-};
-
 export const setupConsoleFilter = () => {
+  // Filtrer les warnings et erreurs non critiques
   if (import.meta.env.DEV) {
     const originalWarn = console.warn;
     const originalError = console.error;
-
+    // Sauvegarder les fonctions originales
     console.warn = (...args) => {
       const message = args[0]?.toString() || "";
       if (
@@ -151,7 +80,7 @@ export const setupConsoleFilter = () => {
       }
       originalWarn.apply(console, args);
     };
-
+    // Redéfinir console.warn pour filtrer certains messages
     console.error = (...args) => {
       const message = args[0]?.toString() || "";
       if (
@@ -167,28 +96,16 @@ export const setupConsoleFilter = () => {
     };
   }
 };
-
-const defaultHTMLOptions = {
-  ALLOWED_TAGS: ["b", "i", "em", "strong", "p", "br", "ul", "ol", "li", "a"],
-  ALLOWED_ATTR: ["href", "target", "rel"],
-};
-
-export const sanitizeHTML = (dirty, options = {}) =>
-  dirty ? DOMPurify.sanitize(dirty, { ...defaultHTMLOptions, ...options }) : "";
-
-export const sanitizeText = (text) =>
+// Configurer le filtrage de la console pour ignorer certains warnings non critiques
+const sanitizeText = (text) =>
   text === null || text === undefined
     ? ""
     : DOMPurify.sanitize(String(text), { ALLOWED_TAGS: [] });
 
-export const sanitizeURL = (url) =>
-  !url || /^(javascript|data|vbscript):/i.test(url)
-    ? ""
-    : DOMPurify.sanitize(url, { ALLOWED_TAGS: [] });
-
+// Sanitiser une chaîne de texte en supprimant les balises HTML
 export const sanitizeObject = (obj) => {
   if (obj === null || obj === undefined || typeof obj !== "object") return obj;
-
+  // Retourner l'objet tel quel s'il n'est pas un objet valide
   if (Array.isArray(obj)) {
     return obj.map((item) =>
       typeof item === "string"
@@ -198,9 +115,10 @@ export const sanitizeObject = (obj) => {
         : item
     );
   }
-
+  // Sanitiser récursivement les propriétés de l'objet
   return Object.keys(obj).reduce((cleaned, key) => {
     const value = obj[key];
+    // Sanitiser en fonction du type de la valeur
     cleaned[key] =
       typeof value === "string"
         ? sanitizeText(value)
@@ -210,17 +128,20 @@ export const sanitizeObject = (obj) => {
     return cleaned;
   }, {});
 };
-
+// Fonction pour sanitiser récursivement un objet ou un tableau
 export const validateLoginForm = (formData) => {
   const errors = {};
+  // Valider les champs du formulaire de connexion
   if (!formData.email) errors.email = "L'email est requis";
   else if (!validateEmail(formData.email)) errors.email = "Email invalide";
   if (!formData.password) errors.password = "Le mot de passe est requis";
   return errors;
 };
 
+// Fonction pour valider les données du formulaire d'inscription
 export const validateRegisterForm = (formData) => {
   const errors = {};
+  // Valider les champs du formulaire d'inscription
   if (!formData.prenom?.trim()) errors.prenom = "Le prénom est requis";
   if (!formData.nom?.trim()) errors.nom = "Le nom est requis";
   if (!formData.email) errors.email = "L'email est requis";
@@ -247,6 +168,7 @@ export const validateRegisterForm = (formData) => {
   return errors;
 };
 
+// Fonction pour valider les données du formulaire d'inscription
 export const handleFormChange = (setFormData, setErrors) => (e) => {
   const { name, value } = e.target;
   setFormData((prev) => ({ ...prev, [name]: value }));

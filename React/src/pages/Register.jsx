@@ -12,6 +12,7 @@ import Button from "../components/common/Button.jsx";
 import { validateRegisterForm, handleFormChange } from "../utils/helpers.js";
 import "../css/Register.css";
 
+// Page : formulaire d'inscription utilisateur; validation côté client et création de compte.
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useContext(AuthContext);

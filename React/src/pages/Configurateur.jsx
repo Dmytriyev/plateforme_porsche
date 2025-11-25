@@ -21,6 +21,7 @@ import "../css/components/Message.css";
 import buildUrl from "../utils/buildUrl";
 import { debug } from "../utils/logger.js";
 
+// Page : configurateur de véhicule — sélectionner variante, options et calculer prix/acompte.
 const Configurateur = () => {
   const { voitureId, varianteId } = useParams();
   const navigate = useNavigate();

@@ -46,6 +46,7 @@ const POPULATE_FIELDS = {
 };
 
 // Fonction pour valider l'existence d'une entité par son ID
+// Valide qu'une entité existe par ID, renvoie instance ou null.
 const validateEntity = async (Model, id, entityName) => {
   // Rechercher l'entité par son ID dans le modèle spécifié
   const entity = await Model.findById(id);
@@ -57,6 +58,7 @@ const validateEntity = async (Model, id, entityName) => {
 };
 
 // Fonction pour valider plusieurs entités par leurs IDs
+// Valide un tableau d'IDs et renvoie les instances correspondantes.
 const validateEntities = async (Model, ids, entityName) => {
   // Créer un tableau de promesses de validation pour chaque ID
   const validationPromises = ids.map((id) =>
@@ -150,6 +152,7 @@ const calculatePrix = (model) => {
 };
 
 // Créer une nouvelle configuration de modèle Porsche
+// Crée un modèle Porsche (validation des références et sauvegarde).
 const createModel_porsche = async (req, res) => {
   try {
     const { body } = req;
@@ -218,6 +221,7 @@ const createModel_porsche = async (req, res) => {
 };
 
 // Récupérer toutes les configurations de modèles Porsche
+// Récupère tous les modèles Porsche (liste complète).
 const getAllModel_porsches = async (req, res) => {
   try {
     logger.info("getAllModel_porsches - start");
@@ -304,6 +308,7 @@ const getAllModel_porsches = async (req, res) => {
 };
 
 // Récupérer toutes les configurations pour une voiture spécifique
+// Récupère les configurations (variantes) associées à une voiture.
 const getConfigurationsByVoiture = async (req, res) => {
   try {
     const voitureId = req.params.voiture_id;
@@ -375,6 +380,7 @@ const getConfigurationsByVoiture = async (req, res) => {
 };
 
 // Récupérer une configuration de modèle Porsche par son ID
+// Récupère un modèle Porsche par ID (populations utiles).
 const getModel_porscheById = async (req, res) => {
   try {
     const model_porsche = await populateModel(
@@ -398,6 +404,7 @@ const getModel_porscheById = async (req, res) => {
 };
 
 // Mettre à jour une configuration de modèle Porsche par son ID
+// Met à jour un modèle Porsche (validation et population).
 const updateModel_porsche = async (req, res) => {
   try {
     const { body } = req;
@@ -458,6 +465,7 @@ const updateModel_porsche = async (req, res) => {
 };
 
 // Supprimer une configuration de modèle Porsche par son ID
+// Supprime un modèle Porsche et nettoie les relations.
 const deleteModel_porsche = async (req, res) => {
   try {
     const model_porsche = await Model_porsche.findByIdAndDelete(req.params.id);
@@ -475,6 +483,7 @@ const deleteModel_porsche = async (req, res) => {
 };
 
 // Ajouter des images à une configuration de modèle Porsche existante
+// Ajoute des images à un modèle Porsche (vérifie doublons).
 const addImages = async (req, res) => {
   try {
     const { body } = req;
@@ -516,6 +525,7 @@ const addImages = async (req, res) => {
 };
 
 // Supprimer des images d'une configuration de modèle Porsche existante
+// Retire des images d'un modèle Porsche.
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -555,6 +565,7 @@ const removeImages = async (req, res) => {
 };
 
 // Ajouter une couleur extérieure à une configuration de modèle Porsche existante
+// Ajoute une couleur extérieure à un modèle Porsche.
 const addCouleurExterieur = async (req, res) => {
   try {
     const { couleur_exterieur } = req.body;
@@ -590,6 +601,7 @@ const addCouleurExterieur = async (req, res) => {
 };
 
 // Supprimer la couleur extérieure d'une configuration de modèle Porsche existante
+// Supprime une couleur extérieure associée.
 const removeCouleurExterieur = async (req, res) => {
   try {
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
@@ -615,6 +627,7 @@ const removeCouleurExterieur = async (req, res) => {
 };
 
 // Ajouter des couleurs intérieures à une configuration de modèle Porsche existante
+// Ajoute une couleur intérieure à un modèle Porsche.
 const addCouleursInterieur = async (req, res) => {
   try {
     const { couleur_interieur } = req.body;
@@ -652,6 +665,7 @@ const addCouleursInterieur = async (req, res) => {
 };
 
 // Supprimer des couleurs intérieures d'une configuration de modèle Porsche existante
+// Supprime une couleur intérieure associée.
 const removeCouleursInterieur = async (req, res) => {
   try {
     const { couleur_interieur } = req.body;
@@ -691,6 +705,7 @@ const removeCouleursInterieur = async (req, res) => {
 };
 
 // Ajouter une taille de jante à une configuration de modèle Porsche existante
+// Ajoute une taille de jante à un modèle Porsche.
 const addTailleJante = async (req, res) => {
   try {
     const { taille_jante } = req.body;
@@ -722,6 +737,7 @@ const addTailleJante = async (req, res) => {
 };
 
 // Supprimer la taille de jante d'une configuration de modèle Porsche existante
+// Supprime une taille de jante associée.
 const removeTailleJante = async (req, res) => {
   try {
     await validateEntity(Model_porsche, req.params.id, "Modèle Porsche");
@@ -746,6 +762,7 @@ const removeTailleJante = async (req, res) => {
 };
 
 // Calculer le prix total d'une configuration de modèle Porsche spécifique en fonction des options sélectionnées
+// Calcule le prix total d'un modèle (somme des options).
 const calculatePrixTotal = async (req, res) => {
   try {
     const model_porsche = await populateModel(
@@ -773,6 +790,7 @@ const calculatePrixTotal = async (req, res) => {
 };
 
 // Récupère tous les types de carrosseries disponibles
+// Récupère la liste de toutes les carrosseries disponibles.
 const getAllCarrosseries = async (req, res) => {
   try {
     const carrosseries = getAvailableCarrosseries();
@@ -791,6 +809,7 @@ const getAllCarrosseries = async (req, res) => {
 };
 
 // Récupère les variantes et carrosseries pour un modèle de voiture spécifique
+// Récupère les variantes d'un modèle de voiture (par nom).
 const getVariantesByVoitureModel = async (req, res) => {
   try {
     const { nomModel } = req.params;
@@ -828,6 +847,7 @@ const getVariantesByVoitureModel = async (req, res) => {
 };
 
 // Récupère toutes les variantes avec leurs modèles associés
+// Récupère toutes les variantes disponibles.
 const getAllVariantes = async (req, res) => {
   try {
     // Transformer les constantes en un format structuré pour la réponse API
@@ -852,6 +872,7 @@ const getAllVariantes = async (req, res) => {
 };
 
 // Récupère uniquement les voitures d'occasion disponibles
+// Récupère les modèles Porsche d'occasion.
 const getModelPorscheOccasions = async (req, res) => {
   try {
     // Récupérer toutes les voitures de type occasion (type_voiture = false)
@@ -888,6 +909,7 @@ const getModelPorscheOccasions = async (req, res) => {
 };
 
 // Récupère uniquement les voitures neuves (configurateur)
+// Récupère les modèles Porsche neufs.
 const getModelPorscheNeuves = async (req, res) => {
   try {
     // Récupérer toutes les voitures de type neuf (type_voiture = true)
@@ -925,6 +947,7 @@ const getModelPorscheNeuves = async (req, res) => {
 
 // Page explicative complète d'une variante model_porsche (GTS, GT3, GT4RS, etc.)
 // Retourne toutes les informations nécessaires pour afficher une page détaillée de la variante
+// Récupère la page détaillée d'un modèle/variante.
 const getModelPorschePage = async (req, res) => {
   try {
     const modelId = req.params.id;
@@ -1050,6 +1073,7 @@ const getModelPorschePage = async (req, res) => {
 
 // Page explicative complète d'une voiture d'occasion
 // Retourne toutes les informations nécessaires pour afficher une page détaillée de la voiture d'occasion
+// Récupère la page d'une voiture d'occasion (traitement erreurs 404/400).
 const getOccasionPage = async (req, res) => {
   try {
     const modelId = req.params.id;

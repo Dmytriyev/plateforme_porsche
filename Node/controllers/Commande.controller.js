@@ -19,7 +19,7 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-// Créer une nouvelle commande
+// Crée une nouvelle commande (panier -> commande). Nécessite auth.
 const createCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -53,7 +53,7 @@ const createCommande = async (req, res) => {
   }
 };
 
-// Récupérer toutes les commandes
+// Récupère toutes les commandes validées (admin view) avec lignes enrichies.
 const getAllCommandes = async (req, res) => {
   try {
     const commandes = await Commande.find({ status: true })
@@ -90,7 +90,7 @@ const getAllCommandes = async (req, res) => {
   }
 };
 
-// Récupérer une commande par ID
+// Récupère une commande par ID et calcule le total.
 const getCommandeById = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id).populate(
@@ -131,7 +131,7 @@ const getCommandeById = async (req, res) => {
   }
 };
 
-// Mettre à jour une commande par ID
+// Met à jour une commande (validation des champs).
 const updateCommande = async (req, res) => {
   try {
     const { body } = req;
@@ -158,7 +158,7 @@ const updateCommande = async (req, res) => {
   }
 };
 
-// Supprimer une commande par ID
+// Supprime une commande et ses lignes associées.
 const deleteCommande = async (req, res) => {
   try {
     const commande = await Commande.findById(req.params.id);
@@ -178,7 +178,7 @@ const deleteCommande = async (req, res) => {
   }
 };
 
-// Récupérer le panier actif de l'utilisateur
+// Récupère le panier actif (commande.status=false) pour l'utilisateur courant.
 const getPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 

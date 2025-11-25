@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/CatalogueModeles.css";
 import "../css/ChoixVoiture.css";
 
+// Page : choix entre voiture neuve ou d'occasion; redirige vers catalogue/ configurateur.
 const ChoixVoiture = () => {
   const navigate = useNavigate();
   const imageStatic = "/Logo/Logo_porsche_black.jpg";

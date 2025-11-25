@@ -233,6 +233,7 @@ const GestionAchatsBlock = ({ commandes }) => {
   );
 };
 
+// Page : dashboard utilisateur (infos, commandes, réservations, voitures). Requiert authentification.
 const MonCompte = () => {
   const navigate = useNavigate();
   const { user, logout, isStaff } = useContext(AuthContext);

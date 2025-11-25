@@ -15,6 +15,7 @@ import buildUrl from "../utils/buildUrl";
 import "../css/Accessoires.css";
 import "../css/components/Message.css";
 
+// Page : liste des accessoires avec filtres et pagination; actions admin visibles aux staff.
 const Accessoires = () => {
   const navigate = useNavigate();
   const [accessoires, setAccessoires] = useState([]);

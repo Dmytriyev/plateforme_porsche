@@ -6,6 +6,7 @@
 
 import "../../css/components/Button.css";
 
+// Composant bouton réutilisable : variant/size, utilisé dans les formulaires et actions.
 const Button = ({
   children,
   variant = "primary",

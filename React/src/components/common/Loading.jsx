@@ -6,6 +6,7 @@
 
 import "../../css/components/Loading.css";
 
+// Indicateur de chargement centralisé (option fullScreen) utilisé dans l'UI
 const Loading = ({ size = "md", fullScreen = false, message = "" }) => {
   const spinner = (
     <div className="loading-content">

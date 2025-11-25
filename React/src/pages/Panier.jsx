@@ -13,6 +13,7 @@ import { formatPrice } from "../utils/helpers.js";
 import "../css/Panier.css";
 import "../css/components/Message.css";
 
+// Page : affiche le panier utilisateur, gestion des quantités et passage au paiement. Requiert connexion.
 const Panier = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);

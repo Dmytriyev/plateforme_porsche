@@ -11,6 +11,7 @@ import buildUrl from "../utils/buildUrl";
 import "../css/AccessoireDetail.css";
 import "../css/components/Message.css";
 
+// Page : affiche le détail d'un accessoire; permet ajout au panier (connexion requise pour ajouter).
 const AccessoireDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();

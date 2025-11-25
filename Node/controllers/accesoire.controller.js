@@ -15,6 +15,7 @@ import {
 } from "../utils/responses.js";
 
 // Créer un nouvel accesoire dans la base de données
+// Crée un accessoire (valide données + sauvegarde).
 const createAccesoire = async (req, res) => {
   try {
     const { body } = req;
@@ -66,6 +67,7 @@ const createAccesoire = async (req, res) => {
 };
 
 // Récupérer tous les accesoires de la base de données
+// Récupère la liste de tous les accessoires.
 const getAllAccesoires = async (req, res) => {
   try {
     const accesoires = await Accesoire.find()
@@ -82,6 +84,7 @@ const getAllAccesoires = async (req, res) => {
 };
 
 // Récupérer un accesoire par son ID
+// Récupère un accessoire par son ID (détails).
 const getAccesoireById = async (req, res) => {
   try {
     const accesoire = await Accesoire.findById(req.params.id)
@@ -100,6 +103,7 @@ const getAccesoireById = async (req, res) => {
 };
 
 // Mettre à jour un accesoire existant dans la base de données
+// Met à jour un accessoire (vérifie validation et images).
 const updateAccesoire = async (req, res) => {
   try {
     const { body } = req;
@@ -146,6 +150,7 @@ const updateAccesoire = async (req, res) => {
 };
 
 // Supprimer un accesoire de la base de données par son ID
+// Supprime un accessoire et ses relations (photos, couleurs).
 const deleteAccesoire = async (req, res) => {
   try {
     const accesoire = await Accesoire.findByIdAndDelete(req.params.id);
@@ -160,6 +165,7 @@ const deleteAccesoire = async (req, res) => {
 };
 
 // Ajouter des images à un accesoire existant dans la base de données
+// Ajoute des images à un accessoire (vérifie existence photos).
 const addImages = async (req, res) => {
   try {
     // Vérifier que l'accesoire existe avant d'ajouter des images
@@ -227,6 +233,7 @@ const addImages = async (req, res) => {
 };
 
 // Supprimer des images d'un accesoire existant dans la base de données
+// Supprime des images d'un accessoire.
 const removeImages = async (req, res) => {
   try {
     const { body } = req;
@@ -272,6 +279,7 @@ const removeImages = async (req, res) => {
 };
 
 // Définir la couleur d'un accesoire existant dans la base de données
+// Associe une couleur à un accessoire.
 const setCouleur = async (req, res) => {
   try {
     const { body } = req;
@@ -316,6 +324,7 @@ const setCouleur = async (req, res) => {
 };
 
 // Retirer la couleur d'un accesoire existant dans la base de données
+// Retire la couleur associée à un accessoire.
 const removeCouleur = async (req, res) => {
   try {
     // Vérifier que l'accesoire existe
@@ -343,6 +352,7 @@ const removeCouleur = async (req, res) => {
 };
 
 // Récupère les accesoires en fonction de critères spécifiques
+// Recherche des accessoires par critères (filtrage simple).
 const getAccesoiresByCriteria = async (req, res) => {
   try {
     // Extraire les critères de la requête query
@@ -382,6 +392,7 @@ const getAccesoiresByCriteria = async (req, res) => {
 };
 
 // Récupérer les types d'accesoires disponibles
+// Récupère les types d'accessoires disponibles (options pour UI).
 const getAvailableTypesAccesoireOptions = async (req, res) => {
   try {
     const types = getAvailableTypesAccesoire();
@@ -396,6 +407,7 @@ const getAvailableTypesAccesoireOptions = async (req, res) => {
 /**
  * Ajouter un accessoire (staff uniquement)
  */
+// Ajoute un accessoire depuis une source externe ou script (helper).
 const ajouterAccessoire = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff
@@ -459,6 +471,7 @@ const ajouterAccessoire = async (req, res) => {
 /**
  * Supprimer un accessoire (staff uniquement)
  */
+// Supprime un accessoire (version admin ou batch).
 const supprimerAccessoire = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff
@@ -516,6 +529,7 @@ const supprimerAccessoire = async (req, res) => {
 /**
  * Récupérer tous les accessoires (staff)
  */
+// Récupère la liste paginée/filtrée d'accessoires pour UI.
 const getAccessoires = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff
@@ -549,6 +563,7 @@ const getAccessoires = async (req, res) => {
 /**
  * Mettre à jour un accessoire (staff uniquement)
  */
+// Modifie un accessoire (route utilitaire pour modifications partielles).
 const modifierAccessoire = async (req, res) => {
   try {
     // Vérifier que l'utilisateur est staff

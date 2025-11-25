@@ -6,57 +6,38 @@ import validateRequest from "../middlewares/validateRequest.js";
 
 const router = express.Router();
 
-/**
- * @route   POST /api/panier/voiture-neuve
- * @desc    Ajouter une voiture neuve au panier avec acompte (10%)
- * @access  Private (authentification requise)
- */
+// Routes pour `panier` (préfixe: /api/panier)
+// POST /voiture-neuve         : auth — Ajouter une voiture neuve au panier (acompte)
 router.post(
   "/voiture-neuve",
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.ajouterVoitureNeuveAuPanier,
+  panierController.ajouterVoitureNeuveAuPanier
 );
 
-/**
- * @route   POST /api/panier/accessoire
- * @desc    Ajouter un accessoire au panier
- * @access  Private (authentification requise)
- */
+// POST /accessoire            : auth — Ajouter un accessoire au panier
 router.post(
   "/accessoire",
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.ajouterAccessoireAuPanier,
+  panierController.ajouterAccessoireAuPanier
 );
 
-/**
- * @route   GET /api/panier
- * @desc    Récupérer le panier de l'utilisateur connecté
- * @access  Private (authentification requise)
- */
+// GET /                      : auth — Récupérer le panier de l'utilisateur connecté
 router.get("/", auth, panierController.getPanier);
 
-/**
- * @route   PATCH /api/panier/ligne/:ligne_id/quantite
- * @desc    Modifier la quantité d'une ligne de panier
- * @access  Private (authentification requise)
- */
+// PATCH /ligne/:ligne_id/quantite : auth — Modifier la quantité d'une ligne du panier
 router.patch(
   "/ligne/:ligne_id/quantite",
   auth,
   sanitizeInputs,
   validateRequest,
-  panierController.modifierQuantiteLigne,
+  panierController.modifierQuantiteLigne
 );
 
-/**
- * @route   DELETE /api/panier/ligne/:ligne_id
- * @desc    Supprimer une ligne du panier
- * @access  Private (authentification requise)
- */
+// DELETE /ligne/:ligne_id      : auth — Supprimer une ligne du panier
 router.delete("/ligne/:ligne_id", auth, panierController.supprimerLignePanier);
 
 export default router;

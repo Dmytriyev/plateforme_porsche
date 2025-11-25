@@ -12,6 +12,7 @@ import Button from "../components/common/Button.jsx";
 import { validateLoginForm, handleFormChange } from "../utils/helpers.js";
 import "../css/Login.css";
 
+// Page : formulaire de connexion utilisateur; gère validation et redirections.
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);

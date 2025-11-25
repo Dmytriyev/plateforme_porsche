@@ -18,7 +18,7 @@ import {
 import { getJanteOptions } from "../utils/jante.constants.js";
 import { removeUploadedFile } from "../utils/fileConstants.js";
 
-//  Créer une nouvelle taille de jante
+// Crée une nouvelle taille de jante (gère upload et validation).
 const createTaille_jante = async (req, res) => {
   try {
     if (isEmptyBody(req.body)) {
@@ -59,7 +59,7 @@ const createTaille_jante = async (req, res) => {
     return handleError(res, error, "createTaille_jante");
   }
 };
-// Obtenir toutes les tailles de jantes
+// Récupère toutes les tailles de jantes.
 const getAllTaille_jantes = async (req, res) => {
   try {
     const taille_jantes = await Taille_jante.find();
@@ -72,7 +72,7 @@ const getAllTaille_jantes = async (req, res) => {
     return handleError(res, error, "getAllTaille_jantes");
   }
 };
-// Obtenir une taille de jante par ID
+// Récupère une taille de jante par ID.
 const getTaille_janteById = async (req, res) => {
   try {
     const taille_jante = await Taille_jante.findById(req.params.id);
@@ -88,7 +88,7 @@ const getTaille_janteById = async (req, res) => {
     return handleError(res, error, "getTaille_janteById");
   }
 };
-// Mettre à jour une taille de jante par ID
+// Met à jour une taille de jante (remplace photo si upload).
 const updateTaille_jante = async (req, res) => {
   try {
     if (isEmptyBody(req.body) && !req.file) {
@@ -143,7 +143,7 @@ const updateTaille_jante = async (req, res) => {
     return handleError(res, error, "updateTaille_jante");
   }
 };
-// Supprimer une taille de jante par ID
+// Supprime une taille de jante et sa photo associée.
 const deleteTaille_jante = async (req, res) => {
   try {
     const taille_jante = await Taille_jante.findByIdAndDelete(req.params.id);
@@ -162,7 +162,7 @@ const deleteTaille_jante = async (req, res) => {
     return handleError(res, error, "deleteTaille_jante");
   }
 };
-// Obtenir les options de jantes disponibles
+// Fournit les options/constantes de jantes pour l'UI.
 const getAvailableJanteOptions = async (req, res) => {
   try {
     const options = getJanteOptions();

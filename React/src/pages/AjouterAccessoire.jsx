@@ -10,6 +10,7 @@ import Loading from "../components/common/Loading.jsx";
 import "../css/AjouterAccessoire.css";
 import { warn } from "../utils/logger.js";
 
+// Page (admin) : formulaire de création d'un accessoire et upload d'images.
 const AjouterAccessoire = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -169,13 +170,12 @@ const AjouterAccessoire = () => {
         });
 
         try {
+          // Le token est automatiquement envoyé via cookie HTTP-Only
           await fetch(
             `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/accesoire/addImage/${nouvelAccessoire._id}`,
             {
               method: "PATCH",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
+              credentials: "include",
               body: formDataPhotos,
             },
           );

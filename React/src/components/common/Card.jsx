@@ -4,6 +4,7 @@
  * @file components/common/Card.jsx
  */
 
+// Composant visuel 'Card' : conteneur réutilisable pour affichage produit/infos.
 const Card = ({
   children,
   className = "",

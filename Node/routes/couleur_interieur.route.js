@@ -14,16 +14,10 @@ import isAdmin from "../middlewares/isAdmin.js";
 
 const router = Router();
 
-// ============================================
-// ROUTES PUBLIQUES
-// ============================================
 router.get("/couleurs", getAvailableCouleursInterieurOptions);
 router.get("/all", getAllCouleurInterieur);
 router.get("/:id", validateObjectId("id"), getCouleurInterieurById);
 
-// ============================================
-// ROUTES ADMIN
-// ============================================
 router.post("/new", auth, isAdmin, optionalUpload, createCouleurInterieur);
 router.put(
   "/update/:id",
@@ -31,14 +25,14 @@ router.put(
   isAdmin,
   validateObjectId("id"),
   optionalUpload,
-  updateCouleurInterieur,
+  updateCouleurInterieur
 );
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"),
-  deleteCouleurInterieur,
+  deleteCouleurInterieur
 );
 
 export default router;

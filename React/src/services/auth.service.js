@@ -1,25 +1,26 @@
 /**
  * auth.service.js — Service d'authentification
  * - Gestion des tokens et login.
+ * - Le token est stocké dans un cookie HTTP-Only par le backend
  */
 
 import apiClient from "../config/api.js";
 import { extractData } from "./httpHelper";
 import TokenService from "./token.service.js";
 import { sanitizeObject } from "../utils/helpers";
+import storage from "../utils/storage.js";
 
 const authService = {
+  // Authentifie l'utilisateur et stocke le token si présent.
   login: async (email, password) => {
     try {
       const response = await apiClient.post("/user/login", { email, password });
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token);
+        // Cache temporaire pour la session (optionnel)
         if (data.user) {
-          localStorage.setItem(
-            "user",
-            JSON.stringify(sanitizeObject(data.user))
-          );
+          storage.set("user", sanitizeObject(data.user));
         }
       }
       return data;
@@ -28,17 +29,16 @@ const authService = {
     }
   },
 
+  // Enregistre un nouvel utilisateur et stocke le token retourné.
   register: async (userData) => {
     try {
       const response = await apiClient.post("/user/register", userData);
       const data = extractData(response) || {};
       if (data.token) {
         TokenService.setToken(data.token);
+        // Cache temporaire pour la session (optionnel)
         if (data.user) {
-          localStorage.setItem(
-            "user",
-            JSON.stringify(sanitizeObject(data.user))
-          );
+          storage.set("user", sanitizeObject(data.user));
         }
       }
       return data;
@@ -47,18 +47,20 @@ const authService = {
     }
   },
 
+  // Déconnecte l'utilisateur : supprime le token et redirige.
   logout: () => {
     TokenService.clear();
-    localStorage.removeItem("user");
+    storage.remove("user");
     window.location.href = "/login";
   },
 
+  // Récupère le profil d'un utilisateur par ID et le met en cache local.
   getProfile: async (userId) => {
     try {
       const response = await apiClient.get(`/user/profile/${userId}`);
       const data = extractData(response) || {};
       if (data.user) {
-        localStorage.setItem("user", JSON.stringify(sanitizeObject(data.user)));
+        storage.set("user", sanitizeObject(data.user));
       }
       return data;
     } catch (error) {
@@ -66,12 +68,13 @@ const authService = {
     }
   },
 
+  // Met à jour le profil de l'utilisateur et met à jour le cache local.
   updateProfile: async (userId, userData) => {
     try {
       const response = await apiClient.put(`/user/update/${userId}`, userData);
       const data = extractData(response);
       if (data) {
-        localStorage.setItem("user", JSON.stringify(sanitizeObject(data)));
+        storage.set("user", sanitizeObject(data));
       }
       return data;
     } catch (error) {
@@ -79,20 +82,18 @@ const authService = {
     }
   },
 
+  // Retourne l'utilisateur courant depuis le stockage local (s'il existe).
   getCurrentUser: () => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
+    return storage.get("user");
   },
 
+  // Indique si un token est présent (utilisateur connecté).
   isAuthenticated: () => !!TokenService.getToken(),
 
+  // Retourne le token en mémoire/session.
   getToken: () => TokenService.getToken(),
 
+  // Vérifie si l'utilisateur courant a un rôle précis.
   hasRole: (role) => {
     const user = authService.getCurrentUser();
     return user?.role === role;

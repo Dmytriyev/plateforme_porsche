@@ -10,6 +10,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import commandeService from "../services/commande.service.js";
 
+// Hook : gestion du nombre d'articles du panier et actions d'ajout (requiert auth)
 const usePanierAPI = () => {
   const { isAuthenticated, user } = useContext(AuthContext);
   const [nombreArticles, setNombreArticles] = useState(0);

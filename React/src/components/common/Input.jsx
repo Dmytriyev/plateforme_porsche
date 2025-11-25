@@ -6,6 +6,7 @@
 
 import "../../css/components/Input.css";
 
+// Champ contrôlé réutilisable : gère label, erreur et validité (utilisé dans forms)
 const Input = ({
   label,
   type = "text",

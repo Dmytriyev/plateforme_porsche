@@ -16,7 +16,7 @@ import User from "../models/user.model.js";
 import userValidation from "../validations/user.validation.js";
 import Voiture from "../models/voiture.model.js";
 
-// Enregistrer un nouvel utilisateur
+// Enregistre un nouvel utilisateur, crée un panier et renvoie l'utilisateur (sans mot de passe).
 const register = async (req, res) => {
   try {
     const { body } = req;
@@ -109,7 +109,7 @@ const register = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Connexion d'un utilisateur existant
+// Authentifie un utilisateur et renvoie token + info utilisateur.
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -168,7 +168,7 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Obtenir tous les utilisateurs
+// Récupère la liste complète des utilisateurs (sans mot de passe).
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
@@ -180,7 +180,7 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Obtenir un utilisateur par ID
+// Récupère un utilisateur par ID (vérifie droits d'accès).
 const getUserById = async (req, res) => {
   try {
     // Vérifier l'autorisation d'accès
@@ -201,7 +201,7 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Mettre à jour un utilisateur existant
+// Met à jour un utilisateur (protection des champs sensibles).
 const updateUser = async (req, res) => {
   try {
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
@@ -252,7 +252,7 @@ const updateUser = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
-// Supprimer un utilisateur et toutes ses données associées
+// Supprime un utilisateur et cascade sur ses données associées.
 const deleteUser = async (req, res) => {
   try {
     if (req.user.id !== req.params.id && !req.user.isAdmin) {
@@ -292,7 +292,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// Créer une réservation pour l'utilisateur
+// Crée une réservation au nom d'un utilisateur (vérifie droits et disponibilité).
 const createUserReservation = async (req, res) => {
   try {
     const { body } = req;
@@ -375,7 +375,7 @@ const createUserReservation = async (req, res) => {
   }
 };
 
-// Obtenir les réservations de l'utilisateur
+// Récupère les réservations d'un utilisateur (vérifie droits).
 const getUserReservations = async (req, res) => {
   try {
     const userId = req.params.id;

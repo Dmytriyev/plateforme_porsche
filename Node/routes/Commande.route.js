@@ -19,16 +19,8 @@ import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
 
-// ============================================
-// ROUTES ADMIN/STAFF
-// ============================================
 router.get("/all", auth, isAdmin, getAllCommandes);
 
-// ============================================
-// ROUTES PANIER (Utilisateur authentifié)
-// @DEPRECATED - Utilisez /api/panier à la place
-// Ces routes sont conservées pour compatibilité avec d'anciennes versions
-// ============================================
 router.get("/panier", auth, getPanier);
 router.get("/panier/create", auth, getOrCreatePanier);
 router.post("/panier/addConfig", auth, ajouterConfigurationAuPanier);
@@ -39,18 +31,15 @@ router.delete(
   "/delete/ligne/:ligne_id",
   auth,
   validateObjectId("ligne_id"),
-  supprimerLignePanier,
+  supprimerLignePanier
 );
 router.patch(
   "/updateQuantite/ligne/:ligne_id",
   auth,
   validateObjectId("ligne_id"),
-  modifierQuantitePanier,
+  modifierQuantitePanier
 );
 
-// ============================================
-// ROUTES COMMANDES (Utilisateur)
-// ============================================
 router.get("/historique", auth, getMyCommandes);
 router.post("/new", auth, createCommande);
 router.get("/:id", auth, validateObjectId("id"), getCommandeById);

@@ -22,6 +22,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import LoginPromptModal from "../components/modals/LoginPromptModal.jsx";
 import ContactModal from "../components/modals/ContactModal.jsx";
 
+// Page : affichage des annonces d'occasion (liste ou page modèle). Permet réservation (connexion requise pour réserver).
 const OccasionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -7,6 +7,7 @@
 import { useEffect } from "react";
 import "../../css/components/Modal.css";
 
+// Wrapper modal accessible : gère ouverture/fermeture, ESC et blocage du scroll
 const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   // Bloquer le scroll du body quand la modale est ouverte
   useEffect(() => {

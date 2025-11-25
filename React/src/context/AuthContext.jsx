@@ -6,17 +6,42 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useState, useMemo, useCallback } from "react";
+import { createContext, useState, useMemo, useCallback, useEffect } from "react";
 import authService from "../services/auth.service.js";
+import userService from "../services/user.service.js";
 
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // Initialiser l'utilisateur depuis le service d'authentification (localStorage/session)
-  // Evite un setState synchrones dans useEffect au premier rendu (meilleure compatibilité avec ESLint)
+  // Initialiser l'utilisateur depuis le cache sessionStorage (si disponible)
   const [user, setUser] = useState(() => authService.getCurrentUser());
-  // Loading est statique ici car l'initialisation est synchrone depuis localStorage
-  const loading = false;
+  const [loading, setLoading] = useState(true);
+
+  // Charger l'utilisateur depuis l'API au démarrage si un token existe
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        // Si on a déjà un user en cache, on l'utilise temporairement
+        if (user) {
+          setLoading(false);
+          return;
+        }
+
+        // Sinon, on tente de charger depuis l'API (via cookie)
+        const userData = await userService.getCurrentUser();
+        if (userData) {
+          setUser(userData);
+        }
+      } catch (error) {
+        // Pas d'utilisateur connecté ou token invalide
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const login = useCallback(async (email, password) => {
     try {
@@ -55,7 +80,6 @@ export function AuthProvider({ children }) {
 
   const updateUser = useCallback((userData) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
   }, []);
 
   const isAuthenticated = useCallback(

@@ -15,7 +15,6 @@ import "./css/index.css";
 import "./css/utilities.css";
 
 setupConsoleFilter();
-// Rendu de l'application React dans l'élément racine du DOM
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />

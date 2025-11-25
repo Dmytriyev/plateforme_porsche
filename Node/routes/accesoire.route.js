@@ -20,17 +20,11 @@ import optionalUpload from "../middlewares/optionalUpload.js";
 
 const router = Router();
 
-// ============================================
-// ROUTES PUBLIQUES
-// ============================================
 router.get("/types", getAvailableTypesAccesoireOptions);
 router.get("/all", getAllAccesoires);
 router.get("/search", getAccesoiresByCriteria);
 router.get("/:id", validateObjectId("id"), getAccesoireById);
 
-// ============================================
-// ROUTES STAFF (Création/Modification)
-// ============================================
 router.post("/new", auth, isStaff, optionalUpload, createAccesoire);
 router.put(
   "/update/:id",
@@ -38,7 +32,7 @@ router.put(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  updateAccesoire,
+  updateAccesoire
 );
 
 // Gestion des images
@@ -48,14 +42,14 @@ router.patch(
   isStaff,
   validateObjectId("id"),
   optionalUpload,
-  addImages,
+  addImages
 );
 router.patch(
   "/removeImages/:id",
   auth,
   isStaff,
   validateObjectId("id"),
-  removeImages,
+  removeImages
 );
 
 // Gestion des couleurs (Many-to-One)
@@ -64,21 +58,21 @@ router.patch(
   auth,
   isStaff,
   validateObjectId("id"), // id accesoire
-  setCouleur,
+  setCouleur
 );
 router.patch(
   "/removeCouleur/:id",
   auth,
   isStaff,
   validateObjectId("id"), // id accesoire
-  removeCouleur,
+  removeCouleur
 );
 router.delete(
   "/delete/:id",
   auth,
   isAdmin,
   validateObjectId("id"), // id accesoire
-  deleteAccesoire,
+  deleteAccesoire
 );
 
 export default router;

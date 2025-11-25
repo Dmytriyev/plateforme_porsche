@@ -15,6 +15,7 @@ import "../css/CatalogueModeles.css";
 import "../css/components/Message.css";
 import { warn } from "../utils/logger.js";
 
+// Page : catalogue des modèles (neuf / occasion) — regroupe et présente modèles et statistiques.
 const CatalogueModeles = () => {
   const { type } = useParams(); // 'neuve' ou 'occasion'
   const navigate = useNavigate();

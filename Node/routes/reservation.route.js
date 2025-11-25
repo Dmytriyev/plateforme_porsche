@@ -17,56 +17,56 @@ import isStaff from "../middlewares/isStaff.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
 
 const router = Router();
-
-// ============================================
-// ROUTES PUBLIQUES
-// ============================================
+// Routes pour les réservations (préfixe: /api/reservation)
+// GET  /check/:voitureId        : public — Vérifier disponibilités sur une voiture
 router.get(
   "/check/:voitureId",
   validateObjectId("voitureId"),
-  checkReservations,
+  checkReservations
 );
 
-// ============================================
-// ROUTES ADMIN
-// ============================================
+// GET  /all                     : admin — Récupérer toutes les réservations
 router.get("/all", auth, isAdmin, getAllReservations);
+// GET  /voiture/:voitureId      : admin — Réservations d'une voiture spécifique
 router.get(
   "/voiture/:voitureId",
   auth,
   isAdmin,
   validateObjectId("voitureId"),
-  getReservationsByVoiture,
+  getReservationsByVoiture
 );
 
-// ============================================
-// ROUTES UTILISATEUR
-// ============================================
+// GET  /user/:userId            : auth — Réservations d'un utilisateur
 router.get(
   "/user/:userId",
   auth,
   validateObjectId("userId"),
-  getReservationsByUser,
+  getReservationsByUser
 );
+// POST /new                     : auth — Créer une nouvelle réservation
 router.post("/new", auth, createReservation);
+// GET  /:id                     : auth — Détails d'une réservation
 router.get("/:id", auth, validateObjectId("id"), getReservationById);
+// PUT  /update/:id              : auth — Mettre à jour une réservation
 router.put("/update/:id", auth, validateObjectId("id"), updateReservation);
+// DELETE /delete/:id            : auth — Supprimer une réservation
 router.delete("/delete/:id", auth, validateObjectId("id"), deleteReservation);
 
-// Routes staff - Gestion des réservations
+// PATCH /:id/accepter           : staff — Accepter une réservation
 router.patch(
   "/:id/accepter",
   auth,
   isStaff,
   validateObjectId("id"),
-  accepterReservation,
+  accepterReservation
 );
+// PATCH /:id/refuser            : staff — Refuser une réservation
 router.patch(
   "/:id/refuser",
   auth,
   isStaff,
   validateObjectId("id"),
-  refuserReservation,
+  refuserReservation
 );
 
 export default router;

@@ -1,14 +1,17 @@
 /**
- * httpHelper.js — Helpers HTTP
- * - Centralise les appels HTTP et gestion d'erreurs.
+ * Extrait l'objet `data` normalisé depuis la réponse axios.
+ * Retourne `null` si réponse invalide.
  */
-
 const extractData = (response) => {
   if (!response?.data) return null;
   const { data } = response;
   return data?.data ?? data;
 };
 
+/**
+ * Tente d'extraire un tableau depuis la réponse API.
+ * Parcourt plusieurs clés connues pour trouver un tableau.
+ */
 const extractArray = (response) => {
   if (!response?.data) return [];
 
@@ -36,6 +39,12 @@ const extractArray = (response) => {
   return [];
 };
 
+/**
+ * Wrapper pour appels API qui normalise la réponse et gère les erreurs.
+ * - `returnArray`: force l'extraction en tableau.
+ * - `defaultValue`: valeur retournée si erreur ignorée.
+ * - `ignoreErrors`: codes HTTP à ignorer (ex: 404).
+ */
 export const apiRequest = async (requestFn, options = {}) => {
   const {
     returnArray = false,

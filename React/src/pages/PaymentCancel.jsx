@@ -6,6 +6,7 @@
 import { useNavigate } from "react-router-dom";
 import "../css/PaymentStatus.css";
 
+// Page : affiche l'annulation d'un paiement et propose actions (retour panier / accueil).
 const PaymentCancel = () => {
   const navigate = useNavigate();
 

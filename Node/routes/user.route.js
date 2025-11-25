@@ -58,12 +58,12 @@ router.post(
     .withMessage("Le mot de passe doit contenir au moins 8 caractères")
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
     .withMessage(
-      "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
+      "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial"
     ),
   body("nom").optional().isString().trim().escape(),
   body("prenom").optional().isString().trim().escape(),
   validateRequest,
-  register,
+  register
 );
 router.post(
   "/login",
@@ -71,19 +71,30 @@ router.post(
   body("email").isEmail().withMessage("Email invalide").normalizeEmail(),
   body("password").exists().withMessage("Mot de passe requis"),
   validateRequest,
-  login,
+  login
 );
+
+// Notes rapides :
+// - POST /register : publique — inscription (validation + rate limit)
+// - POST /login    : publique — connexion (rate limit)
 
 // Routes admin
 router.get("/all", auth, isAdmin, getAllUsers);
 router.get("/roles", auth, isAdmin, getAvailableUserRoles);
 router.put("/role/:id", auth, isAdmin, validateObjectId("id"), updateUserRole);
 
+// Routes admin ci-dessus : accès administrateur requis
+
 // Routes utilisateur - Routes spécifiques AVANT les routes génériques avec :id
 // Profil de l'utilisateur connecté (sans ID)
 router.get("/profile", auth, getCurrentUserProfile);
 router.patch("/profile", auth, updateCurrentUserProfile);
 router.get("/profile/:id", auth, validateObjectId("id"), getUserProfile);
+
+// Routes utilisateur :
+// - GET /profile          : auth — profil courant
+// - PATCH /profile        : auth — mise à jour profil courant
+// - GET /profile/:id      : auth — profil d'un utilisateur (par id)
 
 // Routes génériques avec ID (doivent être APRÈS les routes spécifiques)
 router.get("/:id", auth, validateObjectId("id"), getUserById);
@@ -95,27 +106,27 @@ router.post(
   "/reservations/new/:id",
   auth,
   validateObjectId("id"), //id utilisateur
-  createUserReservation,
+  createUserReservation
 );
 router.get(
   "/reservations/:id",
   auth,
   validateObjectId("id"), //id utilisateur
-  getUserReservations,
+  getUserReservations
 );
 router.patch(
   "/cancel/reservations/:id/:reservationId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("reservationId"), //id réservation
-  cancelUserReservation,
+  cancelUserReservation
 );
 router.delete(
   "/delete/reservations/:id/:reservationId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("reservationId"), //id réservation
-  deleteUserReservation,
+  deleteUserReservation
 );
 // Gestion des voitures actuellles
 router.post("/porsches/new/:id", auth, validateObjectId("id"), addUserPorsche);
@@ -125,14 +136,16 @@ router.patch(
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("porscheId"), //id porsche
-  updateUserPorsche,
+  updateUserPorsche
 );
 router.delete(
   "/delete/porsches/:id/:porscheId",
   auth,
   validateObjectId("id"), //id utilisateur
   validateObjectId("porscheId"), //id porsche
-  deleteUserPorsche,
+  deleteUserPorsche
 );
+
+// Routes utilisateurs (porsches/reservations) : auth required — opérations CRUD liées à l'utilisateur
 
 export default router;

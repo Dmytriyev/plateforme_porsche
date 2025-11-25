@@ -13,6 +13,7 @@ import buildUrl from "../utils/buildUrl";
 import "../css/CatalogueModeles.css";
 import "../css/Home.css";
 
+// Page d'accueil : sections promos, modèles mis en avant et navigation vers catalogues.
 const Home = () => {
   const navigate = useNavigate();
   const [modeles, setModeles] = useState([]);

@@ -11,6 +11,7 @@ import userService from "../services/user.service.js";
 import Loading from "../components/common/Loading.jsx";
 import "../css/ModifierMonCompte.css";
 
+// Page : modifier les informations du compte utilisateur et le mot de passe. Requiert connexion.
 const ModifierMonCompte = () => {
   const navigate = useNavigate();
   const { updateUser } = useContext(AuthContext);

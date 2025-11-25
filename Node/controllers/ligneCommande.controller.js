@@ -21,7 +21,7 @@ import {
 } from "../utils/responses.js";
 import { isOwnerOrAdmin } from "../utils/errorHandler.js";
 
-// Créer une nouvelle ligne de commande (ajouter au panier)
+// Ajoute une ligne au panier (validation, calcul prix/acompte).
 const createLigneCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
   // Vérifier que le corps de la requête n'est pas vide
@@ -144,7 +144,7 @@ const createLigneCommande = async (req, res) => {
   }
 };
 
-// Récupérer toutes les lignes de commande
+// Récupère toutes les lignes de commande (admin/outil).
 const getAllLigneCommandes = async (req, res) => {
   try {
     const ligneCommandes = await LigneCommande.find()
@@ -167,7 +167,7 @@ const getAllLigneCommandes = async (req, res) => {
   }
 };
 
-// Récupérer une ligne de commande par ID
+// Récupère une ligne par ID et vérifie la propriété.
 const getLigneCommandeById = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
   // Vérifier que l'utilisateur a le droit d'accéder à cette ligne de commande
@@ -205,7 +205,7 @@ const getLigneCommandeById = async (req, res) => {
   }
 };
 
-// Mettre à jour une ligne de commande
+// Met à jour une ligne (contrôle droits et champs modifiables).
 const updateLigneCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -263,7 +263,7 @@ const updateLigneCommande = async (req, res) => {
   }
 };
 
-// Supprimer une ligne de commande
+// Supprime une ligne du panier (vérifie droits et état du panier).
 const deleteLigneCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -297,7 +297,7 @@ const deleteLigneCommande = async (req, res) => {
   }
 };
 
-// Récupérer les lignes de commande d'une commande spécifique
+// Récupère les lignes d'une commande spécifique (avec total et enrich.)
 const getLignesByCommande = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -353,7 +353,7 @@ const getLignesByCommande = async (req, res) => {
   }
 };
 
-// Récupérer les lignes du panier actif de l'utilisateur connecté
+// Récupère les lignes du panier actif pour l'utilisateur connecté.
 const getMesLignesPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -410,7 +410,7 @@ const getMesLignesPanier = async (req, res) => {
   }
 };
 
-// Vider le panier actif de l'utilisateur connecté
+// Vide le panier actif de l'utilisateur (supprime lignes associées).
 const viderPanier = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 
@@ -430,7 +430,7 @@ const viderPanier = async (req, res) => {
   }
 };
 
-// Mettre à jour la quantité d'une ligne de commande dans le panier actif de l'utilisateur connecté
+// Met à jour la quantité d'une ligne (contraintes: voiture neuve = 1).
 const updateQuantite = async (req, res) => {
   if (!req.user) return sendUnauthorized(res);
 

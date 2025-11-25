@@ -65,24 +65,26 @@ const components = {
 
 function App() {
   return (
+    // Fournit le contexte d'authentification à l'application
     <AuthProvider>
+      {/*Gère la navigation entre les pages  */}
       <BrowserRouter>
+        {/*  Capture les erreurs dans l'arborescence des composants */}
         <ErrorBoundary>
           <div className="app-container">
-            <Navbar />
+            <Navbar />{/* Barre de navigation en haut de la page */}
             <main className="app-main">
-
-              <Routes>
+              <Routes>{/* Définit les routes de l'application */}
                 {routes.map(({ path, elementName }) => {
                   const Component = components[elementName];
                   return (
                     <Route key={path} path={path} element={<Component />} />
                   );
                 })}
-
                 {protectedRoutes.map(({ path, elementName, roles }) => {
                   const Component = components[elementName];
                   return (
+                    // Route protégée par rôle d'utilisateur
                     <Route
                       key={path}
                       path={path}
@@ -94,7 +96,7 @@ function App() {
                     />
                   );
                 })}
-
+                {/* Route pour les pages non trouvées (404) */}
                 <Route
                   path="*"
                   element={

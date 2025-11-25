@@ -9,6 +9,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import commandeService from "../services/commande.service.js";
 import "../css/Checkout.css";
 
+// Page : finaliser la commande et initier le paiement (Stripe). Requiert authentification.
 const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);

@@ -8,6 +8,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import "../../css/components/ContactModal.css";
 
+// Composant modal : formulaire de contact, prérempli depuis `user` ou `vehiculeInfo` si disponibles.
 const ContactModal = ({ onClose, vehiculeInfo = null }) => {
   const { user, isAuthenticated } = useContext(AuthContext);
 
@@ -47,7 +48,7 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
     // become available. This avoids awkward empty fields for logged-in users.
     // ESLint rule `react-hooks/set-state-in-effect` is acknowledged but acceptable
     // here because we're only initializing derived defaults (no cascading updates).
-     
+
     if (isAuthenticated && user) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({
@@ -60,7 +61,7 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
     if (vehiculeInfo) {
       const messageAuto = `Je suis intéressé(e) par ${vehiculeInfo.nom_model}${vehiculeInfo.variante ? ` ${vehiculeInfo.variante}` : ""}${vehiculeInfo.prix ? ` (${vehiculeInfo.prix})` : ""}.
 \n\n`;
-       
+
       setFormData((prev) => ({
         ...prev,
         message: messageAuto,
@@ -221,3 +222,5 @@ const ContactModal = ({ onClose, vehiculeInfo = null }) => {
 };
 
 export default ContactModal;
+
+// ContactModal : modal de contact; pré-remplit avec `user` ou `vehiculeInfo` si disponibles.

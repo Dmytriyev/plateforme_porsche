@@ -13,6 +13,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import { Loading } from "./common";
 import "../css/ProtectedRoute.css";
 
+// Composant route protégée : redirige si non-auth ou rôle manquant
 const ProtectedRoute = ({ children, roles }) => {
   const { loading, isAuthenticated, hasRole } = useContext(AuthContext);
 

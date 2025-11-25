@@ -10,6 +10,7 @@ import { AuthContext } from "../context/AuthContext.jsx";
 import { formatPrice, formatDate } from "../utils/helpers.js";
 import "../css/MesCommandes.css";
 
+// Page : affiche l'historique des commandes de l'utilisateur; nécessite authentification.
 const MesCommandes = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);

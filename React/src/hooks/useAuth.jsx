@@ -17,3 +17,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Hook utilitaire : expose le contexte d'authentification (user, token, méthodes)

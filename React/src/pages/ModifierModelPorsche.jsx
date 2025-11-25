@@ -29,6 +29,7 @@ const CARROSSERIES_PAR_MODELE = {
   Cayenne: ["SUV"],
 };
 
+// Page (admin) : éditer un modèle Porsche complet (variantes, options, photos).
 const ModifierModelPorsche = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -14,6 +14,7 @@ import buildUrl from "../utils/buildUrl";
 import "../css/MesVoitures.css";
 import "../css/components/Message.css";
 
+// Page : gestion des voitures personnelles (liste, ajout, suppression). Requiert connexion.
 const MesVoitures = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);

@@ -1,34 +1,29 @@
 /**
- * services/user.service.js — Gestion du profil utilisateur côté client
- *
- * - Centralise la lecture/mise à jour du profil et la synchronisation du `localStorage`.
- * - Après modification, met à jour le `localStorage` pour garder l'UI cohérente.
- * - Evitez d'y mettre de la logique métier complexe ; déléguez au backend.
+ *  — Gestion du profil utilisateur côté client
+ * - Centralise la lecture/mise à jour du profil.
  */
 
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 import { sanitizeObject } from "../utils/helpers";
 
+// Service pour les opérations liées aux utilisateurs
 const userService = {
+  // Récupère le profil de l'utilisateur connecté.
   getCurrentUser: async () => {
     return apiRequest(() => apiClient.get("/user/profile"));
   },
 
+  // Met à jour le profil courant et renvoie l'objet nettoyé.
   updateProfile: async (userData) => {
     const response = await apiRequest(() =>
       apiClient.patch("/user/profile", userData)
     );
 
-    if (response) {
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const updatedUser = { ...currentUser, ...sanitizeObject(response) };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-    }
-
-    return response;
+    return response ? sanitizeObject(response) : null;
   },
 
+  // Supprime le compte de l'utilisateur connecté.
   deleteAccount: async () => {
     return apiRequest(() => apiClient.delete("/user/profile"));
   },

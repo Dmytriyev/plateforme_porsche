@@ -17,6 +17,7 @@ import { API_URL } from "../config/api.js";
 import buildUrl from "../utils/buildUrl";
 import { warn } from "../utils/logger.js";
 
+// Page : détail d'une variante (images, options, disponibilité). Permet configuration/achat selon type.
 const VariantePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();

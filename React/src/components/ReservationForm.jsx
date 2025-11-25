@@ -17,6 +17,7 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
 );
 
+// Composant formulaire : créer une réservation puis initier le paiement (Stripe)
 export default function ReservationForm({
   initialConfig = {},
   onCompleted,

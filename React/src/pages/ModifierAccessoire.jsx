@@ -11,6 +11,7 @@ import Loading from "../components/common/Loading.jsx";
 import buildUrl from "../utils/buildUrl";
 import "../css/ModifierAccessoire.css";
 
+// Page (admin) : modifier un accessoire existant, gérer images et métadonnées.
 const ModifierAccessoire = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -194,13 +195,12 @@ const ModifierAccessoire = () => {
           formDataPhotos.append("photos", photo);
         });
 
+        // Le token est automatiquement envoyé via cookie HTTP-Only
         await fetch(
           `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/accesoire/addImage/${id}`,
           {
             method: "PATCH",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            credentials: "include",
             body: formDataPhotos,
           },
         );

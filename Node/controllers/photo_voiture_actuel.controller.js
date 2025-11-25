@@ -14,7 +14,7 @@ import photo_voiture_actuelValidation from "../validations/photo_voiture_actuel.
 // Obtenir le répertoire courant
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Créer une nouvelle photo de voiture actuel
+// Crée une photo pour une annonce de voiture actuelle (vérifie propriétaire).
 const createPhoto_voiture_actuel = async (req, res) => {
   try {
     const { body } = req;
@@ -79,7 +79,7 @@ const createPhoto_voiture_actuel = async (req, res) => {
   }
 };
 
-// Récupérer toutes les photos de voiture actuel
+// Récupère toutes les photos des voitures actuelles.
 const getAllPhoto_voiture_actuels = async (req, res) => {
   try {
     const photo_voiture_actuels = await Photo_voiture_actuel.find();
@@ -89,7 +89,7 @@ const getAllPhoto_voiture_actuels = async (req, res) => {
   }
 };
 
-// Récupérer une photo de voiture actuel par ID
+// Récupère une photo d'annonce par son ID.
 const getPhoto_voiture_actuelById = async (req, res) => {
   try {
     const photo_voiture_actuel = await Photo_voiture_actuel.findById(
@@ -104,7 +104,7 @@ const getPhoto_voiture_actuelById = async (req, res) => {
   }
 };
 
-// Mettre à jour une photo de voiture actuel
+// Met à jour une photo d'annonce (vérifie propriété et remplace fichier si nécessaire).
 const updatePhoto_voiture_actuel = async (req, res) => {
   try {
     if (!req.user) {
@@ -185,7 +185,7 @@ const updatePhoto_voiture_actuel = async (req, res) => {
   }
 };
 
-// Supprimer un fichier uploadé
+// Supprime un fichier uploadé du dossier `uploads/voiture_actuel`.
 function removeUploadedFile(FilenameOrPath) {
   try {
     // Accepte soit un chemin absolu, soit juste le nom de fichier
@@ -201,7 +201,7 @@ function removeUploadedFile(FilenameOrPath) {
   }
 }
 
-// Supprimer une photo de voiture actuel
+// Supprime une photo d'annonce après vérification de propriété et dépendances.
 const deletePhoto_voiture_actuel = async (req, res) => {
   try {
     if (!req.user) {
