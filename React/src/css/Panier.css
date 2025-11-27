@@ -399,6 +399,21 @@
   border-top: 1px solid var(--color-grey-border);
 }
 
+/* Classe utilitaire pour afficher le placeholder (remplace les styles inline) */
+.panier-article-placeholder-visible {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Couleurs pour le swatch d'accessoire (évite les styles inline) */
+.panier-color-swatch-rouge {
+  background-color: #dc2626;
+}
+.panier-color-swatch-default {
+  background-color: #9ca3af;
+}
+
 .panier-summary-detail-item-porsche {
   display: flex;
   justify-content: space-between;

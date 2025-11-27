@@ -4,8 +4,8 @@
  * @file components/common/Modal.jsx
  */
 
-import { useEffect } from "react";
 import "../../css/components/Modal.css";
+import { useEffect } from "react";
 
 // Wrapper modal accessible : gère ouverture/fermeture, ESC et blocage du scroll
 const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {

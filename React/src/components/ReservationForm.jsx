@@ -4,14 +4,14 @@
  * @file components/ReservationForm.jsx
  */
 
-import React, { useState, useMemo } from "react";
-import useReservation from "../hooks/useReservation";
-import PaymentForm from "./PaymentForm";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import Button from "./common/Button.jsx";
 import "../css/components/ReservationForm.css";
+import useReservation from "../hooks/useReservation";
 import { error as logError } from "../utils/logger.js";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import Button from "./common/Button.jsx";
+import PaymentForm from "./PaymentForm";
+import React, { useState, useMemo } from "react";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",

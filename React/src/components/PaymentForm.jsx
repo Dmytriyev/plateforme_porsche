@@ -4,10 +4,10 @@
  * @file components/PaymentForm.jsx
  */
 
-import React, { useState } from "react";
+import "../css/components/PaymentForm.css";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import Button from "./common/Button.jsx";
-import "../css/components/PaymentForm.css";
+import React, { useState } from "react";
 
 // Composant : PaymentForm — intègre Stripe Elements et confirme un paiement via `clientSecret`.
 export default function PaymentForm({ clientSecret, onSuccess, onError }) {

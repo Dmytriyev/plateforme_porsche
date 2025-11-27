@@ -7,10 +7,10 @@
  * - Les interceptors ajoutent automatiquement le token Authorization et gèrent 401.
  */
 
-import axios from "axios";
 import TokenService from "../services/token.service.js";
 import { navigate } from "../utils/navigate.js";
 import notify from "../utils/notify.js";
+import axios from "axios";
 
 export const API_URL =
   import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || "";

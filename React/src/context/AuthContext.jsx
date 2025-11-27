@@ -6,10 +6,10 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useState, useMemo, useCallback, useEffect } from "react";
 import authService from "../services/auth.service.js";
-import userService from "../services/user.service.js";
 import TokenService from "../services/token.service.js";
+import userService from "../services/user.service.js";
+import { createContext, useState, useMemo, useCallback, useEffect } from "react";
 
 export const AuthContext = createContext(null);
 

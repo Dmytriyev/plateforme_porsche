@@ -1,17 +1,12 @@
-/**
- * pages/PaymentSuccess.jsx — Affiche succès du paiement; serveur finalise via webhook.
- *
- * @file pages/PaymentSuccess.jsx
- */
-
+// Affiche succès du paiement; serveur finalise via webhook Stripe
+import "../css/PaymentStatus.css";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../css/PaymentStatus.css";
 
-// Page : affiche le succès du paiement; redirige automatiquement vers l'historique des commandes.
+// affiche le succès du paiement; redirige automatiquement vers l'historique des commandes.
 const PaymentSuccess = () => {
   const navigate = useNavigate();
-
+  // Redirection automatique après un délai de 5 secondes
   useEffect(() => {
     // Rediriger vers les commandes après 5 secondes
     const timer = setTimeout(() => {
@@ -22,8 +17,11 @@ const PaymentSuccess = () => {
   }, [navigate]);
 
   return (
+    // Structure de la page de succès de paiement avec styles Porsche
     <div className="payment-status-container">
+      {/* Contenu de la page de succès de paiement */}
       <div className="payment-status-content">
+        {/* Icône de succès */}
         <div className="payment-status-icon payment-status-success">
           <svg
             viewBox="0 0 24 24"
@@ -42,6 +40,7 @@ const PaymentSuccess = () => {
           Vous recevrez un email de confirmation avec les détails de votre
           commande.
         </p>
+        {/* Actions disponibles après le succès du paiement */}
         <div className="payment-status-actions">
           <button
             onClick={() => navigate("/mes-commandes")}

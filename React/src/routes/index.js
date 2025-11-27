@@ -1,9 +1,9 @@
 /**
- * index.js — Définition des routes React
- *
+ * — Définition des routes React
  * - Routeur et protection des routes.
  */
 
+// Définition des routes publiques
 export const routes = [
   { path: "/", elementName: "Home", title: "Accueil" },
   { path: "/login", elementName: "Login", title: "Login", hideFromMenu: true },
@@ -17,6 +17,38 @@ export const routes = [
     path: "/choix-voiture",
     elementName: "ChoixVoiture",
     title: "Choix voiture",
+  },
+  { path: "/contact", elementName: "Contact", title: "Contact" },
+  { path: "/a-propos", elementName: "APropos", title: "À propos" },
+  {
+    path: "/conditions",
+    elementName: "Conditions",
+    title: "Conditions générales",
+  },
+  {
+    path: "/mentions-legales",
+    elementName: "MentionsLegales",
+    title: "Mentions légales",
+  },
+  {
+    path: "/confidentialite",
+    elementName: "Confidentialite",
+    title: "Politique de confidentialité",
+  },
+  {
+    path: "/accessibilite",
+    elementName: "Accessibilite",
+    title: "Déclaration d'accessibilité",
+  },
+  {
+    path: "/politique-cookies",
+    elementName: "PolitiqueCookies",
+    title: "Politique de cookies",
+  },
+  {
+    path: "/porsche-approved",
+    elementName: "Approved",
+    title: "Porsche Certifier - Contrôle et garantie",
   },
   {
     path: "/catalogue/:type",
@@ -95,7 +127,7 @@ export const routes = [
     hideFromMenu: true,
   },
 ];
-
+// Définition des routes protégées (nécessitent une authentification)
 export const protectedRoutes = [
   {
     path: "/commande/checkout",
@@ -159,9 +191,11 @@ export const protectedRoutes = [
   },
 ];
 
+// Fonction pour obtenir les éléments de menu à partir des routes
 export const getMenuItems = () =>
+  // Filtrer les routes pour exclure celles qui doivent être cachées du menu
   routes
-    .filter((r) => !r.hideFromMenu)
+    .filter((r) => r.hideFromMenu !== true && r.path && r.title)
     .map((r) => ({ path: r.path, title: r.title }));
 
 export default { routes, protectedRoutes, getMenuItems };

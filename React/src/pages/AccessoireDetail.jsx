@@ -1,15 +1,16 @@
-import { useState, useEffect, useCallback, useContext } from "react";
-import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import accesoireService from "../services/accesoire.service.js";
-import { AuthContext } from "../context/AuthContext.jsx";
-import usePanierAPI from "../hooks/usePanierAPI.jsx";
-import Loading from "../components/common/Loading.jsx";
 import Button from "../components/common/Button.jsx";
+import Loading from "../components/common/Loading.jsx";
 import LoginPromptModal from "../components/modals/LoginPromptModal.jsx";
-import { formatPrice } from "../utils/helpers.js";
-import buildUrl from "../utils/buildUrl";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/AccessoireDetail.css";
 import "../css/components/Message.css";
+import usePanierAPI from "../hooks/usePanierAPI.jsx";
+import accesoireService from "../services/accesoire.service.js";
+import buildUrl from "../utils/buildUrl";
+import { formatPrice } from "../utils/helpers.js";
+import { useState, useEffect, useCallback, useContext } from "react";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 
 // Page : affiche le détail d'un accessoire; permet ajout au panier (connexion requise pour ajouter).
 const AccessoireDetail = () => {
@@ -169,16 +170,12 @@ const AccessoireDetail = () => {
                       </svg>
                     </button>
                   )}
-                  <img
-                    src={buildUrl(photos[photoActive]?.name)}
+                  <ImageWithFallback
+                    src={photos[photoActive] ? buildUrl(photos[photoActive].name) : null}
                     alt={photos[photoActive]?.alt || accessoire.nom_accesoire}
-                    className="gallery-main-image-porsche"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      if (e.target.nextSibling) {
-                        e.target.nextSibling.style.display = "flex";
-                      }
-                    }}
+                    imgClass="gallery-main-image-porsche"
+                    imgProps={{ style: { maxWidth: '100%', height: 'auto' } }}
+                    placeholder={<div className="gallery-main-placeholder-porsche"><span className="gallery-placeholder-letter-porsche">{accessoire.nom_accesoire?.charAt(0) || "?"}</span></div>}
                   />
                   {hasMultiplePhotos && (
                     <button
@@ -223,12 +220,11 @@ const AccessoireDetail = () => {
                     className={`gallery-thumb-porsche ${photoActive === index ? "gallery-thumb-active-porsche" : ""}`}
                     aria-label={`Voir la photo ${index + 1}`}
                   >
-                    <img
-                      src={buildUrl(photo?.name)}
+                    <ImageWithFallback
+                      src={photo && photo.name ? buildUrl(photo.name) : null}
                       alt={photo?.alt || `Photo ${index + 1}`}
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                      }}
+                      imgProps={{ style: { width: '100%', height: 'auto' } }}
+                      placeholder={<div className="gallery-thumb-missing-porsche" />}
                     />
                   </button>
                 ))}

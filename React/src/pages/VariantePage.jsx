@@ -1,23 +1,18 @@
-/**
- * pages/VariantePage.jsx — Détail variante: images, options, disponibilité.
- *
- * @file pages/VariantePage.jsx
- */
-
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+// Détail variante: images, options, disponibilité, configuration/achat selon type (neuf/occasion)
+import Button from "../components/common/Button.jsx";
+import buildUrl from "../utils/buildUrl";
+import Loading from "../components/common/Loading.jsx";
 import modelPorscheService from "../services/modelPorsche.service.js";
 import voitureService from "../services/voiture.service.js";
-import Loading from "../components/common/Loading.jsx";
-import Button from "../components/common/Button.jsx";
 import { formatPrice } from "../utils/helpers.js";
-import "../css/VariantePage.css";
-import "../css/components/Message.css";
-import { API_URL } from "../config/api.js";
-import buildUrl from "../utils/buildUrl";
 import { warn } from "../utils/logger.js";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import "../css/components/Message.css";
+import "../css/VariantePage.css";
 
-// Page : détail d'une variante (images, options, disponibilité). Permet configuration/achat selon type.
+// détail d'une variante (images, options, disponibilité). Permet configuration/achat selon type.
 const VariantePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,20 +22,24 @@ const VariantePage = () => {
   const [carrosseriesNav, setCarrosseriesNav] = useState([]);
   const [selectedCarrosserie, setSelectedCarrosserie] = useState("");
 
+  // Récupération des données de la page variante au chargement et à chaque changement d'id de variante 
   useEffect(() => {
     const fetchPageData = async () => {
       try {
         setLoading(true);
         setError("");
+        // Récupérer les données de la variante
         const data = await modelPorscheService.getVariantePage(id);
         setPageData(data);
 
         // Récupérer les carrosseries disponibles pour ce modèle de base
         if (data.voiture_base?._id) {
           try {
+            // Récupérer les données de la voiture de base pour obtenir les carrosseries disponibles
             const voitureData = await voitureService.getVoiturePage(
               data.voiture_base._id,
             );
+            // Mettre à jour la navigation des carrosseries
             if (voitureData?.statistiques?.carrosseries_disponibles) {
               const carrosseries =
                 voitureData.statistiques.carrosseries_disponibles;
@@ -60,16 +59,16 @@ const VariantePage = () => {
         setLoading(false);
       }
     };
-
+    // Lancer la récupération des données si l'id est présent
     if (id) {
       fetchPageData();
     }
   }, [id]);
-
+  // Affichage des états de chargement, d'erreur ou du contenu principal
   if (loading) {
     return <Loading fullScreen message="Chargement de la variante..." />;
   }
-
+  // Afficher un message d'erreur si la récupération des données a échoué
   if (error) {
     return (
       <div className="variante-page-error">
@@ -82,7 +81,7 @@ const VariantePage = () => {
       </div>
     );
   }
-
+  // Afficher un message si la variante n'a pas été trouvée
   if (!pageData || !pageData.variante) {
     return (
       <div className="variante-page-error">
@@ -95,7 +94,7 @@ const VariantePage = () => {
       </div>
     );
   }
-
+  // Extraire les données nécessaires de la page variante 
   const {
     variante,
     voiture_base,
@@ -106,7 +105,9 @@ const VariantePage = () => {
     type,
   } = pageData;
 
+  // Gérer la navigation vers le configurateur ou d'autres actions  
   const handleConfigurer = () => {
+    // Naviguer vers le configurateur si la variante est neuve et les données sont disponibles
     if (type === "neuf" && variante?._id && voiture_base?._id) {
       const targetUrl = `/configurateur/${voiture_base._id}/${variante._id}`;
       navigate(targetUrl);
@@ -115,28 +116,29 @@ const VariantePage = () => {
     }
   };
 
+  // Gérer le changement de modèle  
   const handleChangerModele = () => {
+    // Naviguer vers la page de choix de voiture ou vers la voiture de base si disponible
     if (voiture_base?._id) {
       navigate(`/variantes/neuve/${voiture_base._id}`);
     } else {
       navigate("/choix-voiture");
     }
   };
-
+  // Gérer l'achat de voitures neuves et d'occasion
   const handleAcheter = () => {
     navigate("/occasion");
   };
 
-  /**
-   * Récupérer la photo principale et la photo secondaire
-   */
+  // Récupérer la photo principale et la photo secondaire
   const photoPrincipale = photos && photos.length > 0 ? photos[0] : null;
   const photoSecondaire = photos && photos.length > 1 ? photos[1] : null;
-
+  // Rendu du composant VariantePage avec le style Porsche
   return (
     <div className="variante-page-container-porsche">
-      {/* Navigation Top */}
+      {/* Navigation en haut */}
       <nav className="variante-nav-top-porsche">
+        {/* section navigation gauche */}
         <div className="variante-nav-top-left">
           <span className="variante-nav-model-name">{variante.nom_model}</span>
           <button
@@ -146,6 +148,7 @@ const VariantePage = () => {
             CHANGER DE MODÈLE
           </button>
         </div>
+        {/* section navigation droite */}
         <div className="variante-nav-top-right">
           <button
             className="variante-nav-link variante-btn-configurer"
@@ -168,18 +171,15 @@ const VariantePage = () => {
           )}
         </div>
       </nav>
-
-      {/* Hero Section avec image principale */}
+      {/* Section Hero avec image principale et infos */}
       <section className="variante-hero-porsche">
         {photoPrincipale && (
           <div className="variante-hero-image-porsche">
-            <img
-              src={buildUrl(photoPrincipale.name)}
+            <ImageWithFallback
+              src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
               alt={variante.nom_model}
-              className="variante-hero-img-porsche"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
+              imgClass="variante-hero-img-porsche"
+              placeholder={<div className="variante-hero-missing" />}
             />
           </div>
         )}
@@ -245,13 +245,13 @@ const VariantePage = () => {
                     {specifications.vitesse_max} km/h
                   </div>
                   <div className="variante-performance-label-porsche">
-                    Vitesse maximale sur circuit
+                    Vitesse maximale
                   </div>
                 </div>
               )}
             </div>
           )}
-
+          {/* section détails techniques */}
           {type !== "neuf" && (
             <button className="variante-technical-details-btn-porsche">
               TOUS LES DÉTAILS TECHNIQUES
@@ -263,13 +263,11 @@ const VariantePage = () => {
         {photoSecondaire && (
           <div className="variante-right-column-porsche">
             <div className="variante-secondary-image-porsche">
-              <img
-                src={buildUrl(photoSecondaire.name)}
+              <ImageWithFallback
+                src={photoSecondaire && photoSecondaire.name ? buildUrl(photoSecondaire.name) : null}
                 alt={`${variante.nom_model} - Vue secondaire`}
-                className="variante-secondary-img-porsche"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                imgClass="variante-secondary-img-porsche"
+                placeholder={<div className="variante-secondary-missing" />}
               />
             </div>
           </div>

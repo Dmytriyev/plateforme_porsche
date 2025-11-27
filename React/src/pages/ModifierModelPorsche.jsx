@@ -4,16 +4,16 @@
  * - Formulaire d'édition du modèle.
  */
 
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import modelPorscheService from "../services/modelPorsche.service.js";
-import voitureService from "../services/voiture.service.js";
-import personnalisationService from "../services/personnalisation.service.js";
 import Loading from "../components/common/Loading.jsx";
-import { formatPrice } from "../utils/helpers.js";
 // import buildUrl from "../utils/buildUrl"; // retiré (non utilisé)
 import "../css/ModifierModelPorsche.css";
+import modelPorscheService from "../services/modelPorsche.service.js";
+import personnalisationService from "../services/personnalisation.service.js";
+import voitureService from "../services/voiture.service.js";
+import { formatPrice } from "../utils/helpers.js";
 import { warn } from "../utils/logger.js";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 // Variantes prédéfinies par modèle (synchronisées avec le backend)
 const VARIANTES_PAR_MODELE = {

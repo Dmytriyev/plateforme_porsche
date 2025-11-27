@@ -4,16 +4,17 @@
  * - Affichage détaillé et actions possibles.
  */
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import maVoitureService from "../services/ma_voiture.service.js";
-import modelPorscheService from "../services/modelPorsche.service.js";
 // commandeService retiré (non utilisé)
 import Loading from "../components/common/Loading.jsx";
 import { API_URL } from "../config/api.js";
+import "../css/MaVoitureDetail.css";
+import maVoitureService from "../services/ma_voiture.service.js";
+import modelPorscheService from "../services/modelPorsche.service.js";
 import buildUrl from "../utils/buildUrl";
 import { formatPrice } from "../utils/helpers.js";
-import "../css/MaVoitureDetail.css";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 
 // Page : affiche le détail d'une voiture personnelle; actions possible (retour, modifier, supprimer).
 const MaVoitureDetail = () => {
@@ -145,13 +146,11 @@ const MaVoitureDetail = () => {
           {photos.length > 0 ? (
             <>
               <div className="ma-voiture-detail-main-image">
-                <img
-                  src={buildUrl(photos[photoActive].name)}
+                <ImageWithFallback
+                  src={photos[photoActive] ? buildUrl(photos[photoActive].name) : null}
                   alt={`${nomModele} - Photo ${photoActive + 1}`}
-                  className="ma-voiture-detail-img"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
+                  imgClass="ma-voiture-detail-img"
+                  placeholder={<div className="ma-voiture-detail-img-missing" />}
                 />
               </div>
               {photos.length > 1 && (
@@ -162,12 +161,11 @@ const MaVoitureDetail = () => {
                       className={`ma-voiture-detail-thumbnail ${index === photoActive ? "active" : ""}`}
                       onClick={() => setPhotoActive(index)}
                     >
-                      <img
-                        src={buildUrl(photo.name)}
+                      <ImageWithFallback
+                        src={photo && photo.name ? buildUrl(photo.name) : null}
                         alt={`${nomModele} - Miniature ${index + 1}`}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
+                        imgProps={{ style: { width: '100%', height: 'auto' } }}
+                        placeholder={<div className="ma-voiture-detail-thumb-missing" />}
                       />
                     </button>
                   ))}

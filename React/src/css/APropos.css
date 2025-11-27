@@ -1,0 +1,270 @@
+.apropos-container-porsche,
+/* alias pour compatibilité avec les pages créées sans suffixe */
+.apropos-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+  background: var(--bg-page, #ffffff);
+}
+
+.apropos-card-porsche,
+.apropos-card {
+  max-width: 900px;
+  width: 100%;
+  background: var(--card-bg, #ffffff);
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  color: var(--text-color, #111827);
+}
+
+.apropos-title-porsche,
+.apropos-title {
+  font-size: 42px;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Hero: image + content side-by-side */
+.apropos-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* trois lignes : titre (auto), lead (1fr -> espace central), contenu (auto) */
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "title title"
+    "lead lead"
+    "left right";
+  gap: 24px;
+  align-items: stretch; /* permet aux colonnes de prendre la même hauteur */
+  margin-bottom: 18px;
+  min-height: 50vh; /* réduit légèrement la hauteur par défaut pour mieux s'adapter */
+}
+
+.apropos-hero-image {
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  border-radius: 8px;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  align-self: stretch;
+}
+
+.apropos-hero-image-inner {
+  font-size: 20px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.apropos-title {
+  grid-area: title;
+  justify-self: center;
+  align-self: end; /* placé en haut de la zone du titre */
+  margin-bottom: 8px;
+}
+
+.apropos-lead {
+  grid-area: lead;
+  justify-self: center; /* centre horizontalement */
+  align-self: center; /* centre verticalement dans la ligne centrale */
+  font-size: 20px;
+  margin: 0;
+  max-width: 760px;
+  text-align: center;
+}
+
+.apropos-hero-left {
+  grid-area: left;
+  padding: 8px 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centre verticalement sur grand écran */
+  align-items: flex-start;
+  text-align: left; /* texte aligné à gauche dans la colonne gauche */
+  align-self: stretch;
+  height: 100%;
+}
+
+.apropos-hero-image {
+  grid-area: right;
+}
+
+/* Ensure left text column and image column stretch to same height */
+.apropos-hero-left,
+.apropos-hero-image {
+  align-self: stretch;
+  height: 100%;
+}
+
+.apropos-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Highlighted lead box */
+.apropos-highlight {
+  margin-top: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(17, 24, 39, 0.95),
+    rgba(17, 24, 39, 0.95)
+  );
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+}
+
+.apropos-features {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.apropos-features li {
+  padding-left: 24px;
+  position: relative;
+  color: var(--text-color, #111827);
+}
+
+.apropos-features li::before {
+  content: "\2713"; /* check mark */
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #111827;
+  font-weight: 700;
+}
+
+@media (max-width: 800px) {
+  .apropos-hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "lead"
+      "right"
+      "left";
+  }
+  .apropos-hero-image {
+    min-height: 160px;
+  }
+}
+
+/* Ensure the image element fills its container and is cropped nicely */
+.apropos-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 800px) {
+  .apropos-hero-left {
+    justify-content: flex-start; /* revert centering on small screens */
+    padding-top: 12px;
+  }
+  .apropos-hero {
+    min-height: auto; /* allow natural height on small screens */
+  }
+}
+/* Titres de section (h2) utilisés dans les pages d'information */
+.apropos-section-title {
+  font-size: 18px;
+  margin: 18px 0 8px;
+  font-weight: 700;
+  color: var(--text-color, #111827);
+}
+
+.apropos-subtitle-porsche,
+.apropos-lead {
+  font-size: 20px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  max-width: 680px;
+  width: 100%;
+}
+
+.apropos-text-porsche,
+.apropos-text {
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: rgba(17, 24, 39, 0.9);
+}
+
+.apropos-list-porsche,
+.apropos-list {
+  margin: 0 0 18px 20px;
+}
+
+.apropos-actions-porsche,
+.apropos-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center; /* centre les boutons horizontalement */
+  align-items: center;
+}
+
+/* Bouton rectangulaire principal (plein) */
+.apropos-btn-porsche,
+.apropos-btn,
+.apropos-btn-primary {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #111827; /* gris foncé */
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(17, 24, 39, 0.12);
+  text-align: center;
+}
+
+/* Bouton outline rectangulaire */
+.apropos-btn-outline-porsche,
+.apropos-btn-secondary {
+  display: inline-block;
+  padding: 10px 18px;
+  background: transparent;
+  color: #111827;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .apropos-card-porsche {
+    padding: 20px;
+  }
+  .apropos-title-porsche,
+  .apropos-title {
+    font-size: 28px;
+  }
+  .apropos-section-title {
+    font-size: 16px;
+  }
+  .apropos-actions-porsche {
+    flex-direction: column;
+    align-items: stretch; /* boutons prennent toute la largeur */
+  }
+  .apropos-btn-porsche,
+  .apropos-btn-outline-porsche,
+  .apropos-btn,
+  .apropos-btn-primary,
+  .apropos-btn-secondary {
+    width: 100%;
+    display: inline-block;
+  }
+}

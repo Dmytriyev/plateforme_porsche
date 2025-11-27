@@ -1,4 +1,4 @@
-// fichier servant à la navigation programmatique dans l'application React
+// - fichier servant à la navigation programmatique dans l'application React
 // — Permet d'utiliser la navigation en dehors des composants React
 // — Utilise une fonction de rappel pour effectuer la navigation
 // — Fournit une solution de repli utilisant window.location si nécessaire

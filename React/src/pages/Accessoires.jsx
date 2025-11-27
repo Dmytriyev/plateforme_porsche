@@ -4,16 +4,17 @@
  * @file pages/Accessoires.jsx
  */
 
-import { useState, useEffect, useContext } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import accesoireService from "../services/accesoire.service.js";
-import commandeService from "../services/commande.service.js";
-import { AuthContext } from "../context/AuthContext.jsx";
 import Loading from "../components/common/Loading.jsx";
 import LoginPromptModal from "../components/modals/LoginPromptModal.jsx";
-import buildUrl from "../utils/buildUrl";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/Accessoires.css";
 import "../css/components/Message.css";
+import accesoireService from "../services/accesoire.service.js";
+import commandeService from "../services/commande.service.js";
+import buildUrl from "../utils/buildUrl";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import { useState, useEffect, useContext, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Page : liste des accessoires avec filtres et pagination; actions admin visibles aux staff.
 const Accessoires = () => {
@@ -24,6 +25,7 @@ const Accessoires = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [filtreType, setFiltreType] = useState("tous");
   const { isAuthenticated, isStaff } = useContext(AuthContext);
+  const staff = useMemo(() => !!isStaff && isStaff(), [isStaff]);
   const location = useLocation();
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
@@ -108,7 +110,7 @@ const Accessoires = () => {
           </div>
         </div>
 
-        {isStaff && isStaff() && (
+        {staff && (
           <div className="accessoires-admin-box">
             <h3 className="accessoires-admin-title">Gestion des accessoires</h3>
             <div className="accessoires-admin-actions">
@@ -226,36 +228,19 @@ const Accessoires = () => {
                         En rupture de stock
                       </div>
                     )}
-                    {photoUrl ? (
-                      <img
-                        src={photoUrl}
-                        alt={photoPrincipale?.alt || accessoire.nom_accesoire}
-                        className="accessoire-card-image"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          if (e.target.nextSibling) {
-                            e.target.nextSibling.style.display = "flex";
-                          }
-                        }}
-                        onLoad={() => {
-                          const placeholder = document.querySelector(
-                            `.accessoire-card-porsche[data-accessoire-id="${accessoire._id}"] .accessoire-card-image-placeholder`,
-                          );
-                          if (placeholder) {
-                            placeholder.style.display = "none";
-                          }
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="accessoire-card-image-placeholder"
-                      style={{ display: photoUrl ? "none" : "flex" }}
-                    >
-                      <span className="accessoire-card-image-letter">
-                        {accessoire.nom_accesoire?.charAt(0) || "?"}
-                      </span>
-                    </div>
+                    <ImageWithFallback
+                      src={photoUrl}
+                      alt={photoPrincipale?.alt || accessoire.nom_accesoire}
+                      imgClass="accessoire-card-image"
+                      imgProps={{ loading: "lazy" }}
+                      placeholder={
+                        <div className="accessoire-card-image-placeholder">
+                          <span className="accessoire-card-image-letter">
+                            {accessoire.nom_accesoire?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                      }
+                    />
                   </div>
 
                   <div className="accessoire-card-content">
@@ -308,7 +293,7 @@ const Accessoires = () => {
                       </button>
                     </div>
 
-                    {isStaff && isStaff() && (
+                    {staff && (
                       <div className="accessoire-card-admin-actions">
                         <button
                           className="accessoire-card-admin-btn accessoire-card-admin-btn-edit"

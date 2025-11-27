@@ -4,9 +4,9 @@
  * @file components/modals/ContactModal.jsx
  */
 
-import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import "../../css/components/ContactModal.css";
+import { useState, useEffect, useContext } from "react";
 
 // Composant modal : formulaire de contact, prérempli depuis `user` ou `vehiculeInfo` si disponibles.
 const ContactModal = ({ onClose, vehiculeInfo = null }) => {

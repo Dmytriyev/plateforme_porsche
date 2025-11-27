@@ -1,5 +1,5 @@
 /**
- * - Centralise les appels API pour les voitures (liste, détails, CRUD).
+ * - Centralise les appels API (CRUD) pour les voitures.
  * - Les services rendent les composants plus simples et faciles à tester.
  * - Utiliser `apiRequest` permet de normaliser les erreurs et les formats de réponse.
  */

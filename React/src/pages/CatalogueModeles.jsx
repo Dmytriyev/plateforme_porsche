@@ -4,16 +4,17 @@
  * @file pages/CatalogueModeles.jsx
  */
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import voitureService from "../services/voiture.service.js";
-import modelPorscheService from "../services/modelPorsche.service.js";
 import Loading from "../components/common/Loading.jsx";
-import { formatPrice } from "../utils/helpers.js";
 import { API_URL } from "../config/api.js";
 import "../css/CatalogueModeles.css";
 import "../css/components/Message.css";
+import modelPorscheService from "../services/modelPorsche.service.js";
+import voitureService from "../services/voiture.service.js";
+import { formatPrice } from "../utils/helpers.js";
 import { warn } from "../utils/logger.js";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 
 // Page : catalogue des modèles (neuf / occasion) — regroupe et présente modèles et statistiques.
 const CatalogueModeles = () => {
@@ -361,38 +362,18 @@ const CatalogueModeles = () => {
 
                     {/* Image */}
                     <div className="catalogue-modele-image-porsche">
-                      {photoUrl ? (
-                        <img
-                          src={photoUrl}
-                          alt={photoPrincipale?.alt || modele.nom_model}
-                          className="catalogue-modele-img-porsche"
-                          onError={(e) => {
-                            try {
-                              if (e.target.dataset.fallback) {
-                                e.target.style.display = "none";
-                                if (e.target.nextSibling)
-                                  e.target.nextSibling.style.display = "flex";
-                                return;
-                              }
-                              e.target.dataset.fallback = "1";
-                              e.target.src = "/Logo/Logo_porsche_black.jpg";
-                            } catch (err) {
-                              e.target.style.display = "none";
-                              if (e.target.nextSibling) {
-                                e.target.nextSibling.style.display = "flex";
-                              }
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className="catalogue-modele-placeholder-porsche"
-                        style={{ display: photoUrl ? "none" : "flex" }}
-                      >
-                        <span className="catalogue-modele-letter-porsche">
-                          {modele.nom_model?.charAt(0) || "?"}
-                        </span>
-                      </div>
+                      <ImageWithFallback
+                        src={photoUrl}
+                        alt={photoPrincipale?.alt || modele.nom_model}
+                        imgClass="catalogue-modele-img-porsche"
+                        placeholder={
+                          <div className="catalogue-modele-placeholder-porsche">
+                            <span className="catalogue-modele-letter-porsche">
+                              {modele.nom_model?.charAt(0) || "?"}
+                            </span>
+                          </div>
+                        }
+                      />
                     </div>
 
                     {/* Prix - Affiché entre l'image et le bouton */}
@@ -457,38 +438,18 @@ const CatalogueModeles = () => {
 
                     {/* Image */}
                     <div className="catalogue-modele-image-porsche">
-                      {photoUrl ? (
-                        <img
-                          src={photoUrl}
-                          alt={photoPrincipale?.alt || modele.nom_model}
-                          className="catalogue-modele-img-porsche"
-                          onError={(e) => {
-                            try {
-                              if (e.target.dataset.fallback) {
-                                e.target.style.display = "none";
-                                if (e.target.nextSibling)
-                                  e.target.nextSibling.style.display = "flex";
-                                return;
-                              }
-                              e.target.dataset.fallback = "1";
-                              e.target.src = "/Logo/Logo_porsche_black.jpg";
-                            } catch (err) {
-                              e.target.style.display = "none";
-                              if (e.target.nextSibling) {
-                                e.target.nextSibling.style.display = "flex";
-                              }
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className="catalogue-modele-placeholder-porsche"
-                        style={{ display: photoUrl ? "none" : "flex" }}
-                      >
-                        <span className="catalogue-modele-letter-porsche">
-                          {modele.nom_model?.charAt(0) || "?"}
-                        </span>
-                      </div>
+                      <ImageWithFallback
+                        src={photoUrl}
+                        alt={photoPrincipale?.alt || modele.nom_model}
+                        imgClass="catalogue-modele-img-porsche"
+                        placeholder={
+                          <div className="catalogue-modele-placeholder-porsche">
+                            <span className="catalogue-modele-letter-porsche">
+                              {modele.nom_model?.charAt(0) || "?"}
+                            </span>
+                          </div>
+                        }
+                      />
                     </div>
 
                     {/* Prix */}

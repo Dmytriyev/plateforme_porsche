@@ -1,7 +1,9 @@
 /**
  * Extrait l'objet `data` normalisé depuis la réponse axios.
- * Retourne `null` si réponse invalide.
  */
+
+// Tente d'extraire un objet depuis la réponse API.
+// Gère les formats { data: {...} } et { data: { data: {...} }
 const extractData = (response) => {
   if (!response?.data) return null;
   const { data } = response;
@@ -20,6 +22,7 @@ const extractArray = (response) => {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.data)) return data.data;
 
+  // Vérifier d'autres clés possibles contenant des tableaux
   const extracted = data?.data || data;
   const arrayKeys = [
     "configurations",
@@ -30,6 +33,7 @@ const extractArray = (response) => {
     "porsches",
   ];
 
+  // Retourner le premier tableau trouvé
   for (const key of arrayKeys) {
     if (Array.isArray(extracted?.[key])) {
       return extracted[key];
@@ -45,6 +49,8 @@ const extractArray = (response) => {
  * - `defaultValue`: valeur retournée si erreur ignorée.
  * - `ignoreErrors`: codes HTTP à ignorer (ex: 404).
  */
+
+// Fonction principale pour effectuer une requête API avec gestion des erreurs et extraction des données
 export const apiRequest = async (requestFn, options = {}) => {
   const {
     returnArray = false,
@@ -53,6 +59,7 @@ export const apiRequest = async (requestFn, options = {}) => {
   } = options;
 
   try {
+    // Effectuer la requête API fournie et extraire les données appropriées (objet ou tableau)
     const response = await requestFn();
     return returnArray ? extractArray(response) : extractData(response);
   } catch (error) {

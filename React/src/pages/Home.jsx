@@ -6,12 +6,13 @@
  * - Exemple pratique : filtrage et affichage conditionnel (loading / empty / data).
  */
 
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import voitureService from "../services/voiture.service.js";
-import buildUrl from "../utils/buildUrl";
 import "../css/CatalogueModeles.css";
 import "../css/Home.css";
+import voitureService from "../services/voiture.service.js";
+import buildUrl from "../utils/buildUrl";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 // Page d'accueil : sections promos, modèles mis en avant et navigation vers catalogues.
 const Home = () => {
@@ -64,32 +65,37 @@ const Home = () => {
   return (
     <div className="home-container-porsche">
       <section className="home-hero-section">
-        <div className="home-hero-content">
-          <div className="home-hero-image-container">
-            <div className="home-hero-image">
-              <div className="home-hero-placeholder">
-                <span className="home-hero-logo">PORSCHE</span>
-              </div>
-            </div>
+        <div className="home-hero-content max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row items-center gap-8">
+          <div className="home-hero-image-container w-full md:w-1/2">
+            <figure className="rounded-lg overflow-hidden shadow-xl">
+              <img
+                src="/Image/Porsche_GT3_GT4_RS_4.jpg"
+                alt="Porsche GT3 GT4 RS"
+                loading="lazy"
+                className="w-full h-56 sm:h-72 md:h-96 object-cover"
+              />
+              <figcaption className="sr-only">Porsche GT3 GT4 RS</figcaption>
+            </figure>
           </div>
-          <div className="home-hero-text">
-            <h1 className="home-hero-title">
+
+          <div className="home-hero-text w-full md:w-1/2 text-center md:text-left">
+            <h1 className="home-hero-title text-3xl sm:text-4xl lg:text-5xl font-semibold">
               Votre voyage Porsche commence ici.
             </h1>
-            <p className="home-hero-slogan">
+            <p className="home-hero-slogan mt-4 text-sm sm:text-base text-gray-600">
               Découvrez l'excellence automobile. Choisissez votre expérience
               Porsche.
             </p>
-            <div className="home-hero-buttons">
+            <div className="home-hero-buttons mt-6 flex flex-col sm:flex-row items-center md:items-start justify-center md:justify-start gap-3">
               <Link
                 to="/catalogue/neuve"
-                className="home-hero-btn home-hero-btn-primary"
+                className="home-hero-btn home-hero-btn-primary px-6 py-2 rounded"
               >
                 Voitures Neuves
               </Link>
               <Link
                 to="/catalogue/occasion"
-                className="home-hero-btn home-hero-btn-secondary"
+                className="home-hero-btn home-hero-btn-secondary px-6 py-2 rounded"
               >
                 Voitures d'Occasion
               </Link>
@@ -127,32 +133,18 @@ const Home = () => {
                   </h2>
 
                   <div className="catalogue-modele-image-porsche">
-                    {photoPrincipale && photoPrincipale.name ? (
-                      <img
-                        src={buildUrl(photoPrincipale.name)}
-                        alt={`Porsche ${modele.nom_model}`}
-                        className="catalogue-modele-img-porsche"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          if (e.target.nextSibling) {
-                            e.target.nextSibling.style.display = "flex";
-                          }
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="catalogue-modele-placeholder-porsche"
-                      style={{
-                        display:
-                          photoPrincipale && photoPrincipale.name
-                            ? "none"
-                            : "flex",
-                      }}
-                    >
-                      <span className="catalogue-modele-letter-porsche">
-                        {modele.nom_model?.charAt(0) || "?"}
-                      </span>
-                    </div>
+                    <ImageWithFallback
+                      src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+                      alt={`Porsche ${modele.nom_model}`}
+                      imgClass="catalogue-modele-img-porsche"
+                      placeholder={
+                        <div className="catalogue-modele-placeholder-porsche">
+                          <span className="catalogue-modele-letter-porsche">
+                            {modele.nom_model?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                      }
+                    />
                   </div>
 
                   <div className="home-model-info">
@@ -195,30 +187,38 @@ const Home = () => {
       </section>
 
       <section className="home-approved-section">
-        <div className="home-approved-container">
-          <div className="home-approved-image">
-            <div className="home-approved-image-placeholder">
-              <span className="home-approved-image-text">Porsche Approved</span>
-            </div>
+        <div className="home-approved-container max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 items-stretch gap-6">
+          <div className="home-approved-image order-1 md:order-1 h-64 md:h-auto overflow-hidden">
+            <img
+              src="/Image/old-new-avabt.jpg"
+              alt="Porsche Approved - véhicules certifiés"
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          <div className="home-approved-content">
-            <h2 className="home-approved-title">
-              Véhicules d'occasion
-              <br />
-              Porsche Approved.
-            </h2>
-            <p className="home-approved-text">
-              Une Porsche reste une Porsche. Nos véhicules d'occasion Porsche
-              Approved sont vecteurs d'émotion, comme au premier jour. Ils
-              témoignent de la passion avec laquelle nous les avons contrôlés
-              sur 111 points. Ils font battre votre cœur, car nous avons mis
-              tout le nôtre dans leur préparation. Et votre sérénité est assurée
-              grâce à notre garantie Porsche Approved.
-            </p>
-            <Link to="/occasion" className="home-approved-btn">
-              En savoir plus
-            </Link>
+          <div className="home-approved-content order-2 md:order-2 flex flex-col justify-between p-6">
+            <div>
+              <h2 className="home-approved-title">
+                Véhicules d'occasion
+                <br />
+                Porsche Certifié.
+              </h2>
+              <p className="home-approved-text">
+                Une Porsche reste une Porsche. Nos véhicules d'occasion Porsche
+                certifiés sont vecteurs d'émotion, comme au premier jour. Ils
+                témoignent de la passion avec laquelle nous les avons contrôlés
+                sur 111 points. Ils font battre votre cœur, car nous avons mis
+                tout le nôtre dans leur préparation. Et votre sérénité est assurée
+                grâce à notre garantie Porsche Certifié.
+              </p>
+            </div>
+
+            <div className="home-approved-actions mt-6 md:mt-0">
+              <Link to="/porsche-approved" className="home-approved-btn">
+                En savoir plus
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -4,8 +4,8 @@
  * @file hooks/useReservation.jsx
  */
 
-import { useState, useCallback, useEffect, useRef } from "react";
 import { sanitizeObject } from "../utils/helpers";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 // Hook métier : créer/consulter/annuler une réservation côté client
 export default function useReservation() {

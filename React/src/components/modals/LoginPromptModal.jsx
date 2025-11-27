@@ -4,8 +4,8 @@
  * @file components/modals/LoginPromptModal.jsx
  */
 
-import { useEffect } from "react";
 import "../../css/components/Modal.css";
+import { useEffect } from "react";
 
 const LoginPromptModal = ({
   onClose,

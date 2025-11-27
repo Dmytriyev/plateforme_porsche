@@ -388,8 +388,7 @@
 }
 .configurateur-header-center {
   display: flex;
-  gap: 3rem;
-  align-items: center;
+  justify-content: center;
 }
 .configurateur-header-price-group {
   display: flex;
@@ -527,6 +526,14 @@
   background: #fff;
   padding: 0;
   transition: border-color 0.2s;
+}
+.configurateur-thumbnail:focus,
+.configurateur-package-item:focus,
+.configurateur-jante-item:focus,
+.configurateur-siege-item:focus,
+.configurateur-color-item:focus {
+  outline: 3px solid rgba(0, 102, 204, 0.25);
+  outline-offset: 2px;
 }
 .configurateur-thumbnail:hover {
   border-color: #999;
@@ -717,11 +724,11 @@
 .configurateur-package-image {
   position: relative;
   width: 120px;
-  height: 90px;
+  aspect-ratio: 1 / 1; /* force carré */
   flex-shrink: 0;
   border-radius: 6px;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-grey-hover); /* fond neutre pour éviter le violet */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -741,11 +748,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-white);
+  background: var(--color-grey-light); /* fond neutre */
+  color: var(--color-black);
 }
 .configurateur-package-placeholder svg {
   opacity: 0.7;
+  fill: none;
+  stroke: currentColor;
 }
 .configurateur-package-info {
   flex: 1;
@@ -765,10 +774,22 @@
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  display: -moz-box;
+  display: box;
   -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+}
+
+/* Forcer le texte en noir pour les packages (même si une image est présente) */
+.configurateur-package-item.has-image .configurateur-package-name,
+.configurateur-package-item.has-image .configurateur-package-description {
+  color: var(--color-black);
 }
 .configurateur-package-price {
   font-size: 0.875rem;
@@ -804,6 +825,8 @@
     width: 100%;
     justify-content: space-between;
     margin-top: 1rem;
+    /* Masquer le logo sur écrans moyens et petits (tablettes, smartphones) */
+    display: none;
   }
 }
 @media (max-width: 640px) {

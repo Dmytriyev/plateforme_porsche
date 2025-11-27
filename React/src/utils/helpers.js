@@ -151,6 +151,7 @@ export const validateRegisterForm = (formData) => {
     errors.telephone = "Numéro de téléphone invalide";
   }
   if (!formData.password) errors.password = "Le mot de passe est requis";
+  // Vérification des critères du mot de passe
   else if (!validatePassword(formData.password)) {
     errors.password = getPasswordErrors(formData.password)[0];
   }

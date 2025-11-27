@@ -1,16 +1,5 @@
-/*
-  index.css — Styles globaux d'application.
-*/
-
-/*
- * css/index.css — Entrée pour Tailwind + resets spécifiques au projet.
- * CSS file: css/index.css
- */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+@import "tailwindcss";
+@import "flowbite";
 @font-face {
   font-family: "Porsche Next";
   src: url("../fonts/porsche-next.otf") format("opentype");

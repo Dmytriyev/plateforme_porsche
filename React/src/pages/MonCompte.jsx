@@ -1,34 +1,34 @@
-/**
- * MonCompte.jsx — Page de gestion du compte utilisateur
- * - Dashboard utilisateur (infos, liens rapides).
- */
-
-import { useState, useEffect, useCallback, useContext, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext.jsx";
-import commandeService from "../services/commande.service.js";
-import maVoitureService from "../services/ma_voiture.service.js";
+// - Tableau de bord utilisateur avec gestion des réservations, commandes et voitures.
+// - Montre l'usage de plusieurs services (commandeService, maVoitureService) pour récupérer et gérer les données utilisateur.
+// - Utilisation de useContext pour accéder aux informations d'authentification et de rôle utilisateur.
+// - Gestion des états de chargement, erreurs et succès avec useState et useEffect.
 import Loading from "../components/common/Loading.jsx";
 import { API_URL } from "../config/api.js";
-import buildUrl from "../utils/buildUrl";
-import { formatPrice, formatDate } from "../utils/helpers.js";
-import "../css/MonCompte.css";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/components/Message.css";
-
+import "../css/MonCompte.css";
+import commandeService from "../services/commande.service.js";
+import maVoitureService from "../services/ma_voiture.service.js";
+import buildUrl from "../utils/buildUrl";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import { formatPrice, formatDate } from "../utils/helpers.js";
+import { useState, useEffect, useCallback, useContext, useMemo, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+// Bloc de gestion des achats pour les administrateurs.
 const GestionAchatsBlock = ({ commandes }) => {
   const [sortBy, setSortBy] = useState("date"); // date, user
   const [sortOrder, setSortOrder] = useState("desc");
-
+  // Tri et filtrage des achats.
   const achats = useMemo(() => {
     return commandes.filter((cmd) => cmd.status === true);
   }, [commandes]);
-
+  // Achats triés selon les critères sélectionnés.
   const achatsTries = useMemo(() => {
     const sorted = [...achats];
-
+    // Tri personnalisé selon le critère choisi.
     sorted.sort((a, b) => {
       let comparison = 0;
-
+      // Définition du critère de tri.
       switch (sortBy) {
         case "date":
           comparison = new Date(b.date_commande) - new Date(a.date_commande);
@@ -168,7 +168,7 @@ const GestionAchatsBlock = ({ commandes }) => {
                         <li key={index} className="gestion-achat-produit-item">
                           {ligne.model_porsche_id && (
                             <span className="gestion-achat-produit-nom">
-                              🚗{" "}
+                              {" "}
                               {ligne.model_porsche_id.voiture?.nom_model ||
                                 ligne.model_porsche_id.nom_model ||
                                 "Voiture neuve"}
@@ -176,7 +176,7 @@ const GestionAchatsBlock = ({ commandes }) => {
                           )}
                           {ligne.voiture && !ligne.model_porsche_id && (
                             <span className="gestion-achat-produit-nom">
-                              🚗 {ligne.voiture.nom_model} (
+                              {ligne.voiture.nom_model} (
                               {ligne.voiture.type_voiture || "Occasion"})
                             </span>
                           )}
@@ -233,10 +233,103 @@ const GestionAchatsBlock = ({ commandes }) => {
   );
 };
 
+// Mobile toolbar: small round buttons shown on tablet / mobile
+const MobileToolbar = ({ activeSection, setActiveSection, navigate, handleLogout, isStaff }) => {
+  return (
+    <div className="mon-compte-mobile-toolbar" role="toolbar" aria-label="Navigation mobile">
+      <button
+        className={`mon-compte-mobile-btn ${activeSection === "mes-produits" ? "active" : ""}`}
+        onClick={() => setActiveSection("mes-produits")}
+        aria-label="Mes produits"
+        title="Mes produits"
+        aria-pressed={activeSection === "mes-produits"}
+        aria-current={activeSection === "mes-produits" ? "true" : undefined}
+        tabIndex={0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+      </button>
+
+      <button
+        className={`mon-compte-mobile-btn`}
+        onClick={() => navigate('/mes-commandes')}
+        aria-label="Mes commandes"
+        title="Mes commandes"
+        aria-pressed={false}
+        tabIndex={0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+      </button>
+
+      <button
+        className={`mon-compte-mobile-btn ${activeSection === "parametres" ? "active" : ""}`}
+        onClick={() => setActiveSection('parametres')}
+        aria-label="Paramètres"
+        title="Paramètres"
+        aria-pressed={activeSection === "parametres"}
+        aria-current={activeSection === "parametres" ? "true" : undefined}
+        tabIndex={0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </button>
+
+      <button
+        className={`mon-compte-mobile-btn ${activeSection === "paiement" ? "active" : ""}`}
+        onClick={() => setActiveSection('paiement')}
+        aria-label="Paiement"
+        title="Paiement"
+        aria-pressed={activeSection === "paiement"}
+        aria-current={activeSection === "paiement" ? "true" : undefined}
+        tabIndex={0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+      </button>
+
+      <button
+        className={`mon-compte-mobile-btn mon-compte-mobile-btn-logout`}
+        onClick={handleLogout}
+        aria-label="Déconnexion"
+        title="Déconnexion"
+        aria-pressed={false}
+        tabIndex={0}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      </button>
+    </div>
+  );
+};
 // Page : dashboard utilisateur (infos, commandes, réservations, voitures). Requiert authentification.
 const MonCompte = () => {
   const navigate = useNavigate();
   const { user, logout, isStaff } = useContext(AuthContext);
+
+  // Memoize staff flag to avoid repeated calls to isStaff()
+  const staff = useMemo(() => !!isStaff && isStaff(), [isStaff]);
+
+  // Mounted ref to avoid setting state on unmounted component
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const [activeSection, setActiveSection] = useState("mes-produits");
   const [loading, setLoading] = useState(true);
@@ -256,12 +349,12 @@ const MonCompte = () => {
       const userId = user?._id || user?.id;
 
       const promises = [
-        isStaff()
+        staff
           ? commandeService.getAllReservations().catch(() => [])
           : userId
             ? commandeService.getMyReservations(userId).catch(() => [])
             : Promise.resolve([]),
-        isStaff()
+        staff
           ? commandeService.getAllCommandes().catch(() => [])
           : commandeService.getMyCommandes().catch(() => []),
         maVoitureService.getMesVoitures().catch(() => []),
@@ -270,16 +363,19 @@ const MonCompte = () => {
       const [reservationsData, commandesData, mesVoituresData] =
         await Promise.all(promises);
 
+      if (!mountedRef.current) return;
+
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       setCommandes(Array.isArray(commandesData) ? commandesData : []);
       setMesVoitures(Array.isArray(mesVoituresData) ? mesVoituresData : []);
       setUserData(user);
     } catch (err) {
+      if (!mountedRef.current) return;
       setError(err.message || "Erreur lors du chargement des données");
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
-  }, [user, isStaff]);
+  }, [user, staff]);
 
   useEffect(() => {
     if (user) {
@@ -485,6 +581,15 @@ const MonCompte = () => {
           <div className="mon-compte-section">
             <h1 className="mon-compte-title">Mes produits</h1>
 
+            {/* Mobile toolbar (visible on tablet/mobile via CSS) */}
+            <MobileToolbar
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              navigate={navigate}
+              handleLogout={handleLogout}
+              isStaff={staff}
+            />
+
             <div className="mon-compte-block">
               <div className="mon-compte-block-header">
                 <h2 className="mon-compte-block-title">
@@ -562,28 +667,24 @@ const MonCompte = () => {
                     return (
                       <div
                         key={reservation._id}
-                        className={`mon-compte-reservation-card ${isStaff() ? "mon-compte-reservation-card-staff" : ""}`}
+                        className={`mon-compte-reservation-card ${staff ? "mon-compte-reservation-card-staff" : ""}`}
                       >
-                        {photoPrincipale && photoPrincipale.name ? (
-                          <img
-                            src={buildUrl(photoPrincipale.name)}
-                            alt={nomComplet}
-                            className="mon-compte-reservation-img"
-                            onError={(e) => {
-                              e.target.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="mon-compte-reservation-placeholder">
-                            <span>P</span>
-                          </div>
-                        )}
+                        <ImageWithFallback
+                          src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+                          alt={nomComplet}
+                          imgClass="mon-compte-reservation-img"
+                          placeholder={
+                            <div className="mon-compte-reservation-placeholder">
+                              <span>P</span>
+                            </div>
+                          }
+                        />
                         <div className="mon-compte-reservation-info">
                           <h3 className="mon-compte-reservation-name">
                             {nomComplet}
                           </h3>
 
-                          {isStaff() && reservationUser && (
+                          {staff && reservationUser && (
                             <div className="mon-compte-reservation-user-info">
                               <p className="mon-compte-reservation-user-label">
                                 Client :
@@ -601,7 +702,7 @@ const MonCompte = () => {
 
                           {reservation.date_reservation && (
                             <p className="mon-compte-reservation-date">
-                              {isStaff()
+                              {staff
                                 ? `Réservation : ${dateFormatted} à ${heureFormatted}`
                                 : `Date : ${dateFormatted} à ${heureFormatted}`}
                             </p>
@@ -640,7 +741,7 @@ const MonCompte = () => {
                             Voir
                           </button>
 
-                          {isStaff() ? (
+                          {staff ? (
                             <>
                               <button
                                 className="mon-compte-reservation-btn mon-compte-reservation-btn-accept"
@@ -726,20 +827,16 @@ const MonCompte = () => {
                         key={voiture._id}
                         className="mon-compte-reservation-card"
                       >
-                        {photoPrincipale && photoPrincipale.name ? (
-                          <img
-                            src={buildUrl(photoPrincipale.name)}
-                            alt={nomComplet}
-                            className="mon-compte-reservation-img"
-                            onError={(e) => {
-                              e.target.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="mon-compte-reservation-placeholder">
-                            <span>P</span>
-                          </div>
-                        )}
+                        <ImageWithFallback
+                          src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+                          alt={nomComplet}
+                          imgClass="mon-compte-reservation-img"
+                          placeholder={
+                            <div className="mon-compte-reservation-placeholder">
+                              <span>P</span>
+                            </div>
+                          }
+                        />
                         <div className="mon-compte-reservation-info">
                           <h3 className="mon-compte-reservation-name">
                             {nomComplet}
@@ -817,11 +914,11 @@ const MonCompte = () => {
               )}
             </div>
 
-            {isStaff && isStaff() && (
+            {staff && (
               <GestionAchatsBlock commandes={commandes} />
             )}
 
-            {isStaff && isStaff() && (
+            {staff && (
               <div className="mon-compte-block mon-compte-admin-block">
                 <div className="mon-compte-block-header">
                   <h2 className="mon-compte-block-title">Gestion anonces</h2>

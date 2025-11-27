@@ -1,11 +1,11 @@
 /**
  *  — Gestion du profil utilisateur côté client
- * - Centralise la lecture/mise à jour du profil.
+ *  - Centralise la lecture/mise à jour du profil.
  */
 
 import apiClient from "../config/api.js";
-import { apiRequest } from "./httpHelper";
 import { sanitizeObject } from "../utils/helpers";
+import { apiRequest } from "./httpHelper";
 
 // Service pour les opérations liées aux utilisateurs
 const userService = {

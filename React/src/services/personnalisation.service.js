@@ -1,6 +1,6 @@
 /**
  * — Service de personnalisation
- * - Gestion des préférences utilisateur.
+ * - Gestion des préférences utilisateur pour les options de voiture.
  */
 
 import apiClient from "../config/api.js";

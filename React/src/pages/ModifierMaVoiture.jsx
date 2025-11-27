@@ -6,14 +6,15 @@
  * - Comportement du formulaire et sauvegarde.
  */
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import Loading from "../components/common/Loading.jsx";
+import "../css/ModifierMaVoiture.css";
 import maVoitureService from "../services/ma_voiture.service.js";
 import personnalisationService from "../services/personnalisation.service.js";
-import Loading from "../components/common/Loading.jsx";
 import buildUrl from "../utils/buildUrl";
 import { formatPrice } from "../utils/helpers.js";
-import "../css/ModifierMaVoiture.css";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 
 // Page : modifier une voiture personnelle (édition des infos et gestion des photos). Requiert connexion.
 const ModifierMaVoiture = () => {
@@ -274,20 +275,16 @@ const ModifierMaVoiture = () => {
       <div className="modifier-voiture-content">
         {/* Image de la voiture */}
         <div className="modifier-voiture-preview">
-          {photoPrincipale && photoPrincipale.name ? (
-            <img
-              src={buildUrl(photoPrincipale.name)}
-              alt={voiture.type_model}
-              className="modifier-voiture-img"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
-          ) : (
-            <div className="modifier-voiture-no-photo">
-              <span>{voiture.type_model?.charAt(0) || "P"}</span>
-            </div>
-          )}
+          <ImageWithFallback
+            src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+            alt={voiture.type_model}
+            imgClass="modifier-voiture-img"
+            placeholder={
+              <div className="modifier-voiture-no-photo">
+                <span>{voiture.type_model?.charAt(0) || "P"}</span>
+              </div>
+            }
+          />
         </div>
 
         {/* Formulaire */}
@@ -549,12 +546,11 @@ const ModifierMaVoiture = () => {
                           key={photo._id}
                           className={`modifier-voiture-photo-item ${estMarqueeSuppr ? "marked-delete" : ""}`}
                         >
-                          <img
-                            src={buildUrl(photo.name)}
+                          <ImageWithFallback
+                            src={photo && photo.name ? buildUrl(photo.name) : null}
                             alt={photo.alt || "Photo voiture"}
-                            onError={(e) => {
-                              e.target.style.display = "none";
-                            }}
+                            imgProps={{ style: { width: '100%', height: 'auto' } }}
+                            placeholder={<div className="modifier-voiture-photo-missing" />}
                           />
                           {estMarqueeSuppr ? (
                             <button

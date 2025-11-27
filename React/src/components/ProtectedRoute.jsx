@@ -7,11 +7,11 @@
  *   la route déclare l'accès, le composant gère l'UI (refus/redirect).
  */
 
+import { AuthContext } from "../context/AuthContext.jsx";
+import "../css/ProtectedRoute.css";
+import { Loading } from "./common";
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext.jsx";
-import { Loading } from "./common";
-import "../css/ProtectedRoute.css";
 
 // Composant route protégée : redirige si non-auth ou rôle manquant
 const ProtectedRoute = ({ children, roles }) => {

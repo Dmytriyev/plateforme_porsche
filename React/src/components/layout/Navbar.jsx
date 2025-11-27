@@ -6,11 +6,11 @@
  * - Pensez accessibilité : `aria-*` et gestion clavier pour le menu mobile.
  */
 
+import { AuthContext } from "../../context/AuthContext.jsx";
+import "../../css/Navbar.css";
+import usePanierAPI from "../../hooks/usePanierAPI.jsx";
 import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext.jsx";
-import usePanierAPI from "../../hooks/usePanierAPI.jsx";
-import "../../css/Navbar.css";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useContext(AuthContext);

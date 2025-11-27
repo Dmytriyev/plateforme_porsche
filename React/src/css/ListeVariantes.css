@@ -456,3 +456,78 @@
     min-width: calc(50% - 0.25rem);
   }
 }
+
+/* Overrides et améliorations responsive + couleur réversible */
+.variantes-container-finder {
+  /* variables locales pour boutons (peuvent être surchargées via .color-reversed) */
+  --btn-bg: transparent;
+  --btn-text: var(--color-black);
+  --btn-border: transparent;
+}
+
+/* Styles applicables aux boutons (back + tri) */
+.variantes-back-link-finder,
+.variantes-sort-btn-finder {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: 1px solid var(--btn-border);
+}
+
+/* Classe utilitaire pour inverser les couleurs facilement */
+.variantes-container-finder.color-reversed {
+  --btn-bg: var(--color-black);
+  --btn-text: var(--color-white);
+  --btn-border: var(--color-black);
+}
+
+/* Header: centrer le bouton retour sur petits écrans */
+@media (max-width: 600px) {
+  .variantes-header-finder {
+    align-items: center;
+    text-align: center;
+  }
+
+  .variantes-back-link-finder {
+    width: auto;
+    display: inline-flex;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Barre de tri: centrer et empiler boutons pleins */
+  .variantes-sort-bar-finder {
+    align-items: center;
+    padding: 1rem;
+  }
+  .variantes-sort-info-finder {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+  .variantes-sort-options-finder {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .variantes-sort-btn-finder {
+    flex: 0 1 calc(50% - 0.5rem);
+    min-width: 140px;
+    text-align: center;
+    padding: 0.6rem 0.75rem;
+  }
+}
+
+/* Optionnel: meilleure lisibilité sur très petits écrans */
+@media (max-width: 380px) {
+  .variantes-sort-btn-finder {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  .variantes-title-finder {
+    font-size: 1.25rem;
+  }
+}

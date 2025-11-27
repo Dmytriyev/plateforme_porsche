@@ -1,18 +1,17 @@
-/**
- * PaymentCancel.jsx — Page d'annulation de paiement
- * - Affiche annulation de paiement et actions possibles.
- */
-
-import { useNavigate } from "react-router-dom";
+// Affiche annulation de paiement et actions possibles
 import "../css/PaymentStatus.css";
+import { useNavigate } from "react-router-dom";
 
-// Page : affiche l'annulation d'un paiement et propose actions (retour panier / accueil).
+// affiche l'annulation d'un paiement et propose actions (retour panier / accueil).
 const PaymentCancel = () => {
   const navigate = useNavigate();
 
   return (
+    // Structure de la page d'annulation de paiement avec styles Porsche
     <div className="payment-status-container">
+      {/* Contenu de la page d'annulation de paiement */}
       <div className="payment-status-content">
+        {/* Icône d'annulation */}
         <div className="payment-status-icon payment-status-cancel">
           <svg
             viewBox="0 0 24 24"

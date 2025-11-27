@@ -1,16 +1,15 @@
-//— Composant racine de l'application React
+//— Composant racine de l'application React 
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { routes, protectedRoutes } from "./routes/index.js";
+import { setNavigate } from "./utils/navigate.js";
 import AccessoireDetail from "./pages/AccessoireDetail.jsx";
 import Accessoires from "./pages/Accessoires.jsx";
 import AjouterAccessoire from "./pages/AjouterAccessoire.jsx";
 import AjouterMaVoiture from "./pages/AjouterMaVoiture.jsx";
 import AjouterModelPorsche from "./pages/AjouterModelPorsche.jsx";
-import { AuthProvider } from "./context/AuthContext.jsx";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { setNavigate } from "./utils/navigate.js";
-import ToastifyProvider from "./components/ToastifyProvider.jsx";
-import notify from "./utils/notify.js";
 import CatalogueModeles from "./pages/CatalogueModeles.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import ChoixVoiture from "./pages/ChoixVoiture.jsx";
@@ -18,7 +17,15 @@ import Configurateur from "./pages/Configurateur.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Footer from "./components/layout/Footer.jsx";
 import Home from "./pages/Home.jsx";
+import Contact from "./pages/Contact.jsx";
+import APropos from "./pages/APropos.jsx";
+import Conditions from "./pages/Conditions.jsx";
+import Confidentialite from "./pages/Confidentialite.jsx";
 import ListeVariantes from "./pages/ListeVariantes.jsx";
+import MentionsLegales from "./pages/MentionsLegales.jsx";
+import Accessibilite from "./pages/Accessibilite.jsx";
+import PolitiqueCookies from "./pages/PolitiqueCookies.jsx";
+import Approved from "./pages/Approved.jsx";
 import Login from "./pages/Login.jsx";
 import MaVoitureDetail from "./pages/MaVoitureDetail.jsx";
 import MesCommandes from "./pages/MesCommandes.jsx";
@@ -29,13 +36,14 @@ import ModifierModelPorsche from "./pages/ModifierModelPorsche.jsx";
 import ModifierMonCompte from "./pages/ModifierMonCompte.jsx";
 import MonCompte from "./pages/MonCompte.jsx";
 import Navbar from "./components/layout/Navbar.jsx";
+import notify from "./utils/notify.js";
 import OccasionPage from "./pages/OccasionPage.jsx";
 import Panier from "./pages/Panier.jsx";
 import PaymentCancel from "./pages/PaymentCancel.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Register from "./pages/Register.jsx";
-import { routes, protectedRoutes } from "./routes/index.js";
+import ToastifyProvider from "./components/ToastifyProvider.jsx";
 import VariantePage from "./pages/VariantePage.jsx";
 import "./css/App.css";
 
@@ -50,6 +58,14 @@ const components = {
   ChoixVoiture,
   Configurateur,
   Home,
+  Contact,
+  APropos,
+  Conditions,
+  Confidentialite,
+  MentionsLegales,
+  Accessibilite,
+  PolitiqueCookies,
+  Approved,
   ListeVariantes,
   Login,
   MaVoitureDetail,
@@ -74,7 +90,7 @@ function App() {
     <AuthProvider>
       {/*Gère la navigation entre les pages  */}
       <BrowserRouter>
-        {/* Hook pour exposer `navigate` aux utilitaires non-React (ex: api client) */}
+        {/* Hook pour exposer `navigate` aux utilitaires non-React */}
         <RouterBridge />
         <ToastifyProvider />
         {/*  Capture les erreurs dans l'arborescence des composants */}

@@ -4,15 +4,15 @@
  * @file pages/AjouterModelPorsche.jsx
  */
 
+import Loading from "../components/common/Loading.jsx";
+import "../css/AjouterModelPorsche.css";
+import modelPorscheService from "../services/modelPorsche.service.js";
+import personnalisationService from "../services/personnalisation.service.js";
+import voitureService from "../services/voiture.service.js";
+import { formatPrice } from "../utils/helpers.js";
+import { warn } from "../utils/logger.js";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import modelPorscheService from "../services/modelPorsche.service.js";
-import voitureService from "../services/voiture.service.js";
-import personnalisationService from "../services/personnalisation.service.js";
-import Loading from "../components/common/Loading.jsx";
-import { formatPrice } from "../utils/helpers.js";
-import "../css/AjouterModelPorsche.css";
-import { warn } from "../utils/logger.js";
 
 // Variantes prédéfinies par modèle (synchronisées avec le backend)
 const VARIANTES_PAR_MODELE = {

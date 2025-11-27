@@ -3,12 +3,12 @@
  * - Historique commandes; récupère via `commande.service`.
  */
 
+import { AuthContext } from "../context/AuthContext.jsx";
+import "../css/MesCommandes.css";
+import commandeService from "../services/commande.service.js";
+import { formatPrice, formatDate } from "../utils/helpers.js";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import commandeService from "../services/commande.service.js";
-import { AuthContext } from "../context/AuthContext.jsx";
-import { formatPrice, formatDate } from "../utils/helpers.js";
-import "../css/MesCommandes.css";
 
 // Page : affiche l'historique des commandes de l'utilisateur; nécessite authentification.
 const MesCommandes = () => {

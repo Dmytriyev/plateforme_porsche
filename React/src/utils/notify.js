@@ -1,4 +1,4 @@
-// Notification de l'utilisateur via des toasts
+// Notification de l'utilisateur via des toasts utilisant react-toastify
 import { toast } from "react-toastify";
 
 // Affiche une notification toast à l'utilisateur

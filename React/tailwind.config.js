@@ -9,7 +9,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/flowbite/**/*.js",
   ],
-  // Extension du thème Tailwind avec des couleurs personnalisées Porsche.
+  // Extension du thème Tailwind avec des couleurs Porsche.
   theme: {
     extend: {
       colors: {

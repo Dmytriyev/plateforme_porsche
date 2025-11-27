@@ -4,15 +4,16 @@
  * - Gestion de la liste, pagination et actions.
  */
 
-import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import maVoitureService from "../services/ma_voiture.service.js";
-import { AuthContext } from "../context/AuthContext.jsx";
 import Loading from "../components/common/Loading.jsx";
 import { API_URL } from "../config/api.js";
-import buildUrl from "../utils/buildUrl";
-import "../css/MesVoitures.css";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/components/Message.css";
+import "../css/MesVoitures.css";
+import maVoitureService from "../services/ma_voiture.service.js";
+import buildUrl from "../utils/buildUrl";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 // Page : gestion des voitures personnelles (liste, ajout, suppression). Requiert connexion.
 const MesVoitures = () => {
@@ -107,16 +108,15 @@ const MesVoitures = () => {
       <section className="mes-voitures-hero-finder">
         {photoGenerale ? (
           <div className="mes-voitures-hero-image-finder">
-            <img
+            <ImageWithFallback
               src={buildUrl(photoGenerale.name)}
               alt="Mes Porsche"
-              className="mes-voitures-hero-img-finder"
-              onError={(e) => {
-                e.target.style.display = "none";
-                if (e.target.nextSibling) {
-                  e.target.nextSibling.style.display = "flex";
-                }
-              }}
+              imgClass="mes-voitures-hero-img-finder"
+              placeholder={
+                <div className="mes-voitures-hero-placeholder-finder">
+                  <span className="mes-voitures-hero-text-finder">Mes Porsche</span>
+                </div>
+              }
             />
           </div>
         ) : (
@@ -194,32 +194,18 @@ const MesVoitures = () => {
                 <div className="mes-voitures-card-images-finder">
                   {/* Image principale */}
                   <div className="mes-voitures-main-image-finder">
-                    {photoPrincipale && photoPrincipale.name ? (
-                      <img
-                        src={buildUrl(photoPrincipale.name)}
-                        alt={voiture.type_model || "Porsche"}
-                        className="mes-voitures-main-img-finder"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          if (e.target.nextSibling) {
-                            e.target.nextSibling.style.display = "flex";
-                          }
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="mes-voitures-image-placeholder-finder"
-                      style={{
-                        display:
-                          photoPrincipale && photoPrincipale.name
-                            ? "none"
-                            : "flex",
-                      }}
-                    >
-                      <span className="mes-voitures-image-letter-finder">
-                        {voiture.type_model?.charAt(0) || "P"}
-                      </span>
-                    </div>
+                    <ImageWithFallback
+                      src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+                      alt={voiture.type_model || "Porsche"}
+                      imgClass="mes-voitures-main-img-finder"
+                      placeholder={
+                        <div className="mes-voitures-image-placeholder-finder">
+                          <span className="mes-voitures-image-letter-finder">
+                            {voiture.type_model?.charAt(0) || "P"}
+                          </span>
+                        </div>
+                      }
+                    />
                   </div>
 
                   {/* Thumbnails */}
@@ -230,13 +216,11 @@ const MesVoitures = () => {
                           key={thumb._id || `thumb-${index}`}
                           className="mes-voitures-thumbnail-finder"
                         >
-                          <img
+                          <ImageWithFallback
                             src={buildUrl(thumb.name)}
                             alt={`Vue ${index + 2}`}
-                            className="mes-voitures-thumbnail-img-finder"
-                            onError={(e) => {
-                              e.target.style.display = "none";
-                            }}
+                            imgClass="mes-voitures-thumbnail-img-finder"
+                            placeholder={<div className="mes-voitures-thumbnail-placeholder-finder" />}
                           />
                         </div>
                       ))}

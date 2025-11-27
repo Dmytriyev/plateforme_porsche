@@ -2,7 +2,7 @@
 const isProduction = import.meta.env && import.meta.env.MODE === "production";
 // Logger minimal qui désactive les logs en production
 export const debug = () => {};
-// Logger minimal : warnings désactivés pour réduire le bruit
+// Logger minimal warnings désactivés pour réduire le bruit
 export const warn = () => {};
 // Erreurs toujours envoyées vers console.error
 export const error = (...args) => {

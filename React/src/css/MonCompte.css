@@ -1511,3 +1511,86 @@
     gap: 0.75rem;
   }
 }
+
+/* ============================================
+   MOBILE / TABLET TOOLBAR (RESPONSIVE SIDEBAR)
+   ============================================ */
+
+.mon-compte-mobile-toolbar {
+  display: none;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0 1.25rem 0;
+}
+
+.mon-compte-mobile-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  border: 2px solid var(--color-grey-border);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  color: var(--color-black);
+}
+
+.mon-compte-mobile-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mon-compte-mobile-btn.active,
+.mon-compte-mobile-btn:hover {
+  background: var(--color-black);
+  color: #fff;
+  border-color: var(--color-black);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.mon-compte-mobile-btn-logout {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.mon-compte-mobile-btn-logout:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 968px) {
+  /* hide desktop sidebar and show compact toolbar */
+  .mon-compte-sidebar {
+    display: none;
+  }
+
+  .mon-compte-mobile-toolbar {
+    display: flex;
+  }
+
+  .mon-compte-main {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .mon-compte-mobile-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .mon-compte-mobile-toolbar {
+    gap: 0.5rem;
+  }
+}
+
+/* Focus-visible for keyboard users */
+.mon-compte-mobile-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+}

@@ -6,8 +6,8 @@
  *   la structure globale d'une page (header / main / footer).
  */
 
-import { Link } from "react-router-dom";
 import "../../css/Footer.css";
+import { Link } from "react-router-dom";
 
 // Composant : Footer global — liens de navigation et contacts (présent sur toutes les pages).
 const Footer = () => {
@@ -28,6 +28,11 @@ const Footer = () => {
           <div>
             <h4 className="footer-section-title">Navigation</h4>
             <ul className="footer-list">
+              <li>
+                <Link to="/politique-cookies" className="footer-link">
+                  Politique de cookies
+                </Link>
+              </li>
               <li>
                 <Link to="/choix-voiture" className="footer-link">
                   Voitures
@@ -60,6 +65,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/mentions-legales" className="footer-link">
+                  Mentions légales
+                </Link>
+              </li>
+              <li>
                 <Link to="/conditions" className="footer-link">
                   Conditions générales
                 </Link>
@@ -67,6 +77,11 @@ const Footer = () => {
               <li>
                 <Link to="/confidentialite" className="footer-link">
                   Politique de confidentialité
+                </Link>
+              </li>
+              <li>
+                <Link to="/accessibilite" className="footer-link">
+                  Déclaration d'accessibilité
                 </Link>
               </li>
             </ul>

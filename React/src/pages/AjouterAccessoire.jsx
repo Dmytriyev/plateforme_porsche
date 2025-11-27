@@ -3,12 +3,12 @@
  * - Formulaire et upload d'images.
  */
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import accesoireService from "../services/accesoire.service.js";
 import Loading from "../components/common/Loading.jsx";
 import "../css/AjouterAccessoire.css";
+import accesoireService from "../services/accesoire.service.js";
 import { warn } from "../utils/logger.js";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Page (admin) : formulaire de création d'un accessoire et upload d'images.
 const AjouterAccessoire = () => {

@@ -1,12 +1,11 @@
 /**
- * services/accesoire.service.js — Endpoints pour accessoire (CRUD, upload images).
- *
- * @file services/accesoire.service.js
+ * — Endpoints pour accessoire (CRUD, upload images).
  */
 
 import apiClient from "../config/api.js";
 import { apiRequest } from "./httpHelper";
 
+// Service pour les accessoires et opérations associées
 const accesoireService = {
   // Récupère tous les accessoires (tableau). Retourne tableau ou valeur par défaut.
   getAllAccessoires: () =>

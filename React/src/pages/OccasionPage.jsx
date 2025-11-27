@@ -4,23 +4,24 @@
  * - Liste et filtres pour les annonces d'occasion.
  */
 
-import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import modelPorscheService from "../services/modelPorsche.service.js";
-import voitureService from "../services/voiture.service.js";
-import commandeService from "../services/commande.service.js";
-import Loading from "../components/common/Loading.jsx";
 import Button from "../components/common/Button.jsx";
-import { formatPrice } from "../utils/helpers.js";
-import buildUrl from "../utils/buildUrl";
-import "../css/OccasionPage.css";
-import "../css/ListeVariantes.css";
+import Loading from "../components/common/Loading.jsx";
+import ContactModal from "../components/modals/ContactModal.jsx";
+import LoginPromptModal from "../components/modals/LoginPromptModal.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/CatalogueModeles.css";
 import "../css/components/Message.css";
+import "../css/ListeVariantes.css";
+import "../css/OccasionPage.css";
+import commandeService from "../services/commande.service.js";
+import modelPorscheService from "../services/modelPorsche.service.js";
+import voitureService from "../services/voiture.service.js";
+import buildUrl from "../utils/buildUrl";
+import { formatPrice } from "../utils/helpers.js";
 import { warn } from "../utils/logger.js";
-import { AuthContext } from "../context/AuthContext.jsx";
-import LoginPromptModal from "../components/modals/LoginPromptModal.jsx";
-import ContactModal from "../components/modals/ContactModal.jsx";
+import { useState, useEffect, useContext, useMemo } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 
 // Page : affichage des annonces d'occasion (liste ou page modèle). Permet réservation (connexion requise pour réserver).
 const OccasionPage = () => {
@@ -28,6 +29,7 @@ const OccasionPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isStaff, user: _user } = useContext(AuthContext);
+  const staff = useMemo(() => !!isStaff && isStaff(), [isStaff]);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
 
@@ -501,38 +503,18 @@ const OccasionPage = () => {
 
                     {/* Image */}
                     <div className="catalogue-modele-image-porsche">
-                      {photoUrl ? (
-                        <img
-                          src={photoUrl}
-                          alt={nomComplet}
-                          className="catalogue-modele-img-porsche"
-                          onError={(e) => {
-                            try {
-                              if (e.target.dataset.fallback) {
-                                e.target.style.display = "none";
-                                if (e.target.nextSibling)
-                                  e.target.nextSibling.style.display = "flex";
-                                return;
-                              }
-                              e.target.dataset.fallback = "1";
-                              e.target.src = "/Logo/Logo_porsche_black.jpg";
-                            } catch (err) {
-                              e.target.style.display = "none";
-                              if (e.target.nextSibling) {
-                                e.target.nextSibling.style.display = "flex";
-                              }
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className="catalogue-modele-placeholder-porsche"
-                        style={{ display: photoUrl ? "none" : "flex" }}
-                      >
-                        <span className="catalogue-modele-letter-porsche">
-                          {nomComplet?.charAt(0) || "?"}
-                        </span>
-                      </div>
+                      <ImageWithFallback
+                        src={photoUrl}
+                        alt={nomComplet}
+                        imgClass="catalogue-modele-img-porsche"
+                        placeholder={
+                          <div className="catalogue-modele-placeholder-porsche">
+                            <span className="catalogue-modele-letter-porsche">
+                              {nomComplet?.charAt(0) || "?"}
+                            </span>
+                          </div>
+                        }
+                      />
                     </div>
 
                     {/* Prix */}
@@ -643,17 +625,20 @@ const OccasionPage = () => {
         </div>
 
         <div className="occasion-header-center">
-          <img
-            src="/Logo/Logo_Porsche.png"
+          <ImageWithFallback
+            src={'/Logo/Logo_Porsche.png'}
             alt="Porsche"
-            className="occasion-header-logo"
-            onError={(e) => {
-              try {
-                e.currentTarget.src = "/Logo/Logo_red.svg.png";
-              } catch (err) {
-                // fallback silent
-              }
+            imgClass="occasion-header-logo"
+            imgProps={{
+              onError: (e) => {
+                try {
+                  e.currentTarget.src = "/Logo/Logo_red.svg.png";
+                } catch (err) {
+                  // silent
+                }
+              },
             }}
+            placeholder={null}
           />
         </div>
 
@@ -675,7 +660,7 @@ const OccasionPage = () => {
           <div className="occasion-detail-gallery">
             {/* Grande image principale à gauche - affiche la photo sélectionnée */}
             <div className="occasion-detail-gallery-main">
-              <img
+              <ImageWithFallback
                 src={
                   photos[selectedImage]?.name?.startsWith("http")
                     ? photos[selectedImage].name
@@ -684,10 +669,8 @@ const OccasionPage = () => {
                       : buildUrl(photos[selectedImage].name)
                 }
                 alt={occasion.nom_model}
-                className="occasion-detail-main-image"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                }}
+                imgClass="occasion-detail-main-image"
+                placeholder={<div className="occasion-detail-main-missing" />}
               />
             </div>
             {/* Grille 2x2 à droite (4 premières photos à partir de l'index 2) */}
@@ -698,7 +681,7 @@ const OccasionPage = () => {
                   onClick={() => setSelectedImage(index + 2)}
                   className={`occasion-detail-grid-thumbnail ${selectedImage === index + 2 ? "active" : ""}`}
                 >
-                  <img
+                  <ImageWithFallback
                     src={
                       photo.name?.startsWith("http")
                         ? photo.name
@@ -707,9 +690,8 @@ const OccasionPage = () => {
                           : buildUrl(photo.name)
                     }
                     alt={`Vue ${index + 3}`}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
+                    imgProps={{ style: { width: '100%', height: 'auto' } }}
+                    placeholder={<div className="occasion-detail-grid-missing" />}
                   />
                 </button>
               ))}
@@ -725,7 +707,7 @@ const OccasionPage = () => {
                   onClick={() => setSelectedImage(index + 6)}
                   className={`occasion-detail-gallery-extended-item ${selectedImage === index + 6 ? "active" : ""}`}
                 >
-                  <img
+                  <ImageWithFallback
                     src={
                       photo.name?.startsWith("http")
                         ? photo.name
@@ -734,9 +716,8 @@ const OccasionPage = () => {
                           : buildUrl(photo.name)
                     }
                     alt={`Vue ${index + 7}`}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
+                    imgProps={{ style: { width: '100%', height: 'auto' } }}
+                    placeholder={<div className="occasion-detail-extended-missing" />}
                   />
                 </button>
               ))}
@@ -945,7 +926,7 @@ const OccasionPage = () => {
           )}
 
           {/* Admin/Staff Actions */}
-          {isStaff() && occasion && (
+          {staff && occasion && (
             <div className="occasion-detail-admin-box">
               <h3 className="occasion-detail-admin-title">
                 Actions administrateur

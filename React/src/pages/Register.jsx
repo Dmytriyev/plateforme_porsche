@@ -1,22 +1,17 @@
-/**
- * Register.jsx — Page d'inscription
- *
- * - Formulaire d'inscription et validation côté client.
- */
-
+// Imports des dépendances et composants nécessaires
+import Input from "../components/common/Input.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
+import { validateRegisterForm, handleFormChange } from "../utils/helpers.js";
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext.jsx";
-import Input from "../components/common/Input.jsx";
-import Button from "../components/common/Button.jsx";
-import { validateRegisterForm, handleFormChange } from "../utils/helpers.js";
 import "../css/Register.css";
 
-// Page : formulaire d'inscription utilisateur; validation côté client et création de compte.
+//formulaire d'inscription utilisateur; validation côté client et création de compte.
 const Register = () => {
   const navigate = useNavigate();
+  // Accès à la fonction d'enregistrement depuis le contexte d'authentification
   const { register } = useContext(AuthContext);
-
+  // État local pour les données du formulaire, les erreurs, le chargement et les messages d'erreur
   const [formData, setFormData] = useState({
     prenom: "",
     nom: "",
@@ -31,25 +26,27 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  // Gestion des changements dans les champs du formulaire 
   const handleChange = handleFormChange(setFormData, setErrors);
-
+  // Validation du formulaire avant la soumission
   const validateForm = () => {
+    // Appel de la fonction de validation et mise à jour des erreurs
     const newErrors = validateRegisterForm(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+  // Gestion de la soumission du formulaire d'inscription
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
+    // Validation du formulaire avant la soumission
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
-
+    // Préparation des données utilisateur et appel de la fonction d'enregistrement
     try {
       const userData = {
         nom: formData.nom,
@@ -60,9 +57,9 @@ const Register = () => {
         adresse: formData.adresse,
         code_postal: formData.codePostal,
       };
-
+      // Appel de la fonction d'enregistrement depuis le contexte
       const result = await register(userData);
-
+      // Gestion du résultat de l'enregistrement
       if (result.success) {
         navigate("/", { replace: true });
       } else {
@@ -76,11 +73,14 @@ const Register = () => {
   };
 
   return (
+    // Structure du formulaire d'inscription avec styles Porsche
     <div className="register-container-porsche">
+      {/* Formulaire d'inscription */}
       <div className="register-form-wrapper-porsche">
+        {/* Carte du formulaire d'inscription */}
         <div className="register-form-card-porsche">
           <h1 className="register-title-porsche">Création de compte</h1>
-
+          {/* Message d'erreur */}
           {errorMessage && (
             <div className="register-error-message">
               <p>{errorMessage}</p>
@@ -92,7 +92,7 @@ const Register = () => {
               </button>
             </div>
           )}
-
+          {/* Formulaire d'inscription */}
           <form onSubmit={handleSubmit} className="register-form-porsche">
             <Input
               label="Prénom"
@@ -190,10 +190,12 @@ const Register = () => {
               className="register-btn-primary-porsche"
               disabled={loading}
             >
+              {/* Bouton de soumission du formulaire */}
               {loading ? "CRÉATION..." : "CRÉER MON COMPTE"}
             </button>
           </form>
 
+          {/* Séparateur entre le formulaire et le lien de connexion */}
           <div className="register-separator-porsche">
             <span className="register-separator-text-porsche">ou</span>
           </div>

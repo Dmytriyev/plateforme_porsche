@@ -1,6 +1,8 @@
-// Construire une URL complète en fonction du chemin donné
+// Construire une URL complète en fonction du chemin donné  et de la configuration API
 import { API_URL } from "../config/api.js";
+// startsWith: est une méthode de String qui renvoie true si la chaîne commence par les caractères spécifiés
 
+// Fonction pour construire une URL complète
 export const buildUrl = (path) => {
   // Gestion des cas particuliers
   if (!path) return "";

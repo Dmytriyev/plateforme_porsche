@@ -1,7 +1,7 @@
 /**
  * — Services pour modèles Porsche et variantes
  * - Fournit des fonctions spécifiques (configurations, variantes, prix).
- * Clé = voitureId -> { ts: number, data: any }
+ * - Clé = voitureId -> { ts: number, data: any }
  * _ au début d'un nom est une convention qui signifie "usage interne / ne pas utiliser depuis l'extérieur"
  */
 

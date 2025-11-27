@@ -1,4 +1,4 @@
-//  — Utilitaire de stockage sécurisé
+// — Utilitaire de stockage sécurisé
 // - Gère le stockage uniquement côté navigateur
 // - Évite les erreurs lors du SSR (Serveur-Side Rendering)
 

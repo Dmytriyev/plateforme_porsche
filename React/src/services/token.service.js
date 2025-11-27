@@ -11,7 +11,7 @@ const MEMORY = { token: null, refreshToken: null };
 const KEY_ACCESS = "auth_token";
 const KEY_REFRESH = "refresh_token";
 
-// Service de gestion des tokens (access + refresh)
+// Service de gestion des tokens (access et refresh)
 const TokenService = {
   setToken(token) {
     MEMORY.token = token || null;
@@ -21,6 +21,7 @@ const TokenService = {
     } catch (err) {}
   },
 
+  // Récupère le token d'accès depuis la mémoire ou le sessionStorage
   getToken() {
     if (MEMORY.token) return MEMORY.token;
     try {
@@ -32,6 +33,7 @@ const TokenService = {
     }
   },
 
+  // Gestion du refresh token
   setRefreshToken(refreshToken) {
     MEMORY.refreshToken = refreshToken || null;
     try {
@@ -40,6 +42,7 @@ const TokenService = {
     } catch (err) {}
   },
 
+  // Récupère le refresh token depuis la mémoire ou le sessionStorage
   getRefreshToken() {
     if (MEMORY.refreshToken) return MEMORY.refreshToken;
     try {

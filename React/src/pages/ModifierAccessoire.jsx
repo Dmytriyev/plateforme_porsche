@@ -4,12 +4,12 @@
  * - Edition et gestion des images.
  */
 
+import Loading from "../components/common/Loading.jsx";
+import "../css/ModifierAccessoire.css";
+import accesoireService from "../services/accesoire.service.js";
+import buildUrl from "../utils/buildUrl";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import accesoireService from "../services/accesoire.service.js";
-import Loading from "../components/common/Loading.jsx";
-import buildUrl from "../utils/buildUrl";
-import "../css/ModifierAccessoire.css";
 
 // Page (admin) : modifier un accessoire existant, gérer images et métadonnées.
 const ModifierAccessoire = () => {

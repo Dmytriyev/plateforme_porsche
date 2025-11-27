@@ -6,10 +6,10 @@
  * - En dev, afficher la stack aide à apprendre où l'erreur est survenue; en prod, masquer les détails.
  */
 
-import { Component } from "react";
-import { Button } from "./common";
 import "../css/ErrorBoundary.css";
 import { error as logError } from "../utils/logger.js";
+import { Button } from "./common";
+import { Component } from "react";
 
 // Composant : ErrorBoundary — capture les erreurs runtime UI et propose actions (recharger/accueil).
 class ErrorBoundary extends Component {

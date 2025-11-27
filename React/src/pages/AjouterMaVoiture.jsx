@@ -4,14 +4,14 @@
  * - Collecte des informations et validation.
  */
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Loading from "../components/common/Loading.jsx";
+import "../css/AjouterMaVoiture.css";
 import maVoitureService from "../services/ma_voiture.service.js";
 import personnalisationService from "../services/personnalisation.service.js";
-import Loading from "../components/common/Loading.jsx";
 import { formatPrice } from "../utils/helpers.js";
-import "../css/AjouterMaVoiture.css";
 import { warn } from "../utils/logger.js";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Page : formulaire pour créer une nouvelle voiture. Requiert authentification ; permet l'upload de photos.
 const AjouterMaVoiture = () => {

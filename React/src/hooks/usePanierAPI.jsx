@@ -6,9 +6,9 @@
  * - Le hook utilise le contexte `AuthContext` pour protéger les actions nécessitant l'auth.
  */
 
-import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import commandeService from "../services/commande.service.js";
+import { useState, useEffect, useContext } from "react";
 
 // Hook : gestion du nombre d'articles du panier et actions d'ajout (requiert auth)
 const usePanierAPI = () => {

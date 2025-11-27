@@ -7,8 +7,8 @@
  *   erreurs d'usage chez les étudiants.
  */
 
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
+import { useContext } from "react";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

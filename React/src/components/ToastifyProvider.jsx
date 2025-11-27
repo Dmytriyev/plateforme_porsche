@@ -1,6 +1,6 @@
+import "../css/toast.css";
 import React from "react";
 import { ToastContainer } from "react-toastify";
-import "../css/toast.css";
 
 export default function ToastifyProvider() {
     return (
