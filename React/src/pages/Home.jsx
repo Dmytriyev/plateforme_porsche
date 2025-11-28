@@ -1,11 +1,4 @@
-/**
- * pages/Home.jsx — Page d'accueil; sections promos et liens rapides.
- *
- * - Montre l'usage d'un service (`voitureService`) pour récupérer des données
- *   et de `useEffect` pour déclencher la récupération au montage.
- * - Exemple pratique : filtrage et affichage conditionnel (loading / empty / data).
- */
-
+// Page d'accueil avec sections promos, modèles mis en avant et navigation vers catalogues
 import "../css/CatalogueModeles.css";
 import "../css/Home.css";
 import voitureService from "../services/voiture.service.js";
@@ -14,47 +7,53 @@ import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-// Page d'accueil : sections promos, modèles mis en avant et navigation vers catalogues.
 const Home = () => {
+  // État pour les modèles de voitures et le chargement
   const navigate = useNavigate();
   const [modeles, setModeles] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Charger les modèles au montage du composant
   useEffect(() => {
     fetchModeles();
   }, []);
-
+  // Fonction pour récupérer les modèles de voitures
   const fetchModeles = async () => {
     try {
       setLoading(true);
+      // Récupérer toutes les voitures
       const response = await voitureService.getAllVoitures();
+      // Filtrer les modèles spécifiques
       const data = Array.isArray(response) ? response : [];
-
+      // Filtrer pour ne garder que les modèles 911, Cayman et Cayenne
       const filtered = data.filter((v) =>
         ["911", "Cayman", "Cayenne"].includes(v.nom_model),
       );
+      // Extraire les modèles uniques par nom_model
       const uniqueModeles = [
         ...new Map(filtered.map((v) => [v.nom_model, v])).values(),
       ];
-
+      // Mettre à jour l'état avec les modèles uniques
       setModeles(uniqueModeles);
     } catch (error) {
+      // En cas d'erreur, vider la liste des modèles
       setModeles([]);
+      // Finally garantit que setLoading(false) sera toujours exécuté
     } finally {
       setLoading(false);
     }
   };
-
+  // Gérer le clic sur un modèle pour naviguer vers la configuration
   const handleModeleClick = (modele) =>
     navigate(`/variantes/neuve/${modele._id}`);
-
+  // Descriptions par défaut pour certains modèles
   const DESCRIPTIONS = {
     911: "L'icône de génération en génération.",
     718: "La sportive deux places au moteur central arrière.",
     Cayman: "La sportive deux places au moteur central arrière.",
     Cayenne: "Le SUV à l'ADN sportif et familial.",
   };
-
+  // Obtenir les informations du modèle avec description par défaut si nécessaire
   const getModeleInfo = (modele) => ({
     description:
       modele.description ||
@@ -108,62 +107,69 @@ const Home = () => {
         <div className="models-header-porsche">
           <h2 className="section-title-porsche">Sélectionner une gamme</h2>
         </div>
-
         {loading ? (
+          // si le chargement est en cours afficher un message de chargement
           <div className="models-loading">Chargement des modèles...</div>
-        ) : modeles.length === 0 ? (
-          <div className="models-empty">
-            <p>Aucun modèle disponible pour le moment</p>
-          </div>
-        ) : (
-          <div className="models-grid-porsche">
-            {modeles.map((modele) => {
-              const modeleInfo = getModeleInfo(modele);
-              const photos = modele.photo_voiture?.filter((p) => p?.name) || [];
-              const photoPrincipale =
-                photos.length > 1 ? photos[1] : photos[0] || null;
+        ) :
+          // si aucun modèle n'est disponible afficher un message
+          modeles.length === 0 ? (
+            <div className="models-empty">
+              <p>Aucun modèle disponible pour le moment</p>
+            </div>
+          ) : (
+            // sinon afficher la grille des modèles
+            <div className="models-grid-porsche">
+              {modeles.map((modele) => {
+                // Récupérer les informations du modèle et la photo principale
+                const modeleInfo = getModeleInfo(modele);
+                // Filtrer les photos valides et choisir la principale à afficher
+                const photos = modele.photo_voiture?.filter((p) => p?.name) || [];
+                // Afficher la deuxième photo si disponible, sinon la première ou null
+                const photoPrincipale =
+                  photos.length > 1 ? photos[1] : photos[0] || null;
 
-              return (
-                <article
-                  key={modele._id}
-                  className="catalogue-modele-card-neuf-porsche"
-                >
-                  <h2 className="catalogue-modele-title-porsche">
-                    {modele.nom_model}
-                  </h2>
-
-                  <div className="catalogue-modele-image-porsche">
-                    <ImageWithFallback
-                      src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
-                      alt={`Porsche ${modele.nom_model}`}
-                      imgClass="catalogue-modele-img-porsche"
-                      placeholder={
-                        <div className="catalogue-modele-placeholder-porsche">
-                          <span className="catalogue-modele-letter-porsche">
-                            {modele.nom_model?.charAt(0) || "?"}
-                          </span>
-                        </div>
-                      }
-                    />
-                  </div>
-
-                  <div className="home-model-info">
-                    <p className="home-model-description">
-                      {modeleInfo.description}
-                    </p>
-                  </div>
-
-                  <button
-                    className="catalogue-modele-btn-porsche"
-                    onClick={() => handleModeleClick(modele)}
+                return (
+                  <article
+                    key={modele._id}
+                    className="catalogue-modele-card-neuf-porsche"
                   >
-                    Configurer {modele.nom_model}
-                  </button>
-                </article>
-              );
-            })}
-          </div>
-        )}
+                    <h2 className="catalogue-modele-title-porsche">
+                      {modele.nom_model}
+                    </h2>
+
+                    <div className="catalogue-modele-image-porsche">
+                      {/* Afficher l'image principale du modèle avec fallback */}
+                      <ImageWithFallback
+                        src={photoPrincipale && photoPrincipale.name ? buildUrl(photoPrincipale.name) : null}
+                        alt={`Porsche ${modele.nom_model}`}
+                        imgClass="catalogue-modele-img-porsche"
+                        placeholder={
+                          <div className="catalogue-modele-placeholder-porsche">
+                            <span className="catalogue-modele-letter-porsche">
+                              {modele.nom_model?.charAt(0) || "?"}
+                            </span>
+                          </div>
+                        }
+                      />
+                    </div>
+
+                    <div className="home-model-info">
+                      <p className="home-model-description">
+                        {modeleInfo.description}
+                      </p>
+                    </div>
+                    {/* Bouton pour configurer le modèle */}
+                    <button
+                      className="catalogue-modele-btn-porsche"
+                      onClick={() => handleModeleClick(modele)}
+                    >
+                      Configurer {modele.nom_model}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          )}
       </section>
 
       <section className="home-accessoires-section">

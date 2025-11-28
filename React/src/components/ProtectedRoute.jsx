@@ -9,7 +9,7 @@
 
 import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/ProtectedRoute.css";
-import { Loading } from "./common";
+import Loading from "./common/Loading.jsx";
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 

@@ -1,26 +1,27 @@
-/**
- * ModifierAccessoire.jsx — Modification d'un accessoire
- *
- * - Edition et gestion des images.
- */
-
-import Loading from "../components/common/Loading.jsx";
-import "../css/ModifierAccessoire.css";
+// modifier un accessoire existant, gérer images et métadonnées.
 import accesoireService from "../services/accesoire.service.js";
 import buildUrl from "../utils/buildUrl";
+import Loading from "../components/common/Loading.jsx";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import "../css/ModifierAccessoire.css";
 
-// Page (admin) : modifier un accessoire existant, gérer images et métadonnées.
 const ModifierAccessoire = () => {
+  // Récupérer l'ID de l'accessoire depuis les paramètres d'URL
   const { id } = useParams();
+  // Navigation pour redirection après modification
   const navigate = useNavigate();
+  // États locaux pour le formulaire et la gestion des photos
   const [loading, setLoading] = useState(false);
+  // Chargement des données initiales
   const [loadingData, setLoadingData] = useState(true);
+  // Messages d'erreur et de succès
   const [error, setError] = useState("");
+  // Messages de succès
   const [success, setSuccess] = useState("");
-
+  // Liste des couleurs disponibles
   const [couleurs, setCouleurs] = useState([]);
+  // Types d'accessoires disponibles
   const [typesDisponibles] = useState([
     "porte-clés",
     "vetement",
@@ -28,11 +29,15 @@ const ModifierAccessoire = () => {
     "life-style",
   ]);
 
+  // États locaux pour la gestion des photos
   const [photosExistantes, setPhotosExistantes] = useState([]);
+  // Photos à supprimer lors de la soumission
   const [photosASupprimer, setPhotosASupprimer] = useState([]);
+  // Nouvelles photos à ajouter
   const [nouvellesPhotos, setNouvellesPhotos] = useState([]);
+  // Prévisualisations des nouvelles photos
   const [photosPreviews, setPhotosPreviews] = useState([]);
-
+  // Données du formulaire
   const [formData, setFormData] = useState({
     nom_accesoire: "",
     description: "",
@@ -47,18 +52,18 @@ const ModifierAccessoire = () => {
   const fetchAccessoire = useCallback(async () => {
     try {
       setLoadingData(true);
-
+      // Récupérer les données de l'accessoire et les couleurs disponibles
       const [accessoireData, couleursData] = await Promise.all([
         accesoireService.getAccessoireById(id),
         accesoireService.getCouleurs(),
       ]);
-
+      // Remplir les états avec les données récupérées
       setCouleurs(Array.isArray(couleursData) ? couleursData : []);
-
+      // Remplir les données du formulaire
       if (Array.isArray(accessoireData.photo_accesoire)) {
         setPhotosExistantes(accessoireData.photo_accesoire);
       }
-
+      // Initialiser les données du formulaire avec les valeurs existantes
       setFormData({
         nom_accesoire: accessoireData.nom_accesoire || "",
         description: accessoireData.description || "",
@@ -70,79 +75,88 @@ const ModifierAccessoire = () => {
         couleur_accesoire: accessoireData.couleur_accesoire?._id || "",
       });
     } catch (err) {
+      // Afficher l'erreur si la récupération échoue
       setError(err.message || "Erreur lors du chargement de l'accessoire");
     } finally {
       setLoadingData(false);
     }
   }, [id]);
-
+  // Charger les données de l'accessoire au montage du composant
   useEffect(() => {
     if (id) {
       fetchAccessoire();
     }
   }, [id, fetchAccessoire]);
-
+  // Gérer les changements dans les champs du formulaire
   const handleChange = (e) => {
+    // Récupérer le nom, la valeur, le type et l'état coché du champ
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
+  // Supprimer une photo existante
   const supprimerPhotoExistante = (photoId) => {
     setPhotosASupprimer((prev) => [...prev, photoId]);
   };
-
+  // Annuler la suppression d'une photo existante
   const annulerSuppressionPhoto = (photoId) => {
     setPhotosASupprimer((prev) => prev.filter((id) => id !== photoId));
   };
-
+  // Gérer l'ajout de nouvelles photos
   const handleNouvellesPhotos = (e) => {
+    // Récupérer les fichiers sélectionnés
     const files = Array.from(e.target.files);
-
+    // Vérifier le nombre total de photos après ajout
     const totalPhotos =
       photosExistantes.length -
       photosASupprimer.length +
       nouvellesPhotos.length +
       files.length;
+    // Vérifier si le nombre total de photos dépasse la limite
     if (totalPhotos > 10) {
       setError("Maximum 10 photos autorisées au total");
       setTimeout(() => setError(""), 3000);
       return;
     }
-
+    // Vérifier la taille des fichiers sélectionnés
     const invalidFiles = files.filter((file) => file.size > 5 * 1024 * 1024);
+    // Afficher une erreur si des fichiers sont trop volumineux
     if (invalidFiles.length > 0) {
       setError("Chaque photo doit faire moins de 5MB");
       setTimeout(() => setError(""), 3000);
       return;
     }
-
+    // Ajouter les nouvelles photos à l'état
     setNouvellesPhotos((prev) => [...prev, ...files]);
-
+    // Générer les prévisualisations des nouvelles photos
     files.forEach((file) => {
+      // Créer un FileReader pour lire le fichier
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotosPreviews((prev) => [...prev, reader.result]);
       };
+      // Lire le fichier en tant qu'URL de données
       reader.readAsDataURL(file);
     });
-
+    // Réinitialiser la valeur de l'input pour permettre la sélection du même fichier à nouveau
     e.target.value = "";
   };
-
+  // Supprimer une nouvelle photo ajoutée
   const supprimerNouvellePhoto = (index) => {
+    // Supprimer la photo et sa prévisualisation correspondante
     setNouvellesPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotosPreviews((prev) => prev.filter((_, i) => i !== index));
   };
-
+  // Gérer la soumission du formulaire 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+    // Validation des champs obligatoires
     if (
+      // si un des champs obligatoires est vide
       !formData.nom_accesoire ||
       !formData.description ||
       !formData.type_accesoire ||
@@ -151,23 +165,25 @@ const ModifierAccessoire = () => {
       setError("Veuillez remplir tous les champs obligatoires");
       return;
     }
-
+    // Validation des valeurs numériques
     if (formData.prix <= 0) {
       setError("Le prix doit être supérieur à 0");
       return;
     }
-
+    // Validation du prix promotionnel
     if (
       formData.prix_promotion &&
       parseFloat(formData.prix_promotion) >= parseFloat(formData.prix)
     ) {
+      // Le prix promotionnel doit être inférieur au prix normal
       setError("Le prix promotionnel doit être inférieur au prix normal");
       return;
     }
 
     try {
+      // Envoyer les données modifiées au serveur
       setLoading(true);
-
+      // Préparer les données à envoyer
       const dataToSend = {
         nom_accesoire: formData.nom_accesoire.trim(),
         description: formData.description.trim(),
@@ -175,29 +191,32 @@ const ModifierAccessoire = () => {
         prix: parseFloat(formData.prix),
         stock: parseInt(formData.stock) || 0,
       };
-
+      // Ajouter les champs optionnels si remplis
       if (formData.prix_promotion) {
         dataToSend.prix_promotion = parseFloat(formData.prix_promotion);
       }
+      // Ajouter la couleur si sélectionnée
       if (formData.couleur_accesoire) {
         dataToSend.couleur_accesoire = formData.couleur_accesoire;
       }
-
+      // Envoyer les données modifiées au serveur
       await accesoireService.updateAccessoire(id, dataToSend);
-
+      // Gérer la suppression des photos marquées
       if (photosASupprimer.length > 0) {
         await accesoireService.removeImages(id, photosASupprimer);
       }
-
+      // Gérer l'ajout des nouvelles photos
       if (nouvellesPhotos.length > 0) {
+        // Créer un FormData pour l'upload des photos
         const formDataPhotos = new FormData();
+        // Ajouter chaque nouvelle photo au FormData
         nouvellesPhotos.forEach((photo) => {
+          // Ajouter la photo au FormData avec la clé "photos"
           formDataPhotos.append("photos", photo);
         });
-
         // Le token est automatiquement envoyé via cookie HTTP-Only
         await fetch(
-          `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/accesoire/addImage/${id}`,
+          `${import.meta.env.VITE_API_URL}/accesoire/addImage/${id}`,
           {
             method: "PATCH",
             credentials: "include",
@@ -205,25 +224,28 @@ const ModifierAccessoire = () => {
           },
         );
       }
-
+      // Afficher le message de succès
       setSuccess("Accessoire modifié avec succès !");
       setTimeout(() => {
         navigate("/accessoires");
       }, 2000);
     } catch (err) {
+      // Afficher l'erreur si la modification échoue
       setError(err.message || "Erreur lors de la modification");
     } finally {
       setLoading(false);
     }
   };
-
+  // Afficher le chargement si les données sont en cours de récupération
   if (loadingData) {
+    // Afficher un composant de chargement avec un message
     return <Loading fullScreen message="Chargement de l'accessoire..." />;
   }
 
   return (
     <div className="modifier-accessoire-container">
       <div className="modifier-accessoire-header">
+        {/* button de retour */}
         <button
           className="modifier-accessoire-back"
           onClick={() => navigate("/accessoires")}
@@ -250,19 +272,19 @@ const ModifierAccessoire = () => {
           Modifiez les informations de l'accessoire
         </p>
       </div>
-
+      {/* error message */}
       {error && (
         <div className="modifier-accessoire-message modifier-accessoire-message-error">
           {error}
         </div>
       )}
-
+      {/* success message */}
       {success && (
         <div className="modifier-accessoire-message modifier-accessoire-message-success">
           {success}
         </div>
       )}
-
+      {/* modification accessoire */}
       <form onSubmit={handleSubmit} className="modifier-accessoire-form">
         <div className="modifier-accessoire-section">
           <h2 className="modifier-accessoire-section-title">
@@ -371,7 +393,7 @@ const ModifierAccessoire = () => {
           </div>
         </div>
 
-        {/* Section: Personnalisation */}
+        {/* Personnalisation */}
         <div className="modifier-accessoire-section">
           <h2 className="modifier-accessoire-section-title">
             Personnalisation
@@ -395,7 +417,7 @@ const ModifierAccessoire = () => {
           </div>
         </div>
 
-        {/* Section: Photos existantes */}
+        {/* Photos existantes */}
         {photosExistantes.length > 0 && (
           <div className="modifier-accessoire-section">
             <h2 className="modifier-accessoire-section-title">
@@ -415,6 +437,7 @@ const ModifierAccessoire = () => {
                       src={buildUrl(photo.name)}
                       alt={photo.alt || "Photo accessoire"}
                     />
+                    {/* button de suppression */}
                     {isMarkedForDeletion ? (
                       <button
                         type="button"
@@ -438,6 +461,7 @@ const ModifierAccessoire = () => {
                         Annuler
                       </button>
                     ) : (
+                      // button de marquage pour suppression
                       <button
                         type="button"
                         onClick={() => supprimerPhotoExistante(photo._id)}
@@ -465,7 +489,7 @@ const ModifierAccessoire = () => {
           </div>
         )}
 
-        {/* Section: Nouvelles photos */}
+        {/* Nouvelles photos */}
         <div className="modifier-accessoire-section">
           <h2 className="modifier-accessoire-section-title">
             Ajouter de nouvelles photos
@@ -504,7 +528,7 @@ const ModifierAccessoire = () => {
               </span>
             </label>
           </div>
-
+          {/* Nouvelles photos */}
           {photosPreviews.length > 0 && (
             <div className="modifier-accessoire-photos-grid">
               {photosPreviews.map((preview, index) => (
@@ -545,6 +569,7 @@ const ModifierAccessoire = () => {
             className="modifier-accessoire-btn modifier-accessoire-btn-submit"
             disabled={loading}
           >
+            {/* Bouton d'enregistrement */}
             {loading ? "Enregistrement..." : "Enregistrer les modifications"}
           </button>
         </div>

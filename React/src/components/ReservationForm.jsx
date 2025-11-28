@@ -11,7 +11,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Button from "./common/Button.jsx";
 import PaymentForm from "./PaymentForm";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",

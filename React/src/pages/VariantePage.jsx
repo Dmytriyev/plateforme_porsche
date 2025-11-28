@@ -7,7 +7,7 @@ import voitureService from "../services/voiture.service.js";
 import { formatPrice } from "../utils/helpers.js";
 import { warn } from "../utils/logger.js";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 import "../css/components/Message.css";
 import "../css/VariantePage.css";

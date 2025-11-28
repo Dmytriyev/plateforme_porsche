@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
     };
 
     loadUser();
-  }, []);
+  }, [user]);
 
   const login = useCallback(async (email, password) => {
     try {

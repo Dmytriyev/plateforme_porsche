@@ -1,4 +1,3 @@
-import React from 'react';
 import buildUrl from "../utils/buildUrl";
 import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 import { formatPrice } from "../utils/helpers.js";

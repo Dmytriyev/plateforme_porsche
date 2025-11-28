@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 // ImageWithFallback: affiche l'image si src valide, sinon render `placeholder`.
 // Props:

@@ -22,7 +22,7 @@ const Contact = () => {
         const el = document.querySelector(".contact-modal");
         if (el) el.focus();
     }, []);
-
+    // Met à jour les métadonnées de la page
     usePageMeta({
         title: "Contact - Porsche",
         description: "Contactez notre équipe Porsche pour toute question sur les modèles, services ou accessoires.",

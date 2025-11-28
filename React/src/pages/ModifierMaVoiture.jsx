@@ -1,41 +1,28 @@
-/**
- * pages/ModifierMaVoiture.jsx — Édition d'une voiture personnelle enregistrée.
-/**
- * ModifierMaVoiture.jsx — Page de modification d'une voiture
- *
- * - Comportement du formulaire et sauvegarde.
- */
-
-import Loading from "../components/common/Loading.jsx";
-import "../css/ModifierMaVoiture.css";
+// modifier une voiture personnelle (édition des infos et gestion des photos)
+import buildUrl from "../utils/buildUrl";
 import maVoitureService from "../services/ma_voiture.service.js";
 import personnalisationService from "../services/personnalisation.service.js";
-import buildUrl from "../utils/buildUrl";
+import Loading from "../components/common/Loading.jsx";
+import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 import { formatPrice } from "../utils/helpers.js";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import "../css/ModifierMaVoiture.css";
 
-// Page : modifier une voiture personnelle (édition des infos et gestion des photos). Requiert connexion.
 const ModifierMaVoiture = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Données de la voiture
+  // Données de la voiture  
   const [voiture, setVoiture] = useState(null);
-
-  // Options de personnalisation
+  // Options de personnalisation  
   const [couleursExt, setCouleursExt] = useState([]);
   const [couleursInt, setCouleursInt] = useState([]);
   const [jantes, setJantes] = useState([]);
-  const [sieges, setSieges] = useState([]);
-
-  // Photos
+  // Gestion des photos de la voiture
   const [photosExistantes, setPhotosExistantes] = useState([]);
   const [nouvellesPhotos, setNouvellesPhotos] = useState([]);
   const [photosPreviews, setPhotosPreviews] = useState([]);
@@ -48,14 +35,12 @@ const ModifierMaVoiture = () => {
     couleur_exterieur: "",
     couleur_interieur: "",
     taille_jante: "",
-    siege: "",
     info_moteur: "",
     info_transmission: "",
-    package_weissach: false,
-    sport_chrono: false,
   });
 
   useEffect(() => {
+    // Fonction pour charger les données initiales
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -67,64 +52,65 @@ const ModifierMaVoiture = () => {
           couleursExtData,
           couleursIntData,
           jantesData,
-          siegesData,
         ] = await Promise.all([
+          // Récupérer les infos de la voiture à modifier
           maVoitureService.getMaVoitureById(id),
           personnalisationService.getCouleursExterieur(),
           personnalisationService.getCouleursInterieur(),
           personnalisationService.getJantes(),
-          personnalisationService.getSieges(),
         ]);
-
+        // Mettre à jour les états avec les données récupérées
         setVoiture(voitureData);
         setCouleursExt(couleursExtData);
         setCouleursInt(couleursIntData);
         setJantes(jantesData);
-        setSieges(siegesData);
-
-        // Charger les photos existantes
+        // Charger les photos existantes de la voiture
         if (Array.isArray(voitureData.photo_voiture_actuel)) {
           setPhotosExistantes(voitureData.photo_voiture_actuel);
         }
 
-        // Pré-remplir le formulaire
+        // Pré-remplir le formulaire avec les données de la voiture
         setFormData({
           type_model: voitureData.type_model || "",
+          // Format date pour input type="date" si disponible sinon vide
           annee_production: voitureData.annee_production
             ? new Date(voitureData.annee_production).toISOString().split("T")[0]
             : "",
           couleur_exterieur: voitureData.couleur_exterieur?._id || "",
           couleur_interieur: voitureData.couleur_interieur?._id || "",
           taille_jante: voitureData.taille_jante?._id || "",
-          siege: voitureData.siege?._id || "",
           info_moteur: voitureData.info_moteur || "",
           info_transmission: voitureData.info_transmission || "",
-          package_weissach: voitureData.package_weissach || false,
-          sport_chrono: voitureData.sport_chrono || false,
         });
       } catch (err) {
+        // Afficher l'erreur si échec du chargement
         setError(err.message || "Erreur lors du chargement des données");
       } finally {
         setLoading(false);
       }
     };
-
+    // Lancer le chargement des données si un id est présent
     if (id) {
       fetchData();
     }
   }, [id]);
 
+  // Gestion des changements dans le formulaire
   const handleChange = (e) => {
+    // Gérer les changements pour les inputs, selects et checkboxes
     const { name, value, type, checked } = e.target;
+    // Mettre à jour le state du formulaire
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
+  // Gestion des changements de photos
   const handlePhotoChange = (e) => {
+    // Gérer l'ajout de nouvelles photos
     const files = Array.from(e.target.files);
-
+    // si aucun fichier sélectionné, ne rien faire
     if (files.length === 0) return;
 
     // Limiter à 10 photos au total
@@ -133,49 +119,52 @@ const ModifierMaVoiture = () => {
       photosASupprimer.length +
       nouvellesPhotos.length +
       files.length;
+    // si plus de 10, afficher une erreur et ne pas ajouter
     if (totalPhotos > 10) {
       setError("Maximum 10 photos au total");
       return;
     }
-
     // Vérifier la taille des fichiers (5MB max)
     const maxSize = 5 * 1024 * 1024;
     const invalidFiles = files.filter((f) => f.size > maxSize);
+    // si des fichiers invalides, afficher une erreur et ne pas ajouter
     if (invalidFiles.length > 0) {
       setError("Certaines photos dépassent 5MB");
       return;
     }
-
+    // Ajouter les nouvelles photos au state 
     setNouvellesPhotos((prev) => [...prev, ...files]);
-
-    // Créer les previews
+    // Créer les previews des nouvelles photos
     files.forEach((file) => {
+      // Lire le fichier pour prévisualisation
       const reader = new FileReader();
       reader.onloadend = () => {
+        // Ajouter la prévisualisation au state
         setPhotosPreviews((prev) => [...prev, reader.result]);
       };
       reader.readAsDataURL(file);
     });
-
     setError("");
   };
-
+  // Gestion de la suppression des photos existantes et nouvelles
   const supprimerPhotoExistante = (photoId) => {
+    // Marquer la photo pour suppression
     setPhotosASupprimer((prev) => [...prev, photoId]);
   };
-
+  // Annuler la suppression d'une photo existante
   const annulerSuppressionPhoto = (photoId) => {
     setPhotosASupprimer((prev) => prev.filter((id) => id !== photoId));
   };
-
+  // Supprimer une nouvelle photo ajoutée
   const supprimerNouvellePhoto = (index) => {
+    // Supprimer une nouvelle photo et sa prévisualisation
     setNouvellesPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotosPreviews((prev) => prev.filter((_, i) => i !== index));
   };
-
+  // Gestion de la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    // Valider les champs obligatoires
     try {
       setSaving(true);
       setError("");
@@ -183,23 +172,21 @@ const ModifierMaVoiture = () => {
 
       // Préparer les données pour l'API
       const updateData = {
+        // Champs du formulaire 
         type_model: formData.type_model,
         annee_production: formData.annee_production,
         couleur_exterieur: formData.couleur_exterieur || undefined,
         couleur_interieur: formData.couleur_interieur || undefined,
         taille_jante: formData.taille_jante || undefined,
-        siege: formData.siege || undefined,
         info_moteur: formData.info_moteur || undefined,
         info_transmission: formData.info_transmission || undefined,
-        package_weissach: formData.package_weissach,
-        sport_chrono: formData.sport_chrono,
       };
-
+      // Envoyer la requête de mise à jour
       await maVoitureService.updateMaVoiture(id, updateData);
-
-      // Supprimer les photos marquées pour suppression
+      // si des photos à supprimer, les supprimer
       if (photosASupprimer.length > 0) {
         try {
+          // Supprimer les photos existantes marquées pour suppression
           await maVoitureService.supprimerPhotos(id, {
             photo_voiture_actuel: photosASupprimer,
           });
@@ -207,23 +194,40 @@ const ModifierMaVoiture = () => {
           setError("Erreur lors de la suppression des photos");
         }
       }
-
-      // Ajouter les nouvelles photos
+      // Ajouter les nouvelles photos (une par une)
       if (nouvellesPhotos.length > 0) {
-        const photoFormData = new FormData();
-        nouvellesPhotos.forEach((photo) => {
-          photoFormData.append("photos", photo);
-        });
-        photoFormData.append("model_porsche_actuel", id);
-        photoFormData.append("alt", `${formData.type_model} photo`);
+        const photoIds = [];
 
         try {
-          await maVoitureService.ajouterPhoto(photoFormData);
+          // Uploader chaque photo individuellement
+          for (const photo of nouvellesPhotos) {
+            // Préparer le FormData pour l'upload
+            const photoFormData = new FormData();
+            // Champs requis pour l'API
+            photoFormData.append("photos", photo);
+            // Associer la photo à la voiture modifiée
+            photoFormData.append("model_porsche_actuel", id);
+            // Ajouter un alt descriptif
+            photoFormData.append("alt", `${formData.type_model} photo`);
+            // Envoyer la requête d'upload
+            const result = await maVoitureService.ajouterPhoto(photoFormData);
+            // si upload réussi, stocker l'ID de la photo
+            if (result?.photo?._id) {
+              photoIds.push(result.photo._id);
+            }
+          }
+
+          // Associer toutes les photos au véhicule
+          if (photoIds.length > 0) {
+            await maVoitureService.associerPhotos(id, {
+              photo_voiture_actuel: photoIds
+            });
+          }
         } catch (photoError) {
-          setError("Erreur lors de l'ajout des photos");
+          setError(photoError.message || "Erreur lors de l'ajout des photos");
         }
       }
-
+      // Succès de la modification
       setSuccess("Voiture modifiée avec succès !");
       setTimeout(() => {
         navigate(`/mes-voitures/${id}`);
@@ -234,11 +238,11 @@ const ModifierMaVoiture = () => {
       setSaving(false);
     }
   };
-
+  // si en cours de chargement, afficher le loader
   if (loading) {
     return <Loading fullScreen message="Chargement..." />;
   }
-
+  // si voiture introuvable, afficher un message d'erreur
   if (!voiture) {
     return (
       <div className="modifier-voiture-error">
@@ -249,7 +253,7 @@ const ModifierMaVoiture = () => {
       </div>
     );
   }
-
+  // photo principale de la voiture
   const photoPrincipale = voiture.photo_voiture_actuel?.[0];
 
   return (
@@ -363,13 +367,20 @@ const ModifierMaVoiture = () => {
                   onChange={handleChange}
                   className="modifier-voiture-select"
                 >
+                  {/*
+                    par défaut vide : invite l'utilisateur à choisir.
+                    Les options proviennent du(`personnalisationService.getCouleursExterieur()`)
+                    - `key` et `value` utilisent l'identifiant `_id` (stable pour React).
+                    - Si la couleur a un surcoût (`prix > 0`), on affiche
+                      le montant formaté entre parenthèses (+€) grâce à `formatPrice`.
+                  */}
                   <option value="">-- Sélectionner --</option>
                   {couleursExt.map((couleur) => (
                     <option key={couleur._id} value={couleur._id}>
+                      {/* Nom lisible de la couleur */}
                       {couleur.nom_couleur}{" "}
-                      {couleur.prix > 0
-                        ? `(+${formatPrice(couleur.prix)})`
-                        : ""}
+                      {/* Afficher le prix additionnel si > 0 */}
+                      {couleur.prix > 0 ? `(+${formatPrice(couleur.prix)})` : ""}
                     </option>
                   ))}
                 </select>
@@ -389,6 +400,13 @@ const ModifierMaVoiture = () => {
                   onChange={handleChange}
                   className="modifier-voiture-select"
                 >
+                  {/*
+                    par défaut vide : invite l'utilisateur à choisir.
+                    Les options proviennent du(`personnalisationService.getCouleursExterieur()`)
+                    - `key` et `value` utilisent l'identifiant `_id` (stable pour React).
+                    - Si la couleur a un surcoût (`prix > 0`), on affiche
+                      le montant formaté entre parenthèses (+€) grâce à `formatPrice`.
+                  */}
                   <option value="">-- Sélectionner --</option>
                   {couleursInt.map((couleur) => (
                     <option key={couleur._id} value={couleur._id}>
@@ -415,6 +433,13 @@ const ModifierMaVoiture = () => {
                   onChange={handleChange}
                   className="modifier-voiture-select"
                 >
+                  {/*
+                    par défaut vide : invite l'utilisateur à choisir.
+                    Les options proviennent du(`personnalisationService.getCouleursExterieur()`)
+                    - `key` et `value` utilisent l'identifiant `_id` (stable pour React).
+                    - Si la couleur a un surcoût (`prix > 0`), on affiche
+                      le montant formaté entre parenthèses (+€) grâce à `formatPrice`.
+                  */}
                   <option value="">-- Sélectionner --</option>
                   {jantes.map((jante) => (
                     <option key={jante._id} value={jante._id}>
@@ -425,26 +450,6 @@ const ModifierMaVoiture = () => {
                 </select>
               </div>
 
-              <div className="modifier-voiture-form-group">
-                <label htmlFor="siege" className="modifier-voiture-label">
-                  Sièges
-                </label>
-                <select
-                  id="siege"
-                  name="siege"
-                  value={formData.siege}
-                  onChange={handleChange}
-                  className="modifier-voiture-select"
-                >
-                  <option value="">-- Sélectionner --</option>
-                  {sieges.map((siege) => (
-                    <option key={siege._id} value={siege._id}>
-                      {siege.type_siege}{" "}
-                      {siege.prix > 0 ? `(+${formatPrice(siege.prix)})` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             {/* Spécifications techniques */}
@@ -484,39 +489,6 @@ const ModifierMaVoiture = () => {
                   className="modifier-voiture-input"
                   placeholder="Ex: PDK (automatique)"
                 />
-              </div>
-            </div>
-
-            {/* Packages */}
-            <div className="modifier-voiture-section">
-              <h2 className="modifier-voiture-section-title">
-                Packages optionnels
-              </h2>
-
-              <div className="modifier-voiture-checkbox-group">
-                <label className="modifier-voiture-checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="package_weissach"
-                    checked={formData.package_weissach}
-                    onChange={handleChange}
-                    className="modifier-voiture-checkbox"
-                  />
-                  <span>Package Weissach</span>
-                </label>
-              </div>
-
-              <div className="modifier-voiture-checkbox-group">
-                <label className="modifier-voiture-checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="sport_chrono"
-                    checked={formData.sport_chrono}
-                    onChange={handleChange}
-                    className="modifier-voiture-checkbox"
-                  />
-                  <span>Sport Chrono</span>
-                </label>
               </div>
             </div>
 

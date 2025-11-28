@@ -212,14 +212,14 @@
 }
 
 .modifier-compte-btn-save {
-  background: #d5001c;
+  background: #000000;
   color: white;
 }
 
 .modifier-compte-btn-save:hover:not(:disabled) {
-  background: #b00016;
+  background: #111111;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
 .modifier-compte-btn-save:disabled {
@@ -282,6 +282,6 @@
 
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid #d5001c;
+  outline: 2px solid #000000;
   outline-offset: 2px;
 }

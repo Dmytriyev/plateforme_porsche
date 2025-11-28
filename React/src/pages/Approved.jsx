@@ -1,4 +1,3 @@
-import React from "react";
 import usePageMeta from "../utils/usePageMeta.jsx";
 import "../css/APropos.css";
 

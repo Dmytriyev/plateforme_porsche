@@ -34,19 +34,25 @@ const maVoitureService = {
   // Upload d'une photo pour une voiture actuelle (multipart/form-data).
   ajouterPhoto: (formData) =>
     apiRequest(() =>
-      apiClient.post("/photo-voiture-actuel/new", formData, {
+      apiClient.post("/photo_voiture_actuel/new", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
     ),
 
   // Supprime une photo par son ID.
   supprimerPhoto: (id) =>
-    apiRequest(() => apiClient.delete(`/photo-voiture-actuel/delete/${id}`)),
+    apiRequest(() => apiClient.delete(`/photo_voiture_actuel/delete/${id}`)),
 
   // Supprime plusieurs photos associées à une voiture.
   supprimerPhotos: (id, data) =>
     apiRequest(() =>
       apiClient.patch(`/model_porsche_actuel/removeImages/${id}`, data)
+    ),
+
+  // Associe des photos existantes à une voiture.
+  associerPhotos: (id, data) =>
+    apiRequest(() =>
+      apiClient.patch(`/model_porsche_actuel/addImages/${id}`, data)
     ),
 };
 

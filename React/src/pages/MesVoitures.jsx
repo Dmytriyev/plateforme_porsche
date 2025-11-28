@@ -1,41 +1,36 @@
-/**
- * MesVoitures.jsx — Liste des voitures de l'utilisateur
- *
- * - Gestion de la liste, pagination et actions.
- */
-
-import Loading from "../components/common/Loading.jsx";
-import { API_URL } from "../config/api.js";
-import { AuthContext } from "../context/AuthContext.jsx";
-import "../css/components/Message.css";
-import "../css/MesVoitures.css";
+// gestion des voitures personnelles de l'utilisateur
 import maVoitureService from "../services/ma_voiture.service.js";
 import buildUrl from "../utils/buildUrl";
 import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
+import Loading from "../components/common/Loading.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
 import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "../css/components/Message.css";
+import "../css/MesVoitures.css";
 
-// Page : gestion des voitures personnelles (liste, ajout, suppression). Requiert connexion.
 const MesVoitures = () => {
   const navigate = useNavigate();
+  // Récupérer l'utilisateur connecté depuis le contexte d'authentification
   const { user } = useContext(AuthContext);
-
   const [voitures, setVoitures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [voituresEnregistrees, setVoituresEnregistrees] = useState([]);
+  const [success, _setSuccess] = useState("");
 
+  // Charger les voitures de l'utilisateur à la connexion
   useEffect(() => {
     if (user) {
       fetchMesVoitures();
     }
   }, [user]);
 
+  // Fonction pour récupérer les voitures de l'utilisateur
   const fetchMesVoitures = async () => {
     try {
       setLoading(true);
       setError("");
+      // Appel au service pour obtenir les voitures
       const data = await maVoitureService.getMesVoitures();
       setVoitures(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -44,47 +39,13 @@ const MesVoitures = () => {
       setLoading(false);
     }
   };
-
-  /**
-   * Formater la date d'immatriculation
-   */
-  const formatDateImmat = (date) => {
-    if (!date) return null;
-    const d = new Date(date);
-    return d.toLocaleDateString("fr-FR", { month: "2-digit", year: "numeric" });
-  };
-
+  // Formater les informations de puissance du moteur
   const formatPower = (infoMoteur) => {
     if (!infoMoteur) return null;
     return infoMoteur;
   };
 
-  const handleToggleEnregistrer = (voitureId) => {
-    setVoituresEnregistrees((prev) => {
-      const isSelected = prev.includes(voitureId);
-      if (isSelected) {
-        return prev.filter((id) => id !== voitureId);
-      } else {
-        return [...prev, voitureId];
-      }
-    });
-  };
-
-  const _handleSupprimer = async (id) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette voiture ?")) {
-      return;
-    }
-
-    try {
-      await maVoitureService.supprimerMaVoiture(id);
-      setSuccess("Voiture supprimée avec succès");
-      setTimeout(() => setSuccess(""), 3000);
-      fetchMesVoitures();
-    } catch (err) {
-      setError(err.message || "Erreur lors de la suppression");
-    }
-  };
-
+  // si pas connecté, rediriger vers la page de connexion
   if (!user) {
     return (
       <div className="mes-voitures-error">
@@ -93,12 +54,13 @@ const MesVoitures = () => {
       </div>
     );
   }
-
+  // Afficher un indicateur de chargement pendant la récupération des données
   if (loading) {
     return <Loading fullScreen message="Chargement de vos voitures..." />;
   }
-
+  // Image générale pour l'en-tête de la page
   const photoGenerale =
+    // si il y a au moins une voiture avec une photo actuelle, prendre la première photo de la première voiture
     voitures.length > 0 && voitures[0]?.photo_voiture_actuel?.length > 0
       ? voitures[0].photo_voiture_actuel[0]
       : null;
@@ -186,9 +148,6 @@ const MesVoitures = () => {
             const photoPrincipale = photos.length > 0 ? photos[0] : null;
             const thumbnails = photos.slice(1, 4);
 
-            const isEnregistree = voituresEnregistrees.includes(voiture._id);
-            const dateImmat = formatDateImmat(voiture.annee_production);
-
             return (
               <article key={voiture._id} className="mes-voitures-card-finder">
                 <div className="mes-voitures-card-images-finder">
@@ -239,11 +198,6 @@ const MesVoitures = () => {
                       <span className="mes-voitures-approved-badge-finder">
                         Véhicule d'occasion Porsche Approved
                       </span>
-                      {dateImmat && (
-                        <span className="mes-voitures-date-finder">
-                          Enregistrée le {dateImmat}
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -272,16 +226,6 @@ const MesVoitures = () => {
                         Essence
                       </span>
                     </div>
-                    {dateImmat && (
-                      <div className="mes-voitures-spec-item-finder">
-                        <span className="mes-voitures-spec-label-finder">
-                          Première immatriculation:
-                        </span>
-                        <span className="mes-voitures-spec-value-finder">
-                          {dateImmat}
-                        </span>
-                      </div>
-                    )}
                     {voiture.info_transmission &&
                       voiture.info_transmission !== "N/A" && (
                         <div className="mes-voitures-spec-item-finder">
@@ -313,38 +257,6 @@ const MesVoitures = () => {
                       onClick={() => navigate(`/mes-voitures/${voiture._id}`)}
                     >
                       Détails du véhicule
-                    </button>
-                    <button
-                      className={`mes-voitures-btn-compare-finder ${isEnregistree ? "enregistre" : ""}`}
-                      onClick={() => handleToggleEnregistrer(voiture._id)}
-                    >
-                      {isEnregistree ? (
-                        <>
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-                          </svg>
-                          Enregistré
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-                          </svg>
-                          → Comparer
-                        </>
-                      )}
                     </button>
                   </div>
                 </div>

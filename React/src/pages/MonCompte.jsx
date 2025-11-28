@@ -1,9 +1,11 @@
-// - Tableau de bord utilisateur avec gestion des réservations, commandes et voitures.
-// - Montre l'usage de plusieurs services (commandeService, maVoitureService) pour récupérer et gérer les données utilisateur.
-// - Utilisation de useContext pour accéder aux informations d'authentification et de rôle utilisateur.
-// - Gestion des états de chargement, erreurs et succès avec useState et useEffect.
+/**
+ * - Tableau de bord utilisateur avec gestion des réservations, commandes et voitures. 
+ * - séparation sidebar/main, extraction de sous-composants mémorisés
+ * - useCallback pour les handlers, useMemo pour les calculs coûteux
+ * - useState pour UI locale, useContext pour auth globale, useRef pour mounted state
+ * - mémorisation des composants avec React.memo
+ */
 import Loading from "../components/common/Loading.jsx";
-import { API_URL } from "../config/api.js";
 import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/components/Message.css";
 import "../css/MonCompte.css";
@@ -12,10 +14,68 @@ import maVoitureService from "../services/ma_voiture.service.js";
 import buildUrl from "../utils/buildUrl";
 import ImageWithFallback from "../components/common/ImageWithFallback.jsx";
 import { formatPrice, formatDate } from "../utils/helpers.js";
-import { useState, useEffect, useCallback, useContext, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useContext, useMemo, useRef, memo } from "react";
 import { useNavigate } from "react-router-dom";
-// Bloc de gestion des achats pour les administrateurs.
-const GestionAchatsBlock = ({ commandes }) => {
+
+const selectMainPhoto = (photos, preferThird = false) => {
+  if (!Array.isArray(photos) || photos.length === 0) return null;
+  const validPhotos = photos.filter((p) => p && (p.name || p._id));
+  if (validPhotos.length === 0) return null;
+  // Si preferThird = true, privilégier la 3ème photo (réservations)
+  // Sinon, prendre la première photo (mes voitures)
+  if (preferThird && validPhotos.length > 2) {
+    return validPhotos[2];
+  }
+  return validPhotos[0];
+};
+
+/**
+ * Construit le nom complet d'un modèle Porsche.
+ * Combine marque + modèle + variante de manière sécurisée.
+ * 
+ * @param {string} nomModele - Nom du modèle (ex: "911")
+ * @param {string} nomVariante - Nom de la variante (ex: "Carrera S")
+ * @returns {string} - Nom complet (ex: "Porsche 911 Carrera S")
+ */
+const buildPorscheName = (nomModele = "", nomVariante = "") => {
+  return `Porsche ${nomModele} ${nomVariante}`.trim();
+};
+
+/**
+ * Messages d'erreur standardisés pour l'UX.
+ * Évite d'exposer des détails techniques (RGPD, sécurité).
+ */
+const ERROR_MESSAGES = {
+  FETCH_DATA: "Impossible de charger vos données. Veuillez réessayer.",
+  CANCEL_RESERVATION: "Impossible d'annuler la réservation. Veuillez réessayer.",
+  ACCEPT_RESERVATION: "Impossible d'accepter la réservation. Veuillez réessayer.",
+  REFUSE_RESERVATION: "Impossible de refuser la réservation. Veuillez réessayer.",
+  DELETE_CAR: "Impossible de supprimer la voiture. Veuillez réessayer.",
+};
+
+const SUCCESS_MESSAGES = {
+  CANCEL_RESERVATION: "Réservation annulée avec succès",
+  ACCEPT_RESERVATION: "Réservation acceptée avec succès",
+  REFUSE_RESERVATION: "Réservation refusée avec succès",
+  DELETE_CAR: "Voiture supprimée avec succès",
+};
+
+// Durée d'affichage des messages de succès (en ms)
+const SUCCESS_MESSAGE_DURATION = 3000;
+
+// ============================================================================
+// 📦 COMPOSANTS ENFANTS MÉMORISÉS
+// ============================================================================
+
+/**
+ * Composant mémorisé pour la gestion des achats (admin uniquement).
+ * 
+ * 🎯 Optimisation : React.memo évite le re-render si `commandes` n'a pas changé.
+ * 💡 Performance : Tri et filtrage mémorisés avec useMemo pour éviter recalculs inutiles.
+ * 
+ * @param {Array} commandes - Liste de toutes les commandes
+ */
+const GestionAchatsBlock = memo(({ commandes }) => {
   const [sortBy, setSortBy] = useState("date"); // date, user
   const [sortOrder, setSortOrder] = useState("desc");
   // Tri et filtrage des achats.
@@ -51,14 +111,19 @@ const GestionAchatsBlock = ({ commandes }) => {
     return sorted;
   }, [achats, sortBy, sortOrder]);
 
-  const toggleSort = (type) => {
-    if (sortBy === type) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(type);
+  // Mémorisation du handler pour éviter sa recréation à chaque render
+  const toggleSort = useCallback((type) => {
+    setSortBy((prevSortBy) => {
+      if (prevSortBy === type) {
+        // Si même critère, inverser l'ordre
+        setSortOrder((prev) => prev === "asc" ? "desc" : "asc");
+        return prevSortBy;
+      }
+      // Nouveau critère, reset ordre à desc
       setSortOrder("desc");
-    }
-  };
+      return type;
+    });
+  }, []);
 
   return (
     <div className="mon-compte-block mon-compte-admin-block">
@@ -231,10 +296,23 @@ const GestionAchatsBlock = ({ commandes }) => {
       )}
     </div>
   );
-};
+});
 
-// Mobile toolbar: small round buttons shown on tablet / mobile
-const MobileToolbar = ({ activeSection, setActiveSection, navigate, handleLogout, isStaff }) => {
+// Display name pour React DevTools (facilite le debugging)
+GestionAchatsBlock.displayName = "GestionAchatsBlock";
+
+/**
+ * Barre d'outils mobile pour la navigation (visible sur tablettes/mobiles).
+ * 
+ * 🎯 Responsive Design : composant affiché uniquement sur petits écrans via CSS.
+ * ♿ Accessibilité : aria-labels, aria-pressed, tabIndex pour navigation clavier.
+ * 
+ * @param {string} activeSection - Section actuellement active
+ * @param {Function} setActiveSection - Setter pour changer de section
+ * @param {Function} navigate - Hook de navigation React Router
+ * @param {Function} handleLogout - Handler de déconnexion
+ */
+const MobileToolbar = memo(({ activeSection, setActiveSection, navigate, handleLogout }) => {
   return (
     <div className="mon-compte-mobile-toolbar" role="toolbar" aria-label="Navigation mobile">
       <button
@@ -283,21 +361,6 @@ const MobileToolbar = ({ activeSection, setActiveSection, navigate, handleLogout
       </button>
 
       <button
-        className={`mon-compte-mobile-btn ${activeSection === "paiement" ? "active" : ""}`}
-        onClick={() => setActiveSection('paiement')}
-        aria-label="Paiement"
-        title="Paiement"
-        aria-pressed={activeSection === "paiement"}
-        aria-current={activeSection === "paiement" ? "true" : undefined}
-        tabIndex={0}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-          <line x1="1" y1="10" x2="23" y2="10" />
-        </svg>
-      </button>
-
-      <button
         className={`mon-compte-mobile-btn mon-compte-mobile-btn-logout`}
         onClick={handleLogout}
         aria-label="Déconnexion"
@@ -313,8 +376,21 @@ const MobileToolbar = ({ activeSection, setActiveSection, navigate, handleLogout
       </button>
     </div>
   );
-};
-// Page : dashboard utilisateur (infos, commandes, réservations, voitures). Requiert authentification.
+});
+
+MobileToolbar.displayName = "MobileToolbar";
+
+// ============================================================================
+// 🏠 COMPOSANT PRINCIPAL
+// ============================================================================
+
+/**
+ * Page MonCompte — Dashboard utilisateur avec gestion complète du compte.
+ * 
+ * 🔒 Sécurité : requiert authentification (redirect si pas de user).
+ * 📊 Features : réservations, commandes, voitures personnelles, paramètres.
+ * 👮 Admin : features additionnelles (gestion achats, ajout voitures occasion).
+ */
 const MonCompte = () => {
   const navigate = useNavigate();
   const { user, logout, isStaff } = useContext(AuthContext);
@@ -341,6 +417,17 @@ const MonCompte = () => {
   const [mesVoitures, setMesVoitures] = useState([]);
   const [userData, setUserData] = useState(null);
 
+  /**
+   * Récupère toutes les données utilisateur en parallèle.
+   * 
+   * 🚀 Performance : Promise.all pour appels API parallèles (plus rapide que séquentiel).
+   * 🛡️ Sécurité : chaque promesse a son propre catch pour éviter échec complet.
+   * ♻️ Memory leak prevention : vérification de mountedRef avant setState.
+   * 
+   * 💡 Pourquoi Promise.all ?
+   * - 3 appels indépendants → gain de temps significatif
+   * - Fallback sur [] si erreur individuelle → UX dégradée mais pas bloquée
+   */
   const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
@@ -348,6 +435,7 @@ const MonCompte = () => {
 
       const userId = user?._id || user?.id;
 
+      // 🔄 Appels API parallèles avec fallback sur tableau vide
       const promises = [
         staff
           ? commandeService.getAllReservations().catch(() => [])
@@ -363,15 +451,19 @@ const MonCompte = () => {
       const [reservationsData, commandesData, mesVoituresData] =
         await Promise.all(promises);
 
+      // ⚠️ Protection contre memory leak (component unmounted pendant l'appel)
       if (!mountedRef.current) return;
 
+      // 🔒 Validation des types avant setState (defensive programming)
       setReservations(Array.isArray(reservationsData) ? reservationsData : []);
       setCommandes(Array.isArray(commandesData) ? commandesData : []);
       setMesVoitures(Array.isArray(mesVoituresData) ? mesVoituresData : []);
       setUserData(user);
     } catch (err) {
       if (!mountedRef.current) return;
-      setError(err.message || "Erreur lors du chargement des données");
+      // 🔐 RGPD : message générique sans détails techniques
+      setError(ERROR_MESSAGES.FETCH_DATA);
+      console.error("[MonCompte] Erreur chargement données:", err);
     } finally {
       if (mountedRef.current) setLoading(false);
     }
@@ -390,56 +482,69 @@ const MonCompte = () => {
     }
   };
 
-  const handleAnnulerReservation = async (id) => {
-    if (
-      !window.confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")
-    ) {
-      return;
-    }
+  /**
+   * Factory générique pour créer des handlers d'actions sur réservations.
+   * 
+   * 🎯 DRY Principle : mutualise la logique commune (confirm, try/catch, success, refresh).
+   * 🔄 Pattern Factory : génère des handlers spécialisés depuis un template.
+   * 
+   * @param {Function} serviceMethod - Méthode du service à appeler
+   * @param {string} confirmMessage - Message de confirmation
+   * @param {string} successMessage - Message de succès
+   * @param {string} errorMessage - Message d'erreur
+   * @returns {Function} - Handler async prêt à l'emploi
+   */
+  const createReservationHandler = useCallback(
+    (serviceMethod, confirmMessage, successMessage, errorMessage) =>
+      async (id) => {
+        if (!window.confirm(confirmMessage)) return;
 
-    try {
-      await commandeService.cancelReservation(id);
-      setSuccess("Réservation annulée avec succès");
-      setTimeout(() => setSuccess(""), 3000);
-      fetchAllData();
-    } catch (err) {
-      setError(err.message || "Erreur lors de l'annulation");
-    }
-  };
+        try {
+          await serviceMethod(id);
+          setSuccess(successMessage);
+          setTimeout(() => setSuccess(""), SUCCESS_MESSAGE_DURATION);
+          fetchAllData();
+        } catch (err) {
+          setError(errorMessage);
+          console.error(`[MonCompte] Erreur réservation ${id}:`, err);
+        }
+      },
+    [fetchAllData]
+  );
 
-  const handleAccepterReservation = async (id) => {
-    if (
-      !window.confirm("Êtes-vous sûr de vouloir accepter cette réservation ?")
-    ) {
-      return;
-    }
+  // 🎨 Handlers spécialisés créés via factory (moins de duplication)
+  const handleAnnulerReservation = useMemo(
+    () =>
+      createReservationHandler(
+        commandeService.cancelReservation,
+        "Êtes-vous sûr de vouloir annuler cette réservation ?",
+        SUCCESS_MESSAGES.CANCEL_RESERVATION,
+        ERROR_MESSAGES.CANCEL_RESERVATION
+      ),
+    [createReservationHandler]
+  );
 
-    try {
-      await commandeService.acceptReservation(id);
-      setSuccess("Réservation acceptée avec succès");
-      setTimeout(() => setSuccess(""), 3000);
-      fetchAllData();
-    } catch (err) {
-      setError(err.message || "Erreur lors de l'acceptation");
-    }
-  };
+  const handleAccepterReservation = useMemo(
+    () =>
+      createReservationHandler(
+        commandeService.acceptReservation,
+        "Êtes-vous sûr de vouloir accepter cette réservation ?",
+        SUCCESS_MESSAGES.ACCEPT_RESERVATION,
+        ERROR_MESSAGES.ACCEPT_RESERVATION
+      ),
+    [createReservationHandler]
+  );
 
-  const handleRefuserReservation = async (id) => {
-    if (
-      !window.confirm("Êtes-vous sûr de vouloir refuser cette réservation ?")
-    ) {
-      return;
-    }
-
-    try {
-      await commandeService.refuseReservation(id);
-      setSuccess("Réservation refusée avec succès");
-      setTimeout(() => setSuccess(""), 3000);
-      fetchAllData();
-    } catch (err) {
-      setError(err.message || "Erreur lors du refus");
-    }
-  };
+  const handleRefuserReservation = useMemo(
+    () =>
+      createReservationHandler(
+        commandeService.refuseReservation,
+        "Êtes-vous sûr de vouloir refuser cette réservation ?",
+        SUCCESS_MESSAGES.REFUSE_RESERVATION,
+        ERROR_MESSAGES.REFUSE_RESERVATION
+      ),
+    [createReservationHandler]
+  );
 
   if (!user) {
     return (
@@ -523,24 +628,6 @@ const MonCompte = () => {
           </button>
 
           <button
-            className={`mon-compte-nav-item ${activeSection === "paiement" ? "active" : ""}`}
-            onClick={() => setActiveSection("paiement")}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-              <line x1="1" y1="10" x2="23" y2="10" />
-            </svg>
-            <span>Mode de paiement</span>
-          </button>
-
-          <button
             className="mon-compte-nav-item mon-compte-nav-logout"
             onClick={handleLogout}
           >
@@ -587,7 +674,6 @@ const MonCompte = () => {
               setActiveSection={setActiveSection}
               navigate={navigate}
               handleLogout={handleLogout}
-              isStaff={staff}
             />
 
             <div className="mon-compte-block">
@@ -614,51 +700,41 @@ const MonCompte = () => {
               ) : (
                 <div className="mon-compte-reservations-list">
                   {reservations.map((reservation) => {
+                    // 🔍 Extraction des données de la réservation
                     const modelPorsche = reservation.model_porsche;
                     const voitureBase = modelPorsche?.voiture;
 
-                    const nomModele = voitureBase?.nom_model || "";
-                    const nomVariante = modelPorsche?.nom_model || "";
-                    const nomComplet =
-                      `Porsche ${nomModele} ${nomVariante}`.trim();
+                    // 🏷️ Nom complet via fonction utilitaire
+                    const nomComplet = buildPorscheName(
+                      voitureBase?.nom_model,
+                      modelPorsche?.nom_model
+                    );
 
+                    // 💰 Prix avec fallback sur 0
                     const prix =
                       modelPorsche?.prix_base_variante ||
                       modelPorsche?.prix_base ||
                       0;
 
-                    let photoPrincipale = null;
+                    // 📸 Photo principale via fonction utilitaire (3ème photo pour réservations)
                     const photos =
                       modelPorsche?.photo_porsche || voitureBase?.photo_voiture;
-                    if (Array.isArray(photos) && photos.length > 0) {
-                      const validPhotos = photos.filter(
-                        (p) => p && (p.name || p._id),
-                      );
-                      if (validPhotos.length > 2) {
-                        photoPrincipale = validPhotos[2];
-                      } else if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[0];
-                      }
-                    }
+                    const photoPrincipale = selectMainPhoto(photos, true);
 
+                    // 🔑 Données complémentaires
                     const modelPorscheId = modelPorsche?._id;
-
                     const reservationUser = reservation.user;
                     const concessionnaire =
                       modelPorsche?.concessionnaire || "Non spécifié";
 
-                    const dateReservation = reservation.date_reservation
-                      ? new Date(reservation.date_reservation)
-                      : null;
-                    const dateFormatted = dateReservation
-                      ? dateReservation.toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })
+                    // 📅 Formatage de la date avec helper unifié
+                    const dateFormatted = reservation.date_reservation
+                      ? formatDate(reservation.date_reservation)
                       : "N/A";
-                    const heureFormatted = dateReservation
-                      ? dateReservation.toLocaleTimeString("fr-FR", {
+
+                    // ⏰ Heure séparée pour affichage précis
+                    const heureFormatted = reservation.date_reservation
+                      ? new Date(reservation.date_reservation).toLocaleTimeString("fr-FR", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
@@ -732,11 +808,8 @@ const MonCompte = () => {
                         <div className="mon-compte-reservation-actions">
                           <button
                             className="mon-compte-reservation-btn mon-compte-reservation-btn-view"
-                            onClick={() => {
-                              if (modelPorscheId) {
-                                navigate(`/occasion/${modelPorscheId}`);
-                              }
-                            }}
+                            onClick={() => modelPorscheId && navigate(`/occasion/${modelPorscheId}`)}
+                            disabled={!modelPorscheId}
                           >
                             Voir
                           </button>
@@ -801,6 +874,7 @@ const MonCompte = () => {
               ) : (
                 <div className="mon-compte-reservations-list">
                   {mesVoitures.map((voiture) => {
+                    // 🚗 Extraction des données de la voiture
                     const modelPorsche = voiture.model_porsche;
                     const nomModele =
                       modelPorsche?.nom_model || voiture.nom_model || "";
@@ -808,19 +882,12 @@ const MonCompte = () => {
                       modelPorsche?.type_carrosserie ||
                       voiture.type_carrosserie ||
                       "";
-                    const nomComplet =
-                      `Porsche ${nomModele} ${typeCarrosserie}`.trim();
 
-                    let photoPrincipale = null;
-                    const photos = voiture.photo_voiture_actuel;
-                    if (Array.isArray(photos) && photos.length > 0) {
-                      const validPhotos = photos.filter(
-                        (p) => p && (p.name || p._id),
-                      );
-                      if (validPhotos.length > 0) {
-                        photoPrincipale = validPhotos[0];
-                      }
-                    }
+                    // 🏷️ Nom complet via fonction utilitaire
+                    const nomComplet = buildPorscheName(nomModele, typeCarrosserie);
+
+                    // 📸 Photo principale (première photo pour mes voitures)
+                    const photoPrincipale = selectMainPhoto(voiture.photo_voiture_actuel, false);
 
                     return (
                       <div
@@ -883,24 +950,16 @@ const MonCompte = () => {
                           <button
                             className="mon-compte-reservation-btn mon-compte-reservation-btn-delete"
                             onClick={async () => {
-                              if (
-                                window.confirm(
-                                  "Êtes-vous sûr de vouloir supprimer cette voiture ?",
-                                )
-                              ) {
-                                try {
-                                  await maVoitureService.supprimerMaVoiture(
-                                    voiture._id,
-                                  );
-                                  setSuccess("Voiture supprimée avec succès");
-                                  setTimeout(() => setSuccess(""), 3000);
-                                  fetchAllData();
-                                } catch (err) {
-                                  setError(
-                                    err.message ||
-                                    "Erreur lors de la suppression",
-                                  );
-                                }
+                              if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette voiture ?")) return;
+
+                              try {
+                                await maVoitureService.supprimerMaVoiture(voiture._id);
+                                setSuccess(SUCCESS_MESSAGES.DELETE_CAR);
+                                setTimeout(() => setSuccess(""), SUCCESS_MESSAGE_DURATION);
+                                fetchAllData();
+                              } catch (err) {
+                                setError(ERROR_MESSAGES.DELETE_CAR);
+                                console.error(`[MonCompte] Erreur suppression voiture ${voiture._id}:`, err);
                               }
                             }}
                           >
@@ -1030,38 +1089,6 @@ const MonCompte = () => {
                   onClick={() => navigate("/mon-compte/modifier")}
                 >
                   Modifier mes informations
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeSection === "paiement" && (
-          <div className="mon-compte-section">
-            <h1 className="mon-compte-title">Mode de paiement</h1>
-
-            <div className="mon-compte-payment">
-              <div className="mon-compte-payment-empty">
-                <svg
-                  width="48"
-                  height="48"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="mon-compte-payment-icon"
-                >
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                  <line x1="1" y1="10" x2="23" y2="10" />
-                </svg>
-                <p className="mon-compte-payment-text">
-                  Aucun mode de paiement enregistré
-                </p>
-                <button
-                  className="mon-compte-payment-btn"
-                  onClick={() => navigate("/paiement/ajouter")}
-                >
-                  Ajouter un mode de paiement
                 </button>
               </div>
             </div>

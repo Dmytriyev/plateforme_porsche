@@ -7,15 +7,6 @@
 import DOMPurify from "dompurify";
 
 // Importation de la bibliothèque pour la sanitisation HTML
-const ERROR_MESSAGES = {
-  NETWORK_ERROR: "Erreur de connexion au serveur",
-  UNAUTHORIZED: "Vous devez être connecté pour accéder à cette page",
-  FORBIDDEN: "Vous n'avez pas les permissions nécessaires",
-  NOT_FOUND: "Ressource non trouvée",
-  SERVER_ERROR: "Erreur serveur, veuillez réessayer plus tard",
-  VALIDATION_ERROR: "Erreur de validation des données",
-};
-// Messages d'erreur standardisés pour les erreurs API
 const priceFormatter = new Intl.NumberFormat("fr-FR", {
   style: "currency",
   currency: "EUR",

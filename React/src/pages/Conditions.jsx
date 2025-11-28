@@ -1,5 +1,5 @@
 // Page "Conditions générales" — contenu informatif et boutons centrés
-import "../css/APropos.css"; // réutilise le style unifié créé pour APropos
+import "../css/APropos.css";
 import { Link } from "react-router-dom";
 import usePageMeta from "../utils/usePageMeta.jsx";
 

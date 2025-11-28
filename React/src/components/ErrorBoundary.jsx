@@ -8,7 +8,7 @@
 
 import "../css/ErrorBoundary.css";
 import { error as logError } from "../utils/logger.js";
-import { Button } from "./common";
+import Button from "./common/Button.jsx";
 import { Component } from "react";
 
 // Composant : ErrorBoundary — capture les erreurs runtime UI et propose actions (recharger/accueil).
@@ -47,7 +47,24 @@ class ErrorBoundary extends Component {
             {import.meta.env.DEV && error && (
               <details className="error-boundary-details">
                 <summary>Détails de l'erreur</summary>
-                <pre className="error-stack">{error.toString()}</pre>
+                <pre className="error-stack">
+                  {(() => {
+                    try {
+                      // Si l'erreur est un objet, sérialiser proprement
+                      if (typeof error === "object") {
+                        return JSON.stringify(
+                          // inclure propriétés non énumérables si présentes
+                          error,
+                          Object.getOwnPropertyNames(error),
+                          2,
+                        );
+                      }
+                      return String(error);
+                    } catch (e) {
+                      return String(error);
+                    }
+                  })()}
+                </pre>
               </details>
             )}
           </div>

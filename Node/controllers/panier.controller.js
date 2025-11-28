@@ -1,8 +1,4 @@
-/**
- * Contrôleur Panier
- * - Opérations sur le panier utilisateur : ajout/suppression d'articles,
- *   calcul des prix et préparation pour le paiement
- */
+// Opérations sur le panier utilisateur : ajout/suppression d'articles, calcul des prix et préparation pour le paiement
 import Accesoire from "../models/accesoire.model.js";
 import { calculerPrixTotalModelPorsche } from "../utils/prixCalculator.js";
 import Commande from "../models/Commande.model.js";
@@ -17,11 +13,22 @@ import {
   sendValidationError,
 } from "../utils/responses.js";
 
-/**
- * Helper pour récupérer les lignes de commande avec toutes les relations populées
- */
+// Fonction utilitaire pour récupérer les lignes de commande d'un panier avec toutes les relations peuplées
 const getLignesCommandePopulees = async (panierId) => {
-  return await LigneCommande.find({ commande: panierId })
+  // Vérifier que la commande (panier) existe et est active
+  const commandePanier = await Commande.findOne({
+    _id: panierId,
+    status: false,
+  });
+
+  // Si la commande n'existe pas ou est déjà payée, retourner un tableau vide
+  if (!commandePanier) {
+    return [];
+  }
+
+  // Récupérer uniquement les lignes de cette commande active
+  const lignes = await LigneCommande.find({ commande: panierId })
+    .populate("commande") // Populate simple (pas de match)
     .populate("voiture")
     .populate({
       path: "accesoire",
@@ -39,13 +46,17 @@ const getLignesCommandePopulees = async (panierId) => {
         { path: "siege" },
       ],
     });
+
+  // Au cas où des lignes auraient une commande avec status: true
+  return lignes.filter(
+    (ligne) =>
+      ligne.commande &&
+      ligne.commande.status === false &&
+      ligne.commande._id.toString() === panierId.toString()
+  );
 };
 
-/**
- * Ajouter une voiture neuve au panier
- * - Crée une ligne de commande avec acompte (10%)
- * - Crée une notification pour l'utilisateur et le staff
- */
+// Crée une ligne de commande avec acompte (10%), Crée une notification pour l'utilisateur et le staff
 const ajouterVoitureNeuveAuPanier = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -151,10 +162,7 @@ const ajouterVoitureNeuveAuPanier = async (req, res) => {
   }
 };
 
-/**
- * Ajouter un accessoire au panier
- * - Crée une ligne de commande pour l'accessoire
- */
+// Ajouter un accessoire au panier (utilisateur connecté)
 const ajouterAccessoireAuPanier = async (req, res) => {
   try {
     // Vérifier l'authentification
@@ -335,6 +343,14 @@ const modifierQuantiteLigne = async (req, res) => {
       return sendUnauthorized(res, "Non autorisé à modifier cette ligne");
     }
 
+    // Empêcher la modification d'une commande déjà payée
+    if (ligne.commande.status === true) {
+      return sendValidationError(
+        res,
+        "Impossible de modifier un article d'une commande déjà payée"
+      );
+    }
+
     // Calculer la différence de prix
     const ancienneQuantite = ligne.quantite;
     const prixUnitaire = ligne.prix / ancienneQuantite;
@@ -357,9 +373,7 @@ const modifierQuantiteLigne = async (req, res) => {
   }
 };
 
-/**
- * Supprimer une ligne du panier
- */
+// Supprimer une ligne du panier (utilisateur connecté)
 const supprimerLignePanier = async (req, res) => {
   try {
     if (!req.user) {
@@ -378,6 +392,14 @@ const supprimerLignePanier = async (req, res) => {
     // Vérifier que la ligne appartient au panier de l'utilisateur
     if (ligne.commande.user.toString() !== req.user.id) {
       return sendUnauthorized(res, "Non autorisé à supprimer cette ligne");
+    }
+
+    // Empêcher la suppression d'une commande déjà payée
+    if (ligne.commande.status === true) {
+      return sendValidationError(
+        res,
+        "Impossible de supprimer un article d'une commande déjà payée"
+      );
     }
 
     // Mettre à jour le prix total du panier

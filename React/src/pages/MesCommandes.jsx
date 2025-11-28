@@ -1,8 +1,4 @@
-/**
- * MesCommandes.jsx — Liste des commandes utilisateur
- * - Historique commandes; récupère via `commande.service`.
- */
-
+// affiche l'historique des commandes de l'utilisateur; nécessite authentification.
 import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/MesCommandes.css";
 import commandeService from "../services/commande.service.js";
@@ -10,33 +6,38 @@ import { formatPrice, formatDate } from "../utils/helpers.js";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-// Page : affiche l'historique des commandes de l'utilisateur; nécessite authentification.
+// Composant MesCommandes
 const MesCommandes = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
-
   const [commandes, setCommandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Vérifie si le paiement a réussi via les paramètres d'URL
   useEffect(() => {
     const paymentSuccess = searchParams.get("payment");
+    // si paiement réussi, afficher message de succès temporaire et nettoyer l'URL 
     if (paymentSuccess === "success") {
       setSuccessMessage(
         "Paiement effectué avec succès ! Votre commande a été validée.",
       );
+      // Nettoyer l'URL en supprimant les paramètres de requête
       window.history.replaceState({}, "", "/mes-commandes");
       setTimeout(() => setSuccessMessage(""), 5000);
     }
+    // Charger les commandes de l'utilisateur
     fetchCommandes();
   }, [searchParams]);
 
+  // Fonction pour récupérer les commandes de l'utilisateur
   const fetchCommandes = async () => {
     try {
       setLoading(true);
       setError("");
+      // Appel au service pour obtenir les commandes
       const data = await commandeService.getMyCommandes();
       setCommandes(data);
     } catch (err) {
@@ -45,8 +46,9 @@ const MesCommandes = () => {
       setLoading(false);
     }
   };
-
+  // Fonction pour obtenir le badge de statut de la commande
   const getStatusBadge = (status, acompte) => {
+    // Statut validée si `status` true, acompte versé si `acompte` > 0, sinon en attente
     if (status) {
       return <span className="commande-status status-success">Validée</span>;
     }
@@ -58,6 +60,7 @@ const MesCommandes = () => {
     return <span className="commande-status status-pending">En attente</span>;
   };
 
+  // Si l'utilisateur n'est pas connecté, afficher message d'erreur
   if (!user) {
     return (
       <div className="mes-commandes-error">
@@ -72,6 +75,7 @@ const MesCommandes = () => {
     );
   }
 
+  // Afficher un indicateur de chargement pendant la récupération des données
   if (loading) {
     return (
       <div className="mes-commandes-loading">
@@ -91,6 +95,7 @@ const MesCommandes = () => {
               Historique de vos achats et réservations
             </p>
           </div>
+          {/* Bouton pour accéder au panier */}
           <button
             onClick={() => navigate("/panier")}
             className="mes-commandes-btn-panier"
@@ -112,13 +117,13 @@ const MesCommandes = () => {
             <p>{successMessage}</p>
           </div>
         )}
-
+        {/* Afficher un message d'erreur en cas de problème lors du chargement des commandes */}
         {error && (
           <div className="mes-commandes-error-message">
             <p>{error}</p>
           </div>
         )}
-
+        {/* Afficher un message si aucune commande n'est trouvée */}
         {commandes.length === 0 ? (
           <div className="mes-commandes-empty">
             <p className="mes-commandes-empty-text">
@@ -140,6 +145,7 @@ const MesCommandes = () => {
             </div>
           </div>
         ) : (
+          // Afficher la liste des commandes de l'utilisateur 
           <div className="mes-commandes-list">
             {commandes.map((commande) => (
               <div key={commande._id} className="commande-card">

@@ -1,21 +1,21 @@
-/**
- * ModifierMonCompte.jsx — Page de modification du compte
- *
- * - Formulaire de profil et sécurité.
- */
-
+// page de modification du compte utilisateur
 import Loading from "../components/common/Loading.jsx";
 import { AuthContext } from "../context/AuthContext.jsx";
 import "../css/ModifierMonCompte.css";
 import userService from "../services/user.service.js";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+// Constantes de validation et délais 
+const MIN_PASSWORD_LENGTH = 6;
+const REDIRECT_DELAY_MS = 2000;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^0[1-9]([-. ]?\d{2}){4}$/;
+const POSTAL_CODE_REGEX = /^\d{5}$/;
 
-// Page : modifier les informations du compte utilisateur et le mot de passe. Requiert connexion.
 const ModifierMonCompte = () => {
   const navigate = useNavigate();
   const { updateUser } = useContext(AuthContext);
-
+  // États locaux pour les données du formulaire, le chargement, les messages
   const [formData, setFormData] = useState({
     nom: "",
     prenom: "",
@@ -25,25 +25,26 @@ const ModifierMonCompte = () => {
     code_postal: "",
     ville: "",
   });
-
+  // États pour les champs de mot de passe
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
+  // États pour le chargement, l'enregistrement, les messages d'erreur et de succès
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPasswordSection, setShowPasswordSection] = useState(false);
-
+  // Charger les données utilisateur au montage du composant
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
+        // Récupérer les données utilisateur depuis le service
         const userData = await userService.getCurrentUser();
-
+        // Initialiser le formulaire avec les données récupérées
         setFormData({
           nom: userData.nom || "",
           prenom: userData.prenom || "",
@@ -63,51 +64,70 @@ const ModifierMonCompte = () => {
     fetchUserData();
   }, []);
 
-  const handleChange = (e) => {
+  // Handlers generique pour les changements de champs
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError("");
-  };
+  }, []);
 
-  const handlePasswordChange = (e) => {
+  // Handler spécifique pour les champs de mot de passe
+  const handlePasswordChange = useCallback((e) => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({ ...prev, [name]: value }));
     setError("");
-  };
+  }, []);
 
-  const validateForm = () => {
-    if (!formData.nom || !formData.prenom) {
+  // Validation du formulaire avant soumission
+  const validateForm = useCallback(() => {
+    // Validation des champs obligatoires
+    const nomTrimmed = formData.nom?.trim();
+    const prenomTrimmed = formData.prenom?.trim();
+    // si nom ou prenom vide error
+    if (!nomTrimmed || !prenomTrimmed) {
       setError("Le nom et le prénom sont obligatoires");
       return false;
     }
 
-    if (!formData.email) {
+    // Validation de l'email
+    const emailTrimmed = formData.email?.trim();
+    // si email vide error
+    if (!emailTrimmed) {
       setError("L'email est obligatoire");
       return false;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Email invalide");
+    // si format email invalide error
+    if (!EMAIL_REGEX.test(emailTrimmed)) {
+      setError("Format d'email invalide (exemple : nom@domaine.com)");
       return false;
     }
-
+    // si telephone renseigné, validation du format
+    if (formData.telephone?.trim() && !PHONE_REGEX.test(formData.telephone.replace(/\s/g, ""))) {
+      setError("Format de téléphone invalide (exemple : 01 23 45 67 89)");
+      return false;
+    }
+    // si code postal renseigné, validation du format
+    if (formData.code_postal?.trim() && !POSTAL_CODE_REGEX.test(formData.code_postal.trim())) {
+      setError("Le code postal doit contenir 5 chiffres");
+      return false;
+    }
+    // si la section mot de passe est affichée, valider les champs de mot de passe
     if (showPasswordSection) {
       if (!passwordData.currentPassword) {
         setError("Le mot de passe actuel est requis");
         return false;
       }
-
+      // si nouveau mot de passe vide error
       if (!passwordData.newPassword) {
         setError("Le nouveau mot de passe est requis");
         return false;
       }
-
-      if (passwordData.newPassword.length < 6) {
-        setError("Le mot de passe doit contenir au moins 6 caractères");
+      // si nouveau mot de passe trop court error
+      if (passwordData.newPassword.length < MIN_PASSWORD_LENGTH) {
+        setError(`Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères`);
         return false;
       }
-
+      // si confirmation mot de passe ne correspond pas error
       if (passwordData.newPassword !== passwordData.confirmPassword) {
         setError("Les mots de passe ne correspondent pas");
         return false;
@@ -115,60 +135,72 @@ const ModifierMonCompte = () => {
     }
 
     return true;
-  };
+  }, [formData, passwordData, showPasswordSection]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      setSaving(true);
-      setError("");
-      setSuccess("");
-
-      const dataToUpdate = { ...formData };
-
-      // Ajouter les données de mot de passe si la section est ouverte
-      if (
-        showPasswordSection &&
-        passwordData.currentPassword &&
-        passwordData.newPassword
-      ) {
-        dataToUpdate.currentPassword = passwordData.currentPassword;
-        dataToUpdate.newPassword = passwordData.newPassword;
+  // Soumission du formulaire
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      // si validation échoue, arrêter la soumission
+      if (!validateForm()) {
+        return;
       }
 
-      const updatedUser = await userService.updateProfile(dataToUpdate);
+      try {
+        setSaving(true);
+        setError("");
+        setSuccess("");
 
-      // Mettre à jour le contexte
-      if (updateUser) {
-        updateUser(updatedUser);
+        // Nettoyer les données (trim) pour éviter les espaces superflus
+        const cleanedData = Object.fromEntries(
+          // trim de chaque valeur de formData
+          Object.entries(formData).map(([key, value]) => [
+            key,
+            typeof value === "string" ? value.trim() : value,
+          ])
+        );
+        // Préparer les données à envoyer au backend
+        const dataToUpdate = { ...cleanedData };
+        // si modification du mot de passe, ajouter les champs nécessaires
+        if (
+          showPasswordSection &&
+          passwordData.currentPassword &&
+          passwordData.newPassword
+        ) {
+          dataToUpdate.currentPassword = passwordData.currentPassword;
+          dataToUpdate.newPassword = passwordData.newPassword;
+        }
+        // Appeler le service pour mettre à jour le profil utilisateur
+        const updatedUser = await userService.updateProfile(dataToUpdate);
+        // Mettre à jour le contexte Auth si la fonction est disponible
+        if (typeof updateUser === "function") {
+          updateUser(updatedUser);
+        }
+        // Afficher le message de succès
+        setSuccess("Vos informations ont été mises à jour avec succès");
+
+        // Réinitialiser les champs de mot de passe par sécurité
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setShowPasswordSection(false);
+
+        // Rediriger vers la page Mon Compte après un délai
+        setTimeout(() => {
+          navigate("/mon-compte");
+        }, REDIRECT_DELAY_MS);
+      } catch (err) {
+        // Gérer les erreurs du backend
+        setError(err.message || "Erreur lors de la mise à jour du profil");
+      } finally {
+        setSaving(false);
       }
-
-      setSuccess("Vos informations ont été mises à jour avec succès");
-
-      // Réinitialiser les champs de mot de passe
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setShowPasswordSection(false);
-
-      // Rediriger après 2 secondes
-      setTimeout(() => {
-        navigate("/mon-compte");
-      }, 2000);
-    } catch (err) {
-      setError(err.message || "Erreur lors de la mise à jour");
-    } finally {
-      setSaving(false);
-    }
-  };
-
+    },
+    [formData, passwordData, showPasswordSection, validateForm, navigate, updateUser]
+  );
+  // si en chargement, afficher le composant Loading
   if (loading) {
     return <Loading fullScreen message="Chargement..." />;
   }
@@ -204,7 +236,7 @@ const ModifierMonCompte = () => {
             {error}
           </div>
         )}
-
+        {/* success message */}
         {success && (
           <div className="modifier-compte-message modifier-compte-message-success">
             {success}

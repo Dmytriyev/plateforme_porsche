@@ -101,3 +101,23 @@
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: var(--font-size-body);
 }
+
+/* Variant: black button for specific use (e.g., Login primary override) */
+.btn-black {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-black:hover {
+  background-color: #111111;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.btn-black:disabled {
+  background-color: var(--color-grey-disabled);
+  color: var(--color-white);
+  cursor: not-allowed;
+  transform: none;
+}

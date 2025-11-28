@@ -1,9 +1,10 @@
-// Page "Mentions légales" — informations légales obligatoires
-import "../css/APropos.css"; // réutilise style unifié
+//  informations légales du site Porsche
 import { Link } from "react-router-dom";
 import usePageMeta from "../utils/usePageMeta.jsx";
+import "../css/APropos.css";
 
 const MentionsLegales = () => {
+    // Définir les métadonnées de la page pour le SEO
     usePageMeta({
         title: "Mentions légales - Porsche",
         description:
