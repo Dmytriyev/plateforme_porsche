@@ -24,13 +24,6 @@ Système e-commerce complet permettant la personnalisation de véhicules Porsche
 - Upload et gestion d'images multi-formats
 - API REST complète et documentée
 
-## Prérequis
-
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- MongoDB (local ou Atlas)
-- Compte Stripe (clés API)
-
 ## Installation rapide
 
 ```bash
@@ -65,7 +58,7 @@ cd React && npm run dev
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb://localhost:27017/porsche_db
+MONGODB_URI=mongodb://localhost:27017/db
 JWT_SECRET=your_secret_key_minimum_32_characters
 JWT_EXPIRES_IN=7d
 STRIPE_SECRET_KEY=sk_test_...
@@ -190,21 +183,3 @@ npm run build && npm run preview
 **Backend ne démarre pas** : Vérifier MongoDB lancé et variables .env
 **Frontend ne connecte pas** : Vérifier VITE_API_URL et CORS backend
 **Erreur paiement** : Vérifier clés Stripe et webhook configuré
-
-## Améliorations futures
-
-- Tests unitaires et d'intégration (Jest, React Testing Library)
-- CI/CD avec GitHub Actions
-- Système de cache (Redis)
-- Notifications par email (Nodemailer)
-- Système de réservations avec calendrier
-- Comparateur de modèles
-- Mode hors ligne (PWA)
-
-## Licence
-
-ISC
-
-## Note
-
-Projet à des fins éducatives et de démonstration. Mesures de sécurité supplémentaires recommandées pour production.
