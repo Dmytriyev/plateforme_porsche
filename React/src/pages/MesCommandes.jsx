@@ -22,14 +22,22 @@ const MesCommandes = () => {
     // si paiement réussi, afficher message de succès temporaire et nettoyer l'URL 
     if (paymentSuccess === "success") {
       setSuccessMessage(
-        "Paiement effectué avec succès ! Votre commande a été validée.",
+        "Paiement effectué avec succès ! Votre commande est en cours de traitement...",
       );
       // Nettoyer l'URL en supprimant les paramètres de requête
       window.history.replaceState({}, "", "/mes-commandes");
-      setTimeout(() => setSuccessMessage(""), 5000);
+
+      // Attendre 2 secondes pour que le webhook Stripe traite la commande
+      setTimeout(() => {
+        fetchCommandes();
+        setSuccessMessage("Paiement effectué avec succès ! Votre commande a été validée.");
+      }, 2000);
+
+      setTimeout(() => setSuccessMessage(""), 7000);
+    } else {
+      // Charger les commandes de l'utilisateur immédiatement
+      fetchCommandes();
     }
-    // Charger les commandes de l'utilisateur
-    fetchCommandes();
   }, [searchParams]);
 
   // Fonction pour récupérer les commandes de l'utilisateur

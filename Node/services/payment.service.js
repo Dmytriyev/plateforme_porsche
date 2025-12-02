@@ -142,8 +142,10 @@ export const processWebhook = async ({ rawBody, signature }) => {
     const session = event.data.object;
     const commandeId = session.metadata && session.metadata.commandeId;
     logger.info("Webhook checkout.session.completed - commandeId:", commandeId);
+    logger.info("Session complète:", JSON.stringify(session, null, 2));
 
     if (!commandeId) {
+      logger.error("commandeId manquant dans metadata - Session:", session.id);
       throw Object.assign(new Error("commandeId manquant dans metadata"), {
         status: 400,
       });

@@ -181,14 +181,14 @@
 }
 
 .contact-modal-btn-submit {
-  background: #d5001c;
+  background: #000000;
   color: white;
 }
 
 .contact-modal-btn-submit:hover {
-  background: #b00016;
+  background: #333333;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(213, 0, 28, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .contact-modal-success {

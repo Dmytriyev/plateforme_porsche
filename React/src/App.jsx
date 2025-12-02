@@ -45,6 +45,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Register from "./pages/Register.jsx";
 import ToastifyProvider from "./components/ToastifyProvider.jsx";
 import VariantePage from "./pages/VariantePage.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 import "./css/App.css";
 
 const components = {
@@ -92,6 +93,8 @@ function App() {
       <BrowserRouter>
         {/* Hook pour exposer `navigate` aux utilitaires non-React */}
         <RouterBridge />
+        {/* Réinitialise le scroll en haut à chaque changement de page */}
+        <ScrollToTop />
         <ToastifyProvider />
         {/*  Capture les erreurs dans l'arborescence des composants */}
         <ErrorBoundary>

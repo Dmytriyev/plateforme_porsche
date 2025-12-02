@@ -29,27 +29,27 @@ const ListeVariantes = () => {
   const { modele, variantes, loading, error } = useVariantes(modeleId, isNeuf);
   // Data fetching is handled by the `useVariantes` hook.
   const _handleVarianteClick = useCallback((variante) => {
-    // Redirige vers la page de configuration ou d'occasion selon le type
-    const voitureId = variante?.voiture?._id ?? modele?._id ?? modeleId;
-    // si isNeuf, configurateur, sinon occasion  
+    // Redirige vers la page détail de la variante (neuf) ou d'occasion
     if (isNeuf) {
-      navigate(`/configurateur/${voitureId}/${variante._id}`);
+      // Pour les voitures neuves, rediriger vers la page détail de variante
+      navigate(`/variante/${variante._id}`);
     } else {
+      // Pour les voitures d'occasion, rediriger vers la page occasion
       navigate(`/occasion/${variante._id}`);
     }
-  }, [isNeuf, modele, modeleId, navigate]);
+  }, [isNeuf, navigate]);
 
   // Gestion de la sélection d'une variante
   const _handleSelectModel = useCallback((variante) => {
-    // Redirige vers la page de configuration ou d'occasion selon le type
-    const voitureId = variante?.voiture?._id ?? modele?._id ?? modeleId;
-    // si isNeuf, configurateur, sinon occasion
+    // Redirige vers la page détail de la variante (neuf) ou d'occasion
     if (isNeuf) {
-      navigate(`/configurateur/${voitureId}/${variante._id}`);
+      // Pour les voitures neuves, rediriger vers la page détail de variante
+      navigate(`/variante/${variante._id}`);
     } else {
+      // Pour les voitures d'occasion, rediriger vers la page occasion
       navigate(`/occasion/${variante._id}`);
     }
-  }, [isNeuf, modele, modeleId, navigate]);
+  }, [isNeuf, navigate]);
 
   // Variantes filtrées calculées à la volée avec useMemo
   const variantesFiltrees = useMemo(() => {

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import usePageMeta from "../utils/usePageMeta.jsx";
 import "../css/APropos.css";
 
@@ -85,12 +86,12 @@ const Approved = () => {
                 </section>
 
                 <div className="apropos-actions">
-                    <a href="/contact" className="apropos-btn apropos-btn-primary">
-                        Contacter un conseiller
-                    </a>
-                    <a href="/accessoires" className="apropos-btn apropos-btn-secondary">
-                        Voir accessoires
-                    </a>
+                    <Link to="/contact" className="apropos-btn-porsche">
+                        Nous contacter
+                    </Link>
+                    <Link to="/choix-voiture" className="apropos-btn-outline-porsche">
+                        Parcourir les voitures
+                    </Link>
                 </div>
             </div>
         </div>

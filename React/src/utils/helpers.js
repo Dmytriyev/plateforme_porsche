@@ -55,7 +55,7 @@ const getPasswordErrors = (password) => {
 
 // Fonction pour obtenir les erreurs de validation du mot de passe
 export const setupConsoleFilter = () => {
-  // Filtrer les warnings et erreurs non critiques
+  // Filtrer les warnings et erreurs non critiques (extensions navigateur, etc.)
   if (import.meta.env.DEV) {
     const originalWarn = console.warn;
     const originalError = console.error;
@@ -74,12 +74,14 @@ export const setupConsoleFilter = () => {
     // Redéfinir console.warn pour filtrer certains messages
     console.error = (...args) => {
       const message = args[0]?.toString() || "";
+      // Filtrer les erreurs des extensions Chrome/Edge (React DevTools, etc.)
       if (
         message.includes("preload") ||
         message.includes("passive event listener") ||
         message.includes("runtime.lastError") ||
         message.includes("back/forward cache") ||
-        message.includes("extension port")
+        message.includes("extension port") ||
+        message.includes("message channel is closed")
       ) {
         return;
       }
