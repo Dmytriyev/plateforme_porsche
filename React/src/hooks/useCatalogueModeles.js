@@ -58,9 +58,11 @@ const useCatalogueModeles = (type) => {
       setError("");
 
       // Log pour déboguer
-      console.log(
-        `[useCatalogueModeles] Type demandé: ${type}, isNeuf: ${isNeuf}`
-      );
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[useCatalogueModeles] Type demandé: ${type}, isNeuf: ${isNeuf}`
+        );
+      }
 
       // Récupération des voitures selon le type
       const response = isNeuf
@@ -68,13 +70,15 @@ const useCatalogueModeles = (type) => {
         : await voitureService.getVoituresOccasion();
 
       // Log de la réponse
-      console.log(
-        `[useCatalogueModeles] Réponse reçue (${
-          isNeuf ? "neuves" : "occasions"
-        }):`,
-        response?.length || 0,
-        "voitures"
-      );
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[useCatalogueModeles] Réponse reçue (${
+            isNeuf ? "neuves" : "occasions"
+          }):`,
+          response?.length || 0,
+          "voitures"
+        );
+      }
 
       // Vérification et traitement des données reçues
       const data = Array.isArray(response) ? response : [];

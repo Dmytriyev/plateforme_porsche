@@ -6,8 +6,6 @@ export const warn = () => {};
 // Erreurs toujours envoyées vers console.error
 export const error = (...args) => {
   if (console && console.error) console.error(...args);
-  if (import.meta.env && import.meta.env.MODE !== "production")
-    console.log(...args);
 };
 
 export default { debug, warn, error };

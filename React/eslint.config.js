@@ -43,9 +43,21 @@ export default [
       "react-refresh": reactRefresh,
       react,
     },
+    settings: {
+      react: {
+        version: "detect", // Détecte automatiquement la version de React
+      },
+    },
     rules: {
       ...reactHooks.configs.recommended.rules,
+
+      // Règles React essentielles
+      "react/jsx-uses-react": "off", // Pas besoin avec React 17+
+      "react/react-in-jsx-scope": "off", // Pas besoin avec React 17+
       "react/jsx-uses-vars": "error",
+      "react/prop-types": "off", // Optionnel si vous utilisez TypeScript ou pas de PropTypes
+
+      // Gestion des variables non utilisées
       "no-unused-vars": [
         "warn",
         {
@@ -54,10 +66,17 @@ export default [
           caughtErrors: "none",
         },
       ],
+
+      // React Refresh (HMR)
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
       ],
+
+      // Bonnes pratiques (Code Quality)
+      "no-console": ["warn", { allow: ["warn", "error"] }], // Éviter console.log en production
+      "prefer-const": "error", // Utiliser const quand c'est possible
+      "no-var": "error", // Interdire var, utiliser let/const
     },
   },
 ];

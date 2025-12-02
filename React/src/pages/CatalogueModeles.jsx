@@ -28,7 +28,7 @@ const CatalogueModeles = () => {
 
   useEffect(() => {
     let isMounted = true;
-    let abortController = new AbortController();
+    const abortController = new AbortController();
 
     const fetchModeles = async () => {
       try {
@@ -44,7 +44,7 @@ const CatalogueModeles = () => {
         // Vérifier que le composant est toujours monté avant de mettre à jour l'état
         if (!isMounted) return;
 
-        let data = Array.isArray(response) ? response : [];
+        const data = Array.isArray(response) ? response : [];
 
         if (isNeuf) {
           // Pour les neuves: grouper par nom_model et calculer le prix minimum
