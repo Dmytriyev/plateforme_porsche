@@ -57,21 +57,21 @@ cd React && npm run dev
 ### Backend (.env)
 
 ```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/db
+PORT=
+MONGODB_URI=mongodb://localhost:/db
 JWT_SECRET=your_secret_key_minimum_32_characters
 JWT_EXPIRES_IN=7d
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=http://localhost:
 NODE_ENV=development
 ```
 
 ### Frontend (.env)
 
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=http://localhost:
 ```
 
 ## Structure du projet
@@ -164,7 +164,7 @@ Variables d'environnement de production requises avec clés Stripe live et JWT_S
 
 ```bash
 # Backend
-curl http://localhost:3000/model_porsche
+curl http://localhost:
 
 # Frontend
 npm run build && npm run preview

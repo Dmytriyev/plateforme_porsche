@@ -56,8 +56,8 @@ Authorization: Bearer TOKEN
 - Voiture user : `/model_porsche_actuel`, `/photo_voiture_actuel`
 - Réservations : `/reservation`
 - Commandes : `/commande`
-- Panier : `/api/panier`
-- Paiement : `/api/payment`
+- Panier : `/panier`
+- Paiement : `/payment`
 
 ## Paiement — Checkout Stripe (multi-étapes)
 
@@ -68,14 +68,14 @@ Cette API utilise Stripe Checkout pour les paiements. Le flux est en deux partie
 
 Endpoints et exemples
 
-- POST `/api/payment/checkout/:id`
+- POST `/payment/checkout/:id`
   - Description : Crée une session Stripe Checkout pour la commande `:id` (doit être un panier actif `status: false`).
   - Auth : requis (JWT)
   - Réponse (succès) : `{ id, url, status, customer }` — ouvrez `url` dans un navigateur pour finaliser le paiement.
   - Exemple (curl) :
 
 ```
-curl -X POST "http://localhost:3000/api/payment/checkout/<COMMANDE_ID>" \
+curl -X POST "http://localhost:payment/checkout/<COMMANDE_ID>" \
   -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json"
 ```
@@ -98,7 +98,7 @@ Configuration locale pour tester les webhooks
 
 ```bash
 stripe login
-stripe listen --forward-to localhost:3000/webhook
+stripe listen --forward-to localhost:
 ```
 
 3. Ouvrir la session Checkout renvoyée par l'endpoint de création ; effectuer un paiement en mode test.
@@ -120,7 +120,7 @@ Notes et bonnes pratiques
 
 - **Voiture neuve** : créer options → `voiture` → `model-porsche` → photos
 - **Voiture occasion** : créer `model-porsche` → photos
-- **Commander neuve** : configurer → acompte 500€ → livraison
+- **Commander neuve** : configurer → acompte 10% → livraison
 - **Commander accesoires** : créer `commande` → paiement
 - **Réserver occasion** : `POST /api/reservation` (délai 48h)
 
@@ -151,7 +151,7 @@ npm install
 
 - `MONGO_URI` : chaîne de connexion MongoDB
 - `JWT_SECRET` : secret pour JWT
-- `PORT` : port (par défaut 3000)
+- `PORT` : port
 
 3. Lancer :
 
@@ -485,16 +485,6 @@ User:
          ├─► Taille_jante (options admin)
          └─► Photo_voiture_actuel
 ```
-
-### Comptes de Test
-
-| Rôle       | Email                  | Mot de passe   |
-| ---------- | ---------------------- | -------------- |
-| Admin      | admin@porsche.com      | Admin123!      |
-| Conseiller | conseiller@porsche.com | Conseiller123! |
-| User       | user@gmail.com         | User123!       |
-
----
 
 ## Questions Fréquentes
 

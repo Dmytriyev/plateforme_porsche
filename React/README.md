@@ -56,26 +56,6 @@ Cette application React constitue le frontend de la plateforme Porsche. Elle off
 - **Axios** - Client HTTP pour les appels API
 - **JWT Decode** - Décodage des tokens d'authentification
 
-### Utilitaires
-
-- **React Toastify** - Notifications utilisateur
-- **React Icons** - Bibliothèque d'icônes
-- **Date-fns** - Manipulation de dates
-- **DOMPurify** - Sécurisation du contenu HTML
-
-### Qualité du code
-
-- **ESLint** - Linting JavaScript/React
-- **React Hooks ESLint** - Règles pour les hooks React
-
-## Prérequis
-
-Avant de commencer, assurez-vous d'avoir installé :
-
-- **Node.js** ≥ 18.0.0
-- **npm** ≥ 9.0.0 ou **yarn** ≥ 1.22.0
-- **Backend API** : Le serveur Node.js doit être opérationnel
-
 ## Installation
 
 1. **Cloner le repository** (si ce n'est pas déjà fait)
@@ -97,10 +77,6 @@ npm install
 
 Créez un fichier `.env` à la racine du dossier `React` :
 
-```env
-VITE_API_URL=http://localhost:3000
-```
-
 > **Note** : Modifiez l'URL selon votre configuration backend.
 
 2. **Configuration Stripe**
@@ -116,8 +92,6 @@ Lancer le serveur de développement avec hot-reload :
 ```bash
 npm run dev
 ```
-
-L'application sera accessible sur `http://localhost:5173`
 
 Pour rendre accessible sur le réseau local :
 
@@ -244,43 +218,5 @@ logger.info("Message informatif");
 logger.error("Erreur détectée", error);
 logger.warn("Avertissement");
 ```
-
-## Bonnes pratiques respectées
-
-### Architecture
-
-- **SOLID** : Séparation des responsabilités (services, hooks, components)
-- **DRY** : Composants et hooks réutilisables
-- **Convention de nommage** : Cohérente et descriptive
-
-### React
-
-- Composants fonctionnels avec hooks
-- Gestion d'état optimisée (Context API)
-- Error boundaries pour la robustesse
-- Code splitting et lazy loading (si applicable)
-
-### Code Quality
-
-- ESLint configuré avec règles React
-- Structure de dossiers claire et logique
-- Gestion centralisée des appels API
-
-## Contribution
-
-1. Suivre les conventions de nommage existantes
-2. Utiliser ESLint avant chaque commit
-3. Tester les fonctionnalités avant de pusher
-4. Documenter les fonctions complexes
-
-## Support
-
-Pour toute question ou problème :
-
-1. Vérifier que le backend est opérationnel
-2. Consulter les logs du navigateur (Console)
-3. Vérifier la configuration `.env`
-
----
 
 **Note** : Cette application nécessite le backend Node.js pour fonctionner. Consultez le README du dossier `Node/` pour les instructions d'installation et configuration du serveur.

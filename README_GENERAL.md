@@ -61,87 +61,6 @@ Le projet suit une architecture client-serveur découplée :
 **Paiement** : Stripe API
 **Sécurité** : Bcrypt, Express-validator, HPP, Rate limiting
 
-## Technologies utilisées
-
-### Backend (Node.js)
-
-#### Core
-
-- **Express 5.1.0** - Framework web minimaliste et flexible
-- **MongoDB 8.20.0** (Mongoose) - Base de données NoSQL avec ODM
-- **Node.js ≥ 18.0.0** - Runtime JavaScript
-
-#### Sécurité
-
-- **bcrypt 6.0.0** - Hachage sécurisé des mots de passe
-- **jsonwebtoken 9.0.2** - Génération et validation de tokens JWT
-- **express-validator 7.3.1** - Validation et sanitization des entrées
-- **express-rate-limit 8.2.1** - Protection contre le brute force
-- **hpp 0.2.3** - Protection contre HTTP Parameter Pollution
-- **cors 2.8.5** - Gestion des requêtes cross-origin
-
-#### Paiement et fichiers
-
-- **Stripe 18.5.0** - Traitement des paiements
-- **Multer 2.0.2** - Gestion des uploads de fichiers
-
-#### Validation
-
-- **Joi 18.0.1** - Schémas de validation
-
-#### Utilitaires
-
-- **dotenv 17.2.3** - Gestion des variables d'environnement
-- **cookie-parser 1.4.6** - Parsing des cookies
-
-### Frontend (React)
-
-#### Core
-
-- **React 19.2.0** - Bibliothèque UI avec dernières fonctionnalités
-- **Vite 7.2.2** - Build tool ultra-rapide avec HMR
-- **React Router DOM 7.9.6** - Navigation SPA
-
-#### Styling
-
-- **Tailwind CSS 4.1.17** - Framework CSS utility-first
-- **Flowbite 4.0.1** - Composants UI pré-construits
-- **TW Elements 2.0.0** - Composants interactifs
-
-#### Intégrations
-
-- **Stripe (@stripe/react-stripe-js 5.4.0)** - Composants React pour Stripe
-- **Axios 1.13.2** - Client HTTP pour les requêtes API
-- **JWT Decode 4.0.0** - Décodage des tokens d'authentification
-
-#### Utilitaires
-
-- **React Toastify 9.1.1** - Notifications toast
-- **React Icons 5.5.0** - Bibliothèque d'icônes
-- **Date-fns 4.1.0** - Manipulation de dates
-- **DOMPurify 3.3.0** - Sanitization du HTML
-
-#### Qualité de code
-
-- **ESLint 9.39.1** - Linting JavaScript/React
-- **Nodemon 3.1.10** (backend dev) - Hot-reload du serveur
-
-## Prérequis
-
-Avant de commencer, assurez-vous d'avoir installé les éléments suivants :
-
-### Logiciels requis
-
-- **Node.js** version 18.0.0 ou supérieure
-- **npm** version 9.0.0 ou supérieure (ou yarn ≥ 1.22.0)
-- **MongoDB** (local ou Atlas cloud)
-- **Git** pour le contrôle de version
-
-### Comptes externes
-
-- **Stripe Account** - Pour les paiements (clés API requises)
-- **MongoDB Atlas** (optionnel) - Pour la base de données cloud
-
 ### Vérification des installations
 
 ```bash
@@ -217,12 +136,11 @@ Créer un fichier `.env` dans le dossier `Node/` :
 
 ```env
 # Port du serveur
-PORT=3000
 
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/porsche_db
+MONGODB_URI=mongodb
 # Ou pour MongoDB Atlas :
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/porsche_db
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/db
 
 # JWT
 JWT_SECRET=votre_secret_jwt_très_sécurisé_minimum_32_caractères
@@ -234,7 +152,7 @@ STRIPE_PUBLISHABLE_KEY=pk_test_votre_clé_publique
 STRIPE_WEBHOOK_SECRET=whsec_votre_secret_webhook
 
 # Client URL (pour CORS)
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=
 
 # Node Environment
 NODE_ENV=development
@@ -246,7 +164,6 @@ Créer un fichier `.env` dans le dossier `React/` :
 
 ```env
 # URL de l'API backend
-VITE_API_URL=http://localhost:3000
 ```
 
 ### Important : Sécurité
@@ -273,16 +190,12 @@ npm run dev      # Avec nodemon (auto-reload)
 npm start        # Sans auto-reload
 ```
 
-Le serveur démarre sur `http://localhost:3000`
-
 **Terminal 2 : Frontend**
 
 ```bash
 cd React
 npm run dev      # Mode développement
 ```
-
-L'application React s'ouvre sur `http://localhost:5173`
 
 ### Méthode 2 : Accès réseau local
 
@@ -300,8 +213,8 @@ npm run start    # Accessible via IP locale
 
 ### Vérification du fonctionnement
 
-1. **Backend** : Ouvrir `http://localhost:3000/` (devrait retourner un statut)
-2. **Frontend** : Ouvrir `http://localhost:5173` (page d'accueil)
+1. **Backend** : Ouvrir `http://localhost:` (devrait retourner un statut)
+2. **Frontend** : Ouvrir `http://localhost:` (page d'accueil)
 3. **Base de données** : Vérifier la connexion MongoDB dans les logs du backend
 
 ## Structure du projet
@@ -624,80 +537,6 @@ GET    /uploads/:filename          # Accéder aux fichiers uploadés
 - Gestion des erreurs réseau
 - Retry logic sur les échecs temporaires
 
-### Bonnes pratiques recommandées
-
-**En production**
-
-- Utiliser HTTPS obligatoirement
-- Configurer des secrets forts (JWT_SECRET > 32 caractères)
-- Activer les logs de sécurité
-- Mettre en place une surveillance (monitoring)
-- Sauvegardes régulières de la base de données
-- Limiter les accès à la base de données (whitelist IP)
-
-**Variables d'environnement**
-
-- Ne jamais commiter les fichiers `.env`
-- Utiliser des valeurs différentes par environnement
-- Rotation régulière des secrets en production
-
-## Tests et déploiement
-
-### Tests locaux
-
-**Backend**
-
-```bash
-cd Node
-npm start
-# Tester un endpoint
-curl http://localhost:3000/model_porsche
-```
-
-**Frontend**
-
-```bash
-cd React
-npm run build       # Build de production
-npm run preview     # Prévisualiser le build
-```
-
-### Build de production
-
-**Backend**
-
-```bash
-cd Node
-# Le backend utilise directement Node.js, pas de build nécessaire
-# S'assurer que NODE_ENV=production dans .env
-```
-
-**Frontend**
-
-```bash
-cd React
-npm run build
-# Les fichiers optimisés sont dans dist/
-```
-
-### Déploiement recommandé
-
-**Backend** : Heroku, Railway, DigitalOcean, AWS EC2
-**Frontend** : Vercel, Netlify, AWS S3 + CloudFront
-**Base de données** : MongoDB Atlas (recommandé)
-
-### Variables d'environnement en production
-
-Configurer les mêmes variables `.env` que localement mais avec :
-
-- MongoDB Atlas URI
-- Clés Stripe en mode live (pas test)
-- JWT_SECRET fort et unique
-- NODE_ENV=production
-- URL de production pour CLIENT_URL et VITE_API_URL
-
-## Commandes utiles
-
 ### Backend (Node/)
 
 ```bash
@@ -730,7 +569,7 @@ mongosh porsche_db
 ### Stripe CLI (pour tester les webhooks localement)
 
 ```bash
-stripe listen --forward-to localhost:3000/api/payment/webhook
+stripe listen --forward-to localhost:
 ```
 
 ## Principes de développement
@@ -773,76 +612,3 @@ stripe listen --forward-to localhost:3000/api/payment/webhook
 - Hooks personnalisés pour la logique partagée
 - Services API centralisés
 - Middlewares Express réutilisables
-
-## Support et maintenance
-
-### Logs
-
-**Backend** : Les logs sont affichés dans la console du serveur
-**Frontend** : Utiliser les DevTools du navigateur (Console)
-
-### Debugging
-
-**Backend**
-
-```bash
-# Mode debug Node.js
-node --inspect server.js
-```
-
-**Frontend**
-
-- React DevTools (extension Chrome/Firefox)
-- Vite DevTools intégré
-
-### Problèmes courants
-
-**Le backend ne démarre pas**
-
-- Vérifier que MongoDB est lancé
-- Vérifier les variables d'environnement (.env)
-- Vérifier que le port 3000 n'est pas déjà utilisé
-
-**Le frontend ne se connecte pas au backend**
-
-- Vérifier que VITE_API_URL est correct dans .env
-- Vérifier que le backend tourne sur le bon port
-- Vérifier la configuration CORS du backend
-
-**Erreur de paiement Stripe**
-
-- Vérifier les clés API Stripe (mode test vs live)
-- Vérifier le webhook Stripe
-- Consulter les logs Stripe Dashboard
-
-**Problèmes de base de données**
-
-- Vérifier la connexion MongoDB
-- Vérifier les permissions utilisateur MongoDB
-- Consulter les logs Mongoose
-
-## Contribution
-
-Pour contribuer au projet :
-
-1. Suivre les conventions de nommage existantes
-2. Respecter l'architecture MVC (backend) et component-based (frontend)
-3. Utiliser ESLint avant de commit
-4. Documenter les fonctions complexes
-5. Tester les modifications avant de pusher
-
-## Licence
-
-Ce projet est sous licence ISC.
-
-## Contact et support
-
-Pour toute question technique :
-
-1. Consulter cette documentation
-2. Vérifier les logs d'erreur
-3. Consulter la documentation des technologies utilisées
-
----
-
-**Note importante** : Ce projet est conçu à des fins éducatives et de démonstration. Pour une utilisation en production, des mesures de sécurité et d'optimisation supplémentaires sont recommandées.
