@@ -158,11 +158,8 @@ const createModel_porsche = async (req, res) => {
     const { body } = req;
     // Vérifier si le corps de la requête est vide ou non défini
     if (!body || Object.keys(body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
+      return res.status(400).json({ message: "Pas de données dans la requête" });
     }
-
     const { error } = model_porscheValidation(body).model_porscheCreate;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -171,26 +168,15 @@ const createModel_porsche = async (req, res) => {
     await validateEntity(Voiture, body.voiture, "Voiture");
     // Valider que le prix de base est défini et supérieur à 0
     if (!body.prix_base || body.prix_base <= 0) {
-      return res.status(400).json({
-        message:
-          "Le prix_base de la variante est requis et doit être supérieur à 0",
-      });
+      return res.status(400).json({message:"Le prix_base de la variante est requis et doit être supérieur à 0",});
     }
     // Valider l'existence de la couleur extérieure associée
     if (body.couleur_exterieur) {
-      await validateEntity(
-        Couleur_exterieur,
-        body.couleur_exterieur,
-        "Couleur extérieure"
-      );
+      await validateEntity(Couleur_exterieur,body.couleur_exterieur,"Couleur extérieure");
     }
     // Valider l'existence des couleurs intérieures associées
     if (body.couleur_interieur && Array.isArray(body.couleur_interieur)) {
-      await validateEntities(
-        Couleur_interieur,
-        body.couleur_interieur,
-        "Couleur intérieure"
-      );
+      await validateEntities(Couleur_interieur,body.couleur_interieur,"Couleur intérieure");
     }
     // Valider l'existence de la taille de jante associée
     if (body.taille_jante) {

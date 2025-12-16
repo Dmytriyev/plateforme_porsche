@@ -22,66 +22,38 @@ const createModel_porsche_actuel = async (req, res) => {
   try {
     const { body } = req;
     // Vérifier l'accès authentifié
-    if (!req.user) {
-      return sendError(res, "Non autorisé", 401);
-    }
+    if (!req.user) {return sendError(res, "Non autorisé", 401);}
     // Vérifier que le corps de la requête n'est pas vide
-    if (!body || Object.keys(body).length === 0) {
-      return sendError(res, "Pas de données dans la requête", 400);
-    }
+    if (!body || Object.keys(body).length === 0) {return sendError(res, "Pas de données dans la requête", 400);}
     // Assigner l'utilisateur actuel comme propriétaire
     body.user = req.user.id;
     // Valider les données d'entrée avec Joi
-    const { error } =
-      model_porsche_actuelValidation(body).model_porsche_actuelCreate;
-    if (error) {
-      return sendValidationError(res, error);
-    }
-
+    const { error } =model_porsche_actuelValidation(body).model_porsche_actuelCreate;
+    if (error) {return sendValidationError(res, error);}
     // Vérifier que les couleur_exterieur existent si fournies
     if (body.couleur_exterieur) {
-      const couleurExt = await Couleur_exterieur.findById(
-        body.couleur_exterieur
-      );
-      if (!couleurExt) {
-        return sendNotFound(res, "Couleur extérieure");
-      }
-    }
+      const couleurExt = await Couleur_exterieur.findById(body.couleur_exterieur);
+      if (!couleurExt) {return sendNotFound(res, "Couleur extérieure");}}
     // Vérifier que les couleur_interieur existent si fournies
     if (body.couleur_interieur) {
-      const couleurInt = await Couleur_interieur.findById(
-        body.couleur_interieur
-      );
-      if (!couleurInt) {
-        return sendNotFound(res, "Couleur intérieure");
-      }
+      const couleurInt = await Couleur_interieur.findById(body.couleur_interieur);
+      if (!couleurInt) {return sendNotFound(res, "Couleur intérieure");}
     }
-
     // Vérifier que les taille_jante existent si fournies
     if (body.taille_jante) {
       const jante = await Taille_jante.findById(body.taille_jante);
-      if (!jante) {
-        return sendNotFound(res, "Taille de jante");
-      }
+      if (!jante) {return sendNotFound(res, "Taille de jante");}
     }
-
     // Créer et sauvegarder le nouveau modèle_Porsche_actuel dans la base de données
     const model_porsche_actuel = new Model_porsche_actuel(body);
     const newModel_porsche_actuel = await model_porsche_actuel.save();
-
     const populated = await Model_porsche_actuel.findById(
       newModel_porsche_actuel._id
-    )
-      .populate("photo_voiture_actuel", "name alt")
-      .populate("couleur_exterieur", "nom_couleur")
-      .populate("couleur_interieur", "nom_couleur")
-      .populate("taille_jante", "taille_jante couleur_jante")
-      .populate("user", "nom prenom email");
-
+    ).populate("photo_voiture_actuel", "name alt").populate("couleur_exterieur", "nom_couleur")
+    .populate("couleur_interieur", "nom_couleur").populate("taille_jante", "taille_jante couleur_jante")
+    .populate("user", "nom prenom email");
     return sendSuccess(res, populated, "Modèle Porsche créé avec succès", 201);
-  } catch (error) {
-    return sendError(res, "Erreur serveur", 500, error);
-  }
+  } catch (error) {return sendError(res, "Erreur serveur", 500, error);}
 };
 
 // Récupère toutes les annonces voitures (liste, triée).
@@ -257,14 +229,9 @@ const deleteModel_porsche_actuel = async (req, res) => {
 const addImages = async (req, res) => {
   try {
     const { body } = req;
-    if (!req.user) {
-      return res.status(401).json({ message: "Non autorisé" });
-    }
+    if (!req.user) {return res.status(401).json({ message: "Non autorisé" });}
     if (!body || Object.keys(body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
-    }
+      return res.status(400).json({ message: "Pas de données dans la requête" });}
     const { error } =
       model_porsche_actuelValidation(body).model_porsche_actuelAddOrRemoveImage;
     if (error) {
@@ -274,28 +241,16 @@ const addImages = async (req, res) => {
     for (let photo_voiture_actuelId of body.photo_voiture_actuel) {
       const photo_voiture_actuel = await Photo.findById(photo_voiture_actuelId);
       if (!photo_voiture_actuel) {
-        return res
-          .status(404)
-          .json({ message: `Photo ${photo_voiture_actuelId} n'existe pas` });
-      }
+        return res.status(404).json({ message: `Photo ${photo_voiture_actuelId} n'existe pas` });}
     }
     // Vérifier que le modèle_porsche_actuel existe
-    const model_porsche_actuel = await Model_porsche_actuel.findById(
-      req.params.id
-    );
+    const model_porsche_actuel = await Model_porsche_actuel.findById(req.params.id);
     if (!model_porsche_actuel) {
-      return res
-        .status(404)
-        .json({ message: `Modèle ${req.params.id} n'existe pas` });
-    }
-
+      return res.status(404).json({ message: `Modèle ${req.params.id} n'existe pas` });}
     // Vérifier que l'utilisateur est propriétaire ou admin
-    if (
-      model_porsche_actuel.user.toString() !== req.user.id &&
-      !req.user.isAdmin
-    ) {
-      return res.status(403).json({ message: "Accès non autorisé" });
-    }
+    if (model_porsche_actuel.user.toString() !== req.user.id &&!req.user.isAdmin) 
+      {return res.status(403).json({ message: "Accès non autorisé" });
+  }
 
     // ajouter les photos sans doublons avec $addToSet
     const updatedModel_porsche_actuel =

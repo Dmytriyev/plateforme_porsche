@@ -15,111 +15,64 @@ import { useNavigate } from "react-router-dom";
 
 // Page : formulaire pour créer une nouvelle voiture. Requiert authentification ; permet l'upload de photos.
 const AjouterMaVoiture = () => {
-  const navigate = useNavigate();
-
+  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [couleursExt, setCouleursExt] = useState([]);
   const [couleursInt, setCouleursInt] = useState([]);
   const [jantes, setJantes] = useState([]);
   const [sieges, setSieges] = useState([]);
-
+  
+  const navigate = useNavigate();
   const [photos, setPhotos] = useState([]);
   const [photoPreviews, setPhotoPreviews] = useState([]);
-
   const [formData, setFormData] = useState({
-    type_model: "",
-    annee_production: "",
-    couleur_exterieur: "",
-    couleur_interieur: "",
-    taille_jante: "",
-    siege: "",
-    info_moteur: "",
-    info_transmission: "",
-    type_carrosserie: "",
-    puissance: "",
-    couple: "",
-    acceleration: "",
-    vitesse_max: "",
-    consommation: "",
-    prix_base: "",
-    package_weissach: false,
-    sport_chrono: false,
-  });
-
+    type_model: "",annee_production: "",couleur_exterieur: "",couleur_interieur: "",taille_jante: "",siege: "",
+    info_moteur: "",info_transmission: "",type_carrosserie: "",puissance: "",couple: "",acceleration: "",
+    vitesse_max: "",consommation: "",prix_base: "",package_weissach: false,sport_chrono: false, });
   useEffect(() => {
     const fetchOptions = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
+      try {setLoading(true); setError("");
         const [couleursExtData, couleursIntData, jantesData, siegesData] =
           await Promise.all([
-            personnalisationService.getCouleursExterieur(),
-            personnalisationService.getCouleursInterieur(),
-            personnalisationService.getJantes(),
-            personnalisationService.getSieges(),
-          ]);
-
-        setCouleursExt(couleursExtData);
-        setCouleursInt(couleursIntData);
-        setJantes(jantesData);
-        setSieges(siegesData);
+            personnalisationService.getCouleursExterieur(), personnalisationService.getCouleursInterieur(),
+            personnalisationService.getJantes(), personnalisationService.getSieges(), ]);
+        setCouleursExt(couleursExtData);setCouleursInt(couleursIntData);
+        setJantes(jantesData); setSieges(siegesData);
       } catch (err) {
         setError(err.message || "Erreur lors du chargement des options");
       } finally {
-        setLoading(false);
-      }
+        setLoading(false);}
     };
-
     fetchOptions();
   }, []);
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value, }));};
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
-
     if (files.length === 0) return;
-
     // Limiter à 10 photos maximum
-    if (photos.length + files.length > 10) {
-      setError("Maximum 10 photos autorisées");
-      return;
-    }
-
+    if (photos.length + files.length > 10) {setError("Maximum 10 photos autorisées");
+      return;}
     // Vérifier la taille des fichiers (5MB max par fichier)
     const maxSize = 5 * 1024 * 1024;
     const invalidFiles = files.filter((f) => f.size > maxSize);
-    if (invalidFiles.length > 0) {
-      setError("Certaines photos dépassent 5MB");
-      return;
-    }
-
+    if (invalidFiles.length > 0) {setError("Certaines photos dépassent 5MB");
+      return;}
     // Ajouter les nouvelles photos
     setPhotos((prev) => [...prev, ...files]);
-
     // Créer les previews
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoPreviews((prev) => [...prev, reader.result]);
-      };
+        setPhotoPreviews((prev) => [...prev, reader.result]);};
       reader.readAsDataURL(file);
     });
-
     setError("");
   };
-
   const removePhoto = (index) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
     setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
@@ -127,12 +80,8 @@ const AjouterMaVoiture = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      setSaving(true);
-      setError("");
-      setSuccess("");
-
+      setSaving(true);setError("");setSuccess("");
       // Préparer les données
       const dataToSend = {
         type_model: formData.type_model,
@@ -148,40 +97,24 @@ const AjouterMaVoiture = () => {
         sport_chrono: formData.sport_chrono,
         specifications: {},
       };
-
       // Ajouter les spécifications si fournies
-      if (formData.puissance)
-        dataToSend.specifications.puissance = formData.puissance;
+      if (formData.puissance) dataToSend.specifications.puissance = formData.puissance;
       if (formData.couple) dataToSend.specifications.couple = formData.couple;
-      if (formData.acceleration)
-        dataToSend.specifications.acceleration = formData.acceleration;
-      if (formData.vitesse_max)
-        dataToSend.specifications.vitesse_max = formData.vitesse_max;
-      if (formData.consommation)
-        dataToSend.specifications.consommation = formData.consommation;
-      if (formData.prix_base)
-        dataToSend.prix_base_variante = parseFloat(formData.prix_base);
-
+      if (formData.acceleration) dataToSend.specifications.acceleration = formData.acceleration;
+      if (formData.vitesse_max) dataToSend.specifications.vitesse_max = formData.vitesse_max;
+      if (formData.consommation) dataToSend.specifications.consommation = formData.consommation;
+      if (formData.prix_base) dataToSend.prix_base_variante = parseFloat(formData.prix_base);
       // Si pas de spécifications, supprimer l'objet vide
-      if (Object.keys(dataToSend.specifications).length === 0) {
-        delete dataToSend.specifications;
-      }
-
+      if (Object.keys(dataToSend.specifications).length === 0) { delete dataToSend.specifications;}
       // Créer la voiture
-      const nouvelleVoiture =
-        await maVoitureService.ajouterMaVoiture(dataToSend);
-
+      const nouvelleVoiture = await maVoitureService.ajouterMaVoiture(dataToSend);
       // Upload des photos si présentes
       if (photos.length > 0) {
         const photoFormData = new FormData();
-        photos.forEach((photo) => {
-          photoFormData.append("photos", photo);
-        });
+        photos.forEach((photo) => {photoFormData.append("photos", photo);});
         photoFormData.append("model_porsche_actuel", nouvelleVoiture._id);
         photoFormData.append("alt", `${formData.type_model} photo`);
-
-        try {
-          await maVoitureService.ajouterPhoto(photoFormData);
+        try { await maVoitureService.ajouterPhoto(photoFormData);
         } catch (photoError) {
           // Ne pas bloquer la création si l'upload échoue — logger pour debug
           warn("ajouterPhoto error:", photoError);

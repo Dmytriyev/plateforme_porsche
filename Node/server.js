@@ -128,10 +128,7 @@ app.use(
 
 // Route racine (health check)
 app.get("/", (req, res) => {
-  res.json({
-    message: "API Porsche - Plateforme de vente de voitures et accessoires",
-    version: "1.0.0",
-    status: "running",
+  res.json({message: "API Porsche - Plateforme de vente de voitures et accessoires",status: "running",
   });
 });
 // Routes avec limitation d'upload

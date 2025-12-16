@@ -20,61 +20,28 @@ const createPhoto_voiture_actuel = async (req, res) => {
     const { body } = req;
     // Vérifier que le model_porsche_actuel existe et appartient à l'utilisateur
     if (body.model_porsche_actuel) {
-      const model_porsche_actuel = await Model_porsche_actuel.findById(
-        body.model_porsche_actuel
-      );
+      const model_porsche_actuel = await Model_porsche_actuel.findById(body.model_porsche_actuel);
       // Vérifier que le model_porsche_actuel existe
-      if (!model_porsche_actuel) {
-        if (req.file) {
-          removeUploadedFile(req.file.filename);
-        }
-        return res
-          .status(404)
-          .json({ message: "Model Porsche actuel n'existe pas" });
-      }
+      if (!model_porsche_actuel) {if (req.file) {removeUploadedFile(req.file.filename);}
+        return res.status(404).json({ message: "Model Porsche actuel n'existe pas" });}
       // Vérifier que l'utilisateur est le propriétaire
-      if (
-        !model_porsche_actuel.user ||
-        model_porsche_actuel.user.toString() !== req.user.id.toString()
-      ) {
-        if (req.file) {
-          removeUploadedFile(req.file.filename);
-        }
-        return res.status(403).json({
-          message:
-            "Vous n'avez pas la permission d'ajouter des photos à ce véhicule",
-        });
-      }
+      if (!model_porsche_actuel.user ||model_porsche_actuel.user.toString() !== req.user.id.toString()) {
+        if (req.file) {removeUploadedFile(req.file.filename);}
+        return res.status(403).json({message:"Vous n'avez pas la permission d'ajouter des photos à ce véhicule",});}
     }
     // Si un fichier est uploadé, ajouter le champ name
-    if (req.file) {
-      body.name = "/uploads/voiture_actuel/" + req.file.filename;
-    }
-
-    const { error } =
-      photo_voiture_actuelValidation(body).photo_voiture_actuelCreate;
-    if (error) {
-      if (req.file) {
-        removeUploadedFile(req.file.filename);
-      }
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
+    if (req.file) {body.name = "/uploads/voiture_actuel/" + req.file.filename;}
+    const { error } =photo_voiture_actuelValidation(body).photo_voiture_actuelCreate;
+    if (error) {if (req.file) {removeUploadedFile(req.file.filename);}
+      return res.status(400).json({ message: error.details[0].message });}
     // Créer et sauvegarder la nouvelle photo de voiture actuel
     const photo_voiture_actuel = new Photo_voiture_actuel(body);
     const newPhoto_voiture_actuel = await photo_voiture_actuel.save();
-    return res.status(201).json({
-      message: "Photo de voiture ajoutée avec succès",
-      photo: newPhoto_voiture_actuel,
-    });
+    return res.status(201).json({message: "Photo de voiture ajoutée avec succès",photo: newPhoto_voiture_actuel,});
   } catch (error) {
     if (req.file) {
-      try {
-        removeUploadedFile(req.file.filename);
-      } catch (cleanErr) {
-        logger.error("Failed to clean uploaded file", { err: cleanErr });
-      }
-    }
+      try {removeUploadedFile(req.file.filename);
+      } catch (cleanErr) {logger.error("Failed to clean uploaded file", { err: cleanErr });}}
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };

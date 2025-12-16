@@ -26,7 +26,6 @@ const register = async (req, res) => {
         .status(400)
         .json({ message: "Pas de données dans la requête" });
     }
-
     // Normaliser l'email tôt pour éviter les doublons liés à la casse
     if (body.email) {
       body.email = body.email.toLowerCase();
@@ -36,7 +35,6 @@ const register = async (req, res) => {
     if (!body.password) {
       return res.status(400).json({ message: "Mot de passe requis" });
     }
-
     const { error } = userValidation(body).userCreate;
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -115,27 +113,18 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     // Vérifier que des données sont fournies
     if (!req.body || Object.keys(req.body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Pas de données dans la requête" });
-    }
+      return res.status(400).json({ message: "Pas de données dans la requête" });}
     // Validation des données de connexion
     const { error } = userValidation(req.body).userLogin;
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    if (error) {return res.status(400).json({ message: error.details[0].message });}
     // Normaliser l'email pour la recherche d'utilisateur
     const emailToFind = email ? email.toLowerCase() : email;
     // Rechercher l'utilisateur par email avec le mot de passe
     const user = await User.findOne({ email: emailToFind }).select("+password");
-    if (!user) {
-      return res.status(400).json({ message: "Identifiants invalides" });
-    }
+    if (!user) {return res.status(400).json({ message: "Identifiants invalides" });}
     // Vérifier le mot de passe
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Identifiants invalides" });
-    }
+    if (!isMatch) {return res.status(400).json({ message: "Identifiants invalides" });}
     // Préparer les données utilisateur pour le token et la réponse
     const userForToken = {
       id: user._id,
@@ -148,45 +137,24 @@ const login = async (req, res) => {
     // Retourner le token JWT et les informations utilisateur
     // Création d'un access token et d'un refresh token (cookie httpOnly)
     const accessToken = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        role: user.role,
-      },
-      process.env.SECRET_KEY,
-      { expiresIn: "24h" }
+      {id: user._id,email: user.email,isAdmin: user.isAdmin,role: user.role,
+      },process.env.SECRET_KEY, { expiresIn: "24h" }
     );
-
     const refreshSecret = process.env.REFRESH_SECRET || process.env.SECRET_KEY;
     const refreshToken = jwt.sign({ id: user._id }, refreshSecret, {
       expiresIn: "7d",
     });
-
     // Envoyer le refresh token en cookie httpOnly
     try {
-      res.cookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      res.cookie("refresh_token", refreshToken, {httpOnly: true,secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
     } catch (cookieErr) {
-      logger.warn("Impossible de définir le cookie refresh_token", {
-        error: cookieErr?.message || cookieErr,
-      });
+      logger.warn("Impossible de définir le cookie refresh_token", {error: cookieErr?.message || cookieErr,});
     }
-
-    res.status(200).json({
-      message: user.email + " est connecté",
-      user: userForToken,
-      token: accessToken,
-    });
+    res.status(200).json({message: user.email + " est connecté",user: userForToken,token: accessToken,});
   } catch (error) {
-    logger.error("Erreur lors de la connexion", {
-      error: error.message,
-      email: req.body?.email,
-    });
+    logger.error("Erreur lors de la connexion", {error: error.message,email: req.body?.email,});
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
