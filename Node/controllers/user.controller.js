@@ -30,7 +30,6 @@ const register = async (req, res) => {
     if (body.email) {
       body.email = body.email.toLowerCase();
     }
-
     // Vérifier que le mot de passe est fourni
     if (!body.password) {
       return res.status(400).json({ message: "Mot de passe requis" });
@@ -97,7 +96,6 @@ const register = async (req, res) => {
     // Retourner l'utilisateur sans le mot de passe dans la réponse
     const userResponse = newUser.toObject();
     delete userResponse.password;
-
     return res.status(201).json(userResponse);
   } catch (error) {
     logger.error("Erreur lors de l'inscription de l'utilisateur", {

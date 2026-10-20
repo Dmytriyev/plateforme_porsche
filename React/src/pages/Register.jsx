@@ -22,7 +22,6 @@ const Register = () => {
     adresse: "",
     codePostal: "",
   });
-
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -39,12 +38,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-
     // Validation du formulaire avant la soumission
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
     // Préparation des données utilisateur et appel de la fonction d'enregistrement
     try {

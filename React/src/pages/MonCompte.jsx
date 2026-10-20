@@ -63,9 +63,6 @@ const SUCCESS_MESSAGES = {
 // Durée d'affichage des messages de succès (en ms)
 const SUCCESS_MESSAGE_DURATION = 3000;
 
-// ============================================================================
-// 📦 COMPOSANTS ENFANTS MÉMORISÉS
-// ============================================================================
 
 /**
  * Composant mémorisé pour la gestion des achats (admin uniquement).
@@ -380,16 +377,13 @@ const MobileToolbar = memo(({ activeSection, setActiveSection, navigate, handleL
 
 MobileToolbar.displayName = "MobileToolbar";
 
-// ============================================================================
-// 🏠 COMPOSANT PRINCIPAL
-// ============================================================================
 
 /**
  * Page MonCompte — Dashboard utilisateur avec gestion complète du compte.
  * 
- * 🔒 Sécurité : requiert authentification (redirect si pas de user).
- * 📊 Features : réservations, commandes, voitures personnelles, paramètres.
- * 👮 Admin : features additionnelles (gestion achats, ajout voitures occasion).
+ *  Sécurité : requiert authentification (redirect si pas de user).
+ *  Features : réservations, commandes, voitures personnelles, paramètres.
+ *  Admin : features additionnelles (gestion achats, ajout voitures occasion).
  */
 const MonCompte = () => {
   const navigate = useNavigate();
@@ -485,8 +479,8 @@ const MonCompte = () => {
   /**
    * Factory générique pour créer des handlers d'actions sur réservations.
    * 
-   * 🎯 DRY Principle : mutualise la logique commune (confirm, try/catch, success, refresh).
-   * 🔄 Pattern Factory : génère des handlers spécialisés depuis un template.
+   *  DRY Principle : mutualise la logique commune (confirm, try/catch, success, refresh).
+   * Pattern Factory : génère des handlers spécialisés depuis un template.
    * 
    * @param {Function} serviceMethod - Méthode du service à appeler
    * @param {string} confirmMessage - Message de confirmation
