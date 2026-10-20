@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"nom_siege":{"$numberInt":"1"}},"name":"nom_siege_1","background":true},{"v":{"$numberInt":"2"},"key":{"prix":{"$numberInt":"1"}},"name":"prix_1","background":true}],"uuid":"514ff6951fdb4234a967e06727684291","collectionName":"sieges","type":"collection"}

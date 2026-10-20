@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"taille_jante":{"$numberInt":"1"}},"name":"taille_jante_1","background":true},{"v":{"$numberInt":"2"},"key":{"prix":{"$numberInt":"1"}},"name":"prix_1","background":true}],"uuid":"b300e27da30141fb9f31a9bb20815386","collectionName":"taille_jantes","type":"collection"}

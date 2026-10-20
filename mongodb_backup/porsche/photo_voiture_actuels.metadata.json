@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"model_porsche_actuel":{"$numberInt":"1"}},"name":"model_porsche_actuel_1","background":true}],"uuid":"354643945e3e429b9c987f0fdb13f743","collectionName":"photo_voiture_actuels","type":"collection"}
